@@ -1,6 +1,10 @@
 2011-05-16  Karel Klíč  <kklic@redhat.com>
 
+	* configure.ac: Increase version to 0.14.
+
 	* btparser.spec.in (Summary, %description): Minor tweaks.
+
+	* Released as 0.13.
 
 	* NEWS: Mention recent spec file changes.
 
