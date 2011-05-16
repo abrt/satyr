@@ -1,6 +1,7 @@
 == btparser 0.13
 
 - New upstream site fedorahosted.org/btparser.
+- Improved RPM packaging spec file.
 
 == btparser 0.12
 Released 2011-05-02.

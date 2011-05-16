@@ -1,5 +1,7 @@
 2011-05-16  Karel Klíč  <kklic@redhat.com>
 
+	* NEWS: Mention recent spec file changes.
+
 	* btparser.spec.in (Source0): Include full URL.
 	(%post, %postun): Added new sections to call ldconfig, because the
 	main package installs a shared library.
