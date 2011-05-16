@@ -184,10 +184,12 @@ btp_file_to_string(const char *filename)
     }
 
     off_t size = lseek(fd, 0, SEEK_END);
-    if (size < 0) /* EOVERFLOW? */
+    if (size == (off_t)-1) /* EOVERFLOW? */
     {
         fprintf(stderr, "Unable to seek in '%s': %s.\n",
                 filename, strerror(errno));
+	close(fd);
+	return NULL;
     }
 
     lseek(fd, 0, SEEK_SET); /* No reason to fail. */
