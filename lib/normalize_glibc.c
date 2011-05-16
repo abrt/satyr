@@ -78,6 +78,8 @@ btp_normalize_glibc_thread(struct btp_thread *thread)
             btp_frame_calls_func_in_file3(frame, "__" func "_sse42", func, "/sysdeps/", "libc.so") || \
             btp_frame_calls_func_in_file3(frame, "__" func "_ia32", func, "/sysdeps", "libc.so")) \
         {                                                               \
+            /* We know for sure that 'func' is shorter than		\
+               'function_name', no need to use strncpy here. */		\
             strcpy(frame->function_name, func);                         \
         }
 

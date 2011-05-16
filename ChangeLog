@@ -1,5 +1,8 @@
 2011-05-16  Karel Klíč  <kklic@redhat.com>
 
+	* lib/normalize_glibc.c (NORMALIZE_ARCH_SPECIFIC): Added
+	an explanatory comment about strcpy safety.
+
 	* lib/utils.c (btp_file_to_string): Properly handle failed seek to
 	the end of a file.
 
