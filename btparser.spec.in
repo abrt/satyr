@@ -50,14 +50,12 @@ find %{buildroot} -regex ".*\.la$" | xargs rm -f --
 make check
 
 %files
-%defattr(-,root,root,-)
 %doc README NEWS COPYING TODO ChangeLog
 %{_bindir}/%{name}
 %{_mandir}/man1/%{name}.1.gz
 %{_libdir}/lib*.so.*
 
 %files devel
-%defattr(-,root,root,-)
 %{_includedir}/*
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*

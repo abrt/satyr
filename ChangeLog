@@ -2,6 +2,8 @@
 
 	* btparser.spec.in (%package devel): Use arch-specific dependency on the
 	base package in the devel subpackage.
+	(%files): The defattr directive is not necessary for RPM 4.4 and
+	later.
 
 	* lib/normalize_glibc.c (NORMALIZE_ARCH_SPECIFIC): Added
 	an explanatory comment about strcpy safety.
