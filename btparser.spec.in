@@ -49,6 +49,9 @@ find %{buildroot} -regex ".*\.la$" | xargs rm -f --
 %check
 make check
 
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+
 %files
 %doc README NEWS COPYING TODO ChangeLog
 %{_bindir}/%{name}
