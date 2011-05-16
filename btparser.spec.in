@@ -28,7 +28,7 @@ routines:
 %package devel
 Summary: Development libraries for %{name}
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Development libraries and headers for %{name}.
@@ -41,10 +41,10 @@ Development libraries and headers for %{name}.
 make %{?_smp_mflags}
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+make install DESTDIR=%{buildroot}
 
 # Remove all libtool archives (*.la) from modules directory.
-find $RPM_BUILD_ROOT -regex ".*\.la$" | xargs rm -f --
+find %{buildroot} -regex ".*\.la$" | xargs rm -f --
 
 %check
 make check

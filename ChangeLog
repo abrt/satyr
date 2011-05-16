@@ -1,5 +1,8 @@
 2011-05-16  Karel Klíč  <kklic@redhat.com>
 
+	* btparser.spec.in (%package devel): Use arch-specific dependency on the
+	base package in the devel subpackage.
+
 	* lib/normalize_glibc.c (NORMALIZE_ARCH_SPECIFIC): Added
 	an explanatory comment about strcpy safety.
 
