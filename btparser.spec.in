@@ -5,7 +5,7 @@ Summary: Backtrace parser and analyzer for backtraces produced by GDB
 Group: Development/Libraries
 License: GPLv2+
 URL: http://fedorahosted.org/btparser
-Source0: btparser-%{version}.tar.xz
+Source0: https://fedorahosted.org/released/btparser/btparser-%{version}.tar.xz
 
 %description
 btparser is a backtrace parser and analyzer, which works with

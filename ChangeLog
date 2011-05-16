@@ -1,5 +1,7 @@
 2011-05-16  Karel Klíč  <kklic@redhat.com>
 
+	* btparser.spec.in (Source0): Include full URL.
+
 	* tests/Makefile.am (EXTRA_DIST): Distribute the final testsuite
 	script to avoid the Autoconf dependency for building.
 
