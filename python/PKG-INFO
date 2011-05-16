@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: python-btparser
+Version: 0.1
+Summary: python-btparser -- btparser library module for Python
+Home-page: http://klic.name/computer/btparser
+Author: Karel Klic
+Author-email: kklic at redhat.com
+License: GPL3+
+Description: 
+        This module provides Python bindings for the btparser library.
+Platform: All

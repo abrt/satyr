@@ -1,0 +1,61 @@
+Releasing a new version of btparser
+-----------------------------------
+
+1. Check that all changes from all work computers are commited.  Then
+check, that the local clone of the program is up-to-date:
+$ git status
+$ git pull
+
+
+2. Check that the version number has been increased after the last
+release. If it was not, increase it on the first line of configure.ac,
+and document this change in the ChangeLog:
+* configure.ac: Increase version to 0.8.
+
+
+3. Check all the changes in the ChangeLog since the last release, and
+if any change modifies the btparser library interface, increase the
+CURRENT number in lib/Makefile.am:
+libbtparser_la_LDFLAGS = -version-info 2:1:0
+                                       ^
+Document this change in the ChangeLog:
+* lib/Makefile.am (libbtparser_la_LDFLAGS): Increase CURRENT
+library version number, as the library interface changed since the
+last release.
+
+
+4. Update NEWS file to include user-visible, important informations
+about the new release. Provide the date of the release (Released
+YYYY-MM-DD. Document this change in the ChangeLog:
+* NEWS: Document recent changes.
+
+
+5. Read and update the README file, if you see that some change made
+since the last release expanded the project scope, or added
+significant new functionality. Document this change in the ChangeLog.
+
+
+6. Read and update the man page, to be sure that it's synchronized
+with the code. Document changes in the ChangeLog.
+
+
+7. Run ./autogen.sh and the ./configure to update all generated files.
+
+
+8. Run `make dist` to create btparser-x.y.tar.gz. Check that its
+contents is ok, and every file is in place.
+
+
+9. Commit all the new changes. Tag the new release using `git tag x.y`
+(x.y = the new version number). Push the changes to the git server
+using `git push && git push --tags`.
+
+
+10. Run `make upload` to create tar.gz, zip, and tar.xz files, and
+upload them to the FTP server.
+
+11. Increase the version in configure.ac, run `./autogen.sh`,
+`./configure`, `make`, and `make check`, document the change in the
+ChangeLog: * configure.ac: Increase version to x.y.
+
+And then commit and push the changes.

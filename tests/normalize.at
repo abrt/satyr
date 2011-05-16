@@ -1,0 +1,52 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([Normalization])
+
+## ------------------------------------ ##
+## btp_normalize_thread_removes_zeroes  ##
+## ------------------------------------ ##
+# Checks that btp_normalize_thread removes the first and the last
+# frame if they have address 0x0000 and function ??.
+AT_TESTFUN([btp_normalize_thread_removes_zeroes],
+[[
+#include <lib/normalize.h>
+#include <lib/frame.h>
+#include <lib/thread.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+
+int main(void)
+{
+  struct btp_frame *frame2 = btp_frame_new();
+  frame2->function_name = btp_strdup("??");
+  frame2->number = 2;
+  frame2->address = 0x0000;
+
+  struct btp_frame *frame1 = btp_frame_new();
+  frame1->function_name = btp_strdup("write_to_temp_file");
+  frame1->number = 1;
+  frame1->source_file = btp_strdup("gfileutils.c");
+  frame1->source_line = 980;
+  frame1->address = 0x322160e7fdULL;
+  frame1->next = frame2;
+
+  struct btp_frame *frame0 = btp_frame_new();
+  frame0->function_name = btp_strdup("??");
+  frame0->number = 0;
+  frame0->address = 0x0000;
+  frame0->next = frame1;
+
+  struct btp_thread thread;
+  btp_thread_init(&thread);
+  thread.number = 0;
+  thread.frames = frame0;
+
+  btp_normalize_thread(&thread);
+  assert(thread.frames == frame1);
+  assert(thread.frames->next == NULL);
+
+  btp_frame_free(frame1);
+  return 0;
+}
+]])
