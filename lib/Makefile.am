@@ -12,6 +12,7 @@ libbtparser_la_SOURCES = \
 	backtrace.h backtrace.c \
 	frame.h frame.c \
 	location.h location.c \
+	metrics.h metrics.c \
 	normalize.h normalize.c \
 	normalize_dbus.c \
 	normalize_gdk.c \

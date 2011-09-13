@@ -1,0 +1,247 @@
+AT_BANNER([Metrics])
+
+m4_define([CREATE_THREAD],
+[#include <stdarg.h>
+#include <lib/thread.h>
+#include <lib/frame.h>
+#include <lib/utils.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <lib/metrics.h>
+#include <lib/normalize.h>
+
+struct btp_thread *create_thread(int count, ...)
+{
+  struct btp_thread *thread = btp_thread_new();
+  if (count == 0)
+     return thread;
+  int i;
+  va_list argp;
+  va_start(argp, count);
+
+  for (i=0; i < count; i++)
+  {
+    const char *fname = va_arg(argp, const char*);
+    struct btp_frame *frame = btp_frame_new();
+    frame->function_name = btp_strdup(fname);
+
+    if (thread->frames == NULL)thread->frames = frame;
+    else btp_frame_add_sibling(thread->frames, frame);
+  }
+
+  va_end(argp);
+  return thread;
+}
+])
+
+AT_TESTFUN([metrics_all_one_thread_empty],
+[
+CREATE_THREAD
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(0);
+
+  struct btp_thread *thread2 = create_thread(3, "??", "ds", "main");
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(-1 == thread_jarowinkler_distance(thread1, thread2));
+  assert(-1 == thread_jaccard_index(thread1, thread2));
+  assert(-1 == thread_levenshtein_distance(thread1, thread2, false));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_all_both_threads_empty],
+[
+CREATE_THREAD
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(0);
+
+  struct btp_thread *thread2 = create_thread(0);
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(-1 == thread_jarowinkler_distance(thread1, thread2));
+  assert(-1 == thread_jaccard_index(thread1, thread2));
+  assert(-1 == thread_levenshtein_distance(thread1, thread2, false));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_all_both_starting_??_levendistance3_a],
+[
+CREATE_THREAD
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(2, "??", "sd");
+
+  struct btp_thread *thread2 = create_thread(3, "??", "ds", "main");
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(0 == thread_jarowinkler_distance(thread1, thread2));
+  assert(0 == thread_jaccard_index(thread1, thread2));
+  assert(3 == thread_levenshtein_distance(thread1, thread2, false));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_all_both_starting_??_levendistance3_b],
+[
+CREATE_THREAD
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(1, "??");
+
+  struct btp_thread *thread2 = create_thread(3, "??", "ds", "main");
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(0 == thread_jarowinkler_distance(thread1, thread2));
+  assert(0 == thread_jaccard_index(thread1, thread2));
+  assert(3 == thread_levenshtein_distance(thread1, thread2, false));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_levenshtein_random_??_levendistance0_a],
+[
+CREATE_THREAD
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(3, "??", "ds", "main");
+
+  struct btp_thread *thread2 = create_thread(3, "??", "ds", "main");
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(0 == thread_levenshtein_distance(thread1, thread2, false));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_levenshtein_random_??_levendistance0_b],
+[
+CREATE_THREAD
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(4, "dg", "??", "ds", "main");
+
+  struct btp_thread *thread2 = create_thread(4, "dg", "??", "ds", "main");
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(0 == thread_levenshtein_distance(thread1, thread2, false));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_levenshtein_random_??_distance1],
+[
+CREATE_THREAD
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(3, "dg", "??", "ds");
+
+  struct btp_thread *thread2 = create_thread(4, "dg", "??", "ds", "main");
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(1 == thread_levenshtein_distance(thread1, thread2, false));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_levenshtein_random_??_distance2_a],
+[
+CREATE_THREAD
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(2, "dg", "??");
+
+  struct btp_thread *thread2 = create_thread(3, "dg", "??", "main");
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(2 == thread_levenshtein_distance(thread1, thread2, false));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_levenshtein_random_??_distance2_b],
+[
+CREATE_THREAD
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(3, "dg", "??", "??");
+
+  struct btp_thread *thread2 = create_thread(4, "dg", "??", "??", "main");
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(2 == thread_levenshtein_distance(thread1, thread2, false));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_levenshtein_random_??_distance2_c],
+[
+CREATE_THREAD
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(3, "??", "??", "main");
+
+  struct btp_thread *thread2 = create_thread(2, "??", "??");
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(2 == thread_levenshtein_distance(thread1, thread2, false));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_levenshtein_trans_??_distance2_a],
+[
+CREATE_THREAD
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(5, "ale", "asd", "??", "agd", "dsa");
+
+  struct btp_thread *thread2 = create_thread(5, "ale", "huga", "asd", "??", "agd");
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(2 == thread_levenshtein_distance(thread1, thread2, true));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_levenshtein_trans_??_distance2_b],
+[
+CREATE_THREAD
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(4, "asd", "??", "agd", "dsa");
+
+  struct btp_thread *thread2 = create_thread(4, "asd", "agd", "??", "dsa");
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(2 == thread_levenshtein_distance(thread1, thread2, true));
+  return 0;
+}
+])

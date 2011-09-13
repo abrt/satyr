@@ -23,6 +23,7 @@
 #include "lib/utils.h"
 #include "lib/location.h"
 #include "lib/strbuf.h"
+#include "lib/metrics.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -45,6 +46,7 @@ static struct argp_option options[] = {
     {"duplication-hash", 'h', 0, 0, "Prints normalized string useful for hash calculation"},
     {"debug"           , 'd', 0, 0, "Prints parser debug information"},
     {"verbose"         , 'v', 0, 0, "Prints human-friendly superfluous output."},
+    {"comparison-optimized", 'o', 0, 0, "Prints backtrace optimized for comparison."},
     { 0 }
 };
 
@@ -53,7 +55,8 @@ enum what_to_output
     BACKTRACE,
     RATE,
     CRASH_FUNCTION,
-    DUPLICATION_HASH
+    DUPLICATION_HASH,
+    OPTIMIZED_BACKTRACE
 };
 
 struct arguments
@@ -66,7 +69,7 @@ struct arguments
 };
 
 static error_t
-parse_opt (int key, char *arg, struct argp_state *state)
+parse_opt(int key, char *arg, struct argp_state *state)
 {
     /* Get the input argument from argp_parse, which we
        know is a pointer to our arguments structure. */
@@ -80,6 +83,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 'd': arguments->debug = true; break;
     case 'v': arguments->verbose = true; break;
     case 'i': arguments->stdin = true; break;
+    case 'o': arguments->output = OPTIMIZED_BACKTRACE; break;
     case ARGP_KEY_ARG:
         if (arguments->filename || arguments->stdin)
         {
@@ -195,6 +199,20 @@ int main(int argc, char **argv)
         char *hash = btp_backtrace_get_duplication_hash(backtrace);
         puts(hash);
         free(hash);
+        break;
+    }
+    case OPTIMIZED_BACKTRACE:
+    {
+        struct btp_thread *crash_thread = btp_backtrace_find_crash_thread(backtrace);
+        btp_backtrace_remove_threads_except_one(backtrace, crash_thread);
+
+        printf("Thread no. %d", crash_thread->number);
+        struct btp_frame *frame = crash_thread->frames;
+        while (frame)
+        {
+            printf("\n%s", frame->function_name);
+            frame = frame->next;
+        }
         break;
     }
     default:

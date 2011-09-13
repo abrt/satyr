@@ -72,6 +72,20 @@ btp_vasprintf(const char *format, va_list p)
 }
 
 char *
+btp_asprintf(const char *format, ...)
+{
+    va_list p;
+    char *string_ptr;
+
+    va_start(p, format);
+    string_ptr = btp_vasprintf(format, p);
+    va_end(p);
+
+    return string_ptr;
+}
+
+
+char *
 btp_strdup(const char *s)
 {
     return btp_strndup(s, strlen(s));

@@ -21,6 +21,7 @@
 #include "frame.h"
 #include "thread.h"
 #include "backtrace.h"
+#include "utils.h"
 #include <string.h>
 
 void
@@ -74,6 +75,23 @@ btp_normalize_thread(struct btp_thread *thread)
     {
         btp_thread_remove_frame(thread, last);
     }
+
+    /* Merge recursively called functions into single frame */
+    struct btp_frame *curr_frame = thread->frames;
+    struct btp_frame *prev_frame = NULL;
+    while(curr_frame)
+    {
+        if(prev_frame && 0 != btp_strcmp0(prev_frame->function_name, "??") &&
+           0 == btp_strcmp0(prev_frame->function_name, curr_frame->function_name))
+        {
+            prev_frame->next = curr_frame->next;
+            btp_frame_free(curr_frame);
+            curr_frame = prev_frame->next;
+            continue;
+        }
+        prev_frame = curr_frame;
+        curr_frame = curr_frame->next;
+    }
 }
 
 void
@@ -84,5 +102,70 @@ btp_normalize_backtrace(struct btp_backtrace *backtrace)
     {
         btp_normalize_thread(thread);
         thread = thread->next;
+    }
+}
+
+static bool
+next_functions_similar(struct btp_frame *frame1, struct btp_frame *frame2)
+{
+    if ((!frame1->next && frame2->next) ||
+        (frame1->next && !frame2->next) ||
+        (frame1->next && frame2->next &&
+         0 != btp_strcmp0(frame1->next->function_name,
+                         frame2->next->function_name)))
+        return false;
+    return true;
+}
+
+void
+btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct btp_thread *thread2)
+
+{
+    if (!thread1->frames || !thread2->frames)
+    {
+        return;
+    }
+
+    int i = 0;
+    struct btp_frame *curr_frame1 = thread1->frames;
+    struct btp_frame *curr_frame2 = thread2->frames;
+
+    if (0 == btp_strcmp0(curr_frame1->function_name, "??") &&
+        0 == btp_strcmp0(curr_frame2->function_name, "??") &&
+        next_functions_similar(curr_frame1, curr_frame2))
+    {
+        curr_frame1->function_name = btp_asprintf("__unknown_function_%d", i);
+        curr_frame2->function_name = btp_asprintf("__unknown_function_%d", i);
+        i++;
+    }
+
+    struct btp_frame *prev_frame1 = curr_frame1;
+    struct btp_frame *prev_frame2 = curr_frame2;
+    curr_frame1 = curr_frame1->next;
+    curr_frame2 = curr_frame2->next;
+
+    while (curr_frame1)
+    {
+        if (0 == btp_strcmp0(curr_frame1->function_name, "??"))
+        {
+            while (curr_frame2)
+            {
+                if (0 == btp_strcmp0(curr_frame2->function_name, "??") &&
+                    next_functions_similar(curr_frame1, curr_frame2) &&
+                    0 == btp_strcmp0(prev_frame1->function_name,
+                                     prev_frame2->function_name))
+                {
+                    curr_frame1->function_name = btp_asprintf("__unknown_function_%d", i);
+                    curr_frame2->function_name = btp_asprintf("__unknown_function_%d", i);
+                    i++;
+                }
+                prev_frame2 = curr_frame2;
+                curr_frame2 = curr_frame2->next;
+            }
+        }
+        prev_frame1 = curr_frame1;
+        curr_frame1 = curr_frame1->next;
+        prev_frame2 = thread2->frames;
+        curr_frame2 = prev_frame2->next;
     }
 }

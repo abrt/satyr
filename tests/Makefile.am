@@ -33,8 +33,9 @@ TESTSUITE_AT =	\
   strbuf.at	\
   frame.at 	\
   thread.at 	\
-  backtrace.at 	\
-  normalize.at
+  backtrace.at  \
+  normalize.at  \
+  metrics.at
 
 EXTRA_DIST += $(TESTSUITE_AT)
 TESTSUITE = $(srcdir)/testsuite

@@ -59,6 +59,12 @@ btp_vasprintf(const char *format, va_list p);
  * Never returns NULL.
  */
 char *
+btp_asprintf(const char *format, ...);
+
+/**
+ * Never returns NULL.
+ */
+char *
 btp_strdup(const char *s);
 
 /**

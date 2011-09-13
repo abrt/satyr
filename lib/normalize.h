@@ -67,6 +67,15 @@ btp_normalize_linux_thread(struct btp_thread *thread);
 void
 btp_normalize_xorg_thread(struct btp_thread *thread);
 
+/**
+ * Renames unknown function names ("??") that are between the same function names
+ * to be treated as similar in later comparison.
+ * Leaves unpair unknown functions unchanged
+ */
+
+void
+btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct btp_thread *thread2);
+
 #ifdef __cplusplus
 }
 #endif
