@@ -35,8 +35,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = btparser$(EXEEXT) doubleparser$(EXEEXT) \
-	leveltest$(EXEEXT)
+bin_PROGRAMS = btparser$(EXEEXT) doubleparser$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/btparser.pc.in \
@@ -70,12 +69,6 @@ doubleparser_DEPENDENCIES = lib/libbtparser.la
 doubleparser_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(doubleparser_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-am_leveltest_OBJECTS = leveltest-leveltest.$(OBJEXT)
-leveltest_OBJECTS = $(am_leveltest_OBJECTS)
-leveltest_DEPENDENCIES = lib/libbtparser.la
-leveltest_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(leveltest_CFLAGS) \
-	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -89,10 +82,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(btparser_SOURCES) $(doubleparser_SOURCES) \
-	$(leveltest_SOURCES)
-DIST_SOURCES = $(btparser_SOURCES) $(doubleparser_SOURCES) \
-	$(leveltest_SOURCES)
+SOURCES = $(btparser_SOURCES) $(doubleparser_SOURCES)
+DIST_SOURCES = $(btparser_SOURCES) $(doubleparser_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -185,7 +176,6 @@ CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
-DLLTOOL = @DLLTOOL@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -210,7 +200,6 @@ LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
-MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
 NM = @NM@
 NMEDIT = @NMEDIT@
@@ -237,7 +226,6 @@ abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__include = @am__include@
@@ -293,9 +281,6 @@ btparser_LDADD = lib/libbtparser.la
 doubleparser_CFLAGS = -Wall -Werror
 doubleparser_SOURCES = doubleparser.c
 doubleparser_LDADD = lib/libbtparser.la
-leveltest_CFLAGS = -Wall -Werror
-leveltest_SOURCES = leveltest.c
-leveltest_LDADD = lib/libbtparser.la
 man_MANS = btparser.1
 EXTRA_DIST = $(man_MANS) btparser.pc.in autogen.sh RELEASE \
 	btparser.spec.in
@@ -400,9 +385,6 @@ btparser$(EXEEXT): $(btparser_OBJECTS) $(btparser_DEPENDENCIES)
 doubleparser$(EXEEXT): $(doubleparser_OBJECTS) $(doubleparser_DEPENDENCIES) 
 	@rm -f doubleparser$(EXEEXT)
 	$(doubleparser_LINK) $(doubleparser_OBJECTS) $(doubleparser_LDADD) $(LIBS)
-leveltest$(EXEEXT): $(leveltest_OBJECTS) $(leveltest_DEPENDENCIES) 
-	@rm -f leveltest$(EXEEXT)
-	$(leveltest_LINK) $(leveltest_OBJECTS) $(leveltest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -412,7 +394,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/btparser-btparser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/doubleparser-doubleparser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/leveltest-leveltest.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -462,20 +443,6 @@ doubleparser-doubleparser.obj: doubleparser.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='doubleparser.c' object='doubleparser-doubleparser.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(doubleparser_CFLAGS) $(CFLAGS) -c -o doubleparser-doubleparser.obj `if test -f 'doubleparser.c'; then $(CYGPATH_W) 'doubleparser.c'; else $(CYGPATH_W) '$(srcdir)/doubleparser.c'; fi`
-
-leveltest-leveltest.o: leveltest.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(leveltest_CFLAGS) $(CFLAGS) -MT leveltest-leveltest.o -MD -MP -MF $(DEPDIR)/leveltest-leveltest.Tpo -c -o leveltest-leveltest.o `test -f 'leveltest.c' || echo '$(srcdir)/'`leveltest.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/leveltest-leveltest.Tpo $(DEPDIR)/leveltest-leveltest.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='leveltest.c' object='leveltest-leveltest.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(leveltest_CFLAGS) $(CFLAGS) -c -o leveltest-leveltest.o `test -f 'leveltest.c' || echo '$(srcdir)/'`leveltest.c
-
-leveltest-leveltest.obj: leveltest.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(leveltest_CFLAGS) $(CFLAGS) -MT leveltest-leveltest.obj -MD -MP -MF $(DEPDIR)/leveltest-leveltest.Tpo -c -o leveltest-leveltest.obj `if test -f 'leveltest.c'; then $(CYGPATH_W) 'leveltest.c'; else $(CYGPATH_W) '$(srcdir)/leveltest.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/leveltest-leveltest.Tpo $(DEPDIR)/leveltest-leveltest.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='leveltest.c' object='leveltest-leveltest.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(leveltest_CFLAGS) $(CFLAGS) -c -o leveltest-leveltest.obj `if test -f 'leveltest.c'; then $(CYGPATH_W) 'leveltest.c'; else $(CYGPATH_W) '$(srcdir)/leveltest.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

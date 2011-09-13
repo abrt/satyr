@@ -2,16 +2,13 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = lib tests
 
-bin_PROGRAMS = btparser doubleparser leveltest
+bin_PROGRAMS = btparser doubleparser
 btparser_CFLAGS = -Wall -Werror
 btparser_SOURCES = btparser.c
 btparser_LDADD = lib/libbtparser.la
 doubleparser_CFLAGS = -Wall -Werror
 doubleparser_SOURCES = doubleparser.c
 doubleparser_LDADD = lib/libbtparser.la
-leveltest_CFLAGS = -Wall -Werror
-leveltest_SOURCES = leveltest.c
-leveltest_LDADD = lib/libbtparser.la
 
 man_MANS = btparser.1
 EXTRA_DIST = $(man_MANS)
