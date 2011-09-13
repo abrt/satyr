@@ -1,3 +1,13 @@
+== btparser 0.14
+
+- Jan Šmejda implemented backtrace metrics allowing to compute
+  "distance" or "similarity" between two backtraces. See functions
+  thread_jarowinkler_distance, thread_jaccard_index,
+  thread_levenshtein_distance.
+- Jan Šmejda implemented naming of unknown functions in the same
+  context between two threads, see new function
+  btp_normalize_paired_unknown_function_names.
+
 == btparser 0.13
 Released 2011-05-16.
 
