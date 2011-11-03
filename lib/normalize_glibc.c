@@ -39,7 +39,6 @@ btp_glibc_thread_find_exit_frame(struct btp_thread *thread)
             btp_frame_calls_func_in_file3(frame, "abort", "abort.c", "libc.so", "libc-") ||
             /* Terminates a function in case of buffer overflow. */
             btp_frame_calls_func_in_file2(frame, "__chk_fail", "chk_fail.c", "libc.so") || btp_frame_calls_func_in_file(frame, "kill", "syscall-template.S");
-        
 
         if (is_exit_frame)
             result = frame;
