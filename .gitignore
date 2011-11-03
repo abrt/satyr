@@ -9,6 +9,7 @@ btparser.spec
 *.o
 config.log
 config.status
+doubleparser
 lib/.deps
 lib/.libs
 lib/*.l[ao]
