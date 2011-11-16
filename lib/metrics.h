@@ -70,6 +70,20 @@ thread_jaccard_index(struct btp_thread *thread1, struct btp_thread *thread2);
 int
 thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition);
 
+typedef int (*frame_cmp_type)(struct btp_frame*, struct btp_frame*);
+
+/* Following three functions are equivalent to the three above except
+ * that they take frame comparison function as an argument argument
+ */
+float
+thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
+        frame_cmp_type compare_func);
+float
+thread_jaccard_index_custom(struct btp_thread *thread1, struct btp_thread *thread2,
+        frame_cmp_type compare_func);
+int
+thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition,
+        frame_cmp_type compare_func);
 
 #ifdef __cplusplus
 }
