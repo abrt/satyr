@@ -43,6 +43,8 @@ btp_frame_init(struct btp_frame *frame)
     frame->source_line = -1;
     frame->signal_handler_called = false;
     frame->address = -1;
+    frame->user_data = NULL;
+    frame->user_data_destructor = NULL;
     frame->next = NULL;
 }
 
@@ -54,6 +56,8 @@ btp_frame_free(struct btp_frame *frame)
     free(frame->function_name);
     free(frame->function_type);
     free(frame->source_file);
+    if (frame->user_data_destructor)
+        frame->user_data_destructor(frame->user_data);
     free(frame);
 }
 

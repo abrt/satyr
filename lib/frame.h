@@ -72,6 +72,17 @@ struct btp_frame
      */
     uint64_t address;
     /**
+     * Pointer to data that can be used to store further information
+     * about the frame. It is ignored by most of the btp_frame_* except
+     * btp_frame_free.
+     */
+    void *user_data;
+    /**
+     * Pointer to function used to free user_data when freeing the frame.
+     * No function is called if it is set to NULL.
+     */
+    void (*user_data_destructor)(void*);
+    /**
      * A sibling frame residing below this one, or NULL if this is the
      * last frame in the parent thread.
      */
