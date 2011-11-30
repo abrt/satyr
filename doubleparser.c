@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     fseek(file1, 0, SEEK_END);
     file_size = ftell(file1);
     rewind(file1);
-    char *text1 = (char*) malloc (sizeof(char)*file_size);
+    char *text1 = (char*) malloc (sizeof(char)*(file_size + 1));
     if (!text1)
     {
         fprintf(stderr, "Unable to allocate memory\n");
@@ -97,12 +97,13 @@ int main(int argc, char **argv)
         exit(1);
     }
     fclose(file1);
+    text1[file_size] = '\0';
 
   // getting contents of the second file
     fseek(file2, 0, SEEK_END);
     file_size = ftell(file2);
     rewind(file2);
-    char *text2 = (char*) malloc (sizeof(char)*file_size);
+    char *text2 = (char*) malloc (sizeof(char)*(file_size + 1));
     if (!text2)
     {
         fprintf(stderr, "Unable to allocate memory\n");
@@ -115,6 +116,7 @@ int main(int argc, char **argv)
         exit(1);
     }
     fclose(file2);
+    text2[file_size] = '\0';
 
     struct btp_backtrace *backtrace;
     struct btp_backtrace *backtrace2;
