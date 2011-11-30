@@ -26,7 +26,7 @@
 #include <limits.h>
 
 int
-frame_compare(struct btp_frame *frame1, struct btp_frame *frame2)
+btp_frame_compare(struct btp_frame *frame1, struct btp_frame *frame2)
 {
     if (btp_strcmp0(frame1->function_name, "??") == 0 &&
        btp_strcmp0(frame2->function_name, "??") == 0)
@@ -38,8 +38,8 @@ frame_compare(struct btp_frame *frame1, struct btp_frame *frame2)
 
 
 float
-thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
-        frame_cmp_type compare_func)
+btp_thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
+        btp_frame_cmp_type compare_func)
 {
     int frame1_count = btp_thread_get_frame_count(thread1);
     int frame2_count = btp_thread_get_frame_count(thread2);
@@ -101,8 +101,8 @@ thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_thread
 
 
 float
-thread_jaccard_index_custom(struct btp_thread *thread1, struct btp_thread *thread2,
-        frame_cmp_type compare_func)
+btp_thread_jaccard_index_custom(struct btp_thread *thread1, struct btp_thread *thread2,
+        btp_frame_cmp_type compare_func)
 {
     int frame1_count = btp_thread_get_frame_count(thread1);
     int frame2_count = btp_thread_get_frame_count(thread2);
@@ -140,8 +140,8 @@ thread_jaccard_index_custom(struct btp_thread *thread1, struct btp_thread *threa
 
 
 int
-thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
-        bool transposition, frame_cmp_type compare_func)
+btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
+        bool transposition, btp_frame_cmp_type compare_func)
 {
     int frame1_count = btp_thread_get_frame_count(thread1);
     int frame2_count = btp_thread_get_frame_count(thread2);
@@ -221,19 +221,19 @@ thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_thread
 }
 
 float
-thread_jarowinkler_distance(struct btp_thread *thread1, struct btp_thread *thread2)
+btp_thread_jarowinkler_distance(struct btp_thread *thread1, struct btp_thread *thread2)
 {
-    return thread_jarowinkler_distance_custom(thread1, thread2, frame_compare);
+    return btp_thread_jarowinkler_distance_custom(thread1, thread2, btp_frame_compare);
 }
 
 float
-thread_jaccard_index(struct btp_thread *thread1, struct btp_thread *thread2)
+btp_thread_jaccard_index(struct btp_thread *thread1, struct btp_thread *thread2)
 {
-    return thread_jaccard_index_custom(thread1, thread2, frame_compare);
+    return btp_thread_jaccard_index_custom(thread1, thread2, btp_frame_compare);
 }
 
 int
-thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition)
+btp_thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition)
 {
-    return thread_levenshtein_distance_custom(thread1, thread2, transposition, frame_compare);
+    return btp_thread_levenshtein_distance_custom(thread1, thread2, transposition, btp_frame_compare);
 }

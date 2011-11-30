@@ -28,7 +28,7 @@ extern "C" {
 
 /* Compares two frames taking unknown functions ("??") as different ones.*/
 int
-frame_compare(struct btp_frame *frame1, struct btp_frame *frame2);
+btp_frame_compare(struct btp_frame *frame1, struct btp_frame *frame2);
 
 
 /* Jaro-Winkler distance:
@@ -41,7 +41,7 @@ frame_compare(struct btp_frame *frame1, struct btp_frame *frame2);
  */
 
 float
-thread_jarowinkler_distance(struct btp_thread *thread1, struct btp_thread *thread2);
+btp_thread_jarowinkler_distance(struct btp_thread *thread1, struct btp_thread *thread2);
 
 
 /* Jaccard index:
@@ -53,7 +53,7 @@ thread_jarowinkler_distance(struct btp_thread *thread1, struct btp_thread *threa
  */
 
 float
-thread_jaccard_index(struct btp_thread *thread1, struct btp_thread *thread2);
+btp_thread_jaccard_index(struct btp_thread *thread1, struct btp_thread *thread2);
 
 
 /* Levenshtein distance:
@@ -68,22 +68,22 @@ thread_jaccard_index(struct btp_thread *thread1, struct btp_thread *thread2);
  */
 
 int
-thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition);
+btp_thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition);
 
-typedef int (*frame_cmp_type)(struct btp_frame*, struct btp_frame*);
+typedef int (*btp_frame_cmp_type)(struct btp_frame*, struct btp_frame*);
 
 /* Following three functions are equivalent to the three above except
  * that they take frame comparison function as an argument argument
  */
 float
-thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
-        frame_cmp_type compare_func);
+btp_thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
+        btp_frame_cmp_type compare_func);
 float
-thread_jaccard_index_custom(struct btp_thread *thread1, struct btp_thread *thread2,
-        frame_cmp_type compare_func);
+btp_thread_jaccard_index_custom(struct btp_thread *thread1, struct btp_thread *thread2,
+        btp_frame_cmp_type compare_func);
 int
-thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition,
-        frame_cmp_type compare_func);
+btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition,
+        btp_frame_cmp_type compare_func);
 
 #ifdef __cplusplus
 }
