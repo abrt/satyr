@@ -98,35 +98,48 @@ btp_thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_th
     return dist;
 }
 
-
+static bool
+frames_contain(struct btp_frame *frames, struct btp_frame *frame,
+        btp_frame_cmp_type compare_func)
+{
+    while (frames)
+    {
+        // checking if functions are the same but not both "??"
+        if (!compare_func(frames, frame))
+            return true;
+        frames = frames->next;
+    }
+    return false;
+}
 
 float
 btp_thread_jaccard_index_custom(struct btp_thread *thread1, struct btp_thread *thread2,
         btp_frame_cmp_type compare_func)
 {
-    int frame1_count = btp_thread_get_frame_count(thread1);
-    int frame2_count = btp_thread_get_frame_count(thread2);
-
-    int i,j, union_size, intersection_size = 0;
+    int union_size, intersection_size = 0, set1_size = 0, set2_size = 0;
     float j_index;
+    struct btp_frame *curr_frame;
 
-    struct btp_frame *curr_frame = thread1->frames;
-
-    for (i = 1; curr_frame; i++)
+    for (curr_frame = thread1->frames; curr_frame; curr_frame = curr_frame->next)
     {
-        struct btp_frame *curr_frame2 = thread2->frames;
-        for (j = 1; curr_frame2; j++)
-        {
-            // checking if functions are the same but not both "??"
+        if (frames_contain(curr_frame->next, curr_frame, compare_func))
+            continue; // not last, skip
+        set1_size++;
 
-            if (0 == compare_func(curr_frame, curr_frame2))
-                intersection_size++;
-            curr_frame2 = curr_frame2->next;
-        }
-        curr_frame = curr_frame->next;
+        if (frames_contain(thread2->frames, curr_frame, compare_func))
+            intersection_size++;
     }
 
-    union_size = frame1_count + frame2_count - intersection_size;
+    for (curr_frame = thread2->frames; curr_frame; curr_frame = curr_frame->next)
+    {
+        if (frames_contain(curr_frame->next, curr_frame, compare_func))
+            continue; // not last, skip
+        set2_size++;
+    }
+
+    union_size = set1_size + set2_size - intersection_size;
+    if (!union_size)
+        return 1.0;
     j_index = intersection_size / (float)union_size;
 
     return j_index;
