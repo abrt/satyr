@@ -73,7 +73,8 @@ btp_thread_dup(struct btp_thread *thread, bool siblings)
     else
         result->next = NULL; /* Do not copy that. */
 
-    result->frames = btp_frame_dup(result->frames, true);
+    if (result->frames)
+        result->frames = btp_frame_dup(result->frames, true);
 
     return result;
 }
