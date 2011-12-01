@@ -44,9 +44,9 @@ btp_thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_th
     int frame1_count = btp_thread_get_frame_count(thread1);
     int frame2_count = btp_thread_get_frame_count(thread2);
 
-    if (0 == frame1_count || 0 == frame2_count)
+    if (frame1_count == 0 && frame2_count == 0)
     {
-        return -1;
+        return 1.0;
     }
 
     int max_frame_count = (frame2_count > frame1_count ? frame2_count : frame1_count);
@@ -107,12 +107,6 @@ btp_thread_jaccard_index_custom(struct btp_thread *thread1, struct btp_thread *t
     int frame1_count = btp_thread_get_frame_count(thread1);
     int frame2_count = btp_thread_get_frame_count(thread2);
 
-   //case when one of the threads is empty
-    if (frame1_count == 0 || frame2_count == 0)
-    {
-        return(-1);
-    }
-
     int i,j, union_size, intersection_size = 0;
     float j_index;
 
@@ -145,13 +139,6 @@ btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_th
 {
     int frame1_count = btp_thread_get_frame_count(thread1);
     int frame2_count = btp_thread_get_frame_count(thread2);
-
-   // case when one of the threads is empty
-    if (frame1_count == 0 || frame2_count == 0)
-    {
-        return(-1);
-    }
-
 
     int dist[frame1_count+1][frame2_count+1];
     int i, j, k, l, lowest = INT_MAX, cost = 0;

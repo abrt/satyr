@@ -46,9 +46,9 @@ int main()
 
   btp_normalize_paired_unknown_function_names(thread1, thread2);
 
-  assert(-1 == btp_thread_jarowinkler_distance(thread1, thread2));
-  assert(-1 == btp_thread_jaccard_index(thread1, thread2));
-  assert(-1 == btp_thread_levenshtein_distance(thread1, thread2, false));
+  assert(0.0 == btp_thread_jarowinkler_distance(thread1, thread2));
+  assert(0.0 < btp_thread_jaccard_index(thread1, thread2));
+  assert(3 == btp_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -65,9 +65,9 @@ int main()
 
   btp_normalize_paired_unknown_function_names(thread1, thread2);
 
-  assert(-1 == btp_thread_jarowinkler_distance(thread1, thread2));
-  assert(-1 == btp_thread_jaccard_index(thread1, thread2));
-  assert(-1 == btp_thread_levenshtein_distance(thread1, thread2, false));
+  assert(1.0 == btp_thread_jarowinkler_distance(thread1, thread2));
+  assert(1.0 == btp_thread_jaccard_index(thread1, thread2));
+  assert(0 == btp_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
