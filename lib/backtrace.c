@@ -70,9 +70,9 @@ btp_backtrace_dup(struct btp_backtrace *backtrace)
     memcpy(result, backtrace, sizeof(struct btp_backtrace));
 
     if (backtrace->crash)
-        backtrace->crash = btp_frame_dup(backtrace->crash, false);
+        result->crash = btp_frame_dup(backtrace->crash, false);
     if (backtrace->threads)
-        backtrace->threads = btp_thread_dup(backtrace->threads, true);
+        result->threads = btp_thread_dup(backtrace->threads, true);
 
     return result;
 }
