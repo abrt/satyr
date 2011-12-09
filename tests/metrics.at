@@ -1,6 +1,6 @@
 AT_BANNER([Metrics])
 
-m4_define([CREATE_THREAD],
+m4_define([UTILS],
 [#include <stdarg.h>
 #include <lib/thread.h>
 #include <lib/frame.h>
@@ -32,11 +32,17 @@ struct btp_thread *create_thread(int count, ...)
   va_end(argp);
   return thread;
 }
+
+bool is_dist_equal(float x, float y)
+{
+  float epsilon = 1e-6;
+  return x - epsilon <= y && x + epsilon >= y;
+}
 ])
 
 AT_TESTFUN([metrics_all_one_thread_empty],
 [
-CREATE_THREAD
+UTILS
 
 int main()
 {
@@ -46,8 +52,8 @@ int main()
 
   btp_normalize_paired_unknown_function_names(thread1, thread2);
 
-  assert(0.0 == btp_thread_jarowinkler_distance(thread1, thread2));
-  assert(1.0 == btp_thread_jaccard_distance(thread1, thread2));
+  assert(is_dist_equal(0.0, btp_thread_jarowinkler_distance(thread1, thread2)));
+  assert(is_dist_equal(1.0, btp_thread_jaccard_distance(thread1, thread2)));
   assert(3 == btp_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
@@ -55,7 +61,7 @@ int main()
 
 AT_TESTFUN([metrics_all_both_threads_empty],
 [
-CREATE_THREAD
+UTILS
 
 int main()
 {
@@ -65,8 +71,8 @@ int main()
 
   btp_normalize_paired_unknown_function_names(thread1, thread2);
 
-  assert(1.0 == btp_thread_jarowinkler_distance(thread1, thread2));
-  assert(0.0 == btp_thread_jaccard_distance(thread1, thread2));
+  assert(is_dist_equal(1.0, btp_thread_jarowinkler_distance(thread1, thread2)));
+  assert(is_dist_equal(0.0, btp_thread_jaccard_distance(thread1, thread2)));
   assert(0 == btp_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
@@ -74,7 +80,7 @@ int main()
 
 AT_TESTFUN([metrics_all_both_starting_??_levendistance3_a],
 [
-CREATE_THREAD
+UTILS
 
 int main()
 {
@@ -84,8 +90,8 @@ int main()
 
   btp_normalize_paired_unknown_function_names(thread1, thread2);
 
-  assert(0 == btp_thread_jarowinkler_distance(thread1, thread2));
-  assert(1.0 == btp_thread_jaccard_distance(thread1, thread2));
+  assert(is_dist_equal(0.0, btp_thread_jarowinkler_distance(thread1, thread2)));
+  assert(is_dist_equal(1.0, btp_thread_jaccard_distance(thread1, thread2)));
   assert(3 == btp_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
@@ -93,7 +99,7 @@ int main()
 
 AT_TESTFUN([metrics_all_both_starting_??_levendistance3_b],
 [
-CREATE_THREAD
+UTILS
 
 int main()
 {
@@ -103,8 +109,8 @@ int main()
 
   btp_normalize_paired_unknown_function_names(thread1, thread2);
 
-  assert(0 == btp_thread_jarowinkler_distance(thread1, thread2));
-  assert(1.0 == btp_thread_jaccard_distance(thread1, thread2));
+  assert(is_dist_equal(0.0, btp_thread_jarowinkler_distance(thread1, thread2)));
+  assert(is_dist_equal(1.0, btp_thread_jaccard_distance(thread1, thread2)));
   assert(3 == btp_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
@@ -112,7 +118,7 @@ int main()
 
 AT_TESTFUN([metrics_levenshtein_random_??_levendistance0_a],
 [
-CREATE_THREAD
+UTILS
 
 int main()
 {
@@ -129,7 +135,7 @@ int main()
 
 AT_TESTFUN([metrics_levenshtein_random_??_levendistance0_b],
 [
-CREATE_THREAD
+UTILS
 
 int main()
 {
@@ -146,7 +152,7 @@ int main()
 
 AT_TESTFUN([metrics_levenshtein_random_??_distance1],
 [
-CREATE_THREAD
+UTILS
 
 int main()
 {
@@ -163,7 +169,7 @@ int main()
 
 AT_TESTFUN([metrics_levenshtein_random_??_distance2_a],
 [
-CREATE_THREAD
+UTILS
 
 int main()
 {
@@ -180,7 +186,7 @@ int main()
 
 AT_TESTFUN([metrics_levenshtein_random_??_distance2_b],
 [
-CREATE_THREAD
+UTILS
 
 int main()
 {
@@ -197,7 +203,7 @@ int main()
 
 AT_TESTFUN([metrics_levenshtein_random_??_distance2_c],
 [
-CREATE_THREAD
+UTILS
 
 int main()
 {
@@ -214,7 +220,7 @@ int main()
 
 AT_TESTFUN([metrics_levenshtein_trans_??_distance2_a],
 [
-CREATE_THREAD
+UTILS
 
 int main()
 {
@@ -231,7 +237,7 @@ int main()
 
 AT_TESTFUN([metrics_levenshtein_trans_??_distance2_b],
 [
-CREATE_THREAD
+UTILS
 
 int main()
 {
@@ -242,6 +248,53 @@ int main()
   btp_normalize_paired_unknown_function_names(thread1, thread2);
 
   assert(2 == btp_thread_levenshtein_distance(thread1, thread2, true));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_jaccard_random_??_distance0_a],
+[
+UTILS
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(4, "asd", "agd", "agd", "??");
+
+  struct btp_thread *thread2 = create_thread(3, "asd", "agd", "??");
+
+  btp_normalize_paired_unknown_function_names(thread1, thread2);
+
+  assert(is_dist_equal(0.0, btp_thread_jaccard_distance(thread1, thread2)));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_jaccard_random_??_distance23_a],
+[
+UTILS
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(3, "asd", "agd", "agd");
+
+  struct btp_thread *thread2 = create_thread(2, "sad", "agd");
+
+  assert(is_dist_equal(2/3.0, btp_thread_jaccard_distance(thread1, thread2)));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_jaccard_random_??_distance35],
+[
+UTILS
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(5, "asd", "agd", "gad", "sad", "abc");
+
+  struct btp_thread *thread2 = create_thread(4, "sad", "sad", "sad", "gad");
+
+  assert(is_dist_equal(3/5.0, btp_thread_jaccard_distance(thread1, thread2)));
   return 0;
 }
 ])
