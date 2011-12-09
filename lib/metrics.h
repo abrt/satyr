@@ -39,6 +39,8 @@ btp_frame_compare(struct btp_frame *frame1, struct btp_frame *frame2);
  * number of transpositions in place(trans_count)
  * if the transpositioned function names are not farther away than frame_count/2 - 1.
  * Then computes the Jaro-Winkler distance according to the formula.
+ * NOTE: The Jaro-Winkler distance is not a metric distance as it does not
+ * satisfy the triangle inequality.
  * Returns a number between 0 and 1:
  * 0 = no similarity, 1 = similar threads
  */

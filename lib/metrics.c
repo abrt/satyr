@@ -86,6 +86,9 @@ btp_thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_th
     }
     trans_count = trans_count / 2;
 
+    if (prefix_len > 4)
+        prefix_len = 4;
+
     if (match_count == 0)return 0;  // so as not to divide by 0
 
     dist_jaro = (match_count / (float)frame1_count +
