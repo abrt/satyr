@@ -22,8 +22,11 @@
 #include "frame.h"
 #include "utils.h"
 #include "metrics.h"
+#include "normalize.h"
 #include <stdio.h>
 #include <limits.h>
+#include <string.h>
+#include <assert.h>
 
 int
 btp_frame_compare(struct btp_frame *frame1, struct btp_frame *frame2)
@@ -241,4 +244,129 @@ int
 btp_thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition)
 {
     return btp_thread_levenshtein_distance_custom(thread1, thread2, transposition, btp_frame_compare);
+}
+
+static int
+get_distance_position(const struct btp_distances *distances, int i, int j)
+{
+    /* The array holds only matrix entries (i, j) where i < j,
+     * locate the position in the array. */
+    assert(i < j && i >= 0 && i < distances->m && j < distances->n);
+
+    int h = distances->n, l = distances->n - i;
+
+    return ((h * h - h) - (l * l - l)) / 2 + j - 1;
+}
+
+struct btp_distances *
+btp_distances_new(int m, int n)
+{
+    struct btp_distances *distances = btp_malloc(sizeof(struct btp_distances));
+
+    /* The number of rows has to be smaller than columns. */
+    if (m >= n)
+        m = n - 1;
+
+    assert(m > 0 && n > 1 && m < n);
+
+    distances->m = m;
+    distances->n = n;
+    distances->distances = btp_malloc(sizeof(*distances->distances) *
+            (get_distance_position(distances, m - 1, n - 1) + 1));
+    return distances;
+}
+
+struct btp_distances *
+btp_distances_dup(struct btp_distances *distances)
+{
+    struct btp_distances *dup_distances;
+
+    dup_distances = btp_distances_new(distances->m, distances->n);
+    memcpy(dup_distances->distances, distances->distances,
+            sizeof(*distances->distances) *
+            (get_distance_position(distances, distances->m - 1, distances->n - 1) + 1));
+
+    return dup_distances;
+}
+
+void
+btp_distances_free(struct btp_distances *distances)
+{
+    if (!distances)
+        return;
+    free(distances->distances);
+    free(distances);
+}
+
+float
+btp_distances_get_distance(struct btp_distances *distances, int i, int j)
+{
+    if (i == j)
+        return 0.0;
+
+    if (i > j)
+    {
+        int x;
+        x = j, j = i, i = x;
+    }
+
+    return distances->distances[get_distance_position(distances, i, j)];
+}
+
+void
+btp_distances_set_distance(struct btp_distances *distances, int i, int j,
+        float d)
+{
+    if (i == j)
+        return;
+
+    if (i > j)
+    {
+        int x;
+        x = j, j = i, i = x;
+    }
+
+    distances->distances[get_distance_position(distances, i, j)] = d;
+}
+
+struct btp_distances *
+btp_threads_compare(struct btp_thread **threads, int m, int n, btp_dist_thread_type dist_func)
+{
+    struct btp_distances *distances;
+    struct btp_thread *thread1, *thread2;
+    int i, j, ok, all;
+
+    distances = btp_distances_new(m, n);
+
+    for (i = 0; i < m; i++)
+        for (j = i + 1; j < n; j++)
+        {
+            ok = all = 0;
+            btp_thread_quality_counts(threads[i], &ok, &all);
+            btp_thread_quality_counts(threads[j], &ok, &all);
+
+            if (ok == all)
+            {
+                thread1 = threads[i];
+                thread2 = threads[j];
+            }
+            else
+            {
+                /* There are some unknown function names, try to pair them, but
+                 * the threads need to be copied first. */
+                thread1 = btp_thread_dup(threads[i], false);
+                thread2 = btp_thread_dup(threads[j], false);
+                btp_normalize_paired_unknown_function_names(thread1, thread2);
+            }
+
+            distances->distances[get_distance_position(distances, i, j)] = dist_func(thread1, thread2);
+
+            if (ok != all)
+            {
+                btp_thread_free(thread1);
+                btp_thread_free(thread2);
+            }
+        }
+
+    return distances;
 }

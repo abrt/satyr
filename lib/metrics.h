@@ -90,6 +90,100 @@ int
 btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition,
         btp_frame_cmp_type compare_func);
 
+/**
+ * Represents an m-by-n distance matrix.
+ * (only entries (i, j) where i < j are actually stored)
+ */
+struct btp_distances
+{
+    int m;
+    int n;
+    float *distances;
+};
+
+/**
+ * Creates and initializes a new distances structure.
+ * @param m
+ * Number of rows.
+ * @param n
+ * Number of columns.
+ * @returns
+ * It never returns NULL. The returned pointer must be released by
+ * calling the function btp_distances_free().
+ */
+struct btp_distances *
+btp_distances_new(int m, int n);
+
+/**
+ * Creates a duplicate of the distances structure.
+ * @param distances
+ * It must be non-NULL pointer. The structure is not modified by calling
+ * this function.
+ * @returns
+ * This function never returns NULL.
+ */
+struct btp_distances *
+btp_distances_dup(struct btp_distances *distances);
+
+/**
+ * Releases the memory held by the distances structure.
+ * @param distances
+ * If the distances is NULL, no operation is performed.
+ */
+void
+btp_distances_free(struct btp_distances *distances);
+
+/**
+ * Gets the entry (i, j) from the distance matrix.
+ * @param distances
+ * It must be non-NULL pointer.
+ * @param i
+ * Row in the matrix.
+ * @param j
+ * Column in the matrix.
+ * @returns
+ * For entries (i, i) zero distance is returned and values returned for
+ * entries (i, j) and (j, i) are the same.
+ */
+float
+btp_distances_get_distance(struct btp_distances *distances, int i, int j);
+
+/**
+ * Sets the entry (i, j) from the distance matrix.
+ * @param distances
+ * It must be non-NULL pointer.
+ * @param i
+ * Row in the matrix.
+ * @param j
+ * Column in the matrix.
+ * @param d
+ * Distance.
+ */
+void
+btp_distances_set_distance(struct btp_distances *distances, int i, int j, float d);
+
+/**
+ * A function which compares two threads.
+ */
+typedef float (*btp_dist_thread_type)(struct btp_thread *, struct btp_thread *);
+
+/**
+ * Creates a distances structure by comparing threads.
+ * @param threads
+ * Array of threads. They are not modified by calling this function.
+ * @param m
+ * Compare first m threads from the array with other threads.
+ * @param n
+ * Number of threads in the passed array.
+ * @param dist_func
+ * Distance function which will be used to compare the threads. It's assumed to
+ * be symmetric and return zero distance for equal threads.
+ * @returns
+ * This function never returns NULL.
+ */
+struct btp_distances *
+btp_threads_compare(struct btp_thread **threads, int m, int n, btp_dist_thread_type dist_func);
+
 #ifdef __cplusplus
 }
 #endif
