@@ -193,8 +193,8 @@ int main(int argc, char **argv)
   // printing results of all the metrics
     printf("Levenshtein distance of these two backtraces is %d. \n",
            btp_thread_levenshtein_distance(crash_thread1, crash_thread2, true));
-    printf("Jaccard index of these two backtraces is %f. \n",
-           btp_thread_jaccard_index(crash_thread1, crash_thread2));
+    printf("Jaccard distance of these two backtraces is %f. \n",
+           btp_thread_jaccard_distance(crash_thread1, crash_thread2));
     printf("Jaro-Winkler distance of these two backtraces is %f. \n\n",
            btp_thread_jarowinkler_distance(crash_thread1, crash_thread2));
 

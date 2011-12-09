@@ -113,11 +113,11 @@ frames_contain(struct btp_frame *frames, struct btp_frame *frame,
 }
 
 float
-btp_thread_jaccard_index_custom(struct btp_thread *thread1, struct btp_thread *thread2,
+btp_thread_jaccard_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
         btp_frame_cmp_type compare_func)
 {
     int union_size, intersection_size = 0, set1_size = 0, set2_size = 0;
-    float j_index;
+    float j_distance;
     struct btp_frame *curr_frame;
 
     for (curr_frame = thread1->frames; curr_frame; curr_frame = curr_frame->next)
@@ -139,10 +139,12 @@ btp_thread_jaccard_index_custom(struct btp_thread *thread1, struct btp_thread *t
 
     union_size = set1_size + set2_size - intersection_size;
     if (!union_size)
-        return 1.0;
-    j_index = intersection_size / (float)union_size;
+        return 0.0;
+    j_distance = 1.0 - intersection_size / (float)union_size;
+    if (j_distance < 0.0)
+        j_distance = 0.0;
 
-    return j_index;
+    return j_distance;
 }
 
 
@@ -227,9 +229,9 @@ btp_thread_jarowinkler_distance(struct btp_thread *thread1, struct btp_thread *t
 }
 
 float
-btp_thread_jaccard_index(struct btp_thread *thread1, struct btp_thread *thread2)
+btp_thread_jaccard_distance(struct btp_thread *thread1, struct btp_thread *thread2)
 {
-    return btp_thread_jaccard_index_custom(thread1, thread2, btp_frame_compare);
+    return btp_thread_jaccard_distance_custom(thread1, thread2, btp_frame_compare);
 }
 
 int

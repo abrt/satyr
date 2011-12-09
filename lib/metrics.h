@@ -26,6 +26,9 @@
 extern "C" {
 #endif
 
+struct btp_frame;
+struct btp_thread;
+
 /* Compares two frames taking unknown functions ("??") as different ones.*/
 int
 btp_frame_compare(struct btp_frame *frame1, struct btp_frame *frame2);
@@ -44,16 +47,16 @@ float
 btp_thread_jarowinkler_distance(struct btp_thread *thread1, struct btp_thread *thread2);
 
 
-/* Jaccard index:
+/* Jaccard distance:
  * Gives a number representing the difference of the size of the intersection
  * and union divided by the size of the union of two threads.
  * Function names positions in the thread are not taken into account.
  * Returns a number between 0 and 1:
- * 0 = no similarity, 1 = similar threads
+ * 0 = similar threads, 1 = no similarity
  */
 
 float
-btp_thread_jaccard_index(struct btp_thread *thread1, struct btp_thread *thread2);
+btp_thread_jaccard_distance(struct btp_thread *thread1, struct btp_thread *thread2);
 
 
 /* Levenshtein distance:
@@ -79,7 +82,7 @@ float
 btp_thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
         btp_frame_cmp_type compare_func);
 float
-btp_thread_jaccard_index_custom(struct btp_thread *thread1, struct btp_thread *thread2,
+btp_thread_jaccard_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
         btp_frame_cmp_type compare_func);
 int
 btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition,
