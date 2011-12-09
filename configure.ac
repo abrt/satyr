@@ -15,11 +15,26 @@ AM_MISSING_PROG([AUTOM4TE], [autom4te])
 # Needed by tests/atlocal.in.
 AC_SUBST([O0CFLAGS], [`echo $CFLAGS   | sed 's/-O[[0-9]] *//'`])
 
+AM_PATH_PYTHON
+if [ -z "$PYTHON" ]
+then
+    echo "*** Essential program python not found" 1>&2
+    exit 1
+fi
+
+# Just PKG_CHECK_MODULES([PYTHON], [python]) works only with python2.7+
+# Below, if python is not found, we set up for python2.6 w/o checking:
+PKG_CHECK_MODULES([PYTHON], [python],,[
+    PYTHON_LIBS='-L/usr/lib64 -lpython2.6'
+    PYTHON_CFLAGS='-I/usr/include/python2.6'
+])
+
 AC_CONFIG_FILES([
 	btparser.spec
 	btparser.pc
 	Makefile
 	lib/Makefile
+	python/Makefile
 ])
 
 AC_OUTPUT
