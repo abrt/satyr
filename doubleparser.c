@@ -169,6 +169,11 @@ int main(int argc, char **argv)
             crash_thread1 = btp_backtrace_find_crash_thread(backtrace);
             crash_thread2 = btp_backtrace_find_crash_thread(backtrace2);
 
+            if (!crash_thread1 || !crash_thread2)
+            {
+                fprintf(stderr, "Failed to find the crash thread.\n");
+                exit(1);
+            }
            // removing threads not needed for comparison
             btp_thread_remove_frames_below_n(crash_thread1, accuracy);
             btp_thread_remove_frames_below_n(crash_thread2, accuracy);

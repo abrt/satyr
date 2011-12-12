@@ -181,7 +181,7 @@ int main(int argc, char **argv)
         struct btp_frame *frame = btp_backtrace_get_crash_frame(backtrace);
         if (!frame)
         {
-            fprintf(stderr, "Failed to find the crash function.");
+            fprintf(stderr, "Failed to find the crash function.\n");
             exit(1);
         }
         if (frame->function_name)
@@ -204,6 +204,12 @@ int main(int argc, char **argv)
     case OPTIMIZED_BACKTRACE:
     {
         struct btp_thread *crash_thread = btp_backtrace_find_crash_thread(backtrace);
+        if (!crash_thread)
+        {
+            fprintf(stderr, "Failed to find the crash thread.\n");
+            exit(1);
+        }
+
         btp_backtrace_remove_threads_except_one(backtrace, crash_thread);
 
         printf("Thread no. %d", crash_thread->number);
