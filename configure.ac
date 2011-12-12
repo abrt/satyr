@@ -16,7 +16,7 @@ AM_MISSING_PROG([AUTOM4TE], [autom4te])
 AC_SUBST([O0CFLAGS], [`echo $CFLAGS   | sed 's/-O[[0-9]] *//'`])
 
 AM_PATH_PYTHON
-if [ -z "$PYTHON" ]
+if test -z "$PYTHON"
 then
     echo "*** Essential program python not found" 1>&2
     exit 1
