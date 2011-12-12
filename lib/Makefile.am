@@ -12,6 +12,7 @@ lib_LTLIBRARIES = libbtparser.la
 libbtparser_la_SOURCES = \
 	$(pkginclude_HEADERS) \
 	backtrace.c \
+	cluster.c \
 	frame.c \
 	location.c \
 	metrics.c \

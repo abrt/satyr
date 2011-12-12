@@ -176,7 +176,8 @@ TESTSUITE_AT = \
   thread.at 	\
   backtrace.at  \
   normalize.at  \
-  metrics.at
+  metrics.at \
+  cluster.at
 
 TESTSUITE = $(srcdir)/testsuite
 MAINTAINERCLEANFILES = Makefile.in $(TESTSUITE)
