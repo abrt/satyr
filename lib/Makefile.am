@@ -1,5 +1,6 @@
 pkginclude_HEADERS = \
 	backtrace.h \
+	cluster.h \
 	frame.h \
 	location.h \
 	metrics.h \
