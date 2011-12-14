@@ -142,19 +142,27 @@ PyObject *p_btp_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
         return PyErr_NoMemory();
 
     const char *str = NULL;
-    if (!PyArg_ParseTuple(args, "|s", &str))
+    int only_funs = 0;
+    if (!PyArg_ParseTuple(args, "|si", &str, &only_funs))
         return NULL;
 
     PyObject_INIT(to, &ThreadTypeObject);
     if (str)
     {
-        struct btp_location location;
-        btp_location_init(&location);
-        to->thread = btp_thread_parse(&str, &location);
-        if (!to->thread)
+        if (!only_funs)
         {
-            PyErr_SetString(PyExc_ValueError, location.message);
-            return NULL;
+            struct btp_location location;
+            btp_location_init(&location);
+            to->thread = btp_thread_parse(&str, &location);
+            if (!to->thread)
+            {
+                PyErr_SetString(PyExc_ValueError, location.message);
+                return NULL;
+            }
+        }
+        else
+        {
+            to->thread = btp_thread_parse_funs(str);
         }
         to->frames = thread_prepare_frame_list(to->thread);
         if (!to->frames)

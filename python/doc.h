@@ -78,7 +78,8 @@
 #define thread_doc "btparser.Thread - class representing a thread in a backtrace\n" \
                    "Usage:\n" \
                    "btparser.Thread() - creates an empty thread\n" \
-                   "btparser.Thread(str) - parses str and fills the thread object"
+                   "btparser.Thread(str) - parses str and fills the thread object\n" \
+                   "btparser.Thread(str, only_funs=True) - parses list of function names"
 
 #define t_get_number_doc "Usage: thread.get_number()\n" \
                          "Returns: positive integer - thread number"

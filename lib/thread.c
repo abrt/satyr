@@ -398,3 +398,31 @@ btp_thread_skip_lwp(const char **input)
     *input = local_input;
     return count + 1;
 }
+
+struct btp_thread *
+btp_thread_parse_funs(const char *input)
+{
+    const char *next;
+    struct btp_thread *thread = btp_thread_new();
+    struct btp_frame *frame, **pframe = &thread->frames;
+    int number = 0;
+
+    /* Skip the first line (thread number). */
+    input = strchr(input, '\n');
+
+    while (input && *++input)
+    {
+        next = strchr(input + 1, '\n');
+        frame = btp_frame_new();
+        if (next)
+            frame->function_name = btp_strndup(input, next - input);
+        else
+            frame->function_name = btp_strdup(input);
+        frame->number = number++;
+        *pframe = frame;
+        pframe = &frame->next;
+        input = next;
+    }
+
+    return thread;
+}

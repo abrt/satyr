@@ -13,29 +13,6 @@
 #include <sysexits.h>
 #include <assert.h>
 
-struct btp_backtrace *btp_get_backtrace_from_text(char* text, int accuracy)
-{
-    struct btp_backtrace *backtrace = btp_backtrace_new();
-    struct btp_thread *thread = btp_thread_new();
-    int cycle_counter = 0;
-
-    char *line = strtok(text,"\n");
-    while (line)
-    {
-        cycle_counter++;
-        if (cycle_counter > accuracy) break;
-        line = strtok(NULL,"\n");
-        if (line == NULL) break;
-        struct btp_frame *frame = btp_frame_new();
-        frame->function_name = btp_strdup(line);
-
-        if (thread->frames == NULL)thread->frames = frame;
-        else btp_frame_add_sibling(thread->frames, frame);
-    }
-    backtrace->threads = thread;
-    return backtrace;
-}
-
 int main(int argc, char **argv)
 {
     bool optimized = false;
@@ -118,8 +95,6 @@ int main(int argc, char **argv)
     fclose(file2);
     text2[file_size] = '\0';
 
-    struct btp_backtrace *backtrace;
-    struct btp_backtrace *backtrace2;
     struct btp_thread *crash_thread1;
     struct btp_thread *crash_thread2;
 
@@ -127,16 +102,16 @@ int main(int argc, char **argv)
     // having optimized versions of the backtraces
         if (optimized)
         {
-            backtrace = btp_get_backtrace_from_text(text1, accuracy);
-            backtrace2 = btp_get_backtrace_from_text(text2, accuracy);
+            crash_thread1 = btp_thread_parse_funs(text1);
+            crash_thread2 = btp_thread_parse_funs(text2);
             free(text1);
             free(text2);
-            crash_thread1 = backtrace->threads;
-            crash_thread2 = backtrace2->threads;
         }
     // backtraces in files weren't parsed yet, calling btp_bt_parse
         else
         {
+            struct btp_backtrace *backtrace;
+            struct btp_backtrace *backtrace2;
             const char *ptr = text1;
             const char *ptr2 = text2;
 
@@ -168,16 +143,6 @@ int main(int argc, char **argv)
 
             crash_thread1 = btp_backtrace_find_crash_thread(backtrace);
             crash_thread2 = btp_backtrace_find_crash_thread(backtrace2);
-
-            if (!crash_thread1 || !crash_thread2)
-            {
-                fprintf(stderr, "Failed to find the crash thread.\n");
-                exit(1);
-            }
-           // removing threads not needed for comparison
-            btp_thread_remove_frames_below_n(crash_thread1, accuracy);
-            btp_thread_remove_frames_below_n(crash_thread2, accuracy);
-
         }
 
     if (!crash_thread1)
@@ -191,6 +156,9 @@ int main(int argc, char **argv)
         exit(1);
     }
 
+    // removing threads not needed for comparison
+    btp_thread_remove_frames_below_n(crash_thread1, accuracy);
+    btp_thread_remove_frames_below_n(crash_thread2, accuracy);
 
   // renaming paired unknown function names
     btp_normalize_paired_unknown_function_names(crash_thread1, crash_thread2);
