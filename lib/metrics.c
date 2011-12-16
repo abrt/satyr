@@ -211,7 +211,7 @@ btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_th
             /*checking for transposition of two characters in both ways
               taking into account that "??" functions are not similar*/
             if (transposition &&
-                (i == 2 && j == 2 &&
+                (i >= 2 && j >= 2 &&
                  0 == compare_func(curr_frame, prev_frame2) &&
                  0 == compare_func(prev_frame, curr_frame2)) &&
                 dist[i][j] > (dist[i-2][j-2] + cost))
