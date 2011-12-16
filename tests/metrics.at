@@ -252,6 +252,34 @@ int main()
 }
 ])
 
+AT_TESTFUN([metrics_levenshtein_swap_trans_distance2_a],
+[
+UTILS
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(4, "a", "b", "c", "d");
+  struct btp_thread *thread2 = create_thread(4, "b", "a", "d", "c");
+
+  assert(2 == btp_thread_levenshtein_distance(thread1, thread2, true));
+  return 0;
+}
+])
+
+AT_TESTFUN([metrics_levenshtein_swap_notrans_distance3_a],
+[
+UTILS
+
+int main()
+{
+  struct btp_thread *thread1 = create_thread(4, "a", "b", "c", "d");
+  struct btp_thread *thread2 = create_thread(4, "b", "a", "d", "c");
+
+  assert(3 == btp_thread_levenshtein_distance(thread1, thread2, false));
+  return 0;
+}
+])
+
 AT_TESTFUN([metrics_jaccard_random_??_distance0_a],
 [
 UTILS
