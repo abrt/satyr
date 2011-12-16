@@ -158,21 +158,20 @@ int
 btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
         bool transposition, btp_frame_cmp_type compare_func)
 {
-    int frame1_count = btp_thread_get_frame_count(thread1);
-    int frame2_count = btp_thread_get_frame_count(thread2);
+    int m = btp_thread_get_frame_count(thread1) + 1;
+    int n = btp_thread_get_frame_count(thread2) + 1;
 
-    int dist[frame1_count+1][frame2_count+1];
-    int i, j, k, l, lowest = INT_MAX, cost = 0;
+    // store only two last rows and columns instead of whole 2D array
+    int dist[m + n + 1], dist1[m + n + 1], dist2;
+
+    int i, j, l, cost = 0;
 
     // first row and column having distance equal to their position
-    for (i = 0; i <= frame1_count; i++)
-    {
-        dist[i][0] = i;
-    }
-    for (j = 0; j <= frame2_count; j++)
-    {
-        dist[0][j] = j;
-    }
+    for (i = m; i > 0; i--)
+        dist[m - i] = i;
+    for (; i <= n; i++)
+        dist[m + i] = i;
+
     struct btp_frame *curr_frame2 = thread2->frames;
     struct btp_frame *prev_frame = NULL;
     struct btp_frame *prev_frame2 = NULL;
@@ -183,39 +182,35 @@ btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_th
         struct btp_frame *curr_frame = thread1->frames;
         for (i = 1; curr_frame; i++)
         {
+            l = m + j - i;
+
+            dist2 = dist1[l];
+            dist1[l] = dist[l];
 
             /*similar characters have distance equal to the previous one diagonally,
               "??" functions aren't taken as similar */
             if (0 == compare_func(curr_frame, curr_frame2))
             {
                 cost = 0;
-                dist[i][j] = dist[i-1][j-1];
             }
             // different ones takes the lowest value of all previous distances
             else
             {
                 cost = 1;
-                // checking left, top and topleft values in matrix
-                for (k = -1; k <= 0;k++)
-                {
-                    for (l = -1; l <= 0;l++)
-                    {
-                        if (k == 0 && l == 0) continue;
-                        if (lowest > dist[i+k][j+l]) lowest = dist[i+k][j+l];
-                    }
-                }
-                dist[i][j] = lowest + 1;
-                lowest = INT_MAX;
+                dist[l] += 1;
+                if (dist[l] > dist[l - 1] + 1)
+                    dist[l] = dist[l - 1] + 1;
+                if (dist[l] > dist[l + 1] + 1)
+                    dist[l] = dist[l + 1] + 1;
             }
 
             /*checking for transposition of two characters in both ways
               taking into account that "??" functions are not similar*/
             if (transposition &&
-                (i >= 2 && j >= 2 &&
+                (i >= 2 && j >= 2 && dist[l] > dist2 + cost &&
                  0 == compare_func(curr_frame, prev_frame2) &&
-                 0 == compare_func(prev_frame, curr_frame2)) &&
-                dist[i][j] > (dist[i-2][j-2] + cost))
-                  dist[i][j] = (dist[i-2][j-2] + cost);
+                 0 == compare_func(prev_frame, curr_frame2)))
+                dist[l] = dist2 + cost;
 
             prev_frame = curr_frame;
             curr_frame = curr_frame->next;
@@ -225,7 +220,7 @@ btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_th
         curr_frame2 = curr_frame2->next;
     }
 
-    return(dist[frame1_count][frame2_count]);
+    return dist[n];
 }
 
 float
