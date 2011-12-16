@@ -162,3 +162,42 @@
 #define b_threads_doc (char *)"A list containing the btparser.Thread objects " \
                       "representing threads in the backtrace."
 
+/* distances */
+
+#define distances_doc "btparser.Distances - class representing distances between objects\n" \
+                      "Usage:\n" \
+                      "btparser.Distances(m, n) - creates an m-by-n distance matrix\n" \
+                      "btparser.Distances(dist_name, [threads], m) - compares first m threads with others\n" \
+                      "dist_name: \"jaccard\" or \"levenshtein\"\n"
+
+#define di_get_size_doc "Usage: distances.get_size()\n" \
+                       "Returns: (m, n) - size of the distance matrix"
+
+#define di_get_distance_doc "Usage: distances.get_distance(i, j)\n" \
+                            "Returns: positive float - distance between objects i and j"
+
+#define di_set_distance_doc "Usage: distances.set_distance(i, j, d)\n" \
+                            "Sets distance between objects i and j to d"
+
+#define di_dup_doc "Usage: distances.dup()\n" \
+                   "Returns: btparser.Distances - a new clone of the distances\n" \
+                   "Clones the distances object. All new structures are independent\n" \
+                   "on the original object."
+
+
+/* dendrogram */
+
+#define dendrogram_doc "btparser.Distances - class representing distances between a set of objects\n"
+
+#define de_get_size_doc "Usage: dendrogram.get_size()\n" \
+                        "Returns: integer - number of objects in the dendrogram"
+
+#define de_get_object_doc "Usage: dendrogram.get_object(i)\n" \
+                          "Returns: integer - index of the object at position i"
+
+#define de_get_merge_level_doc "Usage: dendrogram.get_merge_level(i)\n" \
+                               "Returns: float - merge level between clusters at positions i and i + 1"
+
+#define de_cut_doc "Usage: dendrogram.cut(level, min_size)\n" \
+                   "Returns: list of clusters (lists of objects) which have at least min_size objects\n" \
+                   "and which were merged at most at the specified distance"

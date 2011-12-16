@@ -7,6 +7,8 @@
 #include "location.h"
 #include "strbuf.h"
 #include "thread.h"
+#include "metrics.h"
+#include "cluster.h"
 #include "utils.h"
 
 /*********/
@@ -121,3 +123,60 @@ PyObject *p_btp_backtrace_limit_frame_depth(PyObject *self, PyObject *args);
 PyObject *p_btp_backtrace_quality_simple(PyObject *self, PyObject *args);
 PyObject *p_btp_backtrace_quality_complex(PyObject *self, PyObject *args);
 PyObject *p_btp_backtrace_get_duplication_hash(PyObject *self, PyObject *args);
+
+/*************/
+/* distances */
+/*************/
+
+extern PyTypeObject DistancesTypeObject;
+
+typedef struct {
+    PyObject_HEAD
+    struct btp_distances *distances;
+} DistancesObject;
+
+/* constructor */
+PyObject *p_btp_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds);
+
+/* destructor */
+void p_btp_distances_free(PyObject *object);
+
+/* str */
+PyObject *p_btp_distances_str(PyObject *self);
+
+/* getters & setters */
+PyObject *p_btp_distances_get_size(PyObject *self, PyObject *args);
+PyObject *p_btp_distances_get_distance(PyObject *self, PyObject *args);
+PyObject *p_btp_distances_set_distance(PyObject *self, PyObject *args);
+
+/* methods */
+PyObject *p_btp_distances_dup(PyObject *self, PyObject *args);
+
+
+/**************/
+/* dendrogram */
+/**************/
+
+extern PyTypeObject DendrogramTypeObject;
+
+typedef struct {
+    PyObject_HEAD
+    struct btp_dendrogram *dendrogram;
+} DendrogramObject;
+
+/* constructor */
+PyObject *p_btp_dendrogram_new(PyTypeObject *object, PyObject *args, PyObject *kwds);
+
+/* destructor */
+void p_btp_dendrogram_free(PyObject *object);
+
+/* str */
+PyObject *p_btp_dendrogram_str(PyObject *self);
+
+/* getters & setters */
+PyObject *p_btp_dendrogram_get_size(PyObject *self, PyObject *args);
+PyObject *p_btp_dendrogram_get_object(PyObject *self, PyObject *args);
+PyObject *p_btp_dendrogram_get_merge_level(PyObject *self, PyObject *args);
+
+/* methods */
+PyObject *p_btp_dendrogram_cut(PyObject *self, PyObject *args);

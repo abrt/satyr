@@ -30,6 +30,18 @@ PyMODINIT_FUNC init_btparser()
         return;
     }
 
+    if (PyType_Ready(&DistancesTypeObject) < 0)
+    {
+        puts("PyType_Ready(&DistancesTypeObject) < 0");
+        return;
+    }
+
+    if (PyType_Ready(&DendrogramTypeObject) < 0)
+    {
+        puts("PyType_Ready(&DendrogramTypeObject) < 0");
+        return;
+    }
+
     PyObject *module = Py_InitModule("_btparser", module_methods);
     if (!module)
     {
@@ -43,4 +55,8 @@ PyMODINIT_FUNC init_btparser()
     PyModule_AddObject(module, "Thread", (PyObject *)&ThreadTypeObject);
     Py_INCREF(&BacktraceTypeObject);
     PyModule_AddObject(module, "Backtrace", (PyObject *)&BacktraceTypeObject);
+    Py_INCREF(&DistancesTypeObject);
+    PyModule_AddObject(module, "Distances", (PyObject *)&DistancesTypeObject);
+    Py_INCREF(&DendrogramTypeObject);
+    PyModule_AddObject(module, "Dendrogram", (PyObject *)&DendrogramTypeObject);
 }
