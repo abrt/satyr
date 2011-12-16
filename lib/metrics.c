@@ -246,6 +246,12 @@ btp_thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *t
     return btp_thread_levenshtein_distance_custom(thread1, thread2, transposition, btp_frame_compare);
 }
 
+float
+btp_thread_levenshtein_distance_f(struct btp_thread *thread1, struct btp_thread *thread2)
+{
+    return btp_thread_levenshtein_distance_custom(thread1, thread2, true, btp_frame_compare);
+}
+
 static int
 get_distance_position(const struct btp_distances *distances, int i, int j)
 {
