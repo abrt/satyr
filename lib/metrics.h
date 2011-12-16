@@ -68,6 +68,7 @@ btp_thread_jaccard_distance(struct btp_thread *thread1, struct btp_thread *threa
  * in one thread to match all the function names in second thread at each respective
  * positions or how many function names need to be different/transpositioned
  * to have a match if the transposition argument is enabled.
+ * NOTE: With transpositions enabled the triangle inequality does not hold.
  * The distance is always between 0 and n, where n is the frame count of longer thread
  * 0 = similar threads, n = no similar function names
  */
@@ -75,7 +76,7 @@ btp_thread_jaccard_distance(struct btp_thread *thread1, struct btp_thread *threa
 int
 btp_thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition);
 
-/* Levenshtein distance returned in float including transpositions */
+/* Levenshtein distance returned in float with transpositions disabled */
 float
 btp_thread_levenshtein_distance_f(struct btp_thread *thread1, struct btp_thread *thread2);
 
