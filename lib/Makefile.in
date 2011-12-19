@@ -83,8 +83,9 @@ am_libbtparser_la_OBJECTS = $(am__objects_1) \
 	libbtparser_la-normalize_glibc.lo \
 	libbtparser_la-normalize_libstdcpp.lo \
 	libbtparser_la-normalize_linux.lo \
-	libbtparser_la-normalize_xorg.lo libbtparser_la-strbuf.lo \
-	libbtparser_la-thread.lo libbtparser_la-utils.lo
+	libbtparser_la-normalize_xorg.lo libbtparser_la-sharedlib.lo \
+	libbtparser_la-strbuf.lo libbtparser_la-thread.lo \
+	libbtparser_la-utils.lo
 libbtparser_la_OBJECTS = $(am_libbtparser_la_OBJECTS)
 libbtparser_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libbtparser_la_CFLAGS) \
@@ -245,6 +246,7 @@ pkginclude_HEADERS = \
 	location.h \
 	metrics.h \
 	normalize.h \
+	sharedlib.h \
 	strbuf.h \
 	thread.h \
 	utils.h
@@ -265,6 +267,7 @@ libbtparser_la_SOURCES = \
 	normalize_libstdcpp.c \
 	normalize_linux.c \
 	normalize_xorg.c \
+	sharedlib.c \
 	strbuf.c \
 	thread.c \
 	utils.c
@@ -358,6 +361,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_libstdcpp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_linux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_xorg.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-sharedlib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-strbuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-thread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-utils.Plo@am__quote@
@@ -473,6 +477,13 @@ libbtparser_la-normalize_xorg.lo: normalize_xorg.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize_xorg.c' object='libbtparser_la-normalize_xorg.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize_xorg.lo `test -f 'normalize_xorg.c' || echo '$(srcdir)/'`normalize_xorg.c
+
+libbtparser_la-sharedlib.lo: sharedlib.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-sharedlib.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-sharedlib.Tpo -c -o libbtparser_la-sharedlib.lo `test -f 'sharedlib.c' || echo '$(srcdir)/'`sharedlib.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-sharedlib.Tpo $(DEPDIR)/libbtparser_la-sharedlib.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sharedlib.c' object='libbtparser_la-sharedlib.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-sharedlib.lo `test -f 'sharedlib.c' || echo '$(srcdir)/'`sharedlib.c
 
 libbtparser_la-strbuf.lo: strbuf.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-strbuf.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-strbuf.Tpo -c -o libbtparser_la-strbuf.lo `test -f 'strbuf.c' || echo '$(srcdir)/'`strbuf.c
