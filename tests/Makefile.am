@@ -36,7 +36,8 @@ TESTSUITE_AT =	\
   backtrace.at  \
   normalize.at  \
   metrics.at \
-  cluster.at
+  cluster.at \
+  sharedlib.at
 
 EXTRA_DIST += $(TESTSUITE_AT)
 TESTSUITE = $(srcdir)/testsuite

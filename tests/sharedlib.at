@@ -1,0 +1,100 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([sharedlib])
+
+## ------------------- ##
+## btp_sharedlib_parse ##
+## ------------------- ##
+AT_TESTFUN([btp_sharedlib_parse],
+[[
+#include <lib/sharedlib.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+
+int main(void)
+{
+  char *bt = btp_file_to_string("../../backtraces/621492.bt");
+  assert(bt);
+  struct btp_sharedlib *libs = btp_sharedlib_parse(bt);
+  assert(libs);
+  assert(libs->from == 0x0000003848c05640);
+  assert(libs->to == 0x0000003848c10e48);
+  assert(libs->symbols == SYMS_OK);
+  assert(strcmp("/lib64/libpthread.so.0", libs->soname) == 0);
+  btp_sharedlib_free(libs);
+  return 0;
+}
+]])
+
+## ------------------- ##
+## btp_sharedlib_count ##
+## ------------------- ##
+AT_TESTFUN([btp_sharedlib_count],
+[[
+#include <lib/sharedlib.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+
+int main(void)
+{
+  char *bt = btp_file_to_string("../../backtraces/621492.bt");
+  assert(bt);
+  struct btp_sharedlib *libs = btp_sharedlib_parse(bt);
+  assert(libs);
+  assert(btp_sharedlib_count(libs) == 185);
+  btp_sharedlib_free(libs);
+  return 0;
+}
+]])
+
+## -------------------- ##
+## btp_sharedlib_append ##
+## -------------------- ##
+AT_TESTFUN([btp_sharedlib_append],
+[[
+#include <lib/sharedlib.h>
+#include <assert.h>
+#include <stdlib.h>
+
+int main(void)
+{
+  struct btp_sharedlib *lib1 = btp_sharedlib_new();
+  assert(lib1);
+  struct btp_sharedlib *lib2 = btp_sharedlib_new();
+  assert(lib2);
+  assert(btp_sharedlib_count(lib1) == 1);
+  assert(btp_sharedlib_count(lib2) == 1);
+  btp_sharedlib_append(lib1, lib2);
+  assert(btp_sharedlib_count(lib1) == 2);
+  assert(btp_sharedlib_count(lib2) == 1);
+  btp_sharedlib_free(lib1);
+  return 0;
+}
+]])
+
+## -------------------------- ##
+## btp_sharedlib_find_address ##
+## -------------------------- ##
+AT_TESTFUN([btp_sharedlib_find_address],
+[[
+#include <lib/sharedlib.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+
+int main(void)
+{
+  char *bt = btp_file_to_string("../../backtraces/621492.bt");
+  assert(bt);
+  struct btp_sharedlib *libs = btp_sharedlib_parse(bt);
+  assert(libs);
+  assert(btp_sharedlib_find_address(libs, 0x0000003848c08000));
+  assert(btp_sharedlib_find_address(libs, 0x00007f907d3f0000));
+  assert(!btp_sharedlib_find_address(libs, 0));
+  assert(!btp_sharedlib_find_address(libs, 0xffff00000000ffff));
+  btp_sharedlib_free(libs);
+  return 0;
+}
+]])

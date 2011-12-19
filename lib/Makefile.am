@@ -5,6 +5,7 @@ pkginclude_HEADERS = \
 	location.h \
 	metrics.h \
 	normalize.h \
+	sharedlib.h \
 	strbuf.h \
 	thread.h \
 	utils.h
@@ -25,6 +26,7 @@ libbtparser_la_SOURCES = \
 	normalize_libstdcpp.c \
 	normalize_linux.c \
 	normalize_xorg.c \
+	sharedlib.c \
 	strbuf.c \
 	thread.c \
 	utils.c
