@@ -212,7 +212,6 @@ btp_thread_skip_lwp(const char **input);
  * Create a thread from function names.
  * @param input
  * String containing function names, one per line.
- * First line is the number of the thread and is ignored.
  * @returns
  * Newly allocated structure, which should be released by
  * calling btp_thread_free().

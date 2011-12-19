@@ -24,6 +24,7 @@
 #include "lib/location.h"
 #include "lib/strbuf.h"
 #include "lib/metrics.h"
+#include "lib/normalize.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -212,11 +213,17 @@ int main(int argc, char **argv)
 
         btp_backtrace_remove_threads_except_one(backtrace, crash_thread);
 
-        printf("Thread no. %d", crash_thread->number);
+        btp_normalize_thread(crash_thread);
+
         struct btp_frame *frame = crash_thread->frames;
-        while (frame)
+        int written_funs = 0;
+        while (frame && written_funs < 8)
         {
-            printf("\n%s", frame->function_name);
+            if (frame->function_name)
+            {
+                printf("%s\n", frame->function_name);
+                written_funs++;
+            }
             frame = frame->next;
         }
         break;

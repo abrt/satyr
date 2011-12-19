@@ -407,21 +407,23 @@ btp_thread_parse_funs(const char *input)
     struct btp_frame *frame, **pframe = &thread->frames;
     int number = 0;
 
-    /* Skip the first line (thread number). */
-    input = strchr(input, '\n');
-
-    while (input && *++input)
+    while (input && *input)
     {
         next = strchr(input + 1, '\n');
         frame = btp_frame_new();
         if (next)
+        {
             frame->function_name = btp_strndup(input, next - input);
+            input = next + 1;
+        }
         else
+        {
             frame->function_name = btp_strdup(input);
+            input = next;
+        }
         frame->number = number++;
         *pframe = frame;
         pframe = &frame->next;
-        input = next;
     }
 
     return thread;
