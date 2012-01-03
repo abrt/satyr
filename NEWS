@@ -1,3 +1,12 @@
+== btparser 0.15
+Released 2011-01-04.
+
+- Added parser for 'info sharedlib' GDB command output (Michal Toman).
+- Added thread clustering (Miroslav Lichvár).
+- Python bindings (Michal Toman, Miroslav Lichvár).
+- Fixed some crashes and a bug in btp_backtrace_dup (Miroslav Lichvar,
+  Michal Toman).
+
 == btparser 0.14
 Released 2011-11-23.
 
