@@ -244,7 +244,16 @@ btp_thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *t
 float
 btp_thread_levenshtein_distance_f(struct btp_thread *thread1, struct btp_thread *thread2)
 {
-    return btp_thread_levenshtein_distance_custom(thread1, thread2, false, btp_frame_compare);
+    int frame_count1, frame_count2, max_frame_count;
+
+    frame_count1 = btp_thread_get_frame_count(thread1);
+    frame_count2 = btp_thread_get_frame_count(thread2);
+    max_frame_count = frame_count1 > frame_count2 ? frame_count1 : frame_count2;
+
+    if (!max_frame_count)
+        return 1.0;
+
+    return (float)btp_thread_levenshtein_distance_custom(thread1, thread2, true, btp_frame_compare) / max_frame_count;
 }
 
 static int

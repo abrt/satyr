@@ -76,7 +76,8 @@ btp_thread_jaccard_distance(struct btp_thread *thread1, struct btp_thread *threa
 int
 btp_thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition);
 
-/* Levenshtein distance returned in float with transpositions disabled */
+/* Levenshtein distance returned with transpositions enabled and
+ * returned in interval [0, 1] */
 float
 btp_thread_levenshtein_distance_f(struct btp_thread *thread1, struct btp_thread *thread2);
 
