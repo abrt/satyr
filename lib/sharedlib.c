@@ -79,7 +79,7 @@ btp_sharedlib_count(struct btp_sharedlib *a)
 
 struct btp_sharedlib *
 btp_sharedlib_find_address(struct btp_sharedlib *first,
-                           unsigned long address)
+                           unsigned long long address)
 {
     struct btp_sharedlib *tmp = first;
     while (tmp)
@@ -99,17 +99,15 @@ find_sharedlib_section_start(const char *input)
     /* searching for
        From      To      Syms Read      Shared Object Library
     */
-    char *tmp, *result;
-
-    /* ugly */
-    for (result = strstr(input, "From"); result; result = strstr(result + 1, "From"))
+    char *result = strstr(input, "From");
+    for (; result; result = strstr(result + 1, "From"))
     {
         /* must be at the beginning of the line
            or at the beginning of whole input */
         if (result != input && *(result - 1) != '\n')
             continue;
 
-        tmp = result + strlen("From");
+        char *tmp = result + strlen("From");
         while (isspace(*tmp))
             ++tmp;
 
@@ -144,23 +142,23 @@ btp_sharedlib_parse(const char *input)
     if (!tmp)
         return NULL;
 
-    struct btp_sharedlib *first = NULL, *current = NULL;
-    unsigned long from, to;
-    int symbols;
     /* Parsing
        From                 To                  Syms Read        Shared Object Library
        0x0123456789abcdef   0xfedcba987654321   Yes (*)|Yes|No   /usr/lib64/libbtparser.so.2.2.2
     */
+    struct btp_sharedlib *first = NULL, *current = NULL;
     while (1)
     {
         /* From To */
-        if (sscanf(tmp, "0x%lx 0x%lx", &from, &to) != 2)
+        unsigned long long from, to;
+        if (sscanf(tmp, "%Lx %Lx", &from, &to) != 2)
             break;
 
         while (isxdigit(*tmp) || isspace(*tmp) || *tmp == 'x')
             ++tmp;
 
         /* Syms Read */
+        int symbols;
         if (strncmp("Yes (*)", tmp, strlen("Yes (*)")) == 0)
         {
             tmp += strlen("Yes (*)");

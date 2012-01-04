@@ -33,8 +33,8 @@ enum
 
 struct btp_sharedlib
 {
-    unsigned long from;
-    unsigned long to;
+    unsigned long long from;
+    unsigned long long to;
     int symbols;
     char *soname;
     struct btp_sharedlib *next;
@@ -88,7 +88,7 @@ btp_sharedlib_count(struct btp_sharedlib *sharedlib);
  */
 struct btp_sharedlib *
 btp_sharedlib_find_address(struct btp_sharedlib *first,
-                           unsigned long address);
+                           unsigned long long address);
 
 /**
  * Parses the output of GDB's 'info sharedlib' command.
