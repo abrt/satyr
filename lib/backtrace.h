@@ -44,6 +44,11 @@ struct btp_backtrace
      * indistinguishable frames.
      */
     struct btp_frame *crash;
+
+    /**
+     * Shared libraries loaded at the moment of crash.
+     */
+    struct btp_sharedlib *libs;
 };
 
 /**

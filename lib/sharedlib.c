@@ -52,6 +52,25 @@ btp_sharedlib_free(struct btp_sharedlib *sharedlib)
     free(sharedlib);
 }
 
+struct btp_sharedlib *
+btp_sharedlib_dup(struct btp_sharedlib *sharedlib,
+                  bool siblings)
+{
+    struct btp_sharedlib *result = btp_sharedlib_new();
+    memcpy(result, sharedlib, sizeof(struct btp_sharedlib));
+    result->soname = btp_strdup(sharedlib->soname);
+
+    if (siblings)
+    {
+        if (result->next)
+            result->next = btp_sharedlib_dup(result->next, true);
+    }
+    else
+        result->next = NULL;
+
+    return result;
+}
+
 void
 btp_sharedlib_append(struct btp_sharedlib *a,
                      struct btp_sharedlib *b)

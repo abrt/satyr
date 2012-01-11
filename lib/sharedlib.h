@@ -20,6 +20,8 @@
 #ifndef BTPARSER_SHAREDLIB_H
 #define BTPARSER_SHAREDLIB_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -73,6 +75,20 @@ btp_sharedlib_free(struct btp_sharedlib *sharedlib);
 void
 btp_sharedlib_append(struct btp_sharedlib *a,
                      struct btp_sharedlib *b);
+
+/**
+ * Creates a duplicate of the sharedlib structure.
+ * @param sharedlib
+ * Structure to be duplicated.
+ * @param siblings
+ * Whether to duplicate a single structure or whole list.
+ * @returns
+ * Never returns NULL. Returns the duplicated structure
+ * or the first structure in the duplicated list.
+ */
+struct btp_sharedlib *
+btp_sharedlib_dup(struct btp_sharedlib *sharedlib,
+                  bool siblings);
 
 /**
  * Returns the number of sharedlibs in the list.

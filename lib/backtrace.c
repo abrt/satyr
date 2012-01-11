@@ -20,6 +20,7 @@
 #include "backtrace.h"
 #include "thread.h"
 #include "frame.h"
+#include "sharedlib.h"
 #include "utils.h"
 #include "strbuf.h"
 #include "location.h"
@@ -42,6 +43,7 @@ btp_backtrace_init(struct btp_backtrace *backtrace)
 {
     backtrace->threads = NULL;
     backtrace->crash = NULL;
+    backtrace->libs = NULL;
 }
 
 void
@@ -55,6 +57,13 @@ btp_backtrace_free(struct btp_backtrace *backtrace)
         struct btp_thread *rm = backtrace->threads;
         backtrace->threads = rm->next;
         btp_thread_free(rm);
+    }
+
+    while (backtrace->libs)
+    {
+        struct btp_sharedlib *rm = backtrace->libs;
+        backtrace->libs = rm->next;
+        btp_sharedlib_free(rm);
     }
 
     if (backtrace->crash)
@@ -73,6 +82,8 @@ btp_backtrace_dup(struct btp_backtrace *backtrace)
         result->crash = btp_frame_dup(backtrace->crash, false);
     if (backtrace->threads)
         result->threads = btp_thread_dup(backtrace->threads, true);
+    if (backtrace->libs)
+        result->libs = btp_sharedlib_dup(backtrace->libs, true);
 
     return result;
 }
@@ -330,6 +341,7 @@ btp_backtrace_parse(const char **input,
 {
     const char *local_input = *input;
     struct btp_backtrace *imbacktrace = btp_backtrace_new(); /* im - intermediate */
+    imbacktrace->libs = btp_sharedlib_parse(*input);
 
     /* The header is mandatory, but it might contain no frame header,
      * in some broken backtraces. In that case, backtrace.crash value
