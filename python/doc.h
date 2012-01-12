@@ -151,6 +151,11 @@
                                    "Returns: string - duplication hash\n" \
                                    "Computes the duplication hash used to compare backtraces."
 
+#define b_find_address_doc "Usage: backtrace.find_address(address)\n" \
+                           "address: long - address to find" \
+                           "Returns: btparser.Sharedlib object or None if not found\n" \
+                           "Looks whether the given address belongs to a shared library."
+
 #define b_crashframe_doc (char *)"Readonly. By default the field contains None. After " \
                          "calling the find_crash_frame method, a reference to " \
                          "btparser.Frame object is stored into the field."
@@ -161,6 +166,9 @@
 
 #define b_threads_doc (char *)"A list containing the btparser.Thread objects " \
                       "representing threads in the backtrace."
+
+#define b_libs_doc (char *)"A list containing the btparser.Sharedlib objects " \
+                   "representing shared libraries loaded at the moment of crash."
 
 /* distances */
 
@@ -201,3 +209,37 @@
 #define de_cut_doc "Usage: dendrogram.cut(level, min_size)\n" \
                    "Returns: list of clusters (lists of objects) which have at least min_size objects\n" \
                    "and which were merged at most at the specified distance"
+
+/* sharedlib */
+
+#define sharedlib_doc "btparser.Sharedlib - class representing a shared library loaded at the moment of crash"
+
+#define s_get_from_doc "Usage: sharedlib.get_from()\n" \
+                       "Returns: long - address where lib's memory begins"
+
+#define s_set_from_doc "Usage: sharedlib.set_from(newvalue)\n" \
+                       "Newvalue: long - address where lib's memory begins"
+
+#define s_get_to_doc "Usage: sharedlib.get_to()\n" \
+                     "Returns: long - address where lib's memory ends"
+
+#define s_set_to_doc "Usage: sharedlib.set_to(newvalue)\n" \
+                     "Newvalue: long - address where lib's memory ends"
+
+#define s_get_symbols_doc "Usage: sharedlib.get_symbols()\n" \
+                          "Returns: SYMS_OK / SYMS_NOT_FOUND / SYMS_WRONG"
+
+#define s_set_symbols_doc "Usage: sharedlib.set_symbols(newvalue)\n" \
+                          "Newvalue: SYMS_OK / SYMS_NOT_FOUND / SYMS_WRONG"
+
+#define s_get_soname_doc "Usage: sharedlib.get_soname()\n" \
+                         "Returns: string - library filename"
+
+#define s_set_soname_doc "Usage: sharedlib.set_soname(newvalue)\n" \
+                         "Newvalue: string - library filename"
+
+#define s_syms_ok_doc (char *)"Constant. Debug symbols for the library were loaded successfully."
+
+#define s_syms_wrong_doc (char *)"Constant. Debug symbols for the library were present, but did not match."
+
+#define s_syms_not_found_doc (char *)"Constant. Debug symbols for the library were not found."

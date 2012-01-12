@@ -9,6 +9,7 @@
 #include "thread.h"
 #include "metrics.h"
 #include "cluster.h"
+#include "sharedlib.h"
 #include "utils.h"
 
 /*********/
@@ -100,6 +101,7 @@ typedef struct {
     PyObject *threads;
     FrameObject *crashframe;
     ThreadObject *crashthread;
+    PyObject *libs;
 } BacktraceObject;
 
 /* helpers */
@@ -123,6 +125,7 @@ PyObject *p_btp_backtrace_limit_frame_depth(PyObject *self, PyObject *args);
 PyObject *p_btp_backtrace_quality_simple(PyObject *self, PyObject *args);
 PyObject *p_btp_backtrace_quality_complex(PyObject *self, PyObject *args);
 PyObject *p_btp_backtrace_get_duplication_hash(PyObject *self, PyObject *args);
+PyObject *p_btp_backtrace_find_address(PyObject *self, PyObject *args);
 
 /*************/
 /* distances */
@@ -180,3 +183,36 @@ PyObject *p_btp_dendrogram_get_merge_level(PyObject *self, PyObject *args);
 
 /* methods */
 PyObject *p_btp_dendrogram_cut(PyObject *self, PyObject *args);
+
+/*************/
+/* Sharedlib */
+/*************/
+
+extern PyTypeObject SharedlibTypeObject;
+
+typedef struct {
+    PyObject_HEAD
+    struct btp_sharedlib *sharedlib;
+    int syms_ok;
+    int syms_wrong;
+    int syms_not_found;
+} SharedlibObject;
+
+/* constructor */
+PyObject *p_btp_sharedlib_new(PyTypeObject *object, PyObject *args, PyObject *kwds);
+
+/* destructor */
+void p_btp_sharedlib_free(PyObject *object);
+
+/* str */
+PyObject *p_btp_sharedlib_str(PyObject *self);
+
+/* getters & setters */
+PyObject *p_btp_sharedlib_get_from(PyObject *self, PyObject *args);
+PyObject *p_btp_sharedlib_set_from(PyObject *self, PyObject *args);
+PyObject *p_btp_sharedlib_get_to(PyObject *self, PyObject *args);
+PyObject *p_btp_sharedlib_set_to(PyObject *self, PyObject *args);
+PyObject *p_btp_sharedlib_get_soname(PyObject *self, PyObject *args);
+PyObject *p_btp_sharedlib_set_soname(PyObject *self, PyObject *args);
+PyObject *p_btp_sharedlib_get_symbols(PyObject *self, PyObject *args);
+PyObject *p_btp_sharedlib_set_symbols(PyObject *self, PyObject *args);

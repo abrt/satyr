@@ -42,6 +42,12 @@ PyMODINIT_FUNC init_btparser()
         return;
     }
 
+    if (PyType_Ready(&SharedlibTypeObject) < 0)
+    {
+        puts("PyType_Ready(&SharedlibTypeObject) < 0");
+        return;
+    }
+
     PyObject *module = Py_InitModule("_btparser", module_methods);
     if (!module)
     {
@@ -59,4 +65,6 @@ PyMODINIT_FUNC init_btparser()
     PyModule_AddObject(module, "Distances", (PyObject *)&DistancesTypeObject);
     Py_INCREF(&DendrogramTypeObject);
     PyModule_AddObject(module, "Dendrogram", (PyObject *)&DendrogramTypeObject);
+    Py_INCREF(&SharedlibTypeObject);
+    PyModule_AddObject(module, "Sharedlib", (PyObject *)&SharedlibTypeObject);
 }

@@ -10,6 +10,7 @@ static PyMethodDef BacktraceMethods[] = {
     { "quality_simple",       p_btp_backtrace_quality_simple,       METH_NOARGS,  b_quality_simple_doc       },
     { "quality_complex",      p_btp_backtrace_quality_complex,      METH_NOARGS,  b_quality_complex_doc      },
     { "get_duplication_hash", p_btp_backtrace_get_duplication_hash, METH_NOARGS,  b_get_duplication_hash_doc },
+    { "find_address",         p_btp_backtrace_find_address,         METH_VARARGS, b_find_address_doc         },
     { NULL },
 };
 
@@ -17,6 +18,7 @@ static PyMemberDef BacktraceMembers[] = {
     { (char *)"threads",     T_OBJECT_EX, offsetof(BacktraceObject, threads),     0,        b_threads_doc     },
     { (char *)"crashframe",  T_OBJECT_EX, offsetof(BacktraceObject, crashframe),  READONLY, b_crashframe_doc  },
     { (char *)"crashthread", T_OBJECT_EX, offsetof(BacktraceObject, crashthread), READONLY, b_crashthread_doc },
+    { (char *)"libs",        T_OBJECT_EX, offsetof(BacktraceObject, libs),        0,        b_libs_doc        },
     { NULL },
 };
 
@@ -74,6 +76,8 @@ int backtrace_prepare_linked_list(BacktraceObject *backtrace)
 {
     int i;
     PyObject *item;
+
+    /* thread */
     ThreadObject *current = NULL, *prev = NULL;
     for (i = 0; i < PyList_Size(backtrace->threads); ++i)
     {
@@ -105,6 +109,36 @@ int backtrace_prepare_linked_list(BacktraceObject *backtrace)
 
     current->thread->next = NULL;
     Py_XDECREF(current);
+
+    /* sharedlib */
+    SharedlibObject *currentlib = NULL, *prevlib = NULL;
+    for (i = 0; i < PyList_Size(backtrace->libs); ++i)
+    {
+        item = PyList_GetItem(backtrace->libs, i);
+        if (!item)
+            return -1;
+
+        Py_INCREF(item);
+        if (!PyObject_TypeCheck(item, &SharedlibTypeObject))
+        {
+            Py_XDECREF(currentlib);
+            Py_XDECREF(prevlib);
+            PyErr_SetString(PyExc_TypeError, "libs must be a list of btparser.Sharedlib objects");
+            return -1;
+        }
+
+        currentlib = (SharedlibObject *)item;
+        if (i == 0)
+            backtrace->backtrace->libs = currentlib->sharedlib;
+        else
+            prevlib->sharedlib->next = currentlib->sharedlib;
+
+        Py_XDECREF(prevlib);
+        prevlib = currentlib;
+    }
+
+    currentlib->sharedlib->next = NULL;
+    Py_XDECREF(currentlib);
 
     return 0;
 }
@@ -140,6 +174,31 @@ PyObject *backtrace_prepare_thread_list(struct btp_backtrace *backtrace)
     return result;
 }
 
+PyObject *backtrace_prepare_sharedlib_list(struct btp_backtrace *backtrace)
+{
+    PyObject *result = PyList_New(0);
+    if (!result)
+        return PyErr_NoMemory();
+
+    Py_INCREF(result);
+
+    struct btp_sharedlib *sharedlib = backtrace->libs;
+    SharedlibObject *item;
+    while (sharedlib)
+    {
+        item = (SharedlibObject *)p_btp_sharedlib_new(&SharedlibTypeObject, PyTuple_New(0), NULL);
+        Py_INCREF(item);
+        btp_sharedlib_free(item->sharedlib);
+        item->sharedlib = sharedlib;
+
+        if (PyList_Append(result, (PyObject *)item) < 0)
+            return NULL;
+
+        sharedlib = sharedlib->next;
+    }
+    return result;
+}
+
 /* constructor */
 PyObject *p_btp_backtrace_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
@@ -168,11 +227,15 @@ PyObject *p_btp_backtrace_new(PyTypeObject *object, PyObject *args, PyObject *kw
         bo->threads = backtrace_prepare_thread_list(bo->backtrace);
         if (!bo->threads)
             return NULL;
+        bo->libs = backtrace_prepare_sharedlib_list(bo->backtrace);
+        if (!bo->libs)
+            return NULL;
     }
     else
     {
         bo->threads = PyList_New(0);
         bo->backtrace = btp_backtrace_new();
+        bo->libs = PyList_New(0);
     }
 
     return (PyObject *)bo;
@@ -218,6 +281,10 @@ PyObject *p_btp_backtrace_dup(PyObject *self, PyObject *args)
 
     bo->threads = backtrace_prepare_thread_list(bo->backtrace);
     if (!bo->threads)
+        return NULL;
+
+    bo->libs = backtrace_prepare_sharedlib_list(bo->backtrace);
+    if (!bo->libs)
         return NULL;
 
     if (PyObject_TypeCheck(this->crashthread, &ThreadTypeObject))
@@ -360,4 +427,32 @@ PyObject *p_btp_backtrace_get_duplication_hash(PyObject *self, PyObject *args)
         return NULL;
 
     return result;
+}
+
+PyObject *p_btp_backtrace_find_address(PyObject *self, PyObject *args)
+{
+    BacktraceObject *this = (BacktraceObject *)self;
+    if (backtrace_prepare_linked_list(this) < 0)
+        return NULL;
+
+    unsigned long long address;
+    if (!PyArg_ParseTuple(args, "l", &address))
+        return NULL;
+
+    int i;
+    SharedlibObject *item;
+    for (i = 0; i < PyList_Size(this->libs); ++i)
+    {
+        item = (SharedlibObject *)PyList_GetItem(this->libs, i);
+        if (!item)
+            return NULL;
+
+        if (item->sharedlib->from <= address && item->sharedlib->to >= address)
+        {
+            Py_INCREF(item);
+            return (PyObject *)item;
+        }
+    }
+
+    Py_RETURN_NONE;
 }

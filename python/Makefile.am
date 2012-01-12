@@ -12,6 +12,7 @@ _btparser_la_SOURCES = \
     backtrace.c \
     dendrogram.c \
     distances.c \
+    sharedlib.c \
     common.h doc.h
 _btparser_la_CPPFLAGS = \
     -DLOCALSTATEDIR='"$(localstatedir)"' \
