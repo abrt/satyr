@@ -74,7 +74,8 @@ LTLIBRARIES = $(clientexec_LTLIBRARIES)
 _btparser_la_LIBADD =
 am__btparser_la_OBJECTS = _btparser_la-module.lo _btparser_la-frame.lo \
 	_btparser_la-thread.lo _btparser_la-backtrace.lo \
-	_btparser_la-dendrogram.lo _btparser_la-distances.lo
+	_btparser_la-dendrogram.lo _btparser_la-distances.lo \
+	_btparser_la-sharedlib.lo
 _btparser_la_OBJECTS = $(am__btparser_la_OBJECTS)
 _btparser_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -240,6 +241,7 @@ _btparser_la_SOURCES = \
     backtrace.c \
     dendrogram.c \
     distances.c \
+    sharedlib.c \
     common.h doc.h
 
 _btparser_la_CPPFLAGS = \
@@ -335,6 +337,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-distances.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-frame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-sharedlib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-thread.Plo@am__quote@
 
 .c.o:
@@ -399,6 +402,13 @@ _btparser_la-distances.lo: distances.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='distances.c' object='_btparser_la-distances.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-distances.lo `test -f 'distances.c' || echo '$(srcdir)/'`distances.c
+
+_btparser_la-sharedlib.lo: sharedlib.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-sharedlib.lo -MD -MP -MF $(DEPDIR)/_btparser_la-sharedlib.Tpo -c -o _btparser_la-sharedlib.lo `test -f 'sharedlib.c' || echo '$(srcdir)/'`sharedlib.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-sharedlib.Tpo $(DEPDIR)/_btparser_la-sharedlib.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sharedlib.c' object='_btparser_la-sharedlib.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-sharedlib.lo `test -f 'sharedlib.c' || echo '$(srcdir)/'`sharedlib.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
