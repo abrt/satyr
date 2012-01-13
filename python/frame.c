@@ -16,6 +16,8 @@ static PyMethodDef FrameMethods[] = {
     { "set_signal_handler_called", p_btp_frame_set_signal_handler_called, METH_VARARGS, f_set_signal_handler_called_doc },
     { "get_address",               p_btp_frame_get_address,               METH_NOARGS,  f_get_address_doc               },
     { "set_address",               p_btp_frame_set_address,               METH_VARARGS, f_set_address_doc               },
+    { "get_library_name",          p_btp_frame_get_library_name,          METH_NOARGS,  f_get_library_name_doc          },
+    { "set_library_name",          p_btp_frame_set_library_name,          METH_VARARGS, f_set_library_name_doc          },
     /* methods */
     { "dup",                       p_btp_frame_dup,                       METH_NOARGS,  f_dup_doc                       },
     { "cmp",                       p_btp_frame_cmp,                       METH_VARARGS, f_cmp_doc                       },
@@ -124,6 +126,8 @@ PyObject *p_btp_frame_str(PyObject *self)
         btp_strbuf_append_strf(buf, "function %s", this->frame->function_name);
     if (this->frame->address != -1)
         btp_strbuf_append_strf(buf, " @ 0x%016lx", this->frame->address);
+    if (this->frame->library_name)
+        btp_strbuf_append_strf(buf, " (%s)", this->frame->library_name);
     char *str = btp_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
@@ -263,6 +267,24 @@ PyObject *p_btp_frame_set_address(PyObject *self, PyObject *args)
 
     struct btp_frame *frame = ((FrameObject *)self)->frame;
     frame->address = newvalue;
+    Py_RETURN_NONE;
+}
+
+/* library_name */
+PyObject *p_btp_frame_get_library_name(PyObject *self, PyObject *args)
+{
+    return Py_BuildValue("s", ((FrameObject *)self)->frame->library_name);
+}
+
+PyObject *p_btp_frame_set_library_name(PyObject *self, PyObject *args)
+{
+    char *newvalue;
+    if (!PyArg_ParseTuple(args, "s", &newvalue))
+        return NULL;
+
+    struct btp_frame *frame = ((FrameObject *)self)->frame;
+    free(frame->library_name);
+    frame->library_name = btp_strdup(newvalue);
     Py_RETURN_NONE;
 }
 

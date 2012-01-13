@@ -43,6 +43,7 @@ btp_frame_init(struct btp_frame *frame)
     frame->source_line = -1;
     frame->signal_handler_called = false;
     frame->address = -1;
+    frame->library_name = NULL;
     frame->user_data = NULL;
     frame->user_data_destructor = NULL;
     frame->next = NULL;
@@ -56,6 +57,7 @@ btp_frame_free(struct btp_frame *frame)
     free(frame->function_name);
     free(frame->function_type);
     free(frame->source_file);
+    free(frame->library_name);
     if (frame->user_data_destructor)
         frame->user_data_destructor(frame->user_data);
     free(frame);
@@ -83,6 +85,8 @@ btp_frame_dup(struct btp_frame *frame, bool siblings)
         result->function_type = btp_strdup(result->function_type);
     if (result->source_file)
         result->source_file = btp_strdup(result->source_file);
+    if (result->library_name)
+        result->library_name = btp_strdup(result->library_name);
 
     return result;
 }
@@ -190,6 +194,11 @@ btp_frame_cmp(struct btp_frame *f1,
     if (source_line != 0)
         return source_line;
 
+    /* Library name. */
+    int library_name = btp_strcmp0(f1->library_name, f2->library_name);
+    if (library_name != 0)
+        return library_name;
+
     /* Frame number. */
     if (compare_number)
     {
@@ -211,6 +220,10 @@ btp_frame_cmp_simple(struct btp_frame *frame1, struct btp_frame *frame2)
     int function_name = btp_strcmp0(frame1->function_name, frame2->function_name);
     if (function_name != 0)
         return function_name;
+
+    /* Assume they are the same if one of them is not known. */
+    if (frame1->library_name && frame2->library_name)
+        return strcmp(frame1->library_name, frame2->library_name);
 
     return 0;
 }

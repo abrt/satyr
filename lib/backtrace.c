@@ -455,3 +455,44 @@ btp_backtrace_parse_header(const char **input,
     *frame = btp_frame_parse(input, location);
     return *frame;
 }
+
+void
+btp_backtrace_set_libnames(struct btp_backtrace *backtrace)
+{
+    struct btp_thread *thread;
+    struct btp_frame *frame;
+    struct btp_sharedlib *lib;
+
+    thread = backtrace->threads;
+
+    while (thread)
+    {
+        frame = thread->frames;
+        while (frame)
+        {
+            lib = btp_sharedlib_find_address(backtrace->libs, frame->address);
+            if (lib)
+            {
+                char *s1, *s2;
+
+                /* Strip directory and version after the .so suffix. */
+                s1 = strrchr(lib->soname, '/');
+                if (!s1)
+                    s1 = lib->soname;
+                else
+                    s1++;
+                s2 = strstr(s1, ".so");
+                if (!s2)
+                    s2 = s1 + strlen(s1);
+                else
+                    s2 += strlen(".so");
+
+                if (frame->library_name)
+                    free(frame->library_name);
+                frame->library_name = btp_strndup(s1, s2 - s1);
+            }
+            frame = frame->next;
+        }
+        thread = thread->next;
+    }
+}

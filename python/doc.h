@@ -47,6 +47,12 @@
 #define f_set_address_doc "Usage: frame.set_address(N)\n" \
                           "N: positive long integer - new address"
 
+#define f_get_library_name_doc "Usage: frame.get_library_name()\n" \
+                              "Returns: string - library name"
+
+#define f_set_library_name_doc "Usage: frame.set_library_name(newname)\n" \
+                              "newname: string - new library name"
+
 #define f_dup_doc "Usage: frame.dup()\n" \
                   "Returns: btparser.Frame - a new clone of frame\n" \
                   "Clones the frame object. All new structures are independent " \
@@ -155,6 +161,9 @@
                            "address: long - address to find" \
                            "Returns: btparser.Sharedlib object or None if not found\n" \
                            "Looks whether the given address belongs to a shared library."
+
+#define b_set_libnames_doc "Usage: backtrace.set_libnames()\n" \
+                           "Sets library names according to sharedlibs data."
 
 #define b_crashframe_doc (char *)"Readonly. By default the field contains None. After " \
                          "calling the find_crash_frame method, a reference to " \

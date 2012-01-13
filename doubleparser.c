@@ -143,6 +143,9 @@ int main(int argc, char **argv)
 
             crash_thread1 = btp_backtrace_find_crash_thread(backtrace);
             crash_thread2 = btp_backtrace_find_crash_thread(backtrace2);
+
+            btp_backtrace_set_libnames(backtrace);
+            btp_backtrace_set_libnames(backtrace2);
         }
 
     if (!crash_thread1)

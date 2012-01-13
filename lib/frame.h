@@ -72,6 +72,10 @@ struct btp_frame
      */
     uint64_t address;
     /**
+     * A library name or NULL.
+     */
+    char *library_name;
+    /**
      * Pointer to data that can be used to store further information
      * about the frame. It is ignored by most of the btp_frame_* except
      * btp_frame_free.
@@ -228,7 +232,9 @@ btp_frame_cmp(struct btp_frame *f1,
               bool compare_number);
 
 /**
- * Compares two frames, but only by their function.
+ * Compares two frames, but only by their function and library names.
+ * Two unknown functions ("??") are assumed to be different and unknown
+ * library names to be the same.
  * @param f1
  * It must be non-NULL pointer. It's not modified by calling this
  * function.

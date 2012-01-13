@@ -111,8 +111,10 @@ next_functions_similar(struct btp_frame *frame1, struct btp_frame *frame2)
     if ((!frame1->next && frame2->next) ||
         (frame1->next && !frame2->next) ||
         (frame1->next && frame2->next &&
-         0 != btp_strcmp0(frame1->next->function_name,
-                         frame2->next->function_name)))
+         (0 != btp_strcmp0(frame1->next->function_name,
+                         frame2->next->function_name) ||
+         (frame1->next->library_name && frame2->next->library_name &&
+          0 != strcmp(frame1->next->library_name, frame2->next->library_name)))))
         return false;
     return true;
 }
@@ -132,6 +134,8 @@ btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct b
 
     if (0 == btp_strcmp0(curr_frame1->function_name, "??") &&
         0 == btp_strcmp0(curr_frame2->function_name, "??") &&
+        !(curr_frame1->library_name && curr_frame2->library_name &&
+          strcmp(curr_frame1->library_name, curr_frame2->library_name)) &&
         next_functions_similar(curr_frame1, curr_frame2))
     {
         free(curr_frame1->function_name);
@@ -153,9 +157,13 @@ btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct b
             while (curr_frame2)
             {
                 if (0 == btp_strcmp0(curr_frame2->function_name, "??") &&
+                    !(curr_frame1->library_name && curr_frame2->library_name &&
+                      strcmp(curr_frame1->library_name, curr_frame2->library_name)) &&
                     next_functions_similar(curr_frame1, curr_frame2) &&
                     0 == btp_strcmp0(prev_frame1->function_name,
-                                     prev_frame2->function_name))
+                                     prev_frame2->function_name) &&
+                    !(prev_frame1->library_name && prev_frame2->library_name &&
+                      strcmp(prev_frame1->library_name, prev_frame2->library_name)))
                 {
                     free(curr_frame1->function_name);
                     curr_frame1->function_name = btp_asprintf("__unknown_function_%d", i);

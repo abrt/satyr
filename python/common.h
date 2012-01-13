@@ -47,6 +47,8 @@ PyObject *p_btp_frame_get_signal_handler_called(PyObject *self, PyObject *args);
 PyObject *p_btp_frame_set_signal_handler_called(PyObject *self, PyObject *args);
 PyObject *p_btp_frame_get_address(PyObject *self, PyObject *args);
 PyObject *p_btp_frame_set_address(PyObject *self, PyObject *args);
+PyObject *p_btp_frame_get_library_name(PyObject *self, PyObject *args);
+PyObject *p_btp_frame_set_library_name(PyObject *self, PyObject *args);
 
 /* methods */
 PyObject *p_btp_frame_dup(PyObject *self, PyObject *args);
@@ -126,6 +128,7 @@ PyObject *p_btp_backtrace_quality_simple(PyObject *self, PyObject *args);
 PyObject *p_btp_backtrace_quality_complex(PyObject *self, PyObject *args);
 PyObject *p_btp_backtrace_get_duplication_hash(PyObject *self, PyObject *args);
 PyObject *p_btp_backtrace_find_address(PyObject *self, PyObject *args);
+PyObject *p_btp_backtrace_set_libnames(PyObject *self, PyObject *args);
 
 /*************/
 /* distances */
