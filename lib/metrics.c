@@ -28,18 +28,6 @@
 #include <string.h>
 #include <assert.h>
 
-int
-btp_frame_compare(struct btp_frame *frame1, struct btp_frame *frame2)
-{
-    if (btp_strcmp0(frame1->function_name, "??") == 0 &&
-       btp_strcmp0(frame2->function_name, "??") == 0)
-    {
-        return -1;
-    }
-    return(btp_strcmp0(frame1->function_name, frame2->function_name));
-}
-
-
 float
 btp_thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
         btp_frame_cmp_type compare_func)
@@ -226,19 +214,19 @@ btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_th
 float
 btp_thread_jarowinkler_distance(struct btp_thread *thread1, struct btp_thread *thread2)
 {
-    return btp_thread_jarowinkler_distance_custom(thread1, thread2, btp_frame_compare);
+    return btp_thread_jarowinkler_distance_custom(thread1, thread2, btp_frame_cmp_simple);
 }
 
 float
 btp_thread_jaccard_distance(struct btp_thread *thread1, struct btp_thread *thread2)
 {
-    return btp_thread_jaccard_distance_custom(thread1, thread2, btp_frame_compare);
+    return btp_thread_jaccard_distance_custom(thread1, thread2, btp_frame_cmp_simple);
 }
 
 int
 btp_thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition)
 {
-    return btp_thread_levenshtein_distance_custom(thread1, thread2, transposition, btp_frame_compare);
+    return btp_thread_levenshtein_distance_custom(thread1, thread2, transposition, btp_frame_cmp_simple);
 }
 
 float
@@ -253,7 +241,7 @@ btp_thread_levenshtein_distance_f(struct btp_thread *thread1, struct btp_thread 
     if (!max_frame_count)
         return 1.0;
 
-    return (float)btp_thread_levenshtein_distance_custom(thread1, thread2, true, btp_frame_compare) / max_frame_count;
+    return (float)btp_thread_levenshtein_distance_custom(thread1, thread2, true, btp_frame_cmp_simple) / max_frame_count;
 }
 
 static int

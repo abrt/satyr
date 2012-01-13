@@ -228,6 +228,22 @@ btp_frame_cmp(struct btp_frame *f1,
               bool compare_number);
 
 /**
+ * Compares two frames, but only by their function.
+ * @param f1
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @param f2
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @returns
+ * Returns 0 if the frames are same.  Returns negative number if f1 is
+ * found to be 'less' than f2.  Returns positive number if f1 is found
+ * to be 'greater' than f2.
+ */
+int
+btp_frame_cmp_simple(struct btp_frame *frame1, struct btp_frame *frame2);
+
+/**
  * Puts the frame 'b' to the bottom of the stack 'a'. In other words,
  * it finds the last sibling of the frame 'a', and appends the frame
  * 'b' to this last sibling.

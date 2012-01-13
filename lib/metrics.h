@@ -29,11 +29,6 @@ extern "C" {
 struct btp_frame;
 struct btp_thread;
 
-/* Compares two frames taking unknown functions ("??") as different ones.*/
-int
-btp_frame_compare(struct btp_frame *frame1, struct btp_frame *frame2);
-
-
 /* Jaro-Winkler distance:
  * Gets number of matching function names(match_count) from both threads and
  * number of transpositions in place(trans_count)

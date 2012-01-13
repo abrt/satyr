@@ -201,6 +201,21 @@ btp_frame_cmp(struct btp_frame *f1,
     return 0;
 }
 
+int
+btp_frame_cmp_simple(struct btp_frame *frame1, struct btp_frame *frame2)
+{
+    if (btp_strcmp0(frame1->function_name, "??") == 0 &&
+        btp_strcmp0(frame2->function_name, "??") == 0)
+        return -1;
+
+    int function_name = btp_strcmp0(frame1->function_name, frame2->function_name);
+    if (function_name != 0)
+        return function_name;
+
+    return 0;
+}
+
+
 void
 btp_frame_add_sibling(struct btp_frame *a, struct btp_frame *b)
 {
