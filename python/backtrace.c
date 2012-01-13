@@ -138,8 +138,11 @@ int backtrace_prepare_linked_list(BacktraceObject *backtrace)
         prevlib = currentlib;
     }
 
-    currentlib->sharedlib->next = NULL;
-    Py_XDECREF(currentlib);
+    if (currentlib)
+    {
+        currentlib->sharedlib->next = NULL;
+        Py_XDECREF(currentlib);
+    }
 
     return 0;
 }
