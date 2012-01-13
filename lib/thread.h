@@ -209,15 +209,30 @@ int
 btp_thread_skip_lwp(const char **input);
 
 /**
- * Create a thread from function names.
+ * Create a thread from function and library names.
  * @param input
- * String containing function names, one per line.
+ * String containing function names and library names separated
+ * by space, one frame per line.
  * @returns
  * Newly allocated structure, which should be released by
  * calling btp_thread_free().
  */
 struct btp_thread *
 btp_thread_parse_funs(const char *input);
+
+/**
+ * Prepare a string representing thread which contains just the function
+ * and library names. This can be used to store only data necessary for
+ * comparison.
+ * @param max_frames
+ * The maximum number of frames included in the output. Can be negative to
+ * effectively disable the limit.
+ * @returns
+ * Newly allocated string, which should be released by
+ * calling free(). The string can be parsed by btp_thread_parse_funs().
+ */
+char *
+btp_thread_format_funs(struct btp_thread *thread, int max_frames);
 
 #ifdef __cplusplus
 }

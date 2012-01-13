@@ -212,20 +212,13 @@ int main(int argc, char **argv)
         }
 
         btp_backtrace_remove_threads_except_one(backtrace, crash_thread);
+        btp_backtrace_set_libnames(backtrace);
 
         btp_normalize_thread(crash_thread);
 
-        struct btp_frame *frame = crash_thread->frames;
-        int written_funs = 0;
-        while (frame && written_funs < 8)
-        {
-            if (frame->function_name)
-            {
-                printf("%s\n", frame->function_name);
-                written_funs++;
-            }
-            frame = frame->next;
-        }
+        char *funs = btp_thread_format_funs(crash_thread, 8);
+        printf("%s", funs);
+        free(funs);
         break;
     }
     default:

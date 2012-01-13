@@ -402,7 +402,7 @@ btp_thread_skip_lwp(const char **input)
 struct btp_thread *
 btp_thread_parse_funs(const char *input)
 {
-    const char *next;
+    const char *next, *libname;
     struct btp_thread *thread = btp_thread_new();
     struct btp_frame *frame, **pframe = &thread->frames;
     int number = 0;
@@ -410,21 +410,49 @@ btp_thread_parse_funs(const char *input)
     while (input && *input)
     {
         next = strchr(input + 1, '\n');
+        if (!next)
+            break;
+
+        libname = strchr(input + 1, ' ');
+        if (!libname || libname > next)
+            libname = next;
+
         frame = btp_frame_new();
-        if (next)
-        {
-            frame->function_name = btp_strndup(input, next - input);
-            input = next + 1;
-        }
-        else
-        {
-            frame->function_name = btp_strdup(input);
-            input = next;
-        }
+        frame->function_name = btp_strndup(input, libname - input);
+        if (libname + 1 < next)
+            frame->library_name = btp_strndup(libname + 1, next - libname - 1);
+
+        input = next + 1;
         frame->number = number++;
         *pframe = frame;
         pframe = &frame->next;
     }
 
     return thread;
+}
+
+char *
+btp_thread_format_funs(struct btp_thread *thread, int max_frames)
+{
+    struct btp_frame *frame = thread->frames;
+    struct btp_strbuf *buf = btp_strbuf_new();
+
+    while (frame && max_frames != 0)
+    {
+        if (frame->function_name)
+        {
+            btp_strbuf_append_str(buf, frame->function_name);
+            if (frame->library_name)
+            {
+                btp_strbuf_append_char(buf, ' ');
+                btp_strbuf_append_str(buf, frame->library_name);
+            }
+            btp_strbuf_append_char(buf, '\n');
+            max_frames--;
+        }
+
+        frame = frame->next;
+    }
+
+    return btp_strbuf_free_nobuf(buf);
 }
