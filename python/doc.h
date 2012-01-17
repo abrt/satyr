@@ -165,6 +165,9 @@
 #define b_set_libnames_doc "Usage: backtrace.set_libnames()\n" \
                            "Sets library names according to sharedlibs data."
 
+#define b_normalize_doc "Usage: backtrace.normalize()\n" \
+                        "Normalizes all threads in the backtrace."
+
 #define b_crashframe_doc (char *)"Readonly. By default the field contains None. After " \
                          "calling the find_crash_frame method, a reference to " \
                          "btparser.Frame object is stored into the field."

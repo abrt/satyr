@@ -11,7 +11,8 @@ static PyMethodDef BacktraceMethods[] = {
     { "quality_complex",      p_btp_backtrace_quality_complex,      METH_NOARGS,  b_quality_complex_doc      },
     { "get_duplication_hash", p_btp_backtrace_get_duplication_hash, METH_NOARGS,  b_get_duplication_hash_doc },
     { "find_address",         p_btp_backtrace_find_address,         METH_VARARGS, b_find_address_doc         },
-    { "set_libnames",         p_btp_backtrace_set_libnames,         METH_VARARGS, b_set_libnames_doc         },
+    { "set_libnames",         p_btp_backtrace_set_libnames,         METH_NOARGS,  b_set_libnames_doc         },
+    { "normalize",            p_btp_backtrace_normalize,            METH_NOARGS,  b_normalize_doc            },
     { NULL },
 };
 
@@ -468,6 +469,21 @@ PyObject *p_btp_backtrace_set_libnames(PyObject *self, PyObject *args)
         return NULL;
 
     btp_backtrace_set_libnames(this->backtrace);
+    Py_CLEAR(this->threads);
+    this->threads = backtrace_prepare_thread_list(this->backtrace);
+    if (!this->threads)
+        return NULL;
+
+    Py_RETURN_NONE;
+}
+
+PyObject *p_btp_backtrace_normalize(PyObject *self, PyObject *args)
+{
+    BacktraceObject *this = (BacktraceObject *)self;
+    if (backtrace_prepare_linked_list(this) < 0)
+        return NULL;
+
+    btp_normalize_backtrace(this->backtrace);
     Py_CLEAR(this->threads);
     this->threads = backtrace_prepare_thread_list(this->backtrace);
     if (!this->threads)
