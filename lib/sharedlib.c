@@ -168,13 +168,23 @@ btp_sharedlib_parse(const char *input)
     struct btp_sharedlib *first = NULL, *current = NULL;
     while (1)
     {
-        /* From To */
-        unsigned long long from, to;
-        if (sscanf(tmp, "%Lx %Lx", &from, &to) != 2)
-            break;
+        unsigned long long from = -1, to = -1;
 
-        while (isxdigit(*tmp) || isspace(*tmp) || *tmp == 'x')
-            ++tmp;
+        /* ugly - from/to address is sometimes missing; skip it and jump to symbols */
+        if (isspace(*tmp))
+        {
+            while (isspace(*tmp))
+                ++tmp;
+        }
+        else
+        {
+            /* From To */
+            if (sscanf(tmp, "%Lx %Lx", &from, &to) != 2)
+                break;
+
+            while (isxdigit(*tmp) || isspace(*tmp) || *tmp == 'x')
+                ++tmp;
+        }
 
         /* Syms Read */
         int symbols;
