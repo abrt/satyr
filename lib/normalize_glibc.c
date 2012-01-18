@@ -107,7 +107,7 @@ btp_normalize_glibc_thread(struct btp_thread *thread)
         NORMALIZE_ARCH_SPECIFIC("strtok");
 
         /* Remove frames which are not a cause of the crash. */
-        bool removable =
+        bool removable_with_above =
             btp_frame_calls_func(frame, "__assert_fail") ||
             btp_frame_calls_func(frame, "__strcat_chk") ||
             btp_frame_calls_func(frame, "__strcpy_chk") ||
@@ -119,12 +119,22 @@ btp_normalize_glibc_thread(struct btp_thread *thread)
             btp_frame_calls_func(frame, "__vasprintf_chk") ||
             btp_frame_calls_func_in_file(frame, "malloc_consolidate", "malloc.c") ||
             btp_frame_calls_func_in_file(frame, "_int_malloc", "malloc.c") ||
+            btp_frame_calls_func_in_file(frame, "_int_memalign", "malloc.c") ||
+            btp_frame_calls_func_in_file(frame, "__libc_memalign", "malloc.c") ||
+            btp_frame_calls_func_in_file(frame, "__posix_memalign", "malloc.c") ||
             btp_frame_calls_func_in_file(frame, "__libc_calloc", "malloc.c");
-        if (removable)
+        bool removable = 
+            btp_frame_calls_func_in_file2(frame, "clone", "clone.S", "libc") ||
+            btp_frame_calls_func_in_file2(frame, "start_thread", "pthread_create.c", "libpthread");
+
+        if (removable_with_above)
         {
             bool success = btp_thread_remove_frames_above(thread, frame);
             assert(success);
-            success = btp_thread_remove_frame(thread, frame);
+        }
+        if (removable_with_above || removable)
+        {
+            bool success = btp_thread_remove_frame(thread, frame);
             assert(success);
         }
 
