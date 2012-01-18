@@ -120,7 +120,9 @@ PyObject *p_btp_frame_str(PyObject *self)
     FrameObject *this = (FrameObject *)self;
     struct btp_strbuf *buf = btp_strbuf_new();
     btp_strbuf_append_strf(buf, "Frame #%u: ", this->frame->number);
-    if (strncmp("??", this->frame->function_name, strlen("??")) == 0)
+    if (!this->frame->function_name)
+        btp_strbuf_append_str(buf, "signal handler");
+    else if (strncmp("??", this->frame->function_name, strlen("??")) == 0)
         btp_strbuf_append_str(buf, "unknown function");
     else
         btp_strbuf_append_strf(buf, "function %s", this->frame->function_name);
