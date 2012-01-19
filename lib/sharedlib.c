@@ -101,6 +101,10 @@ btp_sharedlib_find_address(struct btp_sharedlib *first,
                            unsigned long long address)
 {
     struct btp_sharedlib *tmp = first;
+
+    if (address == -1)
+        return NULL;
+
     while (tmp)
     {
         if (address >= tmp->from && address <= tmp->to)
