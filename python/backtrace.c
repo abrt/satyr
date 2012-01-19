@@ -354,6 +354,8 @@ PyObject *p_btp_backtrace_find_crash_thread(PyObject *self, PyObject *args)
     if (!result)
         return PyErr_NoMemory();
 
+    result->thread->number = thread->number;
+
     Py_CLEAR(result->frames);
     result->frames = thread_prepare_frame_list(thread);
     if (!result->frames)
