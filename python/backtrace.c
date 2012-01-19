@@ -444,6 +444,9 @@ PyObject *p_btp_backtrace_find_address(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &address))
         return NULL;
 
+    if (address == -1)
+        Py_RETURN_NONE;
+
     int i;
     SharedlibObject *item;
     for (i = 0; i < PyList_Size(this->libs); ++i)
