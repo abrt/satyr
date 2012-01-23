@@ -1,3 +1,8 @@
+== btparser 0.16
+
+- The backtrace parser has been extended to handle frames representing
+  inlined frames.
+
 == btparser 0.15
 Released 2011-01-04.
 
