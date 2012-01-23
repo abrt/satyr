@@ -68,7 +68,8 @@ struct btp_frame
     bool signal_handler_called;
     /**
      * The function address in the computer memory, or -1 when the
-     * address is unknown.
+     * address is unknown. Address is unknown when the frame
+     * represents inlined function.
      */
     uint64_t address;
     /**

@@ -404,6 +404,8 @@ void check(bool success,
 int main(void)
 {
   /* minimal */
+  check(true, "raise (sig=6)", -1, "raise");
+  /* still simple */
   check(true, "0x00ad0a91 in raise (sig=6)", 0xad0a91, "raise");
   /* longnum */
   check(true, "0xf00000322221730e in IA__g_bookmark_file_to_file (\n"
@@ -517,8 +519,17 @@ void check(char *input,
 
 int main(void)
 {
-  /* basic */
+  /* no function address - rhbz#752811 */
   struct btp_frame frame;
+  btp_frame_init(&frame);
+  frame.function_name = "slot_tp_getattr_hook";
+  frame.number = 0;
+  frame.source_file = "/usr/src/debug/Python-2.7.1/Objects/typeobject.c";
+  frame.source_line = 5436;
+  frame.address = -1;
+  check("#0  slot_tp_getattr_hook (self=<YumAvailableP...>) at /usr/src/debug/Python-2.7.1/Objects/typeobject.c:5436", &frame);
+
+  /* basic */
   btp_frame_init(&frame);
   frame.function_name = "fsync";
   frame.number = 1;

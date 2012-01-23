@@ -835,66 +835,66 @@ btp_frame_parse_address_in_function(const char **input,
     /* Read memory address in hexadecimal format. */
     int digits = btp_parse_hexadecimal_number(&local_input, address);
     location->column += digits;
-    if (0 == digits)
+    /* Memory address is optional. It is not present for inlined frames. */
+    if (digits == 0)
+        *address = -1;
+    else
     {
-        location->message = "Hexadecimal number representing memory address expected.";
-        return false;
-    }
+        /* Skip spaces. */
+        int chars = btp_skip_char_sequence(&local_input, ' ');
+        location->column += chars;
+        if (0 == chars)
+        {
+            location->message = "Space expected after memory address.";
+            return false;
+        }
 
-    /* Skip spaces. */
-    int chars = btp_skip_char_sequence(&local_input, ' ');
-    location->column += chars;
-    if (0 == chars)
-    {
-        location->message = "Space expected after memory address.";
-        return false;
-    }
+        /* Skip keyword "in". */
+        chars = btp_skip_string(&local_input, "in");
+        location->column += chars;
+        if (0 == chars)
+        {
+            location->message = "Keyword \"in\" expected after memory address.";
+            return false;
+        }
 
-    /* Skip keyword "in". */
-    chars = btp_skip_string(&local_input, "in");
-    location->column += chars;
-    if (0 == chars)
-    {
-        location->message = "Keyword \"in\" expected after memory address.";
-        return false;
-    }
-
-    /* Skip spaces. */
-    chars = btp_skip_char_sequence(&local_input, ' ');
-    location->column += chars;
-    if (0 == chars)
-    {
-        location->message = "Space expected after 'in'.";
-        return false;
-    }
-
-    /* C++ specific case for "0xfafa in vtable for function ()" */
-    chars = btp_skip_string(&local_input, "vtable");
-    location->column += chars;
-    if (0 <  chars)
-    {
+        /* Skip spaces. */
         chars = btp_skip_char_sequence(&local_input, ' ');
         location->column += chars;
         if (0 == chars)
         {
-            location->message = "Space expected after 'vtable'.";
+            location->message = "Space expected after 'in'.";
             return false;
         }
 
-        chars = btp_skip_string(&local_input, "for");
+        /* C++ specific case for "0xfafa in vtable for function ()" */
+        chars = btp_skip_string(&local_input, "vtable");
         location->column += chars;
-        if (0 == chars)
+        if (0 <  chars)
         {
-            location->message = "Keyword \"for\" expected.";
-            return false;
-        }
+            chars = btp_skip_char_sequence(&local_input, ' ');
+            location->column += chars;
+            if (0 == chars)
+            {
+                location->message = "Space expected after 'vtable'.";
+                return false;
+            }
 
-        chars = btp_skip_char_sequence(&local_input, ' ');
-        location->column += chars;
-        if (0 == chars)
-        {
-            location->message = "Space expected after 'for'.";
-            return false;
+            chars = btp_skip_string(&local_input, "for");
+            location->column += chars;
+            if (0 == chars)
+            {
+                location->message = "Keyword \"for\" expected.";
+                return false;
+            }
+
+            chars = btp_skip_char_sequence(&local_input, ' ');
+            location->column += chars;
+            if (0 == chars)
+            {
+                location->message = "Space expected after 'for'.";
+                return false;
+            }
         }
     }
 
