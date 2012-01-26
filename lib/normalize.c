@@ -159,6 +159,7 @@ btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct b
                 if (0 == btp_strcmp0(curr_frame2->function_name, "??") &&
                     !(curr_frame1->library_name && curr_frame2->library_name &&
                       strcmp(curr_frame1->library_name, curr_frame2->library_name)) &&
+                    0 != btp_strcmp0(prev_frame2->function_name, "??") &&
                     next_functions_similar(curr_frame1, curr_frame2) &&
                     0 == btp_strcmp0(prev_frame1->function_name,
                                      prev_frame2->function_name) &&
@@ -170,6 +171,7 @@ btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct b
                     free(curr_frame2->function_name);
                     curr_frame2->function_name = btp_asprintf("__unknown_function_%d", i);
                     i++;
+                    break;
                 }
                 prev_frame2 = curr_frame2;
                 curr_frame2 = curr_frame2->next;
