@@ -35,7 +35,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = btparser$(EXEEXT) doubleparser$(EXEEXT)
+bin_PROGRAMS = btparser$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/btparser.pc.in \
@@ -63,12 +63,6 @@ btparser_DEPENDENCIES = lib/libbtparser.la
 btparser_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(btparser_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am_doubleparser_OBJECTS = doubleparser-doubleparser.$(OBJEXT)
-doubleparser_OBJECTS = $(am_doubleparser_OBJECTS)
-doubleparser_DEPENDENCIES = lib/libbtparser.la
-doubleparser_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(doubleparser_CFLAGS) \
-	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -82,8 +76,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(btparser_SOURCES) $(doubleparser_SOURCES)
-DIST_SOURCES = $(btparser_SOURCES) $(doubleparser_SOURCES)
+SOURCES = $(btparser_SOURCES)
+DIST_SOURCES = $(btparser_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -295,9 +289,6 @@ SUBDIRS = lib python tests
 btparser_CFLAGS = -Wall -Werror
 btparser_SOURCES = btparser.c
 btparser_LDADD = lib/libbtparser.la
-doubleparser_CFLAGS = -Wall -Werror
-doubleparser_SOURCES = doubleparser.c
-doubleparser_LDADD = lib/libbtparser.la
 man_MANS = btparser.1
 EXTRA_DIST = $(man_MANS) btparser.pc.in autogen.sh RELEASE \
 	btparser.spec.in
@@ -399,9 +390,6 @@ clean-binPROGRAMS:
 btparser$(EXEEXT): $(btparser_OBJECTS) $(btparser_DEPENDENCIES) 
 	@rm -f btparser$(EXEEXT)
 	$(btparser_LINK) $(btparser_OBJECTS) $(btparser_LDADD) $(LIBS)
-doubleparser$(EXEEXT): $(doubleparser_OBJECTS) $(doubleparser_DEPENDENCIES) 
-	@rm -f doubleparser$(EXEEXT)
-	$(doubleparser_LINK) $(doubleparser_OBJECTS) $(doubleparser_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -410,7 +398,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/btparser-btparser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/doubleparser-doubleparser.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -446,20 +433,6 @@ btparser-btparser.obj: btparser.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='btparser.c' object='btparser-btparser.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btparser_CFLAGS) $(CFLAGS) -c -o btparser-btparser.obj `if test -f 'btparser.c'; then $(CYGPATH_W) 'btparser.c'; else $(CYGPATH_W) '$(srcdir)/btparser.c'; fi`
-
-doubleparser-doubleparser.o: doubleparser.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(doubleparser_CFLAGS) $(CFLAGS) -MT doubleparser-doubleparser.o -MD -MP -MF $(DEPDIR)/doubleparser-doubleparser.Tpo -c -o doubleparser-doubleparser.o `test -f 'doubleparser.c' || echo '$(srcdir)/'`doubleparser.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/doubleparser-doubleparser.Tpo $(DEPDIR)/doubleparser-doubleparser.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='doubleparser.c' object='doubleparser-doubleparser.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(doubleparser_CFLAGS) $(CFLAGS) -c -o doubleparser-doubleparser.o `test -f 'doubleparser.c' || echo '$(srcdir)/'`doubleparser.c
-
-doubleparser-doubleparser.obj: doubleparser.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(doubleparser_CFLAGS) $(CFLAGS) -MT doubleparser-doubleparser.obj -MD -MP -MF $(DEPDIR)/doubleparser-doubleparser.Tpo -c -o doubleparser-doubleparser.obj `if test -f 'doubleparser.c'; then $(CYGPATH_W) 'doubleparser.c'; else $(CYGPATH_W) '$(srcdir)/doubleparser.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/doubleparser-doubleparser.Tpo $(DEPDIR)/doubleparser-doubleparser.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='doubleparser.c' object='doubleparser-doubleparser.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(doubleparser_CFLAGS) $(CFLAGS) -c -o doubleparser-doubleparser.obj `if test -f 'doubleparser.c'; then $(CYGPATH_W) 'doubleparser.c'; else $(CYGPATH_W) '$(srcdir)/doubleparser.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
