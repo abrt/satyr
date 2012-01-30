@@ -95,8 +95,8 @@ int main()
   struct btp_frame *frame;
   threads[[0]] = create_thread(5, "aa", "??", "??", "??", "??");
   threads[[1]] = create_thread(5, "bb", "aa", "??", "??", "??");
-  threads[[2]] = create_thread(5, "aa", "__unknown_function_0", "__unknown_function_1", "??", "??");
-  threads[[3]] = create_thread(5, "bb", "aa","__unknown_function_0", "__unknown_function_1", "??");
+  threads[[2]] = create_thread(5, "aa", "??", "??", "??", "??");
+  threads[[3]] = create_thread(5, "bb", "aa", "??", "??", "??");
 
   threads[[4]] = btp_thread_dup(threads[[0]], false);
   threads[[5]] = btp_thread_dup(threads[[1]], false);
@@ -107,6 +107,17 @@ int main()
   threads[[4]] = btp_thread_dup(threads[[0]], false);
   threads[[5]] = btp_thread_dup(threads[[1]], false);
   btp_normalize_paired_unknown_function_names(threads[[5]], threads[[4]]);
+  assert(!btp_thread_cmp(threads[[2]], threads[[4]]));
+  assert(!btp_thread_cmp(threads[[3]], threads[[5]]));
+
+  threads[[0]] = create_thread(5, "aa", "??", "cc", "cc", "??");
+  threads[[1]] = create_thread(5, "bb", "aa", "??", "cc", "??");
+  threads[[2]] = create_thread(5, "aa", "__unknown_function_0", "cc", "cc", "__unknown_function_1");
+  threads[[3]] = create_thread(5, "bb", "aa","__unknown_function_0", "cc", "__unknown_function_1");
+
+  threads[[4]] = btp_thread_dup(threads[[0]], false);
+  threads[[5]] = btp_thread_dup(threads[[1]], false);
+  btp_normalize_paired_unknown_function_names(threads[[4]], threads[[5]]);
   assert(!btp_thread_cmp(threads[[2]], threads[[4]]));
   assert(!btp_thread_cmp(threads[[3]], threads[[5]]));
 

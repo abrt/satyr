@@ -113,6 +113,7 @@ next_functions_similar(struct btp_frame *frame1, struct btp_frame *frame2)
         (frame1->next && frame2->next &&
          (0 != btp_strcmp0(frame1->next->function_name,
                          frame2->next->function_name) ||
+          0 == btp_strcmp0(frame1->next->function_name, "??") ||
          (frame1->next->library_name && frame2->next->library_name &&
           0 != strcmp(frame1->next->library_name, frame2->next->library_name)))))
         return false;

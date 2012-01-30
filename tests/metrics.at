@@ -196,7 +196,7 @@ int main()
 
   btp_normalize_paired_unknown_function_names(thread1, thread2);
 
-  assert(2 == btp_thread_levenshtein_distance(thread1, thread2, false));
+  assert(3 == btp_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -213,7 +213,7 @@ int main()
 
   btp_normalize_paired_unknown_function_names(thread1, thread2);
 
-  assert(2 == btp_thread_levenshtein_distance(thread1, thread2, false));
+  assert(3 == btp_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
