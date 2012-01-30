@@ -3,7 +3,7 @@
 btparser \- a backtrace analyzer
 .SH SYNOPSIS
 .B btparser
-[option]... [FILE]
+[option]... [FILE]...
 .SH DESCRIPTION
 .I btparser
 is a command line tool that analyzes backtraces produced by
@@ -31,11 +31,24 @@ successfully detected.
 .IP "\-h, \-\-duplicate\-hash"
 Print a short, textual representation of the backtrace, useful for
 detecting the backtrace duplicates.
+.IP "\-s, \-\-distances"
+Print Damerau–Levenshtein distances between the backtraces specified on the command
+line.
+.IP "\-g, \-\-dendrogram"
+Cluster backtraces by their distance and print an ASCII representation of the
+dendrogram.
+.IP "\-l, \-\-clusters=LEVEL"
+Print clusters cut from the dendrogram at the specified level.
 
 .PP
 .B Additional options
 .IP "\-i, \-\-stdin"
 Read input from the standard input rather than file.
+.IP "\-m, \-\-max\-frames=FRAMES"
+When creating optimized backtrace or preparing backtrace for comparison, limit
+the number of frames to FRAMES. (default 8)
+.IP "\-z, \-\-min\-cluster\-size=SIZE"
+When printing clusters, ignore clusters that contain fewer than SIZE objects. (default 2)
 .IP "\-d, \-\-debug"
 Prints debug information when scanning/parsing the backtrace.
 .IP "\-v, \-\-verbose"
