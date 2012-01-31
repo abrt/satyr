@@ -493,7 +493,10 @@ PyObject *p_btp_backtrace_find_address(PyObject *self, PyObject *args)
             return NULL;
 
         if (item->sharedlib->from <= address && item->sharedlib->to >= address)
+        {
+            Py_INCREF(item);
             return (PyObject *)item;
+        }
     }
 
     Py_RETURN_NONE;
