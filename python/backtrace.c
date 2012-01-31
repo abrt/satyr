@@ -519,9 +519,22 @@ PyObject *p_btp_backtrace_normalize(PyObject *self, PyObject *args)
     if (backtrace_prepare_linked_list(this) < 0)
         return NULL;
 
-    /* destroys the linked list - need to rebuild python list */
-    btp_normalize_backtrace(this->backtrace);
-    if (backtrace_rebuild_thread_python_list(this) < 0)
+    /* destroys the linked list and frees some parts */
+    /* need to rebuild python list manually */
+    struct btp_backtrace *tmp = btp_backtrace_dup(this->backtrace);
+    btp_normalize_backtrace(tmp);
+    if (backtrace_free_thread_python_list(this) < 0)
+    {
+        btp_backtrace_free(tmp);
+        return NULL;
+    }
+
+    this->backtrace->threads = tmp->threads;
+    tmp->threads = NULL;
+    btp_backtrace_free(tmp);
+
+    this->threads = thread_linked_list_to_python_list(this->backtrace);
+    if (!this->threads)
         return NULL;
 
     Py_RETURN_NONE;
