@@ -73,11 +73,10 @@ PyTypeObject SharedlibTypeObject = {
 /* constructor */
 PyObject *p_btp_sharedlib_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
-    SharedlibObject *so = (SharedlibObject *)PyObject_MALLOC(sizeof(SharedlibObject));
+    SharedlibObject *so = (SharedlibObject *)PyObject_New(SharedlibObject, &SharedlibTypeObject);
     if (!so)
         return PyErr_NoMemory();
 
-    PyObject_INIT(so, &SharedlibTypeObject);
     so->sharedlib = btp_sharedlib_new();
     so->syms_ok = SYMS_OK;
     so->syms_wrong = SYMS_WRONG;

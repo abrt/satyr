@@ -71,7 +71,8 @@ typedef struct {
 
 /* helpers */
 int thread_prepare_linked_list(ThreadObject *thread);
-PyObject *thread_prepare_frame_list(struct btp_thread *thread);
+PyObject *frame_linked_list_to_python_list(struct btp_thread *thread);
+int thread_rebuild_python_list(ThreadObject *thread);
 
 /* constructor */
 PyObject *p_btp_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds);

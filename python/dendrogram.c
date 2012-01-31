@@ -63,7 +63,7 @@ PyTypeObject DendrogramTypeObject = {
 /* constructor */
 PyObject *p_btp_dendrogram_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
-    DendrogramObject *o = (DendrogramObject *)PyObject_MALLOC(sizeof(DendrogramObject));
+    DendrogramObject *o = (DendrogramObject *)PyObject_New(DendrogramObject, &DendrogramTypeObject);
     if (!o)
         return PyErr_NoMemory();
 
@@ -72,7 +72,6 @@ PyObject *p_btp_dendrogram_new(PyTypeObject *object, PyObject *args, PyObject *k
     if (!PyArg_ParseTuple(args, "O!", &DistancesTypeObject, &distances))
         return NULL;
 
-    PyObject_INIT(o, &DendrogramTypeObject);
     o->dendrogram = btp_distances_cluster_objects(distances->distances);
 
     return (PyObject *)o;

@@ -78,11 +78,9 @@ PyTypeObject FrameTypeObject = {
 /* constructor */
 PyObject *p_btp_frame_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
-    FrameObject *fo = (FrameObject *)PyObject_MALLOC(sizeof(FrameObject));
+    FrameObject *fo = (FrameObject *)PyObject_New(FrameObject, &FrameTypeObject);
     if (!fo)
         return PyErr_NoMemory();
-
-    PyObject_INIT(fo, &FrameTypeObject);
 
     const char *str = NULL;
     if (!PyArg_ParseTuple(args, "|s", &str))
@@ -295,10 +293,9 @@ PyObject *p_btp_frame_set_library_name(PyObject *self, PyObject *args)
 PyObject *p_btp_frame_dup(PyObject *self, PyObject *args)
 {
     FrameObject *this = (FrameObject *)self;
-    FrameObject *fo = (FrameObject *)PyObject_MALLOC(sizeof(FrameObject));
+    FrameObject *fo = (FrameObject *)PyObject_New(FrameObject, &FrameTypeObject);
     if (!fo)
         return PyErr_NoMemory();
-    PyObject_INIT(fo, &FrameTypeObject);
     fo->frame = btp_frame_dup(this->frame, false);
 
     return (PyObject *)fo;

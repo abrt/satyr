@@ -63,11 +63,9 @@ PyTypeObject DistancesTypeObject = {
 /* constructor */
 PyObject *p_btp_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
-    DistancesObject *o = (DistancesObject *)PyObject_MALLOC(sizeof(DistancesObject));
+    DistancesObject *o = (DistancesObject *)PyObject_New(DistancesObject, &DistancesTypeObject);
     if (!o)
         return PyErr_NoMemory();
-
-    PyObject_INIT(o, &DistancesTypeObject);
 
     PyObject * thread_list;
     int i, m, n;
@@ -190,10 +188,9 @@ PyObject *p_btp_distances_set_distance(PyObject *self, PyObject *args)
 PyObject *p_btp_distances_dup(PyObject *self, PyObject *args)
 {
     DistancesObject *this = (DistancesObject *)self;
-    DistancesObject *o = (DistancesObject *)PyObject_MALLOC(sizeof(DistancesObject));
+    DistancesObject *o = (DistancesObject *)PyObject_New(DistancesObject, &DistancesTypeObject);
     if (!o)
         return PyErr_NoMemory();
-    PyObject_INIT(o, &DistancesTypeObject);
 
     o->distances = btp_distances_dup(this->distances);
     if (!o->distances)

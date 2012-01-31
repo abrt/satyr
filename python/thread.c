@@ -109,7 +109,24 @@ int thread_prepare_linked_list(ThreadObject *thread)
     return 0;
 }
 
-PyObject *thread_prepare_frame_list(struct btp_thread *thread)
+int thread_free_frame_python_list(ThreadObject *thread)
+{
+    int i;
+    PyObject *item;
+
+    for (i = 0; i < PyList_Size(thread->frames); ++i)
+    {
+        item = PyList_GetItem(thread->frames, i);
+        if (!item)
+            return -1;
+        Py_DECREF(item);
+    }
+    Py_DECREF(thread->frames);
+
+    return 0;
+}
+
+PyObject *frame_linked_list_to_python_list(struct btp_thread *thread)
 {
     PyObject *result = PyList_New(0);
     if (!result)
@@ -119,11 +136,9 @@ PyObject *thread_prepare_frame_list(struct btp_thread *thread)
     FrameObject *item;
     while (frame)
     {
-        item = (FrameObject *)PyObject_MALLOC(sizeof(FrameTypeObject));
+        item = (FrameObject *)PyObject_New(FrameObject, &FrameTypeObject);
         if (!item)
             return PyErr_NoMemory();
-        PyObject_INIT(item, &FrameTypeObject);
-        Py_INCREF(item);
 
         item->frame = frame;
         if (PyList_Append(result, (PyObject *)item) < 0)
@@ -131,13 +146,29 @@ PyObject *thread_prepare_frame_list(struct btp_thread *thread)
 
         frame = frame->next;
     }
+
     return result;
+}
+
+int thread_rebuild_python_list(ThreadObject *thread)
+{
+    struct btp_frame *newlinkedlist = btp_frame_dup(thread->thread->frames, true);
+    if (thread_free_frame_python_list(thread) < 0)
+        return -1;
+    /* linked list */
+    thread->thread->frames = newlinkedlist;
+    /* python list */
+    thread->frames = frame_linked_list_to_python_list(thread->thread);
+    if (!thread->frames)
+        return -1;
+
+    return 0;
 }
 
 /* constructor */
 PyObject *p_btp_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
-    ThreadObject *to = (ThreadObject *)PyObject_MALLOC(sizeof(ThreadObject));
+    ThreadObject *to = (ThreadObject *)PyObject_New(ThreadObject, &ThreadTypeObject);
     if (!to)
         return PyErr_NoMemory();
 
@@ -146,7 +177,6 @@ PyObject *p_btp_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
     if (!PyArg_ParseTuple(args, "|si", &str, &only_funs))
         return NULL;
 
-    PyObject_INIT(to, &ThreadTypeObject);
     if (str)
     {
         if (!only_funs)
@@ -164,10 +194,9 @@ PyObject *p_btp_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
         {
             to->thread = btp_thread_parse_funs(str);
         }
-        to->frames = thread_prepare_frame_list(to->thread);
+        to->frames = frame_linked_list_to_python_list(to->thread);
         if (!to->frames)
             return NULL;
-        Py_INCREF(to->frames);
     }
     else
     {
@@ -182,6 +211,7 @@ PyObject *p_btp_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 void p_btp_thread_free(PyObject *object)
 {
     ThreadObject *this = (ThreadObject *)object;
+    thread_free_frame_python_list(this);
     this->thread->frames = NULL;
     btp_thread_free(this->thread);
     PyObject_Del(object);
@@ -231,16 +261,15 @@ PyObject *p_btp_thread_dup(PyObject *self, PyObject *args)
     if (thread_prepare_linked_list(this) < 0)
         return NULL;
 
-    ThreadObject *to = (ThreadObject *)PyObject_MALLOC(sizeof(ThreadObject));
+    ThreadObject *to = (ThreadObject *)PyObject_New(ThreadObject, &ThreadTypeObject);
     if (!to)
         return PyErr_NoMemory();
-    PyObject_INIT(to, &ThreadTypeObject);
 
     to->thread = btp_thread_dup(this->thread, false);
     if (!to->thread)
         return NULL;
 
-    to->frames = thread_prepare_frame_list(to->thread);
+    to->frames = frame_linked_list_to_python_list(to->thread);
 
     return (PyObject *)to;
 }
