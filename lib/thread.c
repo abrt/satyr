@@ -432,12 +432,12 @@ btp_thread_parse_funs(const char *input)
 }
 
 char *
-btp_thread_format_funs(struct btp_thread *thread, int max_frames)
+btp_thread_format_funs(struct btp_thread *thread)
 {
     struct btp_frame *frame = thread->frames;
     struct btp_strbuf *buf = btp_strbuf_new();
 
-    while (frame && max_frames != 0)
+    while (frame)
     {
         if (frame->function_name)
         {
@@ -448,7 +448,6 @@ btp_thread_format_funs(struct btp_thread *thread, int max_frames)
                 btp_strbuf_append_str(buf, frame->library_name);
             }
             btp_strbuf_append_char(buf, '\n');
-            max_frames--;
         }
 
         frame = frame->next;

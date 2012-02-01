@@ -224,15 +224,12 @@ btp_thread_parse_funs(const char *input);
  * Prepare a string representing thread which contains just the function
  * and library names. This can be used to store only data necessary for
  * comparison.
- * @param max_frames
- * The maximum number of frames included in the output. Can be negative to
- * effectively disable the limit.
  * @returns
  * Newly allocated string, which should be released by
  * calling free(). The string can be parsed by btp_thread_parse_funs().
  */
 char *
-btp_thread_format_funs(struct btp_thread *thread, int max_frames);
+btp_thread_format_funs(struct btp_thread *thread);
 
 #ifdef __cplusplus
 }

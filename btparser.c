@@ -299,7 +299,7 @@ int main(int argc, char **argv)
             else
             {
                 struct btp_thread *crash_thread = prepare_crash_thread(backtrace, arguments.max_frames);
-                char *funs = btp_thread_format_funs(crash_thread, -1);
+                char *funs = btp_thread_format_funs(crash_thread);
                 printf("%s", funs);
                 free(funs);
             }
