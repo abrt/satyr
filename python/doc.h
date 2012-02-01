@@ -115,6 +115,9 @@
                       "Returns: float - 0..1, thread quality\n" \
                       "Computes the ratio #good / #all. See quality_counts method for more."
 
+#define t_format_funs_doc "Usage: thread.format_funs()\n" \
+                      "Returns: string"
+
 #define t_frames_doc (char *)"A list containing btparser.Frame objects representing " \
                      "frames in a thread."
 

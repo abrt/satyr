@@ -10,6 +10,7 @@ static PyMethodDef ThreadMethods[] = {
     { "dup",            p_btp_thread_dup,            METH_NOARGS,  t_dup_doc            },
     { "quality_counts", p_btp_thread_quality_counts, METH_NOARGS,  t_quality_counts_doc },
     { "quality",        p_btp_thread_quality,        METH_NOARGS,  t_quality_doc        },
+    { "format_funs",    p_btp_thread_format_funs,    METH_NOARGS, t_format_funs_doc    },
     { NULL },
 };
 
@@ -309,4 +310,9 @@ PyObject *p_btp_thread_quality(PyObject *self, PyObject *args)
         return NULL;
 
     return Py_BuildValue("f", btp_thread_quality(this->thread));
+}
+
+PyObject *p_btp_thread_format_funs(PyObject *self, PyObject *args)
+{
+    return Py_BuildValue("s", btp_thread_format_funs(((ThreadObject *)self)->thread));
 }
