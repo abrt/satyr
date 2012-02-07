@@ -14,6 +14,7 @@ lib/.deps
 lib/.libs
 lib/*.l[ao]
 lib/Makefile
+python/*.l[ao]
 tests/Makefile
 tests/atconfig
 tests/atlocal
