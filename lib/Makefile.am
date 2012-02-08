@@ -31,7 +31,7 @@ libbtparser_la_SOURCES = \
 	thread.c \
 	utils.c
 
-libbtparser_la_CFLAGS = -Wall -Werror -D_GNU_SOURCE
+libbtparser_la_CFLAGS = -Wall -D_GNU_SOURCE
 libbtparser_la_LDFLAGS = -version-info 4:2:2
 
 # From http://www.seul.org/docs/autotut/

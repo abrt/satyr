@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = lib python tests
 
 bin_PROGRAMS = btparser
-btparser_CFLAGS = -Wall -Werror
+btparser_CFLAGS = -Wall
 btparser_SOURCES = btparser.c
 btparser_LDADD = lib/libbtparser.la
 

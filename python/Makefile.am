@@ -19,7 +19,7 @@ _btparser_la_CPPFLAGS = \
     -I../lib/ \
     $(PYTHON_CFLAGS) \
     -D_GNU_SOURCE \
-    -Wall -Wwrite-strings -Werror \
+    -Wall -Wwrite-strings \
     -fno-strict-aliasing
 _btparser_la_LDFLAGS = \
     -module \
