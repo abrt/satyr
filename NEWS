@@ -1,7 +1,20 @@
 == btparser 0.16
+Released 2011-02-08.
 
 - The backtrace parser has been extended to handle frames representing
   inlined frames.
+- Doubleparser command line tool got merged into btparser command line
+  tool.
+- Python bindings were significanly extended and several serious bugs
+  in reference counting and memory management were fixed.
+- The btp_normalize_paired_unknown_function_names function is now more
+  conservative in matching unknown frames.
+- The sharedlib parser was extended to handle less usual input and
+  btp_sharedlib_find_address now correctly handless unknown addresses
+  on input.
+- Thread normalization is now extended to remove a wide range of glib
+  and glibc function calls.
+- The format of optimized backtraces has been changed.
 
 == btparser 0.15
 Released 2011-01-04.
