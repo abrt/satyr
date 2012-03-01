@@ -76,6 +76,12 @@ btp_normalize_xorg_thread(struct btp_thread *thread);
 void
 btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct btp_thread *thread2);
 
+/**
+ * Remove frames which are not interesting in comparison with other threads.
+ */
+void
+btp_normalize_optimize_thread(struct btp_thread *thread);
+
 #ifdef __cplusplus
 }
 #endif

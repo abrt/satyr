@@ -513,6 +513,7 @@ btp_backtrace_get_optimized_thread(struct btp_backtrace *backtrace, int max_fram
     btp_backtrace_remove_threads_except_one(backtrace, crash_thread);
     btp_backtrace_set_libnames(backtrace);
     btp_normalize_thread(crash_thread);
+    btp_normalize_optimize_thread(crash_thread);
 
     /* Remove frames with no function name (i.e. signal handlers). */
     struct btp_frame *frame = crash_thread->frames, *frame_next;

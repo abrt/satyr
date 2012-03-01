@@ -184,3 +184,20 @@ btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct b
         curr_frame2 = prev_frame2->next;
     }
 }
+
+void
+btp_normalize_optimize_thread(struct btp_thread *thread)
+{
+    struct btp_frame *frame = thread->frames;
+    while (frame)
+    {
+        struct btp_frame *next_frame = frame->next;
+
+        /* Remove main(). */
+        if (frame->function_name &&
+                strcmp(frame->function_name, "main") == 0)
+            btp_thread_remove_frame(thread, frame);
+
+        frame = next_frame;
+    }
+}
