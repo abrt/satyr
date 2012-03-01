@@ -496,3 +496,39 @@ btp_backtrace_set_libnames(struct btp_backtrace *backtrace)
         thread = thread->next;
     }
 }
+
+struct btp_thread *
+btp_backtrace_get_optimized_thread(struct btp_backtrace *backtrace, int max_frames)
+{
+    struct btp_thread *crash_thread;
+
+    backtrace = btp_backtrace_dup(backtrace);
+    crash_thread = btp_backtrace_find_crash_thread(backtrace);
+
+    if (!crash_thread) {
+        btp_backtrace_free(backtrace);
+        return NULL;
+    }
+
+    btp_backtrace_remove_threads_except_one(backtrace, crash_thread);
+    btp_backtrace_set_libnames(backtrace);
+    btp_normalize_thread(crash_thread);
+
+    /* Remove frames with no function name (i.e. signal handlers). */
+    struct btp_frame *frame = crash_thread->frames, *frame_next;
+    while (frame)
+    {
+        frame_next = frame->next;
+        if (!frame->function_name)
+            btp_thread_remove_frame(crash_thread, frame);
+        frame = frame_next;
+    }
+
+    if (max_frames > 0)
+        btp_thread_remove_frames_below_n(crash_thread, max_frames);
+
+    crash_thread = btp_thread_dup(crash_thread, false);
+    btp_backtrace_free(backtrace);
+
+    return crash_thread;
+}

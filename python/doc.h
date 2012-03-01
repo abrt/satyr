@@ -171,6 +171,9 @@
 #define b_normalize_doc "Usage: backtrace.normalize()\n" \
                         "Normalizes all threads in the backtrace."
 
+#define b_get_optimized_thread_doc "Usage: backtrace.get_optimized_thread(max_frames)\n" \
+                        "Returns thread optimized for comparison."
+
 #define b_crashframe_doc (char *)"Readonly. By default the field contains None. After " \
                          "calling the find_crash_frame method, a reference to " \
                          "btparser.Frame object is stored into the field."

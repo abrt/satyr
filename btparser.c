@@ -222,33 +222,17 @@ struct btp_backtrace *parse_backtrace(char *filename)
     return backtrace;
 }
 
-struct btp_thread *prepare_crash_thread(struct btp_backtrace *backtrace, int max_frames)
+struct btp_thread *get_optimized_thread(struct btp_backtrace *backtrace, int max_frames)
 {
-    struct btp_thread *crash_thread = btp_backtrace_find_crash_thread(backtrace);
-    if (!crash_thread)
+    struct btp_thread *thread = btp_backtrace_get_optimized_thread(backtrace, max_frames);
+
+    if (!thread)
     {
         fprintf(stderr, "Failed to find the crash thread.\n");
         exit(1);
     }
 
-    btp_backtrace_remove_threads_except_one(backtrace, crash_thread);
-    btp_backtrace_set_libnames(backtrace);
-    btp_normalize_thread(crash_thread);
-
-    /* Remove frames with no function name (i.e. signal handlers). */
-    struct btp_frame *frame = crash_thread->frames, *frame_next;
-    while (frame)
-    {
-        frame_next = frame->next;
-        if (!frame->function_name)
-            btp_thread_remove_frame(crash_thread, frame);
-        frame = frame_next;
-    }
-
-    if (max_frames > 0)
-        btp_thread_remove_frames_below_n(crash_thread, max_frames);
-
-    return crash_thread;
+    return thread;
 }
 
 int main(int argc, char **argv)
@@ -298,10 +282,11 @@ int main(int argc, char **argv)
             }
             else
             {
-                struct btp_thread *crash_thread = prepare_crash_thread(backtrace, arguments.max_frames);
+                struct btp_thread *crash_thread = get_optimized_thread(backtrace, arguments.max_frames);
                 char *funs = btp_thread_format_funs(crash_thread);
                 printf("%s", funs);
                 free(funs);
+                btp_thread_free(crash_thread);
             }
             break;
         }
@@ -364,7 +349,7 @@ int main(int argc, char **argv)
             else
             {
                 struct btp_backtrace *backtrace = parse_backtrace(arguments.filenames[i]);
-                threads[i] = btp_thread_dup(prepare_crash_thread(backtrace, arguments.max_frames), false);
+                threads[i] = get_optimized_thread(backtrace, arguments.max_frames);
                 btp_backtrace_free(backtrace);
             }
         }

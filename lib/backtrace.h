@@ -274,6 +274,22 @@ btp_backtrace_parse_header(const char **input,
 void
 btp_backtrace_set_libnames(struct btp_backtrace *backtrace);
 
+/**
+ * Return crash thread optimized for comparison. It's normalized, with library
+ * names set and functions without names (signal handlers) are removed.
+ * @param backtrace
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @param max_frames
+ * The maximum number of frames in the returned crash thread.
+ * @returns
+ * A newly allocated thread structure or NULL. NULL is returned when the
+ * crashing thread could not be found. The returned structure should be
+ * released by btp_thread_free().
+ */
+struct btp_thread *
+btp_backtrace_get_optimized_thread(struct btp_backtrace *backtrace, int max_frames);
+
 #ifdef __cplusplus
 }
 #endif

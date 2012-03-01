@@ -133,6 +133,7 @@ PyObject *p_btp_backtrace_get_duplication_hash(PyObject *self, PyObject *args);
 PyObject *p_btp_backtrace_find_address(PyObject *self, PyObject *args);
 PyObject *p_btp_backtrace_set_libnames(PyObject *self, PyObject *args);
 PyObject *p_btp_backtrace_normalize(PyObject *self, PyObject *args);
+PyObject *p_btp_backtrace_get_optimized_thread(PyObject *self, PyObject *args);
 
 /*************/
 /* distances */

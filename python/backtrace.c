@@ -13,6 +13,7 @@ static PyMethodDef BacktraceMethods[] = {
     { "find_address",         p_btp_backtrace_find_address,         METH_VARARGS, b_find_address_doc         },
     { "set_libnames",         p_btp_backtrace_set_libnames,         METH_NOARGS,  b_set_libnames_doc         },
     { "normalize",            p_btp_backtrace_normalize,            METH_NOARGS,  b_normalize_doc            },
+    { "get_optimized_thread", p_btp_backtrace_get_optimized_thread, METH_VARARGS, b_get_optimized_thread_doc },
     { NULL },
 };
 
@@ -541,4 +542,34 @@ PyObject *p_btp_backtrace_normalize(PyObject *self, PyObject *args)
         return NULL;
 
     Py_RETURN_NONE;
+}
+
+PyObject *p_btp_backtrace_get_optimized_thread(PyObject *self, PyObject *args)
+{
+    BacktraceObject *this = (BacktraceObject *)self;
+    if (backtrace_prepare_linked_list(this) < 0)
+        return NULL;
+
+    int max_frames;
+    if (!PyArg_ParseTuple(args, "i", &max_frames))
+        return NULL;
+
+    struct btp_thread *thread = btp_backtrace_get_optimized_thread(this->backtrace, max_frames);
+    if (!thread)
+    {
+        PyErr_SetString(PyExc_LookupError, "Crash thread not found");
+        return NULL;
+    }
+
+    ThreadObject *result = (ThreadObject *)PyObject_New(ThreadObject, &ThreadTypeObject);
+    if (!result)
+        return PyErr_NoMemory();
+
+    result->thread = thread;
+    result->frames = frame_linked_list_to_python_list(result->thread);
+
+    if (backtrace_rebuild_thread_python_list(this) < 0)
+        return NULL;
+
+    return (PyObject *)result;
 }
