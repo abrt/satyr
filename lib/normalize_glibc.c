@@ -35,10 +35,14 @@ btp_glibc_thread_find_exit_frame(struct btp_thread *thread)
         bool is_exit_frame =
             btp_frame_calls_func_in_file(frame, "__run_exit_handlers", "exit.c") ||
             btp_frame_calls_func_in_file4(frame, "raise", "pt-raise.c", "libc.so", "libc-", "libpthread.so") ||
+            btp_frame_calls_func_in_file(frame, "__GI_raise", "raise.c") ||
             btp_frame_calls_func_in_file(frame, "exit", "exit.c") ||
             btp_frame_calls_func_in_file3(frame, "abort", "abort.c", "libc.so", "libc-") ||
+            btp_frame_calls_func_in_file(frame, "__GI_abort", "abort.c") ||
             /* Terminates a function in case of buffer overflow. */
-            btp_frame_calls_func_in_file2(frame, "__chk_fail", "chk_fail.c", "libc.so") || btp_frame_calls_func_in_file(frame, "kill", "syscall-template.S");
+            btp_frame_calls_func_in_file2(frame, "__chk_fail", "chk_fail.c", "libc.so") ||
+            btp_frame_calls_func_in_file2(frame, "__stack_chk_fail", "stack_chk_fail.c", "libc.so") ||
+            btp_frame_calls_func_in_file(frame, "kill", "syscall-template.S");
 
         if (is_exit_frame)
             result = frame;
