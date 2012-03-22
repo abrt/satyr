@@ -161,7 +161,16 @@ int thread_rebuild_python_list(ThreadObject *thread)
     /* python list */
     thread->frames = frame_linked_list_to_python_list(thread->thread);
     if (!thread->frames)
+    {
+        struct btp_frame *next;
+        while (newlinkedlist)
+        {
+            next = newlinkedlist->next;
+            btp_thread_free(newlinkedlist);
+            newlinkedlist = next;
+        }
         return -1;
+    }
 
     return 0;
 }

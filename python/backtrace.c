@@ -235,7 +235,16 @@ int backtrace_rebuild_thread_python_list(BacktraceObject *backtrace)
     if (!newlinkedlist)
         return -1;
     if (backtrace_free_thread_python_list(backtrace) < 0)
+    {
+        struct btp_thread *next;
+        while (newlinkedlist)
+        {
+            next = newlinkedlist->next;
+            btp_thread_free(newlinkedlist);
+            newlinkedlist = next;
+        }
         return -1;
+    }
     backtrace->backtrace->threads = newlinkedlist;
     backtrace->threads = thread_linked_list_to_python_list(backtrace->backtrace);
     return 0;
@@ -247,7 +256,16 @@ int backtrace_rebuild_sharedlib_python_list(BacktraceObject *backtrace)
     if (!newlinkedlist)
         return -1;
     if (backtrace_free_sharedlib_python_list(backtrace) < 0)
+    {
+        struct btp_sharedlib *next;
+        while (newlinkedlist)
+        {
+            next = newlinkedlist->next;
+            btp_sharedlib_free(newlinkedlist);
+            newlinkedlist = next;
+        }
         return -1;
+    }
     backtrace->backtrace->libs = newlinkedlist;
     backtrace->libs = sharedlib_linked_list_to_python_list(backtrace->backtrace);
     return 0;
@@ -381,7 +399,7 @@ PyObject *p_btp_backtrace_find_crash_frame(PyObject *self, PyObject *args)
     if (!result)
         return PyErr_NoMemory();
 
-    result->frame = btp_frame_dup(frame, false);
+    result->frame = frame;
     this->crashframe = result;
 
     if (backtrace_rebuild_thread_python_list(this) < 0)
