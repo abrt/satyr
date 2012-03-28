@@ -33,16 +33,7 @@ btp_normalize_glib_thread(struct btp_thread *thread)
         struct btp_frame *next_frame = frame->next;
 
         /* Normalize frame names. */
-        if (frame->function_name &&
-            0 == strncmp(frame->function_name, "IA__g_", strlen("IA__g_")))
-        {
-            /* Remove the IA__ prefix. The strcpy function cannot be
-             * used for that because the source and destination
-             * pointers overlap. */
-            char *p = frame->function_name;
-            while ((*p = p[4]) != '\0')
-                ++p;
-        }
+        btp_frame_remove_func_prefix(frame, "IA__g_", strlen("IA__"));
 
         /* Remove frames which are not a cause of the crash. */
         bool removable =
@@ -51,10 +42,14 @@ btp_normalize_glib_thread(struct btp_thread *thread)
             btp_frame_calls_func_in_file2(frame, "g_assertion_message", "gtestutils.c", "libglib") ||
             btp_frame_calls_func_in_file2(frame, "g_assertion_message_expr", "gtestutils.c", "libglib") ||
             btp_frame_calls_func_in_file2(frame, "g_closure_invoke", "gclosure.c", "libgobject") ||
+            btp_frame_calls_func_in_file2(frame, "g_free", "gmem.c", "libglib") ||
             btp_frame_calls_func_in_file2(frame, "g_type_class_meta_marshal", "gclosure.c", "libglib") ||
             btp_frame_calls_func_in_file2(frame, "g_signal_emit_valist", "gsignal.c", "libgobject") ||
             btp_frame_calls_func_in_file2(frame, "signal_emit_unlocked_R", "gsignal.c", "libgobject") ||
             btp_frame_calls_func_in_file2(frame, "g_signal_emit", "gsignal.c", "libgobject") ||
+            btp_frame_calls_func_in_file2(frame, "g_idle_dispatch", "gmain.c", "gutf8.c") ||
+            btp_frame_calls_func_in_file2(frame, "g_object_dispatch_properties_changed", "gobject.c", "libgobject") ||
+            btp_frame_calls_func_in_file2(frame, "g_object_notify_dispatcher", "gobject.c", "libgobject") ||
             btp_frame_calls_func_in_file2(frame, "g_object_unref", "gobject.c", "libgobject") ||
             btp_frame_calls_func_in_file2(frame, "g_object_run_dispose", "gobject.c", "libgobject") ||
             btp_frame_calls_func_in_file2(frame, "g_object_new", "gobject.c", "libgobject") ||
@@ -63,8 +58,10 @@ btp_normalize_glib_thread(struct btp_thread *thread)
             btp_frame_calls_func_in_file2(frame, "g_main_context_iterate", "gmain.c", "libglib") ||
             btp_frame_calls_func_in_file2(frame, "g_main_dispatch", "gmain.c", "libglib") ||
             btp_frame_calls_func_in_file2(frame, "g_main_loop_run", "gmain.c", "libglib") ||
+            btp_frame_calls_func_in_file2(frame, "g_timeout_dispatch", "gmain.c", "libglib") ||
             btp_frame_calls_func_in_file2(frame, "g_thread_pool_thread_proxy", "gthreadpool.c", "libglib") ||
             btp_frame_calls_func_in_file2(frame, "g_thread_create_proxy", "gthread.c", "libglib") ||
+            btp_frame_calls_func_in_file2(frame, "g_cclosure_marshal_VOID__BOXED", "gmarshal.c", "libgobject") ||
             btp_frame_calls_func_in_file3(frame, "g_cclosure_marshal_VOID__VOID", "gclosure.c", "gmarshal.c", "libgobject");
         if (removable)
         {

@@ -1,7 +1,7 @@
 /*
-    normalize_dbus.c
+    normalize_gdk.c
 
-    Copyright (C) 2010  Red Hat, Inc.
+    Copyright (C) 2012  Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,25 +21,18 @@
 #include "frame.h"
 #include "thread.h"
 #include <stdbool.h>
+#include <string.h>
 
 void
-btp_normalize_dbus_thread(struct btp_thread *thread)
+btp_normalize_gtk_thread(struct btp_thread *thread)
 {
     struct btp_frame *frame = thread->frames;
     while (frame)
     {
         struct btp_frame *next_frame = frame->next;
 
-        /* Remove frames which are not a cause of the crash. */
-        bool removable =
-            btp_frame_calls_func_in_file(frame, "gerror_to_dbus_error_message", "dbus-gobject.c") ||
-            btp_frame_calls_func_in_file(frame, "dbus_g_method_return_error", "dbus-gobject.c") ||
-            btp_frame_calls_func_in_file(frame, "message_queue_dispatch", "dbus-gmain.c") ||
-            btp_frame_calls_func_in_file2(frame, "dbus_connection_dispatch", "dbus-connection.c", "libdbus");
-        if (removable)
-        {
-            btp_thread_remove_frame(thread, frame);
-        }
+        /* Remove IA__ prefix. */
+        btp_frame_remove_func_prefix(frame, "IA__gtk", strlen("IA__"));
 
         frame = next_frame;
     }

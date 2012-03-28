@@ -23,6 +23,7 @@ libbtparser_la_SOURCES = \
 	normalize_gdk.c \
 	normalize_glib.c \
 	normalize_glibc.c \
+	normalize_gtk.c \
 	normalize_libstdcpp.c \
 	normalize_linux.c \
 	normalize_xorg.c \
