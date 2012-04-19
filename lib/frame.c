@@ -732,6 +732,15 @@ btp_frame_skip_function_args(const char **input, struct btp_location *location)
     bool escape = false;
     do
     {
+        /* Sometimes function args would be too long so printer
+         * truncates them. See frame #33 in rhbz#803600.
+         */
+        if (!escape && 0 == strncmp(local_input, "(truncated)", strlen("(truncated)")))
+        {
+            depth = 0;
+            string = false;
+        }
+
         if (string)
         {
             if (escape)
