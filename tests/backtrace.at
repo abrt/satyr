@@ -67,12 +67,12 @@ AT_TESTFUN([btp_backtrace_find_crash_thread],
 #include <lib/utils.h>
 #include <assert.h>
 
-int main(void)
+void check(const char *path, const char *first_thread_function_name)
 {
-  /* Load the backtrace from Red Hat Bugzilla bug #621492. */
+  /* Load the backtrace from a file. */
   struct btp_location location;
   btp_location_init(&location);
-  char *full_input = btp_file_to_string("../../backtraces/621492.bt");
+  char *full_input = btp_file_to_string(path);
   assert(full_input);
   char *input = full_input;
   struct btp_backtrace *backtrace = btp_backtrace_parse(&input, &location);
@@ -81,8 +81,17 @@ int main(void)
   /* Check that the crash thread is found. */
   struct btp_thread *crash_thread = btp_backtrace_find_crash_thread(backtrace);
   assert(crash_thread);
-  assert(0 == strcmp(crash_thread->frames->function_name, "raise"));
+  assert(0 == strcmp(crash_thread->frames->function_name, first_thread_function_name));
   btp_backtrace_free(backtrace);
+  return 0;
+}
+
+int main(void)
+{
+  /* Test the backtrace from Red Hat Bugzilla bug #621492. */
+  check("../../backtraces/621492.bt", "raise");
+  /* Test the backtrace from Red Hat Bugzilla bug #803600. */
+  check("../../backtraces/803600.bt", "validate_row");
   return 0;
 }
 ])
@@ -150,3 +159,36 @@ int main(void)
   return 0;
 }
 ]])
+
+## ----------------------------- ##
+## btp_backtrace_get_crash_frame ##
+## ----------------------------- ##
+AT_TESTFUN([btp_backtrace_get_crash_frame],
+[[
+#include <lib/backtrace.h>
+#include <lib/thread.h>
+#include <lib/frame.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdio.h>
+
+int main(void)
+{
+  /* Check the crash frame of backtrace from Red Hat Bugzilla bug #803600. */
+  struct btp_location location;
+  btp_location_init(&location);
+  char *full_input = btp_file_to_string("../../backtraces/803600.bt");
+  assert(full_input);
+  char *input = full_input;
+  struct btp_backtrace *backtrace = btp_backtrace_parse(&input, &location);
+  assert(backtrace);
+  struct btp_frame *crash_frame = btp_backtrace_get_crash_frame(backtrace);
+  puts(crash_frame->function_name);
+  assert(0 == strcmp(crash_frame->function_name, "validate_row"));
+  btp_frame_free(crash_frame);
+  btp_backtrace_free(backtrace);
+  return 0;
+}
+]])
+
