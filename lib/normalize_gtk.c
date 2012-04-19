@@ -1,5 +1,5 @@
 /*
-    normalize_gdk.c
+    normalize_gtk.c
 
     Copyright (C) 2012  Red Hat, Inc.
 
