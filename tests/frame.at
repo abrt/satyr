@@ -250,6 +250,8 @@ int main(void)
   check(true, "(this=0x7f1860023400, DPI=<value optimized out>)");
   /* string */
   check(true, "(filename=0x18971b0 \"/home/jfclere/.recently-used.xbel\")");
+  /* problematic frame #33 from rhbz#803600 */
+  check(true, "(func=<function at remote 0x1b3aa28>, arg=(<vmmAsyncJob(show_progress=False, topwin=<gtk.Window at remote 0x1b43690>, cancel_args=[<...>], _gobject_handles=[], _signal_id_map={}, cancel_job=None, window=<gtk.glade.XML at remote 0x1b43aa0>, _gobject_timeouts=[], config=<vmmConfig(rhel6_defaults=False, support_threading=True, glade_dir='/usr/share/virt-manager', _spice_error=None, conf_dir='/apps/virt-manager', appname='virt-manager', libvirt_packages=['libvirt'], support_inspection=False, keyring=None, appversion='0.9.0', preferred_distros=['rhel', 'fedora'], hv_packages=['qemu-kvm'], conf=<gconf.Client at remote 0x17ea9b0>, _objects=@<:@'<vmmErrorDialog object at 0x1885460 (virtManager+error+vmmErrorDialog at 0xfe9080)>', '<vmmEngine object at 0x1acaaf0 (virtManager+engine+vmmEngine at 0xfe8920)>', '<vmmErrorDialog object at 0x1acacd0 (virtManager+error+vmmErrorDialog at 0xfe2000)>', '<vmmSystray object at 0x1acad20 (virtManager+systray+vmmSystray at 0xfe8e60)>', '<vmmErrorDialog object at 0x1acad70 (virtManager+error+vmmErrorDialog at 0xd9b120)>', '<vm...(truncated), kw={})");
   /* TODO: parentesis balance */
   return 0;
 }
