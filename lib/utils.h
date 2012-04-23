@@ -52,6 +52,12 @@ btp_malloc(size_t size);
 /**
  * Never returns NULL.
  */
+void *
+btp_mallocz(size_t size);
+
+/**
+ * Never returns NULL.
+ */
 char *
 btp_vasprintf(const char *format, va_list p);
 
@@ -282,6 +288,12 @@ btp_skip_hexadecimal_number(const char **input);
  */
 int
 btp_parse_hexadecimal_number(const char **input, uint64_t *result);
+
+char *
+btp_skip_whitespace(const char *s);
+
+char *
+btp_skip_non_whitespace(const char *s);
 
 #ifdef __cplusplus
 }

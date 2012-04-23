@@ -8,11 +8,13 @@ pkginclude_HEADERS = \
 	sharedlib.h \
 	strbuf.h \
 	thread.h \
-	utils.h
+	utils.h \
+	core-backtrace.h
 
 lib_LTLIBRARIES = libbtparser.la
 libbtparser_la_SOURCES = \
 	$(pkginclude_HEADERS) \
+	core-backtrace.c \
 	backtrace.c \
 	cluster.c \
 	frame.c \
@@ -32,8 +34,8 @@ libbtparser_la_SOURCES = \
 	thread.c \
 	utils.c
 
-libbtparser_la_CFLAGS = -Wall -D_GNU_SOURCE
-libbtparser_la_LDFLAGS = -version-info 4:2:2
+libbtparser_la_CFLAGS = -Wall -D_GNU_SOURCE $(GLIB_CFLAGS)
+libbtparser_la_LDFLAGS = -version-info 4:2:2 $(GLIB_LIBS)
 
 # From http://www.seul.org/docs/autotut/
 # Version consists 3 numbers: CURRENT, REVISION, AGE.

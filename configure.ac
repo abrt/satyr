@@ -8,6 +8,9 @@ AC_PROG_CC
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 
+dnl get rid of glib
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.21])
+
 # Initialize the test suite.
 AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES([tests/Makefile tests/atlocal])
