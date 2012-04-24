@@ -9,6 +9,8 @@ License: GPLv2+
 URL: http://fedorahosted.org/btparser
 Source0: https://fedorahosted.org/released/btparser/btparser-%{version}.tar.xz
 BuildRequires: python2-devel
+BuildRequires: glib2-devel >= 2.21
+Requires: glib2 >= 2.21
 
 %description
 Btparser is a backtrace parser and analyzer, which works with
