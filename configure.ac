@@ -32,6 +32,13 @@ PKG_CHECK_MODULES([PYTHON], [python],,[
     PYTHON_CFLAGS='-I/usr/include/python2.6'
 ])
 
+# Fingerprinting -- x86_64 only
+AC_ARG_ENABLE([fingerprints],
+        AS_HELP_STRING([--enable-fingerprints], [enable assembly-based function fingerprinting (x86_64 only)]),
+        [enable_fingerprints=$enableval], [enable_fingerprints=yes])
+AC_CANONICAL_HOST
+AM_CONDITIONAL(ENABLE_DISASSEMBLY, [test "$host_cpu" = "x86_64" -a "$enable_fingerprints" != "no"])
+
 AC_CONFIG_FILES([
 	btparser.spec
 	btparser.pc

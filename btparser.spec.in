@@ -10,7 +10,9 @@ URL: http://fedorahosted.org/btparser
 Source0: https://fedorahosted.org/released/btparser/btparser-%{version}.tar.xz
 BuildRequires: python2-devel
 BuildRequires: glib2-devel >= 2.21
+BuildRequires: elfutils-devel, elfutils-libelf-devel, binutils-devel
 Requires: glib2 >= 2.21
+Requires: elfutils-libelf, elfutils-libs, binutils
 
 %description
 Btparser is a backtrace parser and analyzer, which works with

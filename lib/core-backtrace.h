@@ -74,6 +74,9 @@ btp_core_assign_build_ids(GList *backtrace, const char *unstrip_output,
 GList *
 btp_backtrace_extract_addresses(const char *bt);
 
+void
+btp_core_backtrace_fingerprint(GList *backtrace);
+
 #ifdef __cplusplus
 }
 #endif
