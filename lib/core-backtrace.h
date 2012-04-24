@@ -20,6 +20,7 @@
 #ifndef BTPARSER_CORE_BACKTRACE_H
 #define BTPARSER_CORE_BACKTRACE_H
 
+#include <glib.h>
 #include "frame.h"
 
 #ifdef __cplusplus
