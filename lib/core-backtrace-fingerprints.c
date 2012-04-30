@@ -18,6 +18,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "core-backtrace.h"
+
 /* NOTE: ENABLE_DISASSEMBLY should be only enabled on x86_64 as the code won't
  * work anywhere else. The configure script should take care of this. */
 #if !defined(ENABLE_DISASSEMBLY)
@@ -52,7 +54,6 @@ btp_core_backtrace_fingerprint(GList *backtrace)
 
 #include "utils.h"
 #include "strbuf.h"
-#include "core-backtrace.h"
 
 /* Logging */
 #define VERB1
