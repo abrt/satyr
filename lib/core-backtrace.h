@@ -30,7 +30,7 @@ extern "C" {
 struct frame_aux
 {
     char *build_id;
-    char *modname;
+    char *filename;
     char *fingerprint;
 };
 

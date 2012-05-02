@@ -47,7 +47,7 @@ btp_core_backtrace_fmt(GList *backtrace)
                                OR_UNKNOWN(entry->build_id),
                                entry->build_id_offset,
                                OR_UNKNOWN(entry->symbol),
-                               OR_UNKNOWN(entry->modname),
+                               OR_UNKNOWN(entry->filename),
                                OR_UNKNOWN(entry->fingerprint));
 
         backtrace = g_list_next(backtrace);
@@ -91,7 +91,7 @@ free_frame_aux(void *user_data)
         return;
 
     free(aux->build_id);
-    free(aux->modname);
+    free(aux->filename);
     free(aux->fingerprint);
     free(aux);
 }
@@ -157,8 +157,8 @@ btp_load_core_backtrace(const char *text)
         /* btparser uses "??" to denote unknown function name */
         frame->function_name = (symbol ? symbol : btp_strdup("??"));
 
-        /* MODNAME */
-        aux->modname = read_string(&cur);
+        /* FILENAME */
+        aux->filename = read_string(&cur);
 
         /* FINGERPRINT */
         aux->fingerprint = read_string(&cur);
