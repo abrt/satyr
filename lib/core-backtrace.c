@@ -32,6 +32,20 @@
 #define BACKTRACE_TRUNCATE_LENGTH 7
 #define OR_UNKNOWN(s) ((s) ? (s) : "-")
 
+void
+btp_backtrace_entry_free(struct backtrace_entry *entry)
+{
+    if (!entry)
+        return;
+
+    free(entry->build_id);
+    free(entry->symbol);
+    free(entry->modname);
+    free(entry->filename);
+    free(entry->fingerprint);
+    free(entry);
+}
+
 char *
 btp_core_backtrace_fmt(GList *backtrace)
 {
@@ -50,6 +64,7 @@ btp_core_backtrace_fmt(GList *backtrace)
                                OR_UNKNOWN(entry->filename),
                                OR_UNKNOWN(entry->fingerprint));
 
+        btp_backtrace_entry_free(entry);
         backtrace = g_list_next(backtrace);
     }
 

@@ -46,6 +46,9 @@ struct backtrace_entry {
     uintptr_t  function_length;
 };
 
+void
+btp_backtrace_entry_free(struct backtrace_entry *entry);
+
 char *
 btp_core_backtrace_fmt(GList *backtrace);
 
