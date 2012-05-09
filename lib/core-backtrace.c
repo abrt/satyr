@@ -28,6 +28,9 @@
 #include "utils.h"
 #include "thread.h"
 #include "normalize.h"
+#include "location.h"
+#include "backtrace.h"
+#include "frame.h"
 
 #define BACKTRACE_TRUNCATE_LENGTH 7
 #define OR_UNKNOWN(s) ((s) ? (s) : "-")
@@ -298,57 +301,46 @@ eat_line:
     }
 }
 
-/* move to backtrace.c */
 GList *
 btp_backtrace_extract_addresses(const char *bt)
 {
-    const char *cur = bt;
+    struct btp_location location;
+    btp_location_init(&location);
 
-    unsigned frame_number;
-    unsigned next_frame = 0;
-    uintmax_t address;
-
-    int ret;
-    int chars_read;
-
-    struct backtrace_entry *entry;
-    GList *backtrace = NULL;
-
-    while (*cur)
+    struct btp_backtrace *backtrace = btp_backtrace_parse(&bt, &location);
+    if (!backtrace)
     {
-        /* check whether current line describes frame and if we haven't seen it
-         * already (gdb prints the first one on start) */
-        ret = sscanf(cur, "#%u 0x%jx in %n", &frame_number, &address, &chars_read);
-        if (ret < 2 || frame_number != next_frame)
-        {
-            goto eat_line;
-        }
-        next_frame++;
-        cur += chars_read;
-
-        /* is symbol available? */
-        const char *sym;
-        if (*cur && *cur != '?')
-        {
-            sym = cur;
-            cur = btp_skip_non_whitespace(cur);
-
-            /* Ignore anything below __libc_start_main. */
-            if (!strncmp("__libc_start_main", sym, strlen("__libc_start_main")))
-                break;
-        }
-        else
-            sym = NULL;
-
-        entry = btp_mallocz(sizeof(*entry));
-        entry->address = (uintptr_t)address;
-        entry->symbol = (sym ? btp_strndup(sym, cur-sym) : NULL);
-        backtrace = g_list_append(backtrace, entry);
-
-eat_line:
-        while (*cur && *cur++ != '\n')
-            continue;
+        if (btp_debug_parser)
+            fprintf(stderr, "Unable to parse backtrace: %d:%d: %s\n",
+                    location.line, location.column, location.message);
+        return NULL;
     }
 
-    return backtrace;
+    struct btp_thread *thread = btp_backtrace_find_crash_thread(backtrace);
+    if (!thread)
+    {
+        if (btp_debug_parser)
+            fprintf(stderr, "Unable to find crash thread\n");
+        return NULL;
+    }
+
+    struct btp_frame *f;
+    GList *core_backtrace = NULL;
+    struct backtrace_entry *entry;
+
+    for (f = thread->frames; f != NULL; f = f->next)
+    {
+        entry = btp_mallocz(sizeof(*entry));
+
+        if (f->address != (uint64_t)(-1))
+            entry->address = (uintptr_t)f->address;
+
+        if (f->function_name && strcmp(f->function_name, "??") != 0)
+            entry->symbol = btp_strdup(f->function_name);
+
+        core_backtrace = g_list_append(core_backtrace, entry);
+    }
+
+    btp_backtrace_free(backtrace);
+    return core_backtrace;
 }
