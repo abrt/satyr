@@ -27,7 +27,7 @@ fi
 
 # Just PKG_CHECK_MODULES([PYTHON], [python]) works only with python2.7+
 # Below, if python is not found, we set up for python2.6 w/o checking:
-PKG_CHECK_MODULES([PYTHON], [python],,[
+PKG_CHECK_MODULES([PYTHON], [python2],,[
     PYTHON_LIBS='-L/usr/lib64 -lpython2.6'
     PYTHON_CFLAGS='-I/usr/include/python2.6'
 ])
