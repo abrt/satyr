@@ -11,7 +11,8 @@ pkginclude_HEADERS = \
 	thread.h \
 	utils.h \
 	core-backtrace.h \
-	core-backtrace-python.h
+	core-backtrace-python.h \
+	core-backtrace-oops.h
 
 lib_LTLIBRARIES = libbtparser.la
 libbtparser_la_SOURCES = \
@@ -19,6 +20,7 @@ libbtparser_la_SOURCES = \
 	core-backtrace.c \
 	core-backtrace-fingerprints.c \
 	core-backtrace-python.c \
+	core-backtrace-oops.c \
 	backtrace.c \
 	cluster.c \
 	frame.c \

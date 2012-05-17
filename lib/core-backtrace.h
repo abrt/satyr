@@ -35,7 +35,7 @@ struct frame_aux
 };
 
 struct backtrace_entry {
-    uintptr_t  address;
+    uint64_t   address;
     char      *build_id;
     uintptr_t  build_id_offset;
     char      *symbol;
