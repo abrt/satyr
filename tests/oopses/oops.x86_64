@@ -1,0 +1,49 @@
+[105546.136543] WARNING: at /builddir/build/BUILD/kernel-3.2.fc16/compat-wireless-3.3-rc1-2/drivers/net/wireless/ath/ath9k/rc.c:697 ath_rc_get_highest_rix+0x158/0x1f0 [ath9k]()
+[105546.136547] Hardware name: UL30JT
+[105546.136549] Modules linked in: lockd rfcomm bnep ip6t_REJECT nf_conntrack_ipv6 nf_defrag_ipv6 ip6table_filter ip6_tables nf_conntrack_ipv4 nf_defrag_ipv4 xt_state nf_conntrack binfmt_misc arc4 ath9k(O) mac80211(O) ath9k_common(O) ath9k_hw(O) ath(O) cfg80211(O) btusb bluetooth snd_hda_codec_hdmi snd_hda_codec_realtek snd_hda_intel snd_hda_codec snd_hwdep snd_seq snd_seq_device snd_pcm snd_timer snd uvcvideo videodev asus_laptop intel_ips sparse_keymap iTCO_wdt media v4l2_compat_ioctl32 rfkill soundcore snd_page_alloc atl1c iTCO_vendor_support serio_raw microcode joydev input_polldev uinput sunrpc xts gf128mul dm_crypt usb_storage nouveau i915 nouveau_jprobe(O) i915_jprobe(O) asus_switcheroo(O) ttm drm_kms_helper drm i2c_algo_bit i2c_core mxm_wmi wmi video [last unloaded: scsi_wait_scan]
+[105546.136611] Pid: 0, comm: swapper/2 Tainted: G        W  O 3.2.2-1.fc16.x86_64 #1
+[105546.136614] Call Trace:
+[105546.136616]  <IRQ>  [<ffffffff8106dd1f>] warn_slowpath_common+0x7f/0xc0
+[105546.136630]  [<ffffffff8106dd7a>] warn_slowpath_null+0x1a/0x20
+[105546.136636]  [<ffffffffa03eb6b8>] ath_rc_get_highest_rix+0x158/0x1f0 [ath9k]
+[105546.136642]  [<ffffffffa03eb88c>] ath_get_rate+0x8c/0x410 [ath9k]
+[105546.136646]  [<ffffffff81088610>] ? insert_work+0x70/0x80
+[105546.136666]  [<ffffffffa04e7aa6>] rate_control_get_rate+0x96/0x170 [mac80211]
+[105546.136680]  [<ffffffffa04f389f>] invoke_tx_handlers+0x6ff/0x13e0 [mac80211]
+[105546.136690]  [<ffffffffa04d2dac>] ? sta_info_get+0x6c/0x80 [mac80211]
+[105546.136703]  [<ffffffffa04f46d0>] ieee80211_tx+0x60/0xc0 [mac80211]
+[105546.136715]  [<ffffffffa04f47b1>] ieee80211_xmit+0x81/0xd0 [mac80211]
+[105546.136726]  [<ffffffffa04f4e5f>] ieee80211_subif_start_xmit+0x3af/0x9f0 [mac80211]
+[105546.136733]  [<ffffffff810992f7>] ? getnstimeofday+0x57/0xe0
+[105546.136739]  [<ffffffff814d48a2>] dev_hard_start_xmit+0x322/0x6e0
+[105546.136746]  [<ffffffff814f03af>] sch_direct_xmit+0xef/0x1c0
+[105546.136750]  [<ffffffff814d4de4>] dev_queue_xmit+0x184/0x600
+[105546.136755]  [<ffffffff814fdf85>] ? nf_hook_slow+0x75/0x150
+[105546.136759]  [<ffffffff8150cec0>] ? ip_fragment+0x810/0x810
+[105546.136763]  [<ffffffff8150d02b>] ip_finish_output+0x16b/0x2f0
+[105546.136766]  [<ffffffff8150db88>] ip_output+0x98/0xa0
+[105546.136769]  [<ffffffff8150d254>] ? __ip_local_out+0xa4/0xb0
+[105546.136772]  [<ffffffff8150d289>] ip_local_out+0x29/0x30
+[105546.136775]  [<ffffffff8150d3df>] ip_queue_xmit+0x14f/0x3f0
+[105546.136780]  [<ffffffff81524804>] tcp_transmit_skb+0x3e4/0x8d0
+[105546.136784]  [<ffffffff81525f31>] tcp_retransmit_skb+0x1a1/0x5f0
+[105546.136790]  [<ffffffff81113056>] ? perf_event_task_tick+0x1b6/0x290
+[105546.136794]  [<ffffffff8152789d>] tcp_retransmit_timer+0x1bd/0x670
+[105546.136798]  [<ffffffff81527ed8>] tcp_write_timer+0x188/0x1f0
+[105546.136803]  [<ffffffff8107d35b>] run_timer_softirq+0x12b/0x3b0
+[105546.136810]  [<ffffffff812bf1d4>] ? timerqueue_add+0x74/0xc0
+[105546.136813]  [<ffffffff81527d50>] ? tcp_retransmit_timer+0x670/0x670
+[105546.136817]  [<ffffffff8101b8d3>] ? native_sched_clock+0x13/0x80
+[105546.136822]  [<ffffffff81075348>] __do_softirq+0xb8/0x230
+[105546.136828]  [<ffffffff8101b3b9>] ? read_tsc+0x9/0x20
+[105546.136833]  [<ffffffff810a09d4>] ? tick_program_event+0x24/0x30
+[105546.136838]  [<ffffffff815eba2c>] call_softirq+0x1c/0x30
+[105546.136841]  [<ffffffff81016275>] do_softirq+0x65/0xa0
+[105546.136844]  [<ffffffff8107575e>] irq_exit+0x9e/0xc0
+[105546.136848]  [<ffffffff815ec3ce>] smp_apic_timer_interrupt+0x6e/0x99
+[105546.136854]  [<ffffffff815ea29e>] apic_timer_interrupt+0x6e/0x80
+[105546.136856]  <EOI>  [<ffffffff8130fd2d>] ? intel_idle+0xed/0x150
+[105546.136864]  [<ffffffff8130fd0f>] ? intel_idle+0xcf/0x150
+[105546.136870]  [<ffffffff814927f1>] cpuidle_idle_call+0xc1/0x280
+[105546.136874]  [<ffffffff8101322a>] cpu_idle+0xca/0x120
+[105546.136878]  [<ffffffff815d01b6>] start_secondary+0x260/0x262
