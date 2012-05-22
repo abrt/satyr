@@ -49,6 +49,20 @@ btp_backtrace_entry_free(struct backtrace_entry *entry)
     free(entry);
 }
 
+/* GFunc for g_list_foreach */
+static void
+btp_core_backtrace_elem_free(void *data, void *user_data)
+{
+    btp_backtrace_entry_free(data);
+}
+
+void
+btp_core_backtrace_free(GList *backtrace)
+{
+    g_list_foreach(backtrace, btp_core_backtrace_elem_free, NULL);
+    g_list_free(backtrace);
+}
+
 char *
 btp_core_backtrace_fmt(GList *backtrace)
 {
@@ -66,8 +80,6 @@ btp_core_backtrace_fmt(GList *backtrace)
                                OR_UNKNOWN(entry->symbol),
                                OR_UNKNOWN(entry->filename),
                                OR_UNKNOWN(entry->fingerprint));
-
-        btp_backtrace_entry_free(entry);
         backtrace = g_list_next(backtrace);
     }
 
