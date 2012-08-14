@@ -1,0 +1,18 @@
+
+#--------------------------------------
+# core backtrace for userspace crashes
+#--------------------------------------
+type userspace
+
+thread
+ frame
+  source /lib/libunwind.so.4 build-id
+  offset 0xfffff
+  symbol btp_test
+  fingerprint xxxxxxxx
+ frame
+  ...
+
+thread
+ frame
+  ...
