@@ -18,8 +18,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "thread.h"
-#include "frame.h"
+#include "gdb_thread.h"
+#include "gdb_frame.h"
 #include "utils.h"
 #include "metrics.h"
 #include "normalize.h"
@@ -29,11 +29,12 @@
 #include <assert.h>
 
 float
-btp_thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
-        btp_frame_cmp_type compare_func)
+btp_gdb_thread_jarowinkler_distance_custom(struct btp_gdb_thread *thread1,
+                                           struct btp_gdb_thread *thread2,
+                                           btp_gdb_frame_cmp_type compare_func)
 {
-    int frame1_count = btp_thread_get_frame_count(thread1);
-    int frame2_count = btp_thread_get_frame_count(thread2);
+    int frame1_count = btp_gdb_thread_get_frame_count(thread1);
+    int frame2_count = btp_gdb_thread_get_frame_count(thread2);
 
     if (frame1_count == 0 && frame2_count == 0)
     {
@@ -46,11 +47,11 @@ btp_thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_th
     float k, trans_count = 0, match_count = 0, dist_jaro, dist;
 
 
-    struct btp_frame *curr_frame = thread1->frames;
+    struct btp_gdb_frame *curr_frame = thread1->frames;
     for (i = 1; curr_frame; i++)
     {
         match = false;
-        struct btp_frame *curr_frame2 = thread2->frames;
+        struct btp_gdb_frame *curr_frame2 = thread2->frames;
         for (j = 1; !match && curr_frame2; j++)
         {
             /*whether the prefix continues to be the same for both threads or not*/
@@ -93,8 +94,8 @@ btp_thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_th
 }
 
 static bool
-frames_contain(struct btp_frame *frames, struct btp_frame *frame,
-        btp_frame_cmp_type compare_func)
+frames_contain(struct btp_gdb_frame *frames, struct btp_gdb_frame *frame,
+        btp_gdb_frame_cmp_type compare_func)
 {
     while (frames)
     {
@@ -107,12 +108,12 @@ frames_contain(struct btp_frame *frames, struct btp_frame *frame,
 }
 
 float
-btp_thread_jaccard_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
-        btp_frame_cmp_type compare_func)
+btp_gdb_thread_jaccard_distance_custom(struct btp_gdb_thread *thread1, struct btp_gdb_thread *thread2,
+        btp_gdb_frame_cmp_type compare_func)
 {
     int union_size, intersection_size = 0, set1_size = 0, set2_size = 0;
     float j_distance;
-    struct btp_frame *curr_frame;
+    struct btp_gdb_frame *curr_frame;
 
     for (curr_frame = thread1->frames; curr_frame; curr_frame = curr_frame->next)
     {
@@ -143,11 +144,11 @@ btp_thread_jaccard_distance_custom(struct btp_thread *thread1, struct btp_thread
 
 
 int
-btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
-        bool transposition, btp_frame_cmp_type compare_func)
+btp_gdb_thread_levenshtein_distance_custom(struct btp_gdb_thread *thread1, struct btp_gdb_thread *thread2,
+        bool transposition, btp_gdb_frame_cmp_type compare_func)
 {
-    int m = btp_thread_get_frame_count(thread1) + 1;
-    int n = btp_thread_get_frame_count(thread2) + 1;
+    int m = btp_gdb_thread_get_frame_count(thread1) + 1;
+    int n = btp_gdb_thread_get_frame_count(thread2) + 1;
 
     // store only two last rows and columns instead of whole 2D array
     int dist[m + n + 1], dist1[m + n + 1], dist2;
@@ -160,14 +161,14 @@ btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_th
     for (; i <= n; i++)
         dist[m + i] = i;
 
-    struct btp_frame *curr_frame2 = thread2->frames;
-    struct btp_frame *prev_frame = NULL;
-    struct btp_frame *prev_frame2 = NULL;
+    struct btp_gdb_frame *curr_frame2 = thread2->frames;
+    struct btp_gdb_frame *prev_frame = NULL;
+    struct btp_gdb_frame *prev_frame2 = NULL;
 
     for (j = 1; curr_frame2; j++)
     {
 
-        struct btp_frame *curr_frame = thread1->frames;
+        struct btp_gdb_frame *curr_frame = thread1->frames;
         for (i = 1; curr_frame; i++)
         {
             l = m + j - i;
@@ -212,36 +213,36 @@ btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_th
 }
 
 float
-btp_thread_jarowinkler_distance(struct btp_thread *thread1, struct btp_thread *thread2)
+btp_gdb_thread_jarowinkler_distance(struct btp_gdb_thread *thread1, struct btp_gdb_thread *thread2)
 {
-    return btp_thread_jarowinkler_distance_custom(thread1, thread2, btp_frame_cmp_simple);
+    return btp_gdb_thread_jarowinkler_distance_custom(thread1, thread2, btp_gdb_frame_cmp_simple);
 }
 
 float
-btp_thread_jaccard_distance(struct btp_thread *thread1, struct btp_thread *thread2)
+btp_gdb_thread_jaccard_distance(struct btp_gdb_thread *thread1, struct btp_gdb_thread *thread2)
 {
-    return btp_thread_jaccard_distance_custom(thread1, thread2, btp_frame_cmp_simple);
+    return btp_gdb_thread_jaccard_distance_custom(thread1, thread2, btp_gdb_frame_cmp_simple);
 }
 
 int
-btp_thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition)
+btp_gdb_thread_levenshtein_distance(struct btp_gdb_thread *thread1, struct btp_gdb_thread *thread2, bool transposition)
 {
-    return btp_thread_levenshtein_distance_custom(thread1, thread2, transposition, btp_frame_cmp_simple);
+    return btp_gdb_thread_levenshtein_distance_custom(thread1, thread2, transposition, btp_gdb_frame_cmp_simple);
 }
 
 float
-btp_thread_levenshtein_distance_f(struct btp_thread *thread1, struct btp_thread *thread2)
+btp_gdb_thread_levenshtein_distance_f(struct btp_gdb_thread *thread1, struct btp_gdb_thread *thread2)
 {
     int frame_count1, frame_count2, max_frame_count;
 
-    frame_count1 = btp_thread_get_frame_count(thread1);
-    frame_count2 = btp_thread_get_frame_count(thread2);
+    frame_count1 = btp_gdb_thread_get_frame_count(thread1);
+    frame_count2 = btp_gdb_thread_get_frame_count(thread2);
     max_frame_count = frame_count1 > frame_count2 ? frame_count1 : frame_count2;
 
     if (!max_frame_count)
         return 1.0;
 
-    return (float)btp_thread_levenshtein_distance_custom(thread1, thread2, true, btp_frame_cmp_simple) / max_frame_count;
+    return (float)btp_gdb_thread_levenshtein_distance_custom(thread1, thread2, true, btp_gdb_frame_cmp_simple) / max_frame_count;
 }
 
 static int
@@ -328,10 +329,10 @@ btp_distances_set_distance(struct btp_distances *distances, int i, int j,
 }
 
 struct btp_distances *
-btp_threads_compare(struct btp_thread **threads, int m, int n, btp_dist_thread_type dist_func)
+btp_gdb_threads_compare(struct btp_gdb_thread **threads, int m, int n, btp_dist_thread_type dist_func)
 {
     struct btp_distances *distances;
-    struct btp_thread *thread1, *thread2;
+    struct btp_gdb_thread *thread1, *thread2;
     int i, j, ok, all;
 
     distances = btp_distances_new(m, n);
@@ -340,8 +341,8 @@ btp_threads_compare(struct btp_thread **threads, int m, int n, btp_dist_thread_t
         for (j = i + 1; j < n; j++)
         {
             ok = all = 0;
-            btp_thread_quality_counts(threads[i], &ok, &all);
-            btp_thread_quality_counts(threads[j], &ok, &all);
+            btp_gdb_thread_quality_counts(threads[i], &ok, &all);
+            btp_gdb_thread_quality_counts(threads[j], &ok, &all);
 
             if (ok == all)
             {
@@ -352,8 +353,8 @@ btp_threads_compare(struct btp_thread **threads, int m, int n, btp_dist_thread_t
             {
                 /* There are some unknown function names, try to pair them, but
                  * the threads need to be copied first. */
-                thread1 = btp_thread_dup(threads[i], false);
-                thread2 = btp_thread_dup(threads[j], false);
+                thread1 = btp_gdb_thread_dup(threads[i], false);
+                thread2 = btp_gdb_thread_dup(threads[j], false);
                 btp_normalize_paired_unknown_function_names(thread1, thread2);
             }
 
@@ -361,8 +362,8 @@ btp_threads_compare(struct btp_thread **threads, int m, int n, btp_dist_thread_t
 
             if (ok != all)
             {
-                btp_thread_free(thread1);
-                btp_thread_free(thread2);
+                btp_gdb_thread_free(thread1);
+                btp_gdb_thread_free(thread2);
             }
         }
 

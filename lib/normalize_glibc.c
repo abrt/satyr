@@ -18,18 +18,18 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "normalize.h"
-#include "frame.h"
-#include "thread.h"
+#include "gdb_frame.h"
+#include "gdb_thread.h"
 #include "utils.h"
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 
-struct btp_frame *
-btp_glibc_thread_find_exit_frame(struct btp_thread *thread)
+struct btp_gdb_frame *
+btp_glibc_thread_find_exit_frame(struct btp_gdb_thread *thread)
 {
-    struct btp_frame *frame = thread->frames;
-    struct btp_frame *result = NULL;
+    struct btp_gdb_frame *frame = thread->frames;
+    struct btp_gdb_frame *result = NULL;
     while (frame)
     {
         bool is_exit_frame =
@@ -55,10 +55,10 @@ btp_glibc_thread_find_exit_frame(struct btp_thread *thread)
 
 
 void
-btp_normalize_glibc_thread(struct btp_thread *thread)
+btp_normalize_glibc_thread(struct btp_gdb_thread *thread)
 {
     /* Find the exit frame and remove everything above it. */
-    struct btp_frame *exit_frame = btp_glibc_thread_find_exit_frame(thread);
+    struct btp_gdb_frame *exit_frame = btp_glibc_thread_find_exit_frame(thread);
     if (exit_frame)
     {
         bool success = btp_thread_remove_frames_above(thread, exit_frame);
@@ -68,10 +68,10 @@ btp_normalize_glibc_thread(struct btp_thread *thread)
     }
 
     /* Standard function filtering loop. */
-    struct btp_frame *frame = thread->frames;
+    struct btp_gdb_frame *frame = thread->frames;
     while (frame)
     {
-        struct btp_frame *next_frame = frame->next;
+        struct btp_gdb_frame *next_frame = frame->next;
 
         /* Normalize frame names. */
 #define NORMALIZE_ARCH_SPECIFIC(func)                                   \
@@ -139,7 +139,7 @@ btp_normalize_glibc_thread(struct btp_thread *thread)
             btp_frame_calls_func_in_file(frame, "__libc_realloc", "malloc.c") ||
             btp_frame_calls_func_in_file(frame, "__posix_memalign", "malloc.c") ||
             btp_frame_calls_func_in_file(frame, "__libc_calloc", "malloc.c");
-        bool removable = 
+        bool removable =
             btp_frame_calls_func(frame, "_start") ||
             btp_frame_calls_func_in_file(frame, "__libc_start_main", "libc") ||
             btp_frame_calls_func_in_file2(frame, "clone", "clone.S", "libc") ||

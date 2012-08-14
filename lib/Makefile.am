@@ -1,28 +1,36 @@
 pkginclude_HEADERS = \
-	backtrace.h \
 	cluster.h \
-	frame.h \
-	hash_sha1.h \
+	core_backtrace.h \
+	core_fingerprint.h \
+	core_frame.h \
+	core_thread.h \
+	gdb_backtrace.h \
+	gdb_frame.h \
+	gdb_sharedlib.h \
+	gdb_thread.h \
 	location.h \
 	metrics.h \
 	normalize.h \
-	sharedlib.h \
-	strbuf.h \
-	thread.h \
+	python_backtrace.h \
 	utils.h \
-	core-backtrace.h \
-	core-backtrace-python.h
+	utils_disassembler.h \
+	utils_elf.h \
+	utils_sha1.h \
+	utils_strbuf.h \
+	utils_unstrip.h
 
 lib_LTLIBRARIES = libbtparser.la
 libbtparser_la_SOURCES = \
 	$(pkginclude_HEADERS) \
-	core-backtrace.c \
-	core-backtrace-fingerprints.c \
-	core-backtrace-python.c \
-	backtrace.c \
 	cluster.c \
-	frame.c \
-	hash_sha1.c \
+	core_backtrace.c \
+	core_fingerprint.c \
+	core_frame.c \
+	core_thread.c \
+	gdb_backtrace.c \
+	gdb_frame.c \
+	gdb_sharedlib.c \
+	gdb_thread.c \
 	location.c \
 	metrics.c \
 	normalize.c \
@@ -34,22 +42,20 @@ libbtparser_la_SOURCES = \
 	normalize_libstdcpp.c \
 	normalize_linux.c \
 	normalize_xorg.c \
-	sharedlib.c \
-	strbuf.c \
-	thread.c \
-	utils.c
+	python_backtrace.c \
+	utils.c \
+	utils_disassembler.c \
+	utils_elf.c \
+	utils_sha1.c \
+	utils_strbuf.c \
+	utils_unstrip.c
 
-libbtparser_la_CFLAGS = -Wall -D_GNU_SOURCE $(GLIB_CFLAGS)
+libbtparser_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE $(GLIB_CFLAGS)
 libbtparser_la_LDFLAGS = -version-info 4:2:2 $(GLIB_LIBS)
 
 if ENABLE_DISASSEMBLY
 libbtparser_la_CFLAGS += -DENABLE_DISASSEMBLY
-libbtparser_la_LIBADD = \
-    -lelf \
-    -ldw \
-    -ldl \
-    -lbfd \
-    -lopcodes
+libbtparser_la_LIBADD = -lelf -ldw -ldl -lbfd -lopcodes
 endif
 
 # From http://www.seul.org/docs/autotut/

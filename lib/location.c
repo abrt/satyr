@@ -19,8 +19,8 @@
 */
 #include "location.h"
 #include "utils.h"
-#include "strbuf.h"
-#include <stdlib.h> /* contains NULL */
+#include "utils_strbuf.h"
+#include <stdlib.h>
 
 void
 btp_location_init(struct btp_location *location)

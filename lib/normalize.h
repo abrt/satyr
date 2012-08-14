@@ -24,28 +24,29 @@
 extern "C" {
 #endif
 
-struct btp_thread;
-struct btp_backtrace;
+struct btp_gdb_frame;
+struct btp_gdb_thread;
+struct btp_gdb_backtrace;
 
 void
-btp_normalize_thread(struct btp_thread *thread);
+btp_normalize_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_backtrace(struct btp_backtrace *backtrace);
+btp_normalize_backtrace(struct btp_gdb_backtrace *backtrace);
 
 /**
  */
 void
-btp_normalize_dbus_thread(struct btp_thread *thread);
+btp_normalize_dbus_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_gdk_thread(struct btp_thread *thread);
+btp_normalize_gdk_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_gtk_thread(struct btp_thread *thread);
+btp_normalize_gtk_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_glib_thread(struct btp_thread *thread);
+btp_normalize_glib_thread(struct btp_gdb_thread *thread);
 
 /**
  * Checks whether the thread it contains some function used to exit
@@ -55,20 +56,20 @@ btp_normalize_glib_thread(struct btp_thread *thread);
  * @returns
  * Returns NULL if such a frame is not found.
  */
-struct btp_frame *
-btp_glibc_thread_find_exit_frame(struct btp_thread *thread);
+struct btp_gdb_frame *
+btp_glibc_thread_find_exit_frame(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_glibc_thread(struct btp_thread *thread);
+btp_normalize_glibc_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_libstdcpp_thread(struct btp_thread *thread);
+btp_normalize_libstdcpp_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_linux_thread(struct btp_thread *thread);
+btp_normalize_linux_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_xorg_thread(struct btp_thread *thread);
+btp_normalize_xorg_thread(struct btp_gdb_thread *thread);
 
 /**
  * Renames unknown function names ("??") that are between the same function names
@@ -77,13 +78,14 @@ btp_normalize_xorg_thread(struct btp_thread *thread);
  */
 
 void
-btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct btp_thread *thread2);
+btp_normalize_paired_unknown_function_names(struct btp_gdb_thread *thread1,
+                                            struct btp_gdb_thread *thread2);
 
 /**
  * Remove frames which are not interesting in comparison with other threads.
  */
 void
-btp_normalize_optimize_thread(struct btp_thread *thread);
+btp_normalize_optimize_thread(struct btp_gdb_thread *thread);
 
 #ifdef __cplusplus
 }

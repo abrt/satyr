@@ -26,8 +26,8 @@
 extern "C" {
 #endif
 
-struct btp_frame;
-struct btp_thread;
+struct btp_gdb_frame;
+struct btp_gdb_thread;
 
 /* Jaro-Winkler distance:
  * Gets number of matching function names(match_count) from both threads and
@@ -39,9 +39,9 @@ struct btp_thread;
  * Returns a number between 0 and 1:
  * 0 = no similarity, 1 = similar threads
  */
-
 float
-btp_thread_jarowinkler_distance(struct btp_thread *thread1, struct btp_thread *thread2);
+btp_gdb_thread_jarowinkler_distance(struct btp_gdb_thread *thread1,
+                                    struct btp_gdb_thread *thread2);
 
 
 /* Jaccard distance:
@@ -51,9 +51,9 @@ btp_thread_jarowinkler_distance(struct btp_thread *thread1, struct btp_thread *t
  * Returns a number between 0 and 1:
  * 0 = similar threads, 1 = no similarity
  */
-
 float
-btp_thread_jaccard_distance(struct btp_thread *thread1, struct btp_thread *thread2);
+btp_gdb_thread_jaccard_distance(struct btp_gdb_thread *thread1,
+                                struct btp_gdb_thread *thread2);
 
 
 /* Levenshtein distance:
@@ -67,29 +67,38 @@ btp_thread_jaccard_distance(struct btp_thread *thread1, struct btp_thread *threa
  * The distance is always between 0 and n, where n is the frame count of longer thread
  * 0 = similar threads, n = no similar function names
  */
-
 int
-btp_thread_levenshtein_distance(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition);
+btp_gdb_thread_levenshtein_distance(struct btp_gdb_thread *thread1,
+                                    struct btp_gdb_thread *thread2,
+                                    bool transposition);
 
 /* Levenshtein distance returned with transpositions enabled and
  * returned in interval [0, 1] */
 float
-btp_thread_levenshtein_distance_f(struct btp_thread *thread1, struct btp_thread *thread2);
+btp_gdb_thread_levenshtein_distance_f(struct btp_gdb_thread *thread1,
+                                      struct btp_gdb_thread *thread2);
 
-typedef int (*btp_frame_cmp_type)(struct btp_frame*, struct btp_frame*);
+typedef int (*btp_gdb_frame_cmp_type)(struct btp_gdb_frame*,
+                                      struct btp_gdb_frame*);
 
 /* Following three functions are equivalent to the three above except
  * that they take frame comparison function as an argument argument
  */
 float
-btp_thread_jarowinkler_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
-        btp_frame_cmp_type compare_func);
+btp_gdb_thread_jarowinkler_distance_custom(struct btp_gdb_thread *thread1,
+                                           struct btp_gdb_thread *thread2,
+                                           btp_gdb_frame_cmp_type compare_func);
+
 float
-btp_thread_jaccard_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2,
-        btp_frame_cmp_type compare_func);
+btp_gdb_thread_jaccard_distance_custom(struct btp_gdb_thread *thread1,
+                                       struct btp_gdb_thread *thread2,
+                                       btp_gdb_frame_cmp_type compare_func);
+
 int
-btp_thread_levenshtein_distance_custom(struct btp_thread *thread1, struct btp_thread *thread2, bool transposition,
-        btp_frame_cmp_type compare_func);
+btp_gdb_thread_levenshtein_distance_custom(struct btp_gdb_thread *thread1,
+                                           struct btp_gdb_thread *thread2,
+                                           bool transposition,
+                                           btp_gdb_frame_cmp_type compare_func);
 
 /**
  * Represents an m-by-n distance matrix.
@@ -166,7 +175,8 @@ btp_distances_set_distance(struct btp_distances *distances, int i, int j, float 
 /**
  * A function which compares two threads.
  */
-typedef float (*btp_dist_thread_type)(struct btp_thread *, struct btp_thread *);
+typedef float (*btp_dist_thread_type)(struct btp_gdb_thread *,
+                                      struct btp_gdb_thread *);
 
 /**
  * Creates a distances structure by comparing threads.
@@ -183,7 +193,9 @@ typedef float (*btp_dist_thread_type)(struct btp_thread *, struct btp_thread *);
  * This function never returns NULL.
  */
 struct btp_distances *
-btp_threads_compare(struct btp_thread **threads, int m, int n, btp_dist_thread_type dist_func);
+btp_gdb_threads_compare(struct btp_gdb_thread **threads,
+                    int m, int n,
+                    btp_dist_thread_type dist_func);
 
 #ifdef __cplusplus
 }

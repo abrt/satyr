@@ -34,7 +34,7 @@ struct btp_dendrogram
     /* How many objects were clustered. */
     int size;
     /* Indices of objects as they were in the top-level cluster. */
-    int *order;  
+    int *order;
     /**
      * Levels at which the clusters were merged. The clustering
      * can be reconstructed in order of increasing levels.

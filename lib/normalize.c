@@ -18,14 +18,14 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "normalize.h"
-#include "frame.h"
-#include "thread.h"
-#include "backtrace.h"
+#include "gdb_frame.h"
+#include "gdb_thread.h"
+#include "gdb_backtrace.h"
 #include "utils.h"
 #include <string.h>
 
 void
-btp_normalize_thread(struct btp_thread *thread)
+btp_normalize_thread(struct btp_gdb_thread *thread)
 {
     btp_normalize_dbus_thread(thread);
     btp_normalize_gdk_thread(thread);
@@ -53,7 +53,7 @@ btp_normalize_thread(struct btp_thread *thread)
         thread->frames->function_name &&
         0 == strcmp(thread->frames->function_name, "??"))
     {
-        btp_thread_remove_frame(thread, thread->frames);
+        btp_gdb_thread_remove_frame(thread, thread->frames);
     }
 
     /* If the last frame has address 0x0000 and its name is '??',
@@ -66,7 +66,7 @@ btp_normalize_thread(struct btp_thread *thread)
      * #3  0x0000000000000000 in ?? ()
      * @endcode
      */
-    struct btp_frame *last = thread->frames;
+    struct btp_gdb_frame *last = thread->frames;
     while (last && last->next)
         last = last->next;
     if (last &&
@@ -74,19 +74,19 @@ btp_normalize_thread(struct btp_thread *thread)
         last->function_name &&
         0 == strcmp(last->function_name, "??"))
     {
-        btp_thread_remove_frame(thread, last);
+        btp_gdb_thread_remove_frame(thread, last);
     }
 
     /* Merge recursively called functions into single frame */
-    struct btp_frame *curr_frame = thread->frames;
-    struct btp_frame *prev_frame = NULL;
-    while(curr_frame)
+    struct btp_gdb_frame *curr_frame = thread->frames;
+    struct btp_gdb_frame *prev_frame = NULL;
+    while (curr_frame)
     {
         if(prev_frame && 0 != btp_strcmp0(prev_frame->function_name, "??") &&
            0 == btp_strcmp0(prev_frame->function_name, curr_frame->function_name))
         {
             prev_frame->next = curr_frame->next;
-            btp_frame_free(curr_frame);
+            btp_gdb_frame_free(curr_frame);
             curr_frame = prev_frame->next;
             continue;
         }
@@ -96,9 +96,9 @@ btp_normalize_thread(struct btp_thread *thread)
 }
 
 void
-btp_normalize_backtrace(struct btp_backtrace *backtrace)
+btp_normalize_backtrace(struct btp_gdb_backtrace *backtrace)
 {
-    struct btp_thread *thread = backtrace->threads;
+    struct btp_gdb_thread *thread = backtrace->threads;
     while (thread)
     {
         btp_normalize_thread(thread);
@@ -107,7 +107,8 @@ btp_normalize_backtrace(struct btp_backtrace *backtrace)
 }
 
 static bool
-next_functions_similar(struct btp_frame *frame1, struct btp_frame *frame2)
+next_functions_similar(struct btp_gdb_frame *frame1,
+                       struct btp_gdb_frame *frame2)
 {
     if ((!frame1->next && frame2->next) ||
         (frame1->next && !frame2->next) ||
@@ -122,7 +123,8 @@ next_functions_similar(struct btp_frame *frame1, struct btp_frame *frame2)
 }
 
 void
-btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct btp_thread *thread2)
+btp_normalize_paired_unknown_function_names(struct btp_gdb_thread *thread1,
+                                            struct btp_gdb_thread *thread2)
 
 {
     if (!thread1->frames || !thread2->frames)
@@ -131,8 +133,8 @@ btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct b
     }
 
     int i = 0;
-    struct btp_frame *curr_frame1 = thread1->frames;
-    struct btp_frame *curr_frame2 = thread2->frames;
+    struct btp_gdb_frame *curr_frame1 = thread1->frames;
+    struct btp_gdb_frame *curr_frame2 = thread2->frames;
 
     if (0 == btp_strcmp0(curr_frame1->function_name, "??") &&
         0 == btp_strcmp0(curr_frame2->function_name, "??") &&
@@ -147,12 +149,12 @@ btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct b
         i++;
     }
 
-    struct btp_frame *prev_frame1 = curr_frame1;
-    struct btp_frame *prev_frame2 = curr_frame2;
+    struct btp_gdb_frame *prev_frame1 = curr_frame1;
+    struct btp_gdb_frame *prev_frame2 = curr_frame2;
     curr_frame1 = curr_frame1->next;
     curr_frame2 = curr_frame2->next;
 
-    while (curr_frame1)
+ while (curr_frame1)
     {
         if (0 == btp_strcmp0(curr_frame1->function_name, "??"))
         {
@@ -187,17 +189,17 @@ btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct b
 }
 
 void
-btp_normalize_optimize_thread(struct btp_thread *thread)
+btp_normalize_optimize_thread(struct btp_gdb_thread *thread)
 {
-    struct btp_frame *frame = thread->frames;
+    struct btp_gdb_frame *frame = thread->frames;
     while (frame)
     {
-        struct btp_frame *next_frame = frame->next;
+        struct btp_gdb_frame *next_frame = frame->next;
 
         /* Remove main(). */
         if (frame->function_name &&
                 strcmp(frame->function_name, "main") == 0)
-            btp_thread_remove_frame(thread, frame);
+            btp_gdb_thread_remove_frame(thread, frame);
 
         frame = next_frame;
     }

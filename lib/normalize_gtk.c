@@ -18,21 +18,21 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "normalize.h"
-#include "frame.h"
-#include "thread.h"
+#include "gdb_frame.h"
+#include "gdb_thread.h"
 #include <stdbool.h>
 #include <string.h>
 
 void
-btp_normalize_gtk_thread(struct btp_thread *thread)
+btp_normalize_gtk_thread(struct btp_gdb_thread *thread)
 {
-    struct btp_frame *frame = thread->frames;
+    struct btp_gdb_frame *frame = thread->frames;
     while (frame)
     {
-        struct btp_frame *next_frame = frame->next;
+        struct btp_gdb_frame *next_frame = frame->next;
 
         /* Remove IA__ prefix. */
-        btp_frame_remove_func_prefix(frame, "IA__gtk", strlen("IA__"));
+        btp_gdb_frame_remove_func_prefix(frame, "IA__gtk", strlen("IA__"));
 
         frame = next_frame;
     }

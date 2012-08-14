@@ -90,7 +90,7 @@ PyObject *p_btp_frame_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
     {
         struct btp_location location;
         btp_location_init(&location);
-        fo->frame = btp_frame_parse(&str, &location);
+        fo->frame = btp_gdb_frame_parse(&str, &location);
 
         if (!fo->frame)
         {
@@ -99,7 +99,7 @@ PyObject *p_btp_frame_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
         }
     }
     else
-        fo->frame = btp_frame_new();
+        fo->frame = btp_gdb_frame_new();
 
     return (PyObject *)fo;
 }

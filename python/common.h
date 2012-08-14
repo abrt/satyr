@@ -1,15 +1,15 @@
 #include <Python.h>
 #include <structmember.h>
 
-#include "backtrace.h"
+#include "gdb_backtrace.h"
 #include "doc.h"
-#include "frame.h"
+#include "gdb_frame.h"
 #include "location.h"
 #include "strbuf.h"
-#include "thread.h"
+#include "gdb_thread.h"
 #include "metrics.h"
 #include "cluster.h"
-#include "sharedlib.h"
+#include "gdb_sharedlib.h"
 #include "normalize.h"
 #include "utils.h"
 

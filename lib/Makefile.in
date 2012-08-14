@@ -80,12 +80,12 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgincludedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libbtparser_la_DEPENDENCIES =
 am__objects_1 =
-am_libbtparser_la_OBJECTS = $(am__objects_1) \
-	libbtparser_la-core-backtrace.lo \
-	libbtparser_la-core-backtrace-fingerprints.lo \
-	libbtparser_la-core-backtrace-python.lo \
-	libbtparser_la-backtrace.lo libbtparser_la-cluster.lo \
-	libbtparser_la-frame.lo libbtparser_la-hash_sha1.lo \
+am_libbtparser_la_OBJECTS = $(am__objects_1) libbtparser_la-cluster.lo \
+	libbtparser_la-core_backtrace.lo \
+	libbtparser_la-core_fingerprint.lo \
+	libbtparser_la-core_frame.lo libbtparser_la-core_thread.lo \
+	libbtparser_la-gdb_backtrace.lo libbtparser_la-gdb_frame.lo \
+	libbtparser_la-gdb_sharedlib.lo libbtparser_la-gdb_thread.lo \
 	libbtparser_la-location.lo libbtparser_la-metrics.lo \
 	libbtparser_la-normalize.lo libbtparser_la-normalize_dbus.lo \
 	libbtparser_la-normalize_gdk.lo \
@@ -94,9 +94,11 @@ am_libbtparser_la_OBJECTS = $(am__objects_1) \
 	libbtparser_la-normalize_gtk.lo \
 	libbtparser_la-normalize_libstdcpp.lo \
 	libbtparser_la-normalize_linux.lo \
-	libbtparser_la-normalize_xorg.lo libbtparser_la-sharedlib.lo \
-	libbtparser_la-strbuf.lo libbtparser_la-thread.lo \
-	libbtparser_la-utils.lo
+	libbtparser_la-normalize_xorg.lo \
+	libbtparser_la-python_backtrace.lo libbtparser_la-utils.lo \
+	libbtparser_la-utils_disassembler.lo \
+	libbtparser_la-utils_elf.lo libbtparser_la-utils_sha1.lo \
+	libbtparser_la-utils_strbuf.lo libbtparser_la-utils_unstrip.lo
 libbtparser_la_OBJECTS = $(am_libbtparser_la_OBJECTS)
 libbtparser_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libbtparser_la_CFLAGS) \
@@ -253,30 +255,38 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 pkginclude_HEADERS = \
-	backtrace.h \
 	cluster.h \
-	frame.h \
-	hash_sha1.h \
+	core_backtrace.h \
+	core_fingerprint.h \
+	core_frame.h \
+	core_thread.h \
+	gdb_backtrace.h \
+	gdb_frame.h \
+	gdb_sharedlib.h \
+	gdb_thread.h \
 	location.h \
 	metrics.h \
 	normalize.h \
-	sharedlib.h \
-	strbuf.h \
-	thread.h \
+	python_backtrace.h \
 	utils.h \
-	core-backtrace.h \
-	core-backtrace-python.h
+	utils_disassembler.h \
+	utils_elf.h \
+	utils_sha1.h \
+	utils_strbuf.h \
+	utils_unstrip.h
 
 lib_LTLIBRARIES = libbtparser.la
 libbtparser_la_SOURCES = \
 	$(pkginclude_HEADERS) \
-	core-backtrace.c \
-	core-backtrace-fingerprints.c \
-	core-backtrace-python.c \
-	backtrace.c \
 	cluster.c \
-	frame.c \
-	hash_sha1.c \
+	core_backtrace.c \
+	core_fingerprint.c \
+	core_frame.c \
+	core_thread.c \
+	gdb_backtrace.c \
+	gdb_frame.c \
+	gdb_sharedlib.c \
+	gdb_thread.c \
 	location.c \
 	metrics.c \
 	normalize.c \
@@ -288,21 +298,18 @@ libbtparser_la_SOURCES = \
 	normalize_libstdcpp.c \
 	normalize_linux.c \
 	normalize_xorg.c \
-	sharedlib.c \
-	strbuf.c \
-	thread.c \
-	utils.c
+	python_backtrace.c \
+	utils.c \
+	utils_disassembler.c \
+	utils_elf.c \
+	utils_sha1.c \
+	utils_strbuf.c \
+	utils_unstrip.c
 
-libbtparser_la_CFLAGS = -Wall -D_GNU_SOURCE $(GLIB_CFLAGS) \
+libbtparser_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE $(GLIB_CFLAGS) \
 	$(am__append_1)
 libbtparser_la_LDFLAGS = -version-info 4:2:2 $(GLIB_LIBS)
-@ENABLE_DISASSEMBLY_TRUE@libbtparser_la_LIBADD = \
-@ENABLE_DISASSEMBLY_TRUE@    -lelf \
-@ENABLE_DISASSEMBLY_TRUE@    -ldw \
-@ENABLE_DISASSEMBLY_TRUE@    -ldl \
-@ENABLE_DISASSEMBLY_TRUE@    -lbfd \
-@ENABLE_DISASSEMBLY_TRUE@    -lopcodes
-
+@ENABLE_DISASSEMBLY_TRUE@libbtparser_la_LIBADD = -lelf -ldw -ldl -lbfd -lopcodes
 all: all-am
 
 .SUFFIXES:
@@ -377,13 +384,15 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-backtrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-cluster.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core-backtrace-fingerprints.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core-backtrace-python.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core-backtrace.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-frame.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-hash_sha1.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core_backtrace.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core_fingerprint.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core_frame.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core_thread.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-gdb_backtrace.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-gdb_frame.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-gdb_sharedlib.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-gdb_thread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-location.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-metrics.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize.Plo@am__quote@
@@ -395,10 +404,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_libstdcpp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_linux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_xorg.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-sharedlib.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-strbuf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-thread.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-python_backtrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-utils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-utils_disassembler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-utils_elf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-utils_sha1.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-utils_strbuf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-utils_unstrip.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -421,34 +433,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-libbtparser_la-core-backtrace.lo: core-backtrace.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-core-backtrace.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-core-backtrace.Tpo -c -o libbtparser_la-core-backtrace.lo `test -f 'core-backtrace.c' || echo '$(srcdir)/'`core-backtrace.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-core-backtrace.Tpo $(DEPDIR)/libbtparser_la-core-backtrace.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='core-backtrace.c' object='libbtparser_la-core-backtrace.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-core-backtrace.lo `test -f 'core-backtrace.c' || echo '$(srcdir)/'`core-backtrace.c
-
-libbtparser_la-core-backtrace-fingerprints.lo: core-backtrace-fingerprints.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-core-backtrace-fingerprints.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-core-backtrace-fingerprints.Tpo -c -o libbtparser_la-core-backtrace-fingerprints.lo `test -f 'core-backtrace-fingerprints.c' || echo '$(srcdir)/'`core-backtrace-fingerprints.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-core-backtrace-fingerprints.Tpo $(DEPDIR)/libbtparser_la-core-backtrace-fingerprints.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='core-backtrace-fingerprints.c' object='libbtparser_la-core-backtrace-fingerprints.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-core-backtrace-fingerprints.lo `test -f 'core-backtrace-fingerprints.c' || echo '$(srcdir)/'`core-backtrace-fingerprints.c
-
-libbtparser_la-core-backtrace-python.lo: core-backtrace-python.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-core-backtrace-python.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-core-backtrace-python.Tpo -c -o libbtparser_la-core-backtrace-python.lo `test -f 'core-backtrace-python.c' || echo '$(srcdir)/'`core-backtrace-python.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-core-backtrace-python.Tpo $(DEPDIR)/libbtparser_la-core-backtrace-python.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='core-backtrace-python.c' object='libbtparser_la-core-backtrace-python.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-core-backtrace-python.lo `test -f 'core-backtrace-python.c' || echo '$(srcdir)/'`core-backtrace-python.c
-
-libbtparser_la-backtrace.lo: backtrace.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-backtrace.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-backtrace.Tpo -c -o libbtparser_la-backtrace.lo `test -f 'backtrace.c' || echo '$(srcdir)/'`backtrace.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-backtrace.Tpo $(DEPDIR)/libbtparser_la-backtrace.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='backtrace.c' object='libbtparser_la-backtrace.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-backtrace.lo `test -f 'backtrace.c' || echo '$(srcdir)/'`backtrace.c
-
 libbtparser_la-cluster.lo: cluster.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-cluster.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-cluster.Tpo -c -o libbtparser_la-cluster.lo `test -f 'cluster.c' || echo '$(srcdir)/'`cluster.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-cluster.Tpo $(DEPDIR)/libbtparser_la-cluster.Plo
@@ -456,19 +440,61 @@ libbtparser_la-cluster.lo: cluster.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-cluster.lo `test -f 'cluster.c' || echo '$(srcdir)/'`cluster.c
 
-libbtparser_la-frame.lo: frame.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-frame.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-frame.Tpo -c -o libbtparser_la-frame.lo `test -f 'frame.c' || echo '$(srcdir)/'`frame.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-frame.Tpo $(DEPDIR)/libbtparser_la-frame.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='frame.c' object='libbtparser_la-frame.lo' libtool=yes @AMDEPBACKSLASH@
+libbtparser_la-core_backtrace.lo: core_backtrace.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-core_backtrace.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-core_backtrace.Tpo -c -o libbtparser_la-core_backtrace.lo `test -f 'core_backtrace.c' || echo '$(srcdir)/'`core_backtrace.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-core_backtrace.Tpo $(DEPDIR)/libbtparser_la-core_backtrace.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='core_backtrace.c' object='libbtparser_la-core_backtrace.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-frame.lo `test -f 'frame.c' || echo '$(srcdir)/'`frame.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-core_backtrace.lo `test -f 'core_backtrace.c' || echo '$(srcdir)/'`core_backtrace.c
 
-libbtparser_la-hash_sha1.lo: hash_sha1.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-hash_sha1.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-hash_sha1.Tpo -c -o libbtparser_la-hash_sha1.lo `test -f 'hash_sha1.c' || echo '$(srcdir)/'`hash_sha1.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-hash_sha1.Tpo $(DEPDIR)/libbtparser_la-hash_sha1.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='hash_sha1.c' object='libbtparser_la-hash_sha1.lo' libtool=yes @AMDEPBACKSLASH@
+libbtparser_la-core_fingerprint.lo: core_fingerprint.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-core_fingerprint.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-core_fingerprint.Tpo -c -o libbtparser_la-core_fingerprint.lo `test -f 'core_fingerprint.c' || echo '$(srcdir)/'`core_fingerprint.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-core_fingerprint.Tpo $(DEPDIR)/libbtparser_la-core_fingerprint.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='core_fingerprint.c' object='libbtparser_la-core_fingerprint.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-hash_sha1.lo `test -f 'hash_sha1.c' || echo '$(srcdir)/'`hash_sha1.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-core_fingerprint.lo `test -f 'core_fingerprint.c' || echo '$(srcdir)/'`core_fingerprint.c
+
+libbtparser_la-core_frame.lo: core_frame.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-core_frame.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-core_frame.Tpo -c -o libbtparser_la-core_frame.lo `test -f 'core_frame.c' || echo '$(srcdir)/'`core_frame.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-core_frame.Tpo $(DEPDIR)/libbtparser_la-core_frame.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='core_frame.c' object='libbtparser_la-core_frame.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-core_frame.lo `test -f 'core_frame.c' || echo '$(srcdir)/'`core_frame.c
+
+libbtparser_la-core_thread.lo: core_thread.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-core_thread.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-core_thread.Tpo -c -o libbtparser_la-core_thread.lo `test -f 'core_thread.c' || echo '$(srcdir)/'`core_thread.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-core_thread.Tpo $(DEPDIR)/libbtparser_la-core_thread.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='core_thread.c' object='libbtparser_la-core_thread.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-core_thread.lo `test -f 'core_thread.c' || echo '$(srcdir)/'`core_thread.c
+
+libbtparser_la-gdb_backtrace.lo: gdb_backtrace.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-gdb_backtrace.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-gdb_backtrace.Tpo -c -o libbtparser_la-gdb_backtrace.lo `test -f 'gdb_backtrace.c' || echo '$(srcdir)/'`gdb_backtrace.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-gdb_backtrace.Tpo $(DEPDIR)/libbtparser_la-gdb_backtrace.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gdb_backtrace.c' object='libbtparser_la-gdb_backtrace.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-gdb_backtrace.lo `test -f 'gdb_backtrace.c' || echo '$(srcdir)/'`gdb_backtrace.c
+
+libbtparser_la-gdb_frame.lo: gdb_frame.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-gdb_frame.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-gdb_frame.Tpo -c -o libbtparser_la-gdb_frame.lo `test -f 'gdb_frame.c' || echo '$(srcdir)/'`gdb_frame.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-gdb_frame.Tpo $(DEPDIR)/libbtparser_la-gdb_frame.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gdb_frame.c' object='libbtparser_la-gdb_frame.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-gdb_frame.lo `test -f 'gdb_frame.c' || echo '$(srcdir)/'`gdb_frame.c
+
+libbtparser_la-gdb_sharedlib.lo: gdb_sharedlib.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-gdb_sharedlib.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-gdb_sharedlib.Tpo -c -o libbtparser_la-gdb_sharedlib.lo `test -f 'gdb_sharedlib.c' || echo '$(srcdir)/'`gdb_sharedlib.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-gdb_sharedlib.Tpo $(DEPDIR)/libbtparser_la-gdb_sharedlib.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gdb_sharedlib.c' object='libbtparser_la-gdb_sharedlib.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-gdb_sharedlib.lo `test -f 'gdb_sharedlib.c' || echo '$(srcdir)/'`gdb_sharedlib.c
+
+libbtparser_la-gdb_thread.lo: gdb_thread.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-gdb_thread.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-gdb_thread.Tpo -c -o libbtparser_la-gdb_thread.lo `test -f 'gdb_thread.c' || echo '$(srcdir)/'`gdb_thread.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-gdb_thread.Tpo $(DEPDIR)/libbtparser_la-gdb_thread.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gdb_thread.c' object='libbtparser_la-gdb_thread.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-gdb_thread.lo `test -f 'gdb_thread.c' || echo '$(srcdir)/'`gdb_thread.c
 
 libbtparser_la-location.lo: location.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-location.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-location.Tpo -c -o libbtparser_la-location.lo `test -f 'location.c' || echo '$(srcdir)/'`location.c
@@ -547,26 +573,12 @@ libbtparser_la-normalize_xorg.lo: normalize_xorg.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize_xorg.lo `test -f 'normalize_xorg.c' || echo '$(srcdir)/'`normalize_xorg.c
 
-libbtparser_la-sharedlib.lo: sharedlib.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-sharedlib.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-sharedlib.Tpo -c -o libbtparser_la-sharedlib.lo `test -f 'sharedlib.c' || echo '$(srcdir)/'`sharedlib.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-sharedlib.Tpo $(DEPDIR)/libbtparser_la-sharedlib.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sharedlib.c' object='libbtparser_la-sharedlib.lo' libtool=yes @AMDEPBACKSLASH@
+libbtparser_la-python_backtrace.lo: python_backtrace.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-python_backtrace.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-python_backtrace.Tpo -c -o libbtparser_la-python_backtrace.lo `test -f 'python_backtrace.c' || echo '$(srcdir)/'`python_backtrace.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-python_backtrace.Tpo $(DEPDIR)/libbtparser_la-python_backtrace.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='python_backtrace.c' object='libbtparser_la-python_backtrace.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-sharedlib.lo `test -f 'sharedlib.c' || echo '$(srcdir)/'`sharedlib.c
-
-libbtparser_la-strbuf.lo: strbuf.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-strbuf.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-strbuf.Tpo -c -o libbtparser_la-strbuf.lo `test -f 'strbuf.c' || echo '$(srcdir)/'`strbuf.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-strbuf.Tpo $(DEPDIR)/libbtparser_la-strbuf.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='strbuf.c' object='libbtparser_la-strbuf.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-strbuf.lo `test -f 'strbuf.c' || echo '$(srcdir)/'`strbuf.c
-
-libbtparser_la-thread.lo: thread.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-thread.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-thread.Tpo -c -o libbtparser_la-thread.lo `test -f 'thread.c' || echo '$(srcdir)/'`thread.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-thread.Tpo $(DEPDIR)/libbtparser_la-thread.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='thread.c' object='libbtparser_la-thread.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-thread.lo `test -f 'thread.c' || echo '$(srcdir)/'`thread.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-python_backtrace.lo `test -f 'python_backtrace.c' || echo '$(srcdir)/'`python_backtrace.c
 
 libbtparser_la-utils.lo: utils.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-utils.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-utils.Tpo -c -o libbtparser_la-utils.lo `test -f 'utils.c' || echo '$(srcdir)/'`utils.c
@@ -574,6 +586,41 @@ libbtparser_la-utils.lo: utils.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils.c' object='libbtparser_la-utils.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-utils.lo `test -f 'utils.c' || echo '$(srcdir)/'`utils.c
+
+libbtparser_la-utils_disassembler.lo: utils_disassembler.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-utils_disassembler.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-utils_disassembler.Tpo -c -o libbtparser_la-utils_disassembler.lo `test -f 'utils_disassembler.c' || echo '$(srcdir)/'`utils_disassembler.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-utils_disassembler.Tpo $(DEPDIR)/libbtparser_la-utils_disassembler.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils_disassembler.c' object='libbtparser_la-utils_disassembler.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-utils_disassembler.lo `test -f 'utils_disassembler.c' || echo '$(srcdir)/'`utils_disassembler.c
+
+libbtparser_la-utils_elf.lo: utils_elf.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-utils_elf.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-utils_elf.Tpo -c -o libbtparser_la-utils_elf.lo `test -f 'utils_elf.c' || echo '$(srcdir)/'`utils_elf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-utils_elf.Tpo $(DEPDIR)/libbtparser_la-utils_elf.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils_elf.c' object='libbtparser_la-utils_elf.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-utils_elf.lo `test -f 'utils_elf.c' || echo '$(srcdir)/'`utils_elf.c
+
+libbtparser_la-utils_sha1.lo: utils_sha1.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-utils_sha1.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-utils_sha1.Tpo -c -o libbtparser_la-utils_sha1.lo `test -f 'utils_sha1.c' || echo '$(srcdir)/'`utils_sha1.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-utils_sha1.Tpo $(DEPDIR)/libbtparser_la-utils_sha1.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils_sha1.c' object='libbtparser_la-utils_sha1.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-utils_sha1.lo `test -f 'utils_sha1.c' || echo '$(srcdir)/'`utils_sha1.c
+
+libbtparser_la-utils_strbuf.lo: utils_strbuf.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-utils_strbuf.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-utils_strbuf.Tpo -c -o libbtparser_la-utils_strbuf.lo `test -f 'utils_strbuf.c' || echo '$(srcdir)/'`utils_strbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-utils_strbuf.Tpo $(DEPDIR)/libbtparser_la-utils_strbuf.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils_strbuf.c' object='libbtparser_la-utils_strbuf.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-utils_strbuf.lo `test -f 'utils_strbuf.c' || echo '$(srcdir)/'`utils_strbuf.c
+
+libbtparser_la-utils_unstrip.lo: utils_unstrip.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-utils_unstrip.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-utils_unstrip.Tpo -c -o libbtparser_la-utils_unstrip.lo `test -f 'utils_unstrip.c' || echo '$(srcdir)/'`utils_unstrip.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-utils_unstrip.Tpo $(DEPDIR)/libbtparser_la-utils_unstrip.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils_unstrip.c' object='libbtparser_la-utils_unstrip.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-utils_unstrip.lo `test -f 'utils_unstrip.c' || echo '$(srcdir)/'`utils_unstrip.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

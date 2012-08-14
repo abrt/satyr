@@ -36,9 +36,9 @@ void *
 btp_malloc(size_t size)
 {
     void *ptr = malloc(size);
-    if (ptr == NULL)
+    if (!ptr)
     {
-        fprintf(stderr, "btp: out of memory");
+        fprintf(stderr, "btp_malloc: out of memory");
         exit(1);
     }
     return ptr;
@@ -50,6 +50,18 @@ btp_mallocz(size_t size)
     void *ptr = btp_malloc(size);
     memset(ptr, 0, size);
     return ptr;
+}
+
+void *
+btp_realloc(void *ptr, size_t size)
+{
+    void *result = realloc(ptr, size);
+    if (!result)
+    {
+        fprintf(stderr, "btp_realloc: out of memory");
+        exit(1);
+    }
+    return result;
 }
 
 char *
@@ -464,23 +476,4 @@ btp_skip_non_whitespace(const char *s)
             ++s;
 
 	return (char *) s;
-}
-
-int
-btp_hash_file(char result[BTP_SHA1_RESULT_LEN], const char *filename)
-{
-    const char *contents = btp_file_to_string(filename);
-    if (!contents)
-        return 0;
-
-    char result_bytes[BTP_SHA1_RESULT_BIN_LEN];
-    btp_sha1_ctx_t sha1ctx;
-    btp_sha1_begin(&sha1ctx);
-    btp_sha1_hash(&sha1ctx, contents, strlen(contents));
-    btp_sha1_end(&sha1ctx, result_bytes);
-    btp_bin2hex(result, result_bytes, BTP_SHA1_RESULT_BIN_LEN)[0] = '\0';
-
-    free(contents);
-
-    return 1;
 }
