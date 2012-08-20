@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <ctype.h>
 
 bool btp_debug_parser = false;
 
@@ -40,6 +41,14 @@ btp_malloc(size_t size)
         fprintf(stderr, "btp: out of memory");
         exit(1);
     }
+    return ptr;
+}
+
+void *
+btp_mallocz(size_t size)
+{
+    void *ptr = btp_malloc(size);
+    memset(ptr, 0, size);
     return ptr;
 }
 
@@ -57,7 +66,7 @@ btp_vasprintf(const char *format, va_list p)
     va_list p2;
     va_copy(p2, p);
     r = vsnprintf(NULL, 0, format, p);
-    string_ptr = xmalloc(r+1);
+    string_ptr = btpmalloc(r+1);
     r = vsnprintf(string_ptr, r+1, format, p2);
     va_end(p2);
 #endif
@@ -436,4 +445,42 @@ btp_parse_hexadecimal_number(const char **input, uint64_t *result)
     *result = r;
     *input = local_input;
     return count;
+}
+
+char *
+btp_skip_whitespace(const char *s)
+{
+	/* NB: isspace('\0') returns 0 */
+	while (isspace(*s))
+            ++s;
+
+	return (char *) s;
+}
+
+char *
+btp_skip_non_whitespace(const char *s)
+{
+	while (*s && !isspace(*s))
+            ++s;
+
+	return (char *) s;
+}
+
+int
+btp_hash_file(char result[BTP_SHA1_RESULT_LEN], const char *filename)
+{
+    const char *contents = btp_file_to_string(filename);
+    if (!contents)
+        return 0;
+
+    char result_bytes[BTP_SHA1_RESULT_BIN_LEN];
+    btp_sha1_ctx_t sha1ctx;
+    btp_sha1_begin(&sha1ctx);
+    btp_sha1_hash(&sha1ctx, contents, strlen(contents));
+    btp_sha1_end(&sha1ctx, result_bytes);
+    btp_bin2hex(result, result_bytes, BTP_SHA1_RESULT_BIN_LEN)[0] = '\0';
+
+    free(contents);
+
+    return 1;
 }

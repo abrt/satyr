@@ -1,0 +1,34 @@
+May  7 12:20:47 devel1 kernel: [4342906.655178] Unable to handle kernel pointer dereference at virtual kernel address           (null)
+May  7 12:20:47 devel1 kernel: [4342906.655184] Oops: 0004 [#1] SMP
+May  7 12:20:47 devel1 kernel: [4342906.655189] Modules linked in: nfs lockd fscache auth_rpcgss nfs_acl sunrpc ip6t_REJECT nf_conntrack_ipv6 nf_defrag_ipv6 ip6table_
+filter ip6_tables nf_nat_ftp nf_nat nf_conntrack_ftp nf_conntrack_ipv4 nf_defrag_ipv4 xt_state nf_conntrack qeth_l3 qeth qdio ccwgroup ipv6 dasd_eckd_mod dasd_mod [la
+st unloaded: scsi_wait_scan]
+May  7 12:20:47 devel1 kernel: [4342906.655214] CPU: 1 Tainted: G        W   2.6.41.4-1.fc15.s390x #1
+May  7 12:20:47 devel1 kernel: [4342906.655218] Process vsftpd (pid: 1857, task: 0000000077a22e10, ksp: 000000007cbe3a78)
+May  7 12:20:47 devel1 kernel: [4342906.655221] Krnl PSW : 0704100180000000 0000000000453fc0 (__list_add+0x50/0xa4)
+May  7 12:20:47 devel1 kernel: [4342906.655227]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:0 CC:1 PM:0 EA:3
+May  7 12:20:47 devel1 kernel: [4342906.655231] Krnl GPRS: 0000000000010000 070000007cbe3c9c 000000000000008a 0000000000000001
+May  7 12:20:47 devel1 kernel: [4342906.655235]            0000000000627084 000000007ff190d8 00000000029472a0 0000000002947278
+May  7 12:20:47 devel1 kernel: [4342906.655239]            0000000076b4f1f8 0000000000000001 000000007c112b28 000000007e0c76b0
+May  7 12:20:47 devel1 kernel: [4342906.655242]            0000000000000000 000000002539e198 000000000045400c 000000007cbe3c50
+May  7 12:20:47 devel1 kernel: [4342906.655253] Krnl Code: 0000000000453fae: e3b0d0080024       stg     %r11,8(%r13)
+May  7 12:20:47 devel1 kernel: [4342906.655259]            0000000000453fb4: e3d0b0000024       stg     %r13,0(%r11)
+May  7 12:20:47 devel1 kernel: [4342906.655264]            0000000000453fba: e3c0b0080024       stg     %r12,8(%r11)
+May  7 12:20:47 devel1 kernel: [4342906.655270]           >0000000000453fc0: e3b0c0000024       stg     %r11,0(%r12)
+May  7 12:20:47 devel1 kernel: [4342906.672801]            0000000000453fc6: e340f0b80004       lg      %r4,184(%r15)
+May  7 12:20:47 devel1 kernel: [4342906.672811]            0000000000453fcc: ebbff0a00004       lmg     %r11,%r15,160(%r15)
+May  7 12:20:47 devel1 kernel: [4342906.672821]            0000000000453fd2: 07f4               bcr     15,%r4
+May  7 12:20:47 devel1 kernel: [4342906.672834]            0000000000453fd4: e34040080004       lg      %r4,8(%r4)
+May  7 12:20:47 devel1 kernel: [4342906.672848] Call Trace:
+May  7 12:20:47 devel1 kernel: [4342906.672853] ([<000000000045400c>] __list_add+0x9c/0xa4)
+May  7 12:20:47 devel1 kernel: [4342906.672870]  [<000000000024798e>] anon_vma_fork+0x10a/0x180
+May  7 12:20:47 devel1 kernel: [4342906.672884]  [<0000000000149786>] dup_mm+0x24a/0x6a4
+May  7 12:20:47 devel1 kernel: [4342906.672899]  [<000000000014a860>] copy_process+0xc0c/0x1374
+May  7 12:20:47 devel1 kernel: [4342906.672913]  [<000000000014b14c>] do_fork+0xdc/0x360
+May  7 12:20:47 devel1 kernel: [4342906.672928]  [<0000000000106c16>] SyS_clone+0x72/0x80
+May  7 12:20:47 devel1 kernel: [4342906.672945]  [<0000000000631e08>] sysc_tracego+0x14/0x1a
+May  7 12:20:47 devel1 kernel: [4342906.672963]  [<000003fffd1f2f0c>] 0x3fffd1f2f0c
+May  7 12:20:47 devel1 kernel: [4342906.672996] Last Breaking-Event-Address:
+May  7 12:20:47 devel1 kernel: [4342906.673010]  [<0000000000454010>] __list_add+0xa0/0xa4
+May  7 12:20:47 devel1 kernel: [4342906.673039]
+May  7 12:20:47 devel1 kernel: [4342906.673044] ---[ end trace b0d3ef649a52e61a ]---

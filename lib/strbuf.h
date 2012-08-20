@@ -20,6 +20,8 @@
 #ifndef BTPARSER_STRBUF_H
 #define BTPARSER_STRBUF_H
 
+#include <stdarg.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -117,6 +119,14 @@ btp_strbuf_append_strf(struct btp_strbuf *strbuf,
                        const char *format, ...);
 
 /**
+ * Same as btp_strbuf_append_strf except that va_list is used instead of
+ * variable number of arguments.
+ */
+struct btp_strbuf *
+btp_strbuf_append_strfv(struct btp_strbuf *strbuf,
+                        const char *format, va_list p);
+
+/**
  * The current content of the string buffer is extended by inserting a
  * sequence of data formatted as the format argument specifies at the
  * buffer beginning.
@@ -124,6 +134,14 @@ btp_strbuf_append_strf(struct btp_strbuf *strbuf,
 struct btp_strbuf *
 btp_strbuf_prepend_strf(struct btp_strbuf *strbuf,
                         const char *format, ...);
+
+/**
+ * Same as btp_strbuf_prepend_strf except that va_list is used instead of
+ * variable number of arguments.
+ */
+struct btp_strbuf *
+btp_strbuf_prepend_strfv(struct btp_strbuf *strbuf,
+                        const char *format, va_list p);
 
 #ifdef __cplusplus
 }

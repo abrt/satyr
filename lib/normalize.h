@@ -42,6 +42,9 @@ void
 btp_normalize_gdk_thread(struct btp_thread *thread);
 
 void
+btp_normalize_gtk_thread(struct btp_thread *thread);
+
+void
 btp_normalize_glib_thread(struct btp_thread *thread);
 
 /**

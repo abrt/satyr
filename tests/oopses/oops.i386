@@ -1,0 +1,28 @@
+[164673.008033] WARNING: at net/sched/sch_generic.c:256 dev_watchdog+0x1da/0x1f0()
+[164673.008037] Hardware name: System Name
+[164673.008040] NETDEV WATCHDOG: em1 (sis900): transmit queue 0 timed out
+[164673.008042] Modules linked in: xt_TCPMSS xt_limit nf_nat_irc nf_nat_ftp iptable_nat iptable_mangle ipt_LOG ipt_MASQUERADE nf_nat xt_DSCP nf_conntrack_irc nf_conntrack_ftp nf_conntrack_ipv4 nf_defrag_ipv4 fuse lockd ip6t_REJECT nf_conntrack_ipv6 nf_defrag_ipv6 xt_state nf_conntrack ip6table_filter ip6_tables snd_intel8x0 snd_ac97_codec ac97_bus snd_seq snd_seq_device snd_pcm ppdev snd_timer parport_pc ns558 snd gameport i2c_sis96x sis900 parport e100 mii microcode soundcore uinput snd_page_alloc sunrpc ata_generic pata_acpi pata_sis nouveau ttm drm_kms_helper drm i2c_core mxm_wmi video wmi [last unloaded: scsi_wait_scan]
+[164673.008108] Pid: 0, comm: swapper/0 Not tainted 3.3.1-3.fc16.i686.PAE #1
+[164673.008111] Call Trace:
+[164673.008122]  [<c0446902>] warn_slowpath_common+0x72/0xa0
+[164673.008128]  [<c087237a>] ? dev_watchdog+0x1da/0x1f0
+[164673.008132]  [<c087237a>] ? dev_watchdog+0x1da/0x1f0
+[164673.008137]  [<c04469d3>] warn_slowpath_fmt+0x33/0x40
+[164673.008141]  [<c087237a>] dev_watchdog+0x1da/0x1f0
+[164673.008155]  [<c044d410>] ? __tasklet_hi_schedule_first+0x80/0x80
+[164673.008161]  [<c0454827>] run_timer_softirq+0xf7/0x2e0
+[164673.008168]  [<c0477a2f>] ? sched_clock_cpu+0xcf/0x150
+[164673.008174]  [<c08721a0>] ? qdisc_reset+0x40/0x40
+[164673.008179]  [<c044d410>] ? __tasklet_hi_schedule_first+0x80/0x80
+[164673.008183]  [<c044d4a1>] __do_softirq+0x91/0x1c0
+[164673.008188]  [<c044d410>] ? __tasklet_hi_schedule_first+0x80/0x80
+[164673.008191]  <IRQ>  [<c044d7fe>] ? irq_exit+0x7e/0xa0
+[164673.008201]  [<c042ea79>] ? smp_apic_timer_interrupt+0x59/0x90
+[164673.008208]  [<c094b865>] ? apic_timer_interrupt+0x31/0x38
+[164673.008215]  [<c0437ee5>] ? native_safe_halt+0x5/0x10
+[164673.008222]  [<c041975c>] ? default_idle+0x6c/0x1b0
+[164673.008228]  [<c0411308>] ? cpu_idle+0xa8/0xe0
+[164673.008234]  [<c092ac05>] ? rest_init+0x5d/0x68
+[164673.008242]  [<c0be278b>] ? start_kernel+0x357/0x35d
+[164673.008247]  [<c0be21c5>] ? loglevel+0x2b/0x2b
+[164673.008251]  [<c0be20ac>] ? i386_start_kernel+0x9b/0xa2

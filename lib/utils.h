@@ -24,6 +24,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "hash_sha1.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,6 +49,12 @@ btp_debug_parser;
  */
 void *
 btp_malloc(size_t size);
+
+/**
+ * Never returns NULL.
+ */
+void *
+btp_mallocz(size_t size);
 
 /**
  * Never returns NULL.
@@ -282,6 +289,16 @@ btp_skip_hexadecimal_number(const char **input);
  */
 int
 btp_parse_hexadecimal_number(const char **input, uint64_t *result);
+
+char *
+btp_skip_whitespace(const char *s);
+
+char *
+btp_skip_non_whitespace(const char *s);
+
+/* get sha1sum of a file */
+int
+hash_text_file(char result[BTP_SHA1_RESULT_LEN], const char *filename);
 
 #ifdef __cplusplus
 }

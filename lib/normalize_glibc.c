@@ -110,9 +110,15 @@ btp_normalize_glibc_thread(struct btp_thread *thread)
         NORMALIZE_ARCH_SPECIFIC("strstr");
         NORMALIZE_ARCH_SPECIFIC("strtok");
 
+        /* Remove __GI_ (glibc internal) prefix. */
+        btp_frame_remove_func_prefix(frame, "__GI_", strlen("__GI_"));
+
         /* Remove frames which are not a cause of the crash. */
         bool removable_with_above =
             btp_frame_calls_func(frame, "__assert_fail") ||
+            btp_frame_calls_func(frame, "__chk_fail") ||
+            btp_frame_calls_func(frame, "__longjmp_chk") ||
+            btp_frame_calls_func(frame, "__malloc_assert") ||
             btp_frame_calls_func(frame, "__strcat_chk") ||
             btp_frame_calls_func(frame, "__strcpy_chk") ||
             btp_frame_calls_func(frame, "__strncpy_chk") ||
@@ -121,13 +127,21 @@ btp_normalize_glibc_thread(struct btp_thread *thread)
             btp_frame_calls_func(frame, "__snprintf_chk") ||
             btp_frame_calls_func(frame, "___snprintf_chk") ||
             btp_frame_calls_func(frame, "__vasprintf_chk") ||
-            btp_frame_calls_func_in_file(frame, "malloc_consolidate", "malloc.c") ||
-            btp_frame_calls_func_in_file(frame, "_int_malloc", "malloc.c") ||
+            btp_frame_calls_func_in_file2(frame, "malloc_consolidate", "malloc.c", "libc") ||
+            btp_frame_calls_func_in_file2(frame, "malloc_printerr", "malloc.c", "libc") ||
+            btp_frame_calls_func_in_file2(frame, "_int_malloc", "malloc.c", "libc") ||
+            btp_frame_calls_func_in_file2(frame, "_int_free", "malloc.c", "libc") ||
+            btp_frame_calls_func_in_file2(frame, "_int_realloc", "malloc.c", "libc") ||
             btp_frame_calls_func_in_file(frame, "_int_memalign", "malloc.c") ||
+            btp_frame_calls_func_in_file(frame, "__libc_free", "malloc.c") ||
+            btp_frame_calls_func_in_file(frame, "__libc_malloc", "malloc.c") ||
             btp_frame_calls_func_in_file(frame, "__libc_memalign", "malloc.c") ||
+            btp_frame_calls_func_in_file(frame, "__libc_realloc", "malloc.c") ||
             btp_frame_calls_func_in_file(frame, "__posix_memalign", "malloc.c") ||
             btp_frame_calls_func_in_file(frame, "__libc_calloc", "malloc.c");
         bool removable = 
+            btp_frame_calls_func(frame, "_start") ||
+            btp_frame_calls_func_in_file(frame, "__libc_start_main", "libc") ||
             btp_frame_calls_func_in_file2(frame, "clone", "clone.S", "libc") ||
             btp_frame_calls_func_in_file2(frame, "start_thread", "pthread_create.c", "libpthread");
 

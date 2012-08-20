@@ -1,4 +1,11 @@
+== btparser 0.18
+
 == btparser 0.17
+Released 2011-03-19.
+
+- New library function btp_backtrace_get_optimized_thread.
+- The main() function is not included in optimized threads.
+- Better exit frame detection.
 
 == btparser 0.16
 Released 2011-02-08.

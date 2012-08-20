@@ -2,20 +2,29 @@ pkginclude_HEADERS = \
 	backtrace.h \
 	cluster.h \
 	frame.h \
+	hash_sha1.h \
 	location.h \
 	metrics.h \
 	normalize.h \
 	sharedlib.h \
 	strbuf.h \
 	thread.h \
-	utils.h
+	utils.h \
+	core-backtrace.h \
+	core-backtrace-python.h \
+	core-backtrace-oops.h
 
 lib_LTLIBRARIES = libbtparser.la
 libbtparser_la_SOURCES = \
 	$(pkginclude_HEADERS) \
+	core-backtrace.c \
+	core-backtrace-fingerprints.c \
+	core-backtrace-python.c \
+	core-backtrace-oops.c \
 	backtrace.c \
 	cluster.c \
 	frame.c \
+	hash_sha1.c \
 	location.c \
 	metrics.c \
 	normalize.c \
@@ -23,6 +32,7 @@ libbtparser_la_SOURCES = \
 	normalize_gdk.c \
 	normalize_glib.c \
 	normalize_glibc.c \
+	normalize_gtk.c \
 	normalize_libstdcpp.c \
 	normalize_linux.c \
 	normalize_xorg.c \
@@ -31,8 +41,18 @@ libbtparser_la_SOURCES = \
 	thread.c \
 	utils.c
 
-libbtparser_la_CFLAGS = -Wall -D_GNU_SOURCE
-libbtparser_la_LDFLAGS = -version-info 4:2:2
+libbtparser_la_CFLAGS = -Wall -D_GNU_SOURCE $(GLIB_CFLAGS)
+libbtparser_la_LDFLAGS = -version-info 4:2:2 $(GLIB_LIBS)
+
+if ENABLE_DISASSEMBLY
+libbtparser_la_CFLAGS += -DENABLE_DISASSEMBLY
+libbtparser_la_LIBADD = \
+    -lelf \
+    -ldw \
+    -ldl \
+    -lbfd \
+    -lopcodes
+endif
 
 # From http://www.seul.org/docs/autotut/
 # Version consists 3 numbers: CURRENT, REVISION, AGE.

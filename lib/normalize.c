@@ -31,6 +31,7 @@ btp_normalize_thread(struct btp_thread *thread)
     btp_normalize_gdk_thread(thread);
     btp_normalize_glib_thread(thread);
     btp_normalize_glibc_thread(thread);
+    btp_normalize_gtk_thread(thread);
     btp_normalize_libstdcpp_thread(thread);
     btp_normalize_linux_thread(thread);
     btp_normalize_xorg_thread(thread);

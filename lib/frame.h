@@ -497,6 +497,14 @@ struct btp_frame *
 btp_frame_parse_header(const char **input,
                        struct btp_location *location);
 
+/**
+ * Removes first num chars from function name in the frame if it begins
+ * with the prefix.
+ */
+void
+btp_frame_remove_func_prefix(struct btp_frame *frame,
+        const char *prefix, int num);
+
 #ifdef __cplusplus
 }
 #endif
