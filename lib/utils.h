@@ -194,7 +194,7 @@ btp_skip_char_span_location(const char **input,
 /**
  * If the input contains one or more characters from string accept,
  * create a string from this sequence and store it to the result, move
- * the input pointer after the sequence, and return the lenght of the
+ * the input pointer after the sequence, and return the length of the
  * sequence.  Otherwise do not modify the input and return 0.
  *
  * If this function returns nonzero value, the caller is responsible
