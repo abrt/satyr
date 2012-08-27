@@ -21,6 +21,11 @@
 #define BTPARSER_ELVES_H
 
 /**
+ * @file
+ * @brief Loading PLT and FDEs from ELF binaries.
+ */
+
+/**
  * File name elf.h cannot be used due to collision with <elf.h> system
  * include.
  */

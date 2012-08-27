@@ -51,15 +51,15 @@ static const char hexdigits_locase[] = "0123456789abcdef";
 
 /* Generic 64-byte helpers for 64-byte block hashes */
 static void
-common64_hash(struct btp_sha1_ctx *ctx, const void *buffer, size_t len);
+common64_hash(struct btp_sha1_state *state, const void *buffer, size_t len);
 
 static void
-common64_end(struct btp_sha1_ctx *ctx, int swap_needed);
+common64_end(struct btp_sha1_state *state, int swap_needed);
 
 /* sha1 specific code */
 
 static void
-sha1_process_block64(struct btp_sha1_ctx *ctx)
+sha1_process_block64(struct btp_sha1_state *state)
 {
     static const uint32_t rconsts[] = {
         0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xCA62C1D6
@@ -70,18 +70,18 @@ sha1_process_block64(struct btp_sha1_ctx *ctx)
     uint32_t a, b, c, d, e;
 
     /* On-stack work buffer frees up one register in the main loop
-     * which otherwise will be needed to hold ctx pointer */
+     * which otherwise will be needed to hold state pointer */
     for (i = 0; i < 16; i++)
         if (SHA1_BIG_ENDIAN)
-            W[i] = W[i+16] = ((uint32_t*)ctx->wbuffer)[i];
+            W[i] = W[i+16] = ((uint32_t*)state->wbuffer)[i];
         else
-            W[i] = W[i+16] = bswap_32(((uint32_t*)ctx->wbuffer)[i]);
+            W[i] = W[i+16] = bswap_32(((uint32_t*)state->wbuffer)[i]);
 
-    a = ctx->hash[0];
-    b = ctx->hash[1];
-    c = ctx->hash[2];
-    d = ctx->hash[3];
-    e = ctx->hash[4];
+    a = state->hash[0];
+    b = state->hash[1];
+    c = state->hash[2];
+    d = state->hash[3];
+    e = state->hash[4];
 
     /* 4 rounds of 20 operations each */
     cnt = 0;
@@ -99,7 +99,7 @@ sha1_process_block64(struct btp_sha1_ctx *ctx)
                 if (j <= 3)
                     goto ge16;
                 /* Used to do bswap_32 here, but this
-                 * requires ctx (see comment above) */
+                 * requires state (see comment above) */
                 work += W[cnt];
             }
             else
@@ -124,70 +124,70 @@ sha1_process_block64(struct btp_sha1_ctx *ctx)
         } while (--j >= 0);
     }
 
-    ctx->hash[0] += a;
-    ctx->hash[1] += b;
-    ctx->hash[2] += c;
-    ctx->hash[3] += d;
-    ctx->hash[4] += e;
+    state->hash[0] += a;
+    state->hash[1] += b;
+    state->hash[2] += c;
+    state->hash[3] += d;
+    state->hash[4] += e;
 }
 
 void
-btp_sha1_begin(struct btp_sha1_ctx *ctx)
+btp_sha1_begin(struct btp_sha1_state *state)
 {
-    ctx->hash[0] = 0x67452301;
-    ctx->hash[1] = 0xefcdab89;
-    ctx->hash[2] = 0x98badcfe;
-    ctx->hash[3] = 0x10325476;
-    ctx->hash[4] = 0xc3d2e1f0;
-    ctx->total64 = 0;
-    /* for sha256: ctx->process_block = sha1_process_block64; */
+    state->hash[0] = 0x67452301;
+    state->hash[1] = 0xefcdab89;
+    state->hash[2] = 0x98badcfe;
+    state->hash[3] = 0x10325476;
+    state->hash[4] = 0xc3d2e1f0;
+    state->total64 = 0;
+    /* for sha256: state->process_block = sha1_process_block64; */
 }
 
 void
-btp_sha1_hash(struct btp_sha1_ctx *ctx,
+btp_sha1_hash(struct btp_sha1_state *state,
               const void *buffer,
               size_t len)
 {
-    common64_hash(ctx, buffer, len);
+    common64_hash(state, buffer, len);
 }
 
 /* May be used also for sha256 */
 void
-btp_sha1_end(struct btp_sha1_ctx *ctx, void *resbuf)
+btp_sha1_end(struct btp_sha1_state *state, void *resbuf)
 {
     unsigned hash_size;
 
     /* SHA stores total in BE, need to swap on LE arches: */
-    common64_end(ctx, /*swap_needed:*/ SHA1_LITTLE_ENDIAN);
+    common64_end(state, /*swap_needed:*/ SHA1_LITTLE_ENDIAN);
 
-    hash_size = 5; /* (ctx->process_block == sha1_process_block64) ? 5 : 8; */
+    hash_size = 5; /* (state->process_block == sha1_process_block64) ? 5 : 8; */
     /* This way we do not impose alignment constraints on resbuf: */
     if (SHA1_LITTLE_ENDIAN)
     {
         unsigned i;
         for (i = 0; i < hash_size; ++i)
-            ctx->hash[i] = bswap_32(ctx->hash[i]);
+            state->hash[i] = bswap_32(state->hash[i]);
     }
-    memcpy(resbuf, ctx->hash, sizeof(ctx->hash[0]) * hash_size);
+    memcpy(resbuf, state->hash, sizeof(state->hash[0]) * hash_size);
 }
 
 /* Generic 64-byte helpers for 64-byte block hashes */
 
-/*#define PROCESS_BLOCK(ctx) ctx->process_block(ctx)*/
-#define PROCESS_BLOCK(ctx) sha1_process_block64(ctx)
+/*#define PROCESS_BLOCK(state) state->process_block(state)*/
+#define PROCESS_BLOCK(state) sha1_process_block64(state)
 
 /* Feed data through a temporary buffer.
  * The internal buffer remembers previous data until it has 64
  * bytes worth to pass on.
  */
 static void
-common64_hash(struct btp_sha1_ctx *ctx,
+common64_hash(struct btp_sha1_state *state,
               const void *buffer,
               size_t len)
 {
-    unsigned bufpos = ctx->total64 & 63;
+    unsigned bufpos = state->total64 & 63;
 
-    ctx->total64 += len;
+    state->total64 += len;
 
     while (1)
     {
@@ -195,7 +195,7 @@ common64_hash(struct btp_sha1_ctx *ctx,
         if (remaining > len)
             remaining = len;
         /* Copy data into aligned buffer */
-        memcpy(ctx->wbuffer + bufpos, buffer, remaining);
+        memcpy(state->wbuffer + bufpos, buffer, remaining);
         len -= remaining;
         buffer = (const char *)buffer + remaining;
         bufpos += remaining;
@@ -204,36 +204,36 @@ common64_hash(struct btp_sha1_ctx *ctx,
         if (bufpos != 0)
             break;
         /* Buffer is filled up, process it */
-        PROCESS_BLOCK(ctx);
+        PROCESS_BLOCK(state);
         /*bufpos = 0; - already is */
     }
 }
 
 /* Process the remaining bytes in the buffer */
 static void
-common64_end(struct btp_sha1_ctx *ctx,
+common64_end(struct btp_sha1_state *state,
              int swap_needed)
 {
-    unsigned bufpos = ctx->total64 & 63;
+    unsigned bufpos = state->total64 & 63;
     /* Pad the buffer to the next 64-byte boundary with 0x80,0,0,0... */
-    ctx->wbuffer[bufpos++] = 0x80;
+    state->wbuffer[bufpos++] = 0x80;
 
     /* This loop iterates either once or twice, no more, no less */
     while (1)
     {
         unsigned remaining = 64 - bufpos;
-        memset(ctx->wbuffer + bufpos, 0, remaining);
+        memset(state->wbuffer + bufpos, 0, remaining);
         /* Do we have enough space for the length count? */
         if (remaining >= 8)
         {
             /* Store the 64-bit counter of bits in the buffer */
-            uint64_t t = ctx->total64 << 3;
+            uint64_t t = state->total64 << 3;
             if (swap_needed)
                 t = bswap_64(t);
             /* wbuffer is suitably aligned for this */
-            *(uint64_t*)(&ctx->wbuffer[64 - 8]) = t;
+            *(uint64_t*)(&state->wbuffer[64 - 8]) = t;
         }
-        PROCESS_BLOCK(ctx);
+        PROCESS_BLOCK(state);
         if (remaining >= 8)
             break;
         bufpos = 0;

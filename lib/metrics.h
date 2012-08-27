@@ -20,11 +20,16 @@
 #ifndef BTPARSER_METRICS_H
 #define BTPARSER_METRICS_H
 
-#include <stdbool.h>
+/**
+ * @file
+ * @brief Distance between stack trace threads.
+ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdbool.h>
 
 struct btp_gdb_frame;
 struct btp_gdb_thread;

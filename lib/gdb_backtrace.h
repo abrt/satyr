@@ -20,8 +20,9 @@
 #ifndef BTPARSER_GDB_BACKTRACE_H
 #define BTPARSER_GDB_BACKTRACE_H
 
-/** @file
- * Backtrace as produced by GDB (the GNU Project Debugger).
+/**
+ * @file
+ * @brief Stack trace as produced by GDB.
  */
 
 #ifdef __cplusplus

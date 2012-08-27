@@ -20,6 +20,17 @@
 #ifndef BTPARSER_CALLGRAPH_H
 #define BTPARSER_CALLGRAPH_H
 
+/**
+ * @file
+ * @brief Call graph for ELF binaries.
+ *
+ * Call graph represents calling relationships between subroutines in
+ * ELF binaries.  Only static relationships obtained from CALL-like
+ * instructions with numeric offsets are handled.
+ *
+ * Call graph is used by fingerprinting algorithms.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

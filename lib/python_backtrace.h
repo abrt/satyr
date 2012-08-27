@@ -21,11 +21,16 @@
 #ifndef BTPARSER_PYTHON_BACKTRACE_H
 #define BTPARSER_PYTHON_BACKTRACE_H
 
-#include "core_backtrace.h"
+/**
+ * @file
+ * @brief Python stack trace structure and related algorithms.
+ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "core_backtrace.h"
 
 struct btp_core_backtrace *
 btp_core_python_parse_backtrace(const char *text);

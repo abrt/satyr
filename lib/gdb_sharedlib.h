@@ -20,6 +20,11 @@
 #ifndef BTPARSER_GDB_SHAREDLIB_H
 #define BTPARSER_GDB_SHAREDLIB_H
 
+/**
+ * @file
+ * @brief Shared library information as produced by GDB.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

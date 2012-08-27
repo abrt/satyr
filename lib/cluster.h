@@ -20,6 +20,14 @@
 #ifndef BTPARSER_CLUSTER_H
 #define BTPARSER_CLUSTER_H
 
+/**
+ * @file
+ * @brief Clustering for stack trace threads.
+ *
+ * The implemented clustering algorithm assigns a set of stack trace
+ * threads into groups.  Each group represents a single program flaw.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -116,7 +124,9 @@ btp_cluster_free(struct btp_cluster *cluster);
  * List of clusters, NULL if empty.
  */
 struct btp_cluster *
-btp_dendrogram_cut(struct btp_dendrogram *dendrogram, float level, int min_size);
+btp_dendrogram_cut(struct btp_dendrogram *dendrogram,
+                   float level,
+                   int min_size);
 
 #ifdef __cplusplus
 }

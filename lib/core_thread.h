@@ -20,6 +20,11 @@
 #ifndef BTPARSER_CORE_THREAD_H
 #define BTPARSER_CORE_THREAD_H
 
+/**
+ * @file
+ * @brief Single thread of execution of core stack trace.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

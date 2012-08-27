@@ -23,11 +23,21 @@
     Based on shasum from http://www.netsw.org/crypto/hash/
     Majorly hacked up to use Dr Brian Gladman's sha1 code
 
-    This is a byte oriented version of SHA1 that operates on arrays of bytes
-    stored in memory. It runs at 22 cycles per byte on a Pentium P4 processor
+    This is a byte oriented version of SHA1 that operates on arrays of
+    bytes stored in memory. It runs at 22 cycles per byte on a Pentium
+    P4 processor.
 */
 #ifndef BTPARSER_SHA1_H
 #define BTPARSER_SHA1_H
+
+/**
+ * @file
+ * @brief An implementation of SHA-1 cryptographic hash function.
+ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <byteswap.h>
 #include <stdlib.h>
@@ -37,15 +47,11 @@
 #define BTP_SHA1_RESULT_BIN_LEN (5 * 4)
 #define BTP_SHA1_RESULT_LEN (5 * 4 * 2 + 1)
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct btp_sha1_ctx
+struct btp_sha1_state
 {
     /* always correctly aligned for uint64_t */
     uint8_t wbuffer[64];
-    /* for sha256: void (*process_block)(struct md5_ctx_t*); */
+    /* for sha256: void (*process_block)(struct md5_state_t*); */
     /* must be directly before hash[] */
     uint64_t total64;
     /* 4 elements for md5, 5 for sha1, 8 for sha256 */
@@ -53,13 +59,15 @@ struct btp_sha1_ctx
 };
 
 void
-btp_sha1_begin(struct btp_sha1_ctx *ctx);
+btp_sha1_begin(struct btp_sha1_state *state);
 
 void
-btp_sha1_hash(struct btp_sha1_ctx *ctx, const void *buffer, size_t len);
+btp_sha1_hash(struct btp_sha1_state *state,
+              const void *buffer,
+              size_t len);
 
 void
-btp_sha1_end(struct btp_sha1_ctx *ctx, void *resbuf);
+btp_sha1_end(struct btp_sha1_state *state, void *resbuf);
 
 char *
 btp_bin2hex(char *dst, const char *str, int count);

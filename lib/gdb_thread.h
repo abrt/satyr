@@ -20,6 +20,11 @@
 #ifndef BTPARSER_GDB_THREAD_H
 #define BTPARSER_GDB_THREAD_H
 
+/**
+ * @file
+ * @brief Single thread of execution of GDB stack trace.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

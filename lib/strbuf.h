@@ -20,11 +20,16 @@
 #ifndef BTPARSER_STRBUF_H
 #define BTPARSER_STRBUF_H
 
-#include <stdarg.h>
+/**
+ * @file
+ * @brief String buffer structure and related algorithms.
+ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdarg.h>
 
 struct btp_strbuf
 {

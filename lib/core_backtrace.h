@@ -20,6 +20,11 @@
 #ifndef BTPARSER_CORE_BACKTRACE_H
 #define BTPARSER_CORE_BACKTRACE_H
 
+/**
+ * @file
+ * @brief Low-level stack trace generated directly from core dump.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

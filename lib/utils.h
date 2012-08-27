@@ -20,14 +20,21 @@
 #ifndef BTPARSER_UTILS_H
 #define BTPARSER_UTILS_H
 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
+/**
+ * @file
+ * @brief Various utility functions, macros and variables that do not
+ * fit elsewhere.
+ */
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #define BTP_lower "abcdefghijklmnopqrstuvwxyz"
 #define BTP_upper "ABCDEFGHIJKLMNOPQRSTUVWXYZ"

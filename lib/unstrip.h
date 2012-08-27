@@ -20,6 +20,11 @@
 #ifndef BTPARSER_UNSTRIP_H
 #define BTPARSER_UNSTRIP_H
 
+/**
+ * @file
+ * @brief Parser for the output of the unstrip utility.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

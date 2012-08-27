@@ -20,6 +20,11 @@
 #ifndef BTPARSER_CORE_FINGERPRINT_H
 #define BTPARSER_CORE_FINGERPRINT_H
 
+/**
+ * @file
+ * @brief Fingerprint algorithm for core stack traces.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

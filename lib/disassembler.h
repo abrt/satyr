@@ -20,6 +20,11 @@
 #ifndef BTPARSER_DISASSEMBLER_H
 #define BTPARSER_DISASSEMBLER_H
 
+/**
+ * @file
+ * @brief BFD-based function disassembler.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

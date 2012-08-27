@@ -20,6 +20,11 @@
 #ifndef BTPARSER_NORMALIZE_H
 #define BTPARSER_NORMALIZE_H
 
+/**
+ * @file
+ * @brief Normalization of stack traces.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

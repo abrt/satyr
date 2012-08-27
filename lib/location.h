@@ -20,11 +20,16 @@
 #ifndef BTPARSER_LOCATION_H
 #define BTPARSER_LOCATION_H
 
-#include <stdbool.h>
+/**
+ * @file
+ * @brief Parser location in input file.
+ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdbool.h>
 
 /**
  * A location in the backtrace file with an attached message.

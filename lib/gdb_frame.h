@@ -20,6 +20,11 @@
 #ifndef BTPARSER_GDB_FRAME_H
 #define BTPARSER_GDB_FRAME_H
 
+/**
+ * @file
+ * @brief Single frame of GDB stack trace thread.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -409,8 +414,6 @@ btp_gdb_frame_skip_function_args(const char **input,
  *
  * If this function returns true, the caller is responsible to free
  * the the function_name.
- * @todo
- * Parse and return the function call arguments.
  * @param location
  * The caller must provide a pointer to an instance of btp_location
  * here.  The line and column members of the location are gradually
