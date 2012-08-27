@@ -1,5 +1,5 @@
 /*
-    core_python.h
+    python_backtrace.h
 
     Copyright (C) 2012  ABRT Team
     Copyright (C) 2012  Red Hat, Inc.
@@ -18,8 +18,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_CORE_PYTHON_H
-#define BTPARSER_CORE_PYTHON_H
+#ifndef BTPARSER_PYTHON_BACKTRACE_H
+#define BTPARSER_PYTHON_BACKTRACE_H
 
 #include "core_backtrace.h"
 

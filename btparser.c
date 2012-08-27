@@ -17,9 +17,9 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "lib/backtrace.h"
-#include "lib/thread.h"
-#include "lib/frame.h"
+#include "lib/gdb_backtrace.h"
+#include "lib/gdb_thread.h"
+#include "lib/gdb_frame.h"
 #include "lib/utils.h"
 #include "lib/location.h"
 #include "lib/strbuf.h"
@@ -138,7 +138,8 @@ parse_opt(int key, char *arg, struct argp_state *state)
 /** Our argp parser. */
 static struct argp argp = { options, parse_opt, args_doc, doc };
 
-void print_dendrogram(struct btp_dendrogram *dendrogram, char **names)
+void
+print_dendrogram(struct btp_dendrogram *dendrogram, char **names)
 {
     int i, j, l, width = 40;
     float min, max;
@@ -174,7 +175,8 @@ void print_dendrogram(struct btp_dendrogram *dendrogram, char **names)
     }
 }
 
-char *read_file(char *filename)
+char *
+read_file(char *filename)
 {
     char *text = NULL;
     if (!filename)
@@ -201,14 +203,15 @@ char *read_file(char *filename)
     return text;
 }
 
-struct btp_backtrace *parse_backtrace(char *filename)
+static struct btp_gdb_backtrace *
+parse_backtrace(char *filename)
 {
     char *text = read_file(filename);
     /* Parse the input string. */
     const char *ptr = text;
     struct btp_location location;
     btp_location_init(&location);
-    struct btp_backtrace *backtrace = btp_backtrace_parse(&ptr, &location);
+    struct btp_gdb_backtrace *backtrace = btp_gdb_backtrace_parse(&ptr, &location);
     if (!backtrace)
     {
         char *location_str = btp_location_to_string(&location);
@@ -222,9 +225,10 @@ struct btp_backtrace *parse_backtrace(char *filename)
     return backtrace;
 }
 
-struct btp_thread *get_optimized_thread(struct btp_backtrace *backtrace, int max_frames)
+static struct btp_gdb_thread *
+get_optimized_thread(struct btp_gdb_backtrace *backtrace, int max_frames)
 {
-    struct btp_thread *thread = btp_backtrace_get_optimized_thread(backtrace, max_frames);
+    struct btp_gdb_thread *thread = btp_gdb_backtrace_get_optimized_thread(backtrace, max_frames);
 
     if (!thread)
     {
@@ -235,7 +239,8 @@ struct btp_thread *get_optimized_thread(struct btp_backtrace *backtrace, int max
     return thread;
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
     /* Set options default values and parse program command line. */
     struct arguments arguments;
@@ -261,7 +266,7 @@ int main(int argc, char **argv)
     case CRASH_FUNCTION:
     case DUPLICATION_HASH:
     {
-        struct btp_backtrace *backtrace;
+        struct btp_gdb_backtrace *backtrace;
 
         if (arguments.stdin)
             backtrace = parse_backtrace(NULL);
@@ -276,29 +281,29 @@ int main(int argc, char **argv)
         {
             if (!arguments.optimized)
             {
-                char *text_parsed = btp_backtrace_to_text(backtrace, false);
+                char *text_parsed = btp_gdb_backtrace_to_text(backtrace, false);
                 puts(text_parsed);
                 free(text_parsed);
             }
             else
             {
-                struct btp_thread *crash_thread = get_optimized_thread(backtrace, arguments.max_frames);
-                char *funs = btp_thread_format_funs(crash_thread);
+                struct btp_gdb_thread *crash_thread = get_optimized_thread(backtrace, arguments.max_frames);
+                char *funs = btp_gdb_thread_format_funs(crash_thread);
                 printf("%s", funs);
                 free(funs);
-                btp_thread_free(crash_thread);
+                btp_gdb_thread_free(crash_thread);
             }
             break;
         }
         case RATE:
         {
-            float q = btp_backtrace_quality_complex(backtrace);
+            float q = btp_gdb_backtrace_quality_complex(backtrace);
             printf("%.2f", q);
             break;
         }
         case CRASH_FUNCTION:
         {
-            struct btp_frame *frame = btp_backtrace_get_crash_frame(backtrace);
+            struct btp_gdb_frame *frame = btp_gdb_backtrace_get_crash_frame(backtrace);
             if (!frame)
             {
                 fprintf(stderr, "Failed to find the crash function.\n");
@@ -311,12 +316,12 @@ int main(int argc, char **argv)
                 assert(frame->signal_handler_called);
                 puts("signal handler");
             }
-            btp_frame_free(frame);
+            btp_gdb_frame_free(frame);
             break;
         }
         case DUPLICATION_HASH:
         {
-            char *hash = btp_backtrace_get_duplication_hash(backtrace);
+            char *hash = btp_gdb_backtrace_get_duplication_hash(backtrace);
             puts(hash);
             free(hash);
             break;
@@ -325,7 +330,7 @@ int main(int argc, char **argv)
             assert(0);
         }
 
-        btp_backtrace_free(backtrace);
+        btp_gdb_backtrace_free(backtrace);
 
         break;
     }
@@ -336,28 +341,28 @@ int main(int argc, char **argv)
         assert(arguments.num_filenames >= 2);
 
         int i, j, n = arguments.num_filenames;
-        struct btp_thread *threads[n];
+        struct btp_gdb_thread *threads[n];
 
         for (i = 0; i < n; i++)
         {
             if (arguments.optimized)
             {
                 char *text = read_file(arguments.filenames[i]);
-                threads[i] = btp_thread_parse_funs(text);
+                threads[i] = btp_gdb_thread_parse_funs(text);
                 free(text);
             }
             else
             {
-                struct btp_backtrace *backtrace = parse_backtrace(arguments.filenames[i]);
+                struct btp_gdb_backtrace *backtrace = parse_backtrace(arguments.filenames[i]);
                 threads[i] = get_optimized_thread(backtrace, arguments.max_frames);
-                btp_backtrace_free(backtrace);
+                btp_gdb_backtrace_free(backtrace);
             }
         }
 
-        struct btp_distances *distances = btp_threads_compare(threads, n - 1, n, btp_thread_levenshtein_distance_f);
+        struct btp_distances *distances = btp_gdb_threads_compare(threads, n - 1, n, btp_gdb_thread_levenshtein_distance_f);
 
         for (i = 0; i < n; i++)
-            btp_thread_free(threads[i]);
+            btp_gdb_thread_free(threads[i]);
 
         if (arguments.output == DISTANCES)
         {

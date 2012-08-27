@@ -206,7 +206,7 @@ btp_gdb_backtrace_get_crash_frame(struct btp_gdb_backtrace *backtrace);
  * releasing the returned memory using function free().
  */
 char *
-btp_backtrace_get_duplication_hash(struct btp_gdb_backtrace *backtrace);
+btp_gdb_backtrace_get_duplication_hash(struct btp_gdb_backtrace *backtrace);
 
 /**
  * Parses a textual backtrace and puts it into a structure.  If

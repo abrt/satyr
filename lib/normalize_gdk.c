@@ -43,7 +43,7 @@ btp_normalize_gdk_thread(struct btp_gdb_thread *thread)
 
         if (removable)
         {
-            btp_thread_remove_frame(thread, frame);
+            btp_gdb_thread_remove_frame(thread, frame);
         }
 
         frame = next_frame;

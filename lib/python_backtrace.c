@@ -1,5 +1,5 @@
 /*
-    core_python.c
+    python_backtrace.c
 
     Copyright (C) 2012  Red Hat, Inc.
 
@@ -161,16 +161,6 @@ btp_core_python_parse_backtrace(const char *text)
         }
         funcname += strlen(", in ");
         frame->function_name = btp_strdup(funcname);
-
-        /* build-id */
-        frame->build_id = btp_mallocz(BTP_SHA1_RESULT_LEN);
-        if (!btp_hash_file(frame->build_id, frame->file_name))
-        {
-            fprintf(stderr, "hash_text_file failed for '%s'\n",
-                    frame->file_name);
-            free(frame->build_id);
-            frame->build_id = NULL;
-        }
 
         backtrace->threads->frames = btp_core_frame_append(backtrace->threads->frames,
                                                            frame);

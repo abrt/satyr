@@ -483,7 +483,7 @@ PyObject *p_btp_gdb_backtrace_get_duplication_hash(PyObject *self, PyObject *arg
         return NULL;
 
     /* does not destroy the linked list */
-    char *duphash = btp_backtrace_get_duplication_hash(this->backtrace);
+    char *duphash = btp_gdb_backtrace_get_duplication_hash(this->backtrace);
     PyObject *result = Py_BuildValue("s", duphash);
     free(duphash);
 

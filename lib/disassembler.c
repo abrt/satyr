@@ -121,10 +121,10 @@ btp_disasm_free(struct btp_disasm_state *state)
 }
 
 char **
-btp_disasm_function_instructions(struct btp_disasm_state *state,
-                                 uint64_t start_offset,
-                                 uint64_t size,
-                                 char **error_message)
+btp_disasm_get_function_instructions(struct btp_disasm_state *state,
+                                     uint64_t start_offset,
+                                     uint64_t size,
+                                     char **error_message)
 {
     asection *section = state->info.section;
     if (start_offset < section->vma
@@ -277,11 +277,11 @@ btp_disasm_get_callee_addresses(const char **instructions)
     instruction_offset = 0;
     while (instructions[instruction_offset])
     {
-        char *instruction = instructions[instruction_offset];
-        if (insn_is_one_of(instruction, call_mnems))
+        const char *instruction = instructions[instruction_offset];
+        if (btp_disasm_function_instruction_is_one_of(instruction, call_mnems))
         {
             uint64_t address;
-            if (insn_has_single_addr_operand(instruction, &address))
+            if (btp_disasm_instruction_parse_single_address_operand(instruction, &address))
             {
                 /* Check if address is already stored in the list. */
                 size_t result_loop = 0;
