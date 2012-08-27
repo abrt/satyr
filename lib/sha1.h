@@ -26,8 +26,8 @@
     This is a byte oriented version of SHA1 that operates on arrays of bytes
     stored in memory. It runs at 22 cycles per byte on a Pentium P4 processor
 */
-#ifndef BTPARSER_UTILS_SHA1_H
-#define BTPARSER_UTILS_SHA1_H
+#ifndef BTPARSER_SHA1_H
+#define BTPARSER_SHA1_H
 
 #include <byteswap.h>
 #include <stdlib.h>

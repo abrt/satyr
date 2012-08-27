@@ -20,11 +20,15 @@
 #ifndef BTPARSER_GDB_BACKTRACE_H
 #define BTPARSER_GDB_BACKTRACE_H
 
-#include <stdbool.h>
+/** @file
+ * Backtrace as produced by GDB (the GNU Project Debugger).
+ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdbool.h>
 
 struct btp_gdb_thread;
 struct btp_gdb_frame;

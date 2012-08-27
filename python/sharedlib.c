@@ -2,14 +2,14 @@
 
 static PyMethodDef SharedlibMethods[] = {
     /* getters & setters */
-    { "get_from",    p_btp_sharedlib_get_from,    METH_NOARGS,  s_get_from_doc    },
-    { "set_from",    p_btp_sharedlib_set_from,    METH_VARARGS, s_set_from_doc    },
-    { "get_to",      p_btp_sharedlib_get_to,      METH_NOARGS,  s_get_to_doc      },
-    { "set_to",      p_btp_sharedlib_set_to,      METH_VARARGS, s_set_to_doc      },
-    { "get_symbols", p_btp_sharedlib_get_symbols, METH_NOARGS,  s_get_symbols_doc },
-    { "set_symbols", p_btp_sharedlib_set_symbols, METH_VARARGS, s_set_symbols_doc },
-    { "get_soname",  p_btp_sharedlib_get_soname,  METH_NOARGS,  s_get_soname_doc  },
-    { "set_soname",  p_btp_sharedlib_set_soname,  METH_VARARGS, s_set_soname_doc  },
+    { "get_from",    p_btp_gdb_sharedlib_get_from,    METH_NOARGS,  s_get_from_doc    },
+    { "set_from",    p_btp_gdb_sharedlib_set_from,    METH_VARARGS, s_set_from_doc    },
+    { "get_to",      p_btp_gdb_sharedlib_get_to,      METH_NOARGS,  s_get_to_doc      },
+    { "set_to",      p_btp_gdb_sharedlib_set_to,      METH_VARARGS, s_set_to_doc      },
+    { "get_symbols", p_btp_gdb_sharedlib_get_symbols, METH_NOARGS,  s_get_symbols_doc },
+    { "set_symbols", p_btp_gdb_sharedlib_set_symbols, METH_VARARGS, s_set_symbols_doc },
+    { "get_soname",  p_btp_gdb_sharedlib_get_soname,  METH_NOARGS,  s_get_soname_doc  },
+    { "set_soname",  p_btp_gdb_sharedlib_set_soname,  METH_VARARGS, s_set_soname_doc  },
     /* methods */
     { NULL },
 };
@@ -27,7 +27,7 @@ PyTypeObject SharedlibTypeObject = {
     "btparser.Sharedlib",       /* tp_name */
     sizeof(SharedlibObject),    /* tp_basicsize */
     0,                          /* tp_itemsize */
-    p_btp_sharedlib_free,       /* tp_dealloc */
+    p_btp_gdb_sharedlib_free,   /* tp_dealloc */
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
@@ -38,7 +38,7 @@ PyTypeObject SharedlibTypeObject = {
     NULL,                       /* tp_as_mapping */
     NULL,                       /* tp_hash */
     NULL,                       /* tp_call */
-    p_btp_sharedlib_str,        /* tp_str */
+    p_btp_gdb_sharedlib_str,    /* tp_str */
     NULL,                       /* tp_getattro */
     NULL,                       /* tp_setattro */
     NULL,                       /* tp_as_buffer */
@@ -60,7 +60,7 @@ PyTypeObject SharedlibTypeObject = {
     0,                          /* tp_dictoffset */
     NULL,                       /* tp_init */
     NULL,                       /* tp_alloc */
-    p_btp_sharedlib_new,        /* tp_new */
+    p_btp_gdb_sharedlib_new,    /* tp_new */
     NULL,                       /* tp_free */
     NULL,                       /* tp_is_gc */
     NULL,                       /* tp_bases */
@@ -71,13 +71,13 @@ PyTypeObject SharedlibTypeObject = {
 };
 
 /* constructor */
-PyObject *p_btp_sharedlib_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
+PyObject *p_btp_gdb_sharedlib_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
     SharedlibObject *so = (SharedlibObject *)PyObject_New(SharedlibObject, &SharedlibTypeObject);
     if (!so)
         return PyErr_NoMemory();
 
-    so->sharedlib = btp_sharedlib_new();
+    so->sharedlib = btp_gdb_sharedlib_new();
     so->syms_ok = SYMS_OK;
     so->syms_wrong = SYMS_WRONG;
     so->syms_not_found = SYMS_NOT_FOUND;
@@ -86,15 +86,15 @@ PyObject *p_btp_sharedlib_new(PyTypeObject *object, PyObject *args, PyObject *kw
 }
 
 /* destructor */
-void p_btp_sharedlib_free(PyObject *object)
+void p_btp_gdb_sharedlib_free(PyObject *object)
 {
     SharedlibObject *this = (SharedlibObject *)object;
-    btp_sharedlib_free(this->sharedlib);
+    btp_gdb_sharedlib_free(this->sharedlib);
     PyObject_Del(object);
 }
 
 /* str */
-PyObject *p_btp_sharedlib_str(PyObject *self)
+PyObject *p_btp_gdb_sharedlib_str(PyObject *self)
 {
     return Py_BuildValue("s", ((SharedlibObject *)self)->sharedlib->soname ?: "Unknown shared library");
 }
@@ -102,12 +102,12 @@ PyObject *p_btp_sharedlib_str(PyObject *self)
 /* getters & setters */
 
 /* function_name */
-PyObject *p_btp_sharedlib_get_from(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_sharedlib_get_from(PyObject *self, PyObject *args)
 {
     return Py_BuildValue("l", ((SharedlibObject *)self)->sharedlib->from);
 }
 
-PyObject *p_btp_sharedlib_set_from(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_sharedlib_set_from(PyObject *self, PyObject *args)
 {
     unsigned long long newvalue;
     if (!PyArg_ParseTuple(args, "l", &newvalue))
@@ -117,12 +117,12 @@ PyObject *p_btp_sharedlib_set_from(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-PyObject *p_btp_sharedlib_get_to(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_sharedlib_get_to(PyObject *self, PyObject *args)
 {
     return Py_BuildValue("l", ((SharedlibObject *)self)->sharedlib->to);
 }
 
-PyObject *p_btp_sharedlib_set_to(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_sharedlib_set_to(PyObject *self, PyObject *args)
 {
     unsigned long long newvalue;
     if (!PyArg_ParseTuple(args, "l", &newvalue))
@@ -132,12 +132,12 @@ PyObject *p_btp_sharedlib_set_to(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-PyObject *p_btp_sharedlib_get_symbols(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_sharedlib_get_symbols(PyObject *self, PyObject *args)
 {
     return Py_BuildValue("i", ((SharedlibObject *)self)->sharedlib->symbols);
 }
 
-PyObject *p_btp_sharedlib_set_symbols(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_sharedlib_set_symbols(PyObject *self, PyObject *args)
 {
     int newvalue;
     if (!PyArg_ParseTuple(args, "i", &newvalue))
@@ -154,12 +154,12 @@ PyObject *p_btp_sharedlib_set_symbols(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-PyObject *p_btp_sharedlib_get_soname(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_sharedlib_get_soname(PyObject *self, PyObject *args)
 {
     return Py_BuildValue("s", ((SharedlibObject *)self)->sharedlib->soname);
 }
 
-PyObject *p_btp_sharedlib_set_soname(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_sharedlib_set_soname(PyObject *self, PyObject *args)
 {
     char *soname;
     if (!PyArg_ParseTuple(args, "s", &soname))

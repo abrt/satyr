@@ -26,7 +26,7 @@
     This is a byte oriented version of SHA1 that operates on arrays of bytes
     stored in memory. It runs at 22 cycles per byte on a Pentium P4 processor
 */
-#include "utils_sha1.h"
+#include "sha1.h"
 
 #if defined(__BIG_ENDIAN__) && __BIG_ENDIAN__
 # define SHA1_BIG_ENDIAN 1

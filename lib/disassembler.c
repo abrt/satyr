@@ -1,5 +1,5 @@
 /*
-    utils_disassembler.c
+    disassembler.c
 
     Copyright (C) 2011, 2012  Red Hat, Inc.
 
@@ -17,15 +17,15 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "utils_disassembler.h"
+#include "disassembler.h"
 #include "utils.h"
-#include "utils_strbuf.h"
+#include "strbuf.h"
 #include <string.h>
 
 /**
  * Captures disassembler output into a strbuf.  This is used as a hook
  * in init_disassemble_info() of libopcodes, which is called from
- * btp_disassembler_init().
+ * btp_disasm_init().
  */
 static int
 buffer_printf(void *buffer, const char *fmt, ...)
@@ -41,11 +41,13 @@ buffer_printf(void *buffer, const char *fmt, ...)
     return (strbuf->len - orig_len);
 }
 
-struct btp_disassembler_state *
-btp_disassembler_init(const char *file_name,
-                      char **error_message)
+struct btp_disasm_state *
+btp_disasm_init(const char *file_name,
+                char **error_message)
 {
-    struct btp_disassembler_state *state = btp_malloc(sizeof(struct btp_disassembler_state));
+    struct btp_disasm_state *state =
+        btp_malloc(sizeof(struct btp_disasm_state));
+
     state->bfd_file = bfd_openr(file_name, NULL);
     if (!state->bfd_file)
     {
@@ -66,12 +68,16 @@ btp_disassembler_init(const char *file_name,
         return NULL;
     }
 
-    asection *section = bfd_get_section_by_name(state->bfd_file, ".text");
+    asection *section =
+        bfd_get_section_by_name(state->bfd_file, ".text");
+
     if (!section)
     {
-        *error_message = btp_asprintf("Failed to find .text section in %s: %s",
-                                      file_name,
-                                      bfd_errmsg(bfd_get_error()));
+        *error_message = btp_asprintf(
+            "Failed to find .text section in %s: %s",
+            file_name,
+            bfd_errmsg(bfd_get_error()));
+
         bfd_close(state->bfd_file);
         free(state);
         return NULL;
@@ -80,8 +86,10 @@ btp_disassembler_init(const char *file_name,
     state->disassembler = disassembler(state->bfd_file);
     if (!state->disassembler)
     {
-        *error_message = btp_asprintf("Unable to find disassembler for %s",
-                                      file_name);
+        *error_message = btp_asprintf(
+            "Unable to find disassembler for %s",
+            file_name);
+
         bfd_close(state->bfd_file);
         free(state);
         return NULL;
@@ -94,13 +102,15 @@ btp_disassembler_init(const char *file_name,
     state->info.buffer_length = section->size;
     state->info.section = section;
     /* TODO: memory error func */
-    bfd_malloc_and_get_section(state->bfd_file, section, &state->info.buffer);
+    bfd_malloc_and_get_section(state->bfd_file, section,
+                               &state->info.buffer);
+
     disassemble_init_for_target(&state->info);
     return state;
 }
 
 void
-btp_disassembler_free(struct btp_disassembler_state *state)
+btp_disasm_free(struct btp_disasm_state *state)
 {
     if (!state)
         return;
@@ -111,18 +121,20 @@ btp_disassembler_free(struct btp_disassembler_state *state)
 }
 
 char **
-btp_disassembler_function_instructions(struct btp_disassembler_state *state,
-                                       uint64_t start_offset,
-                                       uint64_t size,
-                                       char **error_message)
+btp_disasm_function_instructions(struct btp_disasm_state *state,
+                                 uint64_t start_offset,
+                                 uint64_t size,
+                                 char **error_message)
 {
     asection *section = state->info.section;
     if (start_offset < section->vma
         || (start_offset + size) > section->vma + section->size)
     {
-        *error_message = btp_asprintf("Invalid function range: 0x%"PRIx64" - 0x%"PRIx64,
-                                      start_offset,
-                                      start_offset + size);
+        *error_message = btp_asprintf(
+            "Invalid function range: 0x%"PRIx64" - 0x%"PRIx64,
+            start_offset,
+            start_offset + size);
+
         return NULL;
     }
 
@@ -138,8 +150,9 @@ btp_disassembler_function_instructions(struct btp_disassembler_state *state,
         pc += count;
         if (count == 0)
         {
-            *error_message = btp_asprintf("Failed to disassemble a part of function on offset 0x%"PRIx64,
-                                          pc);
+            *error_message = btp_asprintf(
+                "Failed to disassemble a part of function on "
+                "offset 0x%"PRIx64, pc);
             return NULL;
         }
 
@@ -160,7 +173,7 @@ btp_disassembler_function_instructions(struct btp_disassembler_state *state,
 }
 
 void
-btp_disassembler_function_instructions_free(char **instructions)
+btp_disasm_function_instructions_free(char **instructions)
 {
     size_t offset = 0;
     while (instructions[offset])
@@ -173,8 +186,8 @@ btp_disassembler_function_instructions_free(char **instructions)
 }
 
 bool
-btp_disassembler_function_instruction_is_one_of(char *instruction,
-                                                char **mnemonics)
+btp_disasm_function_instruction_is_one_of(const char *instruction,
+                                          const char **mnemonics)
 {
     while (mnemonics)
     {
@@ -192,13 +205,13 @@ btp_disassembler_function_instruction_is_one_of(char *instruction,
 }
 
 bool
-btp_disassembler_function_instruction_present(char **instructions,
-                                              char **mnemonics)
+btp_disasm_function_instruction_present(const char **instructions,
+                                        const char **mnemonics)
 {
     while (instructions)
     {
-        if (btp_disassembler_function_instruction_is_one_of(*instructions,
-                                                            mnemonics))
+        if (btp_disasm_function_instruction_is_one_of(*instructions,
+                                                      mnemonics))
         {
             return true;
         }
@@ -210,8 +223,8 @@ btp_disassembler_function_instruction_present(char **instructions,
 }
 
 bool
-btp_disassembler_instruction_parse_single_address_operand(char *instruction,
-                                                          uint64_t *dest)
+btp_disasm_instruction_parse_single_address_operand(const char *instruction,
+                                                    uint64_t *dest)
 {
     /* Parse the mnemonic. */
     const char *p = instruction;
@@ -234,4 +247,61 @@ btp_disassembler_instruction_parse_single_address_operand(char *instruction,
         *dest = addr;
 
     return true;
+}
+
+uint64_t *
+btp_disasm_get_callee_addresses(const char **instructions)
+{
+    static const char *call_mnems[] = {"call", "callb", "callw",
+                                       "calll", "callq", NULL};
+
+    /* Determine the upper bound on the number of calls. */
+    size_t result_size = 0, instruction_offset = 0;
+    while (instructions[instruction_offset])
+    {
+        const char *instruction = instructions[instruction_offset];
+        if (btp_disasm_function_instruction_is_one_of(instruction, call_mnems))
+        {
+            uint64_t address;
+            if (btp_disasm_instruction_parse_single_address_operand(
+                    instruction, &address))
+                ++result_size;
+        }
+
+        ++instruction_offset;
+    }
+
+    /* Create the output array and fill it */
+    uint64_t *result = malloc(result_size * sizeof(uint64_t) + 1);
+    size_t result_offset = 0;
+    instruction_offset = 0;
+    while (instructions[instruction_offset])
+    {
+        char *instruction = instructions[instruction_offset];
+        if (insn_is_one_of(instruction, call_mnems))
+        {
+            uint64_t address;
+            if (insn_has_single_addr_operand(instruction, &address))
+            {
+                /* Check if address is already stored in the list. */
+                size_t result_loop = 0;
+                for (; result_loop < result_offset; ++result_loop)
+                {
+                    if (result[result_loop] == address)
+                        break;
+                }
+
+                /* If the address is not present in the list, store it
+                 * there.
+                 */
+                if (result_loop == result_offset)
+                    result[result_offset++] = address;
+            }
+        }
+
+        ++instruction_offset;
+    }
+
+    result[result_offset] = 0;
+    return result;
 }

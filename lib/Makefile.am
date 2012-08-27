@@ -1,9 +1,12 @@
 pkginclude_HEADERS = \
+	callgraph.h \
 	cluster.h \
 	core_backtrace.h \
 	core_fingerprint.h \
 	core_frame.h \
 	core_thread.h \
+	disassembler.h \
+	elves.h \
 	gdb_backtrace.h \
 	gdb_frame.h \
 	gdb_sharedlib.h \
@@ -12,21 +15,22 @@ pkginclude_HEADERS = \
 	metrics.h \
 	normalize.h \
 	python_backtrace.h \
-	utils.h \
-	utils_disassembler.h \
-	utils_elf.h \
-	utils_sha1.h \
-	utils_strbuf.h \
-	utils_unstrip.h
+	sha1.h \
+	strbuf.h \
+	unstrip.h \
+	utils.h
 
 lib_LTLIBRARIES = libbtparser.la
 libbtparser_la_SOURCES = \
 	$(pkginclude_HEADERS) \
+	callgraph.c \
 	cluster.c \
 	core_backtrace.c \
 	core_fingerprint.c \
 	core_frame.c \
 	core_thread.c \
+	disassembler.c \
+	elves.c \
 	gdb_backtrace.c \
 	gdb_frame.c \
 	gdb_sharedlib.c \
@@ -43,12 +47,10 @@ libbtparser_la_SOURCES = \
 	normalize_linux.c \
 	normalize_xorg.c \
 	python_backtrace.c \
-	utils.c \
-	utils_disassembler.c \
-	utils_elf.c \
-	utils_sha1.c \
-	utils_strbuf.c \
-	utils_unstrip.c
+	sha1.c \
+	strbuf.c \
+	unstrip.c \
+	utils.c
 
 libbtparser_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE $(GLIB_CFLAGS)
 libbtparser_la_LDFLAGS = -version-info 4:2:2 $(GLIB_LIBS)

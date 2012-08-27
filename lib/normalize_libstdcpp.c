@@ -32,10 +32,10 @@ btp_normalize_libstdcpp_thread(struct btp_gdb_thread *thread)
 
         /* Remove frames which are not a cause of the crash. */
         bool removable =
-            btp_frame_calls_func_in_file(frame, "__gnu_cxx::__verbose_terminate_handler", "vterminate.cc") ||
-            btp_frame_calls_func_in_file(frame, "__cxxabiv1::__terminate", "eh_terminate.cc") ||
-            btp_frame_calls_func_in_file(frame, "std::terminate", "eh_terminate.cc") ||
-            btp_frame_calls_func_in_file(frame, "__cxxabiv1::__cxa_throw", "eh_throw.cc");
+            btp_gdb_frame_calls_func_in_file(frame, "__gnu_cxx::__verbose_terminate_handler", "vterminate.cc") ||
+            btp_gdb_frame_calls_func_in_file(frame, "__cxxabiv1::__terminate", "eh_terminate.cc") ||
+            btp_gdb_frame_calls_func_in_file(frame, "std::terminate", "eh_terminate.cc") ||
+            btp_gdb_frame_calls_func_in_file(frame, "__cxxabiv1::__cxa_throw", "eh_throw.cc");
         if (removable)
         {
             btp_gdb_thread_remove_frame(thread, frame);

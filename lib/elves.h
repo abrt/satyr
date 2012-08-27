@@ -1,5 +1,5 @@
 /*
-    utils_elf.h
+    elves.h
 
     Copyright (C) 2011, 2012  Red Hat, Inc.
 
@@ -17,8 +17,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_UTILS_ELF_H
-#define BTPARSER_UTILS_ELF_H
+#ifndef BTPARSER_ELVES_H
+#define BTPARSER_ELVES_H
+
+/**
+ * File name elf.h cannot be used due to collision with <elf.h> system
+ * include.
+ */
 
 #ifdef __cplusplus
 extern "C" {

@@ -74,7 +74,7 @@ PyObject *p_btp_distances_new(PyTypeObject *object, PyObject *args, PyObject *kw
     if (PyArg_ParseTuple(args, "sO!i", &dist_name, &PyList_Type, &thread_list, &m))
     {
         n = PyList_Size(thread_list);
-        struct btp_thread *threads[n];
+        struct btp_gdb_thread *threads[n];
 
         for (i = 0; i < n; i++)
         {
@@ -95,16 +95,16 @@ PyObject *p_btp_distances_new(PyTypeObject *object, PyObject *args, PyObject *kw
         btp_dist_thread_type dist_func;
 
         if (!strcmp(dist_name, "jaccard"))
-            dist_func = btp_thread_jaccard_distance;
+            dist_func = btp_gdb_thread_jaccard_distance;
         else if (!strcmp(dist_name, "levenshtein"))
-            dist_func = btp_thread_levenshtein_distance_f;
+            dist_func = btp_gdb_thread_levenshtein_distance_f;
         else
         {
             PyErr_SetString(PyExc_ValueError, "Unknown name of distance function");
             return NULL;
         }
 
-        o->distances = btp_threads_compare(threads, m, n, dist_func);
+        o->distances = btp_gdb_threads_compare(threads, m, n, dist_func);
     }
     else if (PyArg_ParseTuple(args, "ii", &m, &n))
     {

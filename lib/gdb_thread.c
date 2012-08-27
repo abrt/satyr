@@ -21,7 +21,7 @@
 #include "gdb_frame.h"
 #include "location.h"
 #include "utils.h"
-#include "utils_strbuf.h"
+#include "strbuf.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>

@@ -20,7 +20,7 @@
 #include "core_thread.h"
 #include "core_frame.h"
 #include "utils.h"
-#include "utils_strbuf.h"
+#include "strbuf.h"
 #include <string.h>
 
 struct btp_core_thread *

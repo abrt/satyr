@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = lib python tests
+SUBDIRS = lib python tests docs
 
 bin_PROGRAMS = btparser
 btparser_CFLAGS = -Wall

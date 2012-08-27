@@ -19,7 +19,7 @@
 */
 #include "gdb_sharedlib.h"
 #include "utils.h"
-#include "utils_strbuf.h"
+#include "strbuf.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>

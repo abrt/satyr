@@ -21,7 +21,7 @@
 #include "core_thread.h"
 #include "core_frame.h"
 #include "utils.h"
-#include "utils_sha1.h"
+#include "sha1.h"
 #include <stdio.h>
 #include <string.h>
 

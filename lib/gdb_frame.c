@@ -19,7 +19,7 @@
 */
 #include "gdb_frame.h"
 #include "utils.h"
-#include "utils_strbuf.h"
+#include "strbuf.h"
 #include "location.h"
 #include <stdlib.h>
 #include <stdio.h>

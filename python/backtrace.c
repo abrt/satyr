@@ -3,17 +3,17 @@
 
 static PyMethodDef BacktraceMethods[] = {
     /* methods */
-    { "dup",                  p_btp_backtrace_dup,                  METH_NOARGS,  b_dup_doc                  },
-    { "find_crash_frame",     p_btp_backtrace_find_crash_frame,     METH_NOARGS,  b_find_crash_frame_doc     },
-    { "find_crash_thread",    p_btp_backtrace_find_crash_thread,    METH_NOARGS,  b_find_crash_thread_doc    },
-    { "limit_frame_depth",    p_btp_backtrace_limit_frame_depth,    METH_VARARGS, b_limit_frame_depth_doc    },
-    { "quality_simple",       p_btp_backtrace_quality_simple,       METH_NOARGS,  b_quality_simple_doc       },
-    { "quality_complex",      p_btp_backtrace_quality_complex,      METH_NOARGS,  b_quality_complex_doc      },
-    { "get_duplication_hash", p_btp_backtrace_get_duplication_hash, METH_NOARGS,  b_get_duplication_hash_doc },
-    { "find_address",         p_btp_backtrace_find_address,         METH_VARARGS, b_find_address_doc         },
-    { "set_libnames",         p_btp_backtrace_set_libnames,         METH_NOARGS,  b_set_libnames_doc         },
-    { "normalize",            p_btp_backtrace_normalize,            METH_NOARGS,  b_normalize_doc            },
-    { "get_optimized_thread", p_btp_backtrace_get_optimized_thread, METH_VARARGS, b_get_optimized_thread_doc },
+    { "dup",                  p_btp_gdb_backtrace_dup,                  METH_NOARGS,  b_dup_doc                  },
+    { "find_crash_frame",     p_btp_gdb_backtrace_find_crash_frame,     METH_NOARGS,  b_find_crash_frame_doc     },
+    { "find_crash_thread",    p_btp_gdb_backtrace_find_crash_thread,    METH_NOARGS,  b_find_crash_thread_doc    },
+    { "limit_frame_depth",    p_btp_gdb_backtrace_limit_frame_depth,    METH_VARARGS, b_limit_frame_depth_doc    },
+    { "quality_simple",       p_btp_gdb_backtrace_quality_simple,       METH_NOARGS,  b_quality_simple_doc       },
+    { "quality_complex",      p_btp_gdb_backtrace_quality_complex,      METH_NOARGS,  b_quality_complex_doc      },
+    { "get_duplication_hash", p_btp_gdb_backtrace_get_duplication_hash, METH_NOARGS,  b_get_duplication_hash_doc },
+    { "find_address",         p_btp_gdb_backtrace_find_address,         METH_VARARGS, b_find_address_doc         },
+    { "set_libnames",         p_btp_gdb_backtrace_set_libnames,         METH_NOARGS,  b_set_libnames_doc         },
+    { "normalize",            p_btp_gdb_backtrace_normalize,            METH_NOARGS,  b_normalize_doc            },
+    { "get_optimized_thread", p_btp_gdb_backtrace_get_optimized_thread, METH_VARARGS, b_get_optimized_thread_doc },
     { NULL },
 };
 
@@ -31,7 +31,7 @@ PyTypeObject BacktraceTypeObject = {
     "btparser.Backtrace",           /* tp_name */
     sizeof(BacktraceObject),        /* tp_basicsize */
     0,                              /* tp_itemsize */
-    p_btp_backtrace_free,           /* tp_dealloc */
+    p_btp_gdb_backtrace_free,       /* tp_dealloc */
     NULL,                           /* tp_print */
     NULL,                           /* tp_getattr */
     NULL,                           /* tp_setattr */
@@ -42,7 +42,7 @@ PyTypeObject BacktraceTypeObject = {
     NULL,                           /* tp_as_mapping */
     NULL,                           /* tp_hash */
     NULL,                           /* tp_call */
-    p_btp_backtrace_str,            /* tp_str */
+    p_btp_gdb_backtrace_str,        /* tp_str */
     NULL,                           /* tp_getattro */
     NULL,                           /* tp_setattro */
     NULL,                           /* tp_as_buffer */
@@ -64,7 +64,7 @@ PyTypeObject BacktraceTypeObject = {
     0,                              /* tp_dictoffset */
     NULL,                           /* tp_init */
     NULL,                           /* tp_alloc */
-    p_btp_backtrace_new,            /* tp_new */
+    p_btp_gdb_backtrace_new,        /* tp_new */
     NULL,                           /* tp_free */
     NULL,                           /* tp_is_gc */
     NULL,                           /* tp_bases */
@@ -183,13 +183,13 @@ int backtrace_free_sharedlib_python_list(BacktraceObject *backtrace)
     return 0;
 }
 
-PyObject *thread_linked_list_to_python_list(struct btp_backtrace *backtrace)
+PyObject *thread_linked_list_to_python_list(struct btp_gdb_backtrace *backtrace)
 {
     PyObject *result = PyList_New(0);
     if (!result)
         return PyErr_NoMemory();
 
-    struct btp_thread *thread = backtrace->threads;
+    struct btp_gdb_thread *thread = backtrace->threads;
     ThreadObject *item;
     while (thread)
     {
@@ -208,13 +208,13 @@ PyObject *thread_linked_list_to_python_list(struct btp_backtrace *backtrace)
     return result;
 }
 
-PyObject *sharedlib_linked_list_to_python_list(struct btp_backtrace *backtrace)
+PyObject *sharedlib_linked_list_to_python_list(struct btp_gdb_backtrace *backtrace)
 {
     PyObject *result = PyList_New(0);
     if (!result)
         return PyErr_NoMemory();
 
-    struct btp_sharedlib *sharedlib = backtrace->libs;
+    struct btp_gdb_sharedlib *sharedlib = backtrace->libs;
     SharedlibObject *item;
     while (sharedlib)
     {
@@ -231,16 +231,16 @@ PyObject *sharedlib_linked_list_to_python_list(struct btp_backtrace *backtrace)
 
 int backtrace_rebuild_thread_python_list(BacktraceObject *backtrace)
 {
-    struct btp_thread *newlinkedlist = btp_thread_dup(backtrace->backtrace->threads, true);
+    struct btp_gdb_thread *newlinkedlist = btp_gdb_thread_dup(backtrace->backtrace->threads, true);
     if (!newlinkedlist)
         return -1;
     if (backtrace_free_thread_python_list(backtrace) < 0)
     {
-        struct btp_thread *next;
+        struct btp_gdb_thread *next;
         while (newlinkedlist)
         {
             next = newlinkedlist->next;
-            btp_thread_free(newlinkedlist);
+            btp_gdb_thread_free(newlinkedlist);
             newlinkedlist = next;
         }
         return -1;
@@ -252,16 +252,16 @@ int backtrace_rebuild_thread_python_list(BacktraceObject *backtrace)
 
 int backtrace_rebuild_sharedlib_python_list(BacktraceObject *backtrace)
 {
-    struct btp_sharedlib *newlinkedlist = btp_sharedlib_dup(backtrace->backtrace->libs, true);
+    struct btp_gdb_sharedlib *newlinkedlist = btp_gdb_sharedlib_dup(backtrace->backtrace->libs, true);
     if (!newlinkedlist)
         return -1;
     if (backtrace_free_sharedlib_python_list(backtrace) < 0)
     {
-        struct btp_sharedlib *next;
+        struct btp_gdb_sharedlib *next;
         while (newlinkedlist)
         {
             next = newlinkedlist->next;
-            btp_sharedlib_free(newlinkedlist);
+            btp_gdb_sharedlib_free(newlinkedlist);
             newlinkedlist = next;
         }
         return -1;
@@ -272,7 +272,7 @@ int backtrace_rebuild_sharedlib_python_list(BacktraceObject *backtrace)
 }
 
 /* constructor */
-PyObject *p_btp_backtrace_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
+PyObject *p_btp_gdb_backtrace_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
     BacktraceObject *bo = (BacktraceObject *)PyObject_New(BacktraceObject, &BacktraceTypeObject);
     if (!bo)
@@ -289,7 +289,7 @@ PyObject *p_btp_backtrace_new(PyTypeObject *object, PyObject *args, PyObject *kw
         /* ToDo parse */
         struct btp_location location;
         btp_location_init(&location);
-        bo->backtrace = btp_backtrace_parse(&str, &location);
+        bo->backtrace = btp_gdb_backtrace_parse(&str, &location);
         if (!bo->backtrace)
         {
             PyErr_SetString(PyExc_ValueError, location.message);
@@ -305,7 +305,7 @@ PyObject *p_btp_backtrace_new(PyTypeObject *object, PyObject *args, PyObject *kw
     else
     {
         bo->threads = PyList_New(0);
-        bo->backtrace = btp_backtrace_new();
+        bo->backtrace = btp_gdb_backtrace_new();
         bo->libs = PyList_New(0);
     }
 
@@ -313,19 +313,19 @@ PyObject *p_btp_backtrace_new(PyTypeObject *object, PyObject *args, PyObject *kw
 }
 
 /* destructor */
-void p_btp_backtrace_free(PyObject *object)
+void p_btp_gdb_backtrace_free(PyObject *object)
 {
     BacktraceObject *this = (BacktraceObject *)object;
     backtrace_free_thread_python_list(this);
     backtrace_free_sharedlib_python_list(this);
     this->backtrace->threads = NULL;
     this->backtrace->libs = NULL;
-    btp_backtrace_free(this->backtrace);
+    btp_gdb_backtrace_free(this->backtrace);
     PyObject_Del(object);
 }
 
 /* str */
-PyObject *p_btp_backtrace_str(PyObject *self)
+PyObject *p_btp_gdb_backtrace_str(PyObject *self)
 {
     BacktraceObject *this = (BacktraceObject *)self;
     struct btp_strbuf *buf = btp_strbuf_new();
@@ -338,7 +338,7 @@ PyObject *p_btp_backtrace_str(PyObject *self)
 }
 
 /* methods */
-PyObject *p_btp_backtrace_dup(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_backtrace_dup(PyObject *self, PyObject *args)
 {
     BacktraceObject *this = (BacktraceObject *)self;
     if (backtrace_prepare_linked_list(this) < 0)
@@ -348,7 +348,7 @@ PyObject *p_btp_backtrace_dup(PyObject *self, PyObject *args)
     if (!bo)
         return PyErr_NoMemory();
 
-    bo->backtrace = btp_backtrace_dup(this->backtrace);
+    bo->backtrace = btp_gdb_backtrace_dup(this->backtrace);
     if (!bo->backtrace)
         return NULL;
 
@@ -362,7 +362,7 @@ PyObject *p_btp_backtrace_dup(PyObject *self, PyObject *args)
 
     if (PyObject_TypeCheck(this->crashthread, &ThreadTypeObject))
     {
-        bo->crashthread = (ThreadObject *)p_btp_thread_dup((PyObject *)this->crashthread, PyTuple_New(0));
+        bo->crashthread = (ThreadObject *)p_btp_gdb_thread_dup((PyObject *)this->crashthread, PyTuple_New(0));
         if (!bo->crashthread)
             return NULL;
     }
@@ -371,7 +371,7 @@ PyObject *p_btp_backtrace_dup(PyObject *self, PyObject *args)
 
     if (PyObject_TypeCheck(this->crashframe, &FrameTypeObject))
     {
-        bo->crashframe = (FrameObject *)p_btp_thread_dup((PyObject *)this->crashframe, PyTuple_New(0));
+        bo->crashframe = (FrameObject *)p_btp_gdb_thread_dup((PyObject *)this->crashframe, PyTuple_New(0));
         if (!bo->crashframe)
             return NULL;
     }
@@ -381,14 +381,14 @@ PyObject *p_btp_backtrace_dup(PyObject *self, PyObject *args)
     return (PyObject *)bo;
 }
 
-PyObject *p_btp_backtrace_find_crash_frame(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_backtrace_find_crash_frame(PyObject *self, PyObject *args)
 {
     BacktraceObject *this = (BacktraceObject *)self;
     if (backtrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* destroys linked list - need to rebuild python list */
-    struct btp_frame *frame = btp_backtrace_get_crash_frame(this->backtrace);
+    struct btp_gdb_frame *frame = btp_gdb_backtrace_get_crash_frame(this->backtrace);
     if (!frame)
     {
         PyErr_SetString(PyExc_LookupError, "Crash frame not found");
@@ -408,14 +408,14 @@ PyObject *p_btp_backtrace_find_crash_frame(PyObject *self, PyObject *args)
     return (PyObject *)result;
 }
 
-PyObject *p_btp_backtrace_find_crash_thread(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_backtrace_find_crash_thread(PyObject *self, PyObject *args)
 {
     BacktraceObject *this = (BacktraceObject *)self;
     if (backtrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* destroys linked list - need to rebuild python list */
-    struct btp_thread *thread = btp_backtrace_find_crash_thread(this->backtrace);
+    struct btp_gdb_thread *thread = btp_gdb_backtrace_find_crash_thread(this->backtrace);
     if (!thread)
     {
         PyErr_SetString(PyExc_LookupError, "Crash thread not found");
@@ -426,7 +426,7 @@ PyObject *p_btp_backtrace_find_crash_thread(PyObject *self, PyObject *args)
     if (!result)
         return PyErr_NoMemory();
 
-    result->thread = btp_thread_dup(thread, false);
+    result->thread = btp_gdb_thread_dup(thread, false);
     result->frames = frame_linked_list_to_python_list(result->thread);
     this->crashthread = result;
 
@@ -436,7 +436,7 @@ PyObject *p_btp_backtrace_find_crash_thread(PyObject *self, PyObject *args)
     return (PyObject *)result;
 }
 
-PyObject *p_btp_backtrace_limit_frame_depth(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_backtrace_limit_frame_depth(PyObject *self, PyObject *args)
 {
     BacktraceObject *this = (BacktraceObject *)self;
     if (backtrace_prepare_linked_list(this) < 0)
@@ -447,36 +447,36 @@ PyObject *p_btp_backtrace_limit_frame_depth(PyObject *self, PyObject *args)
         return NULL;
 
     /* destroys linked list - need to rebuild python list */
-    btp_backtrace_limit_frame_depth(this->backtrace, depth);
+    btp_gdb_backtrace_limit_frame_depth(this->backtrace, depth);
     if (backtrace_rebuild_thread_python_list(this) < 0)
         return NULL;
 
     Py_RETURN_NONE;
 }
 
-PyObject *p_btp_backtrace_quality_simple(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_backtrace_quality_simple(PyObject *self, PyObject *args)
 {
     BacktraceObject *this = (BacktraceObject *)self;
     if (backtrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* does not destroy the linked list */
-    float result = btp_backtrace_quality_simple(this->backtrace);
+    float result = btp_gdb_backtrace_quality_simple(this->backtrace);
     return Py_BuildValue("f", result);
 }
 
-PyObject *p_btp_backtrace_quality_complex(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_backtrace_quality_complex(PyObject *self, PyObject *args)
 {
     BacktraceObject *this = (BacktraceObject *)self;
     if (backtrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* does not destroy the linked list */
-    float result = btp_backtrace_quality_complex(this->backtrace);
+    float result = btp_gdb_backtrace_quality_complex(this->backtrace);
     return Py_BuildValue("f", result);
 }
 
-PyObject *p_btp_backtrace_get_duplication_hash(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_backtrace_get_duplication_hash(PyObject *self, PyObject *args)
 {
     BacktraceObject *this = (BacktraceObject *)self;
     if (backtrace_prepare_linked_list(this) < 0)
@@ -490,7 +490,7 @@ PyObject *p_btp_backtrace_get_duplication_hash(PyObject *self, PyObject *args)
     return result;
 }
 
-PyObject *p_btp_backtrace_find_address(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_backtrace_find_address(PyObject *self, PyObject *args)
 {
     BacktraceObject *this = (BacktraceObject *)self;
     if (backtrace_prepare_linked_list(this) < 0)
@@ -521,21 +521,21 @@ PyObject *p_btp_backtrace_find_address(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-PyObject *p_btp_backtrace_set_libnames(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_backtrace_set_libnames(PyObject *self, PyObject *args)
 {
     BacktraceObject *this = (BacktraceObject *)self;
     if (backtrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* does not destroy the linked list */
-    btp_backtrace_set_libnames(this->backtrace);
+    btp_gdb_backtrace_set_libnames(this->backtrace);
     if (backtrace_rebuild_thread_python_list(this) < 0)
         return NULL;
 
     Py_RETURN_NONE;
 }
 
-PyObject *p_btp_backtrace_normalize(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_backtrace_normalize(PyObject *self, PyObject *args)
 {
     BacktraceObject *this = (BacktraceObject *)self;
     if (backtrace_prepare_linked_list(this) < 0)
@@ -543,17 +543,17 @@ PyObject *p_btp_backtrace_normalize(PyObject *self, PyObject *args)
 
     /* destroys the linked list and frees some parts */
     /* need to rebuild python list manually */
-    struct btp_backtrace *tmp = btp_backtrace_dup(this->backtrace);
+    struct btp_gdb_backtrace *tmp = btp_gdb_backtrace_dup(this->backtrace);
     btp_normalize_backtrace(tmp);
     if (backtrace_free_thread_python_list(this) < 0)
     {
-        btp_backtrace_free(tmp);
+        btp_gdb_backtrace_free(tmp);
         return NULL;
     }
 
     this->backtrace->threads = tmp->threads;
     tmp->threads = NULL;
-    btp_backtrace_free(tmp);
+    btp_gdb_backtrace_free(tmp);
 
     this->threads = thread_linked_list_to_python_list(this->backtrace);
     if (!this->threads)
@@ -562,7 +562,7 @@ PyObject *p_btp_backtrace_normalize(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-PyObject *p_btp_backtrace_get_optimized_thread(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_backtrace_get_optimized_thread(PyObject *self, PyObject *args)
 {
     BacktraceObject *this = (BacktraceObject *)self;
     if (backtrace_prepare_linked_list(this) < 0)
@@ -572,7 +572,7 @@ PyObject *p_btp_backtrace_get_optimized_thread(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "i", &max_frames))
         return NULL;
 
-    struct btp_thread *thread = btp_backtrace_get_optimized_thread(this->backtrace, max_frames);
+    struct btp_gdb_thread *thread = btp_gdb_backtrace_get_optimized_thread(this->backtrace, max_frames);
     if (!thread)
     {
         PyErr_SetString(PyExc_LookupError, "Crash thread not found");

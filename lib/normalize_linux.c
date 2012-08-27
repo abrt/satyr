@@ -32,9 +32,9 @@ btp_normalize_linux_thread(struct btp_gdb_thread *thread)
         struct btp_gdb_frame *next_frame = frame->next;
 
         /* Remove frames which are not a cause of the crash. */
-        bool removable = btp_frame_calls_func(frame, "__kernel_vsyscall");
+        bool removable = btp_gdb_frame_calls_func(frame, "__kernel_vsyscall");
         if (removable)
-            btp_thread_remove_frame(thread, frame);
+            btp_gdb_thread_remove_frame(thread, frame);
 
         frame = next_frame;
     }

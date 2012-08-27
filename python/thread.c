@@ -3,14 +3,14 @@
 
 static PyMethodDef ThreadMethods[] = {
     /* getters & setters */
-    { "get_number",     p_btp_thread_get_number,     METH_NOARGS,  t_get_number_doc     },
-    { "set_number",     p_btp_thread_set_number,     METH_VARARGS, t_set_number_doc     },
+    { "get_number",     p_btp_gdb_thread_get_number,     METH_NOARGS,  t_get_number_doc     },
+    { "set_number",     p_btp_gdb_thread_set_number,     METH_VARARGS, t_set_number_doc     },
     /* methods */
-    { "cmp",            p_btp_thread_cmp,            METH_VARARGS, t_cmp_doc            },
-    { "dup",            p_btp_thread_dup,            METH_NOARGS,  t_dup_doc            },
-    { "quality_counts", p_btp_thread_quality_counts, METH_NOARGS,  t_quality_counts_doc },
-    { "quality",        p_btp_thread_quality,        METH_NOARGS,  t_quality_doc        },
-    { "format_funs",    p_btp_thread_format_funs,    METH_NOARGS, t_format_funs_doc    },
+    { "cmp",            p_btp_gdb_thread_cmp,            METH_VARARGS, t_cmp_doc            },
+    { "dup",            p_btp_gdb_thread_dup,            METH_NOARGS,  t_dup_doc            },
+    { "quality_counts", p_btp_gdb_thread_quality_counts, METH_NOARGS,  t_quality_counts_doc },
+    { "quality",        p_btp_gdb_thread_quality,        METH_NOARGS,  t_quality_doc        },
+    { "format_funs",    p_btp_gdb_thread_format_funs,    METH_NOARGS, t_format_funs_doc    },
     { NULL },
 };
 
@@ -25,7 +25,7 @@ PyTypeObject ThreadTypeObject = {
     "btparser.Thread",          /* tp_name */
     sizeof(ThreadObject),       /* tp_basicsize */
     0,                          /* tp_itemsize */
-    p_btp_thread_free,          /* tp_dealloc */
+    p_btp_gdb_thread_free,      /* tp_dealloc */
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
@@ -36,7 +36,7 @@ PyTypeObject ThreadTypeObject = {
     NULL,                       /* tp_as_mapping */
     NULL,                       /* tp_hash */
     NULL,                       /* tp_call */
-    p_btp_thread_str,           /* tp_str */
+    p_btp_gdb_thread_str,       /* tp_str */
     NULL,                       /* tp_getattro */
     NULL,                       /* tp_setattro */
     NULL,                       /* tp_as_buffer */
@@ -58,7 +58,7 @@ PyTypeObject ThreadTypeObject = {
     0,                          /* tp_dictoffset */
     NULL,                       /* tp_init */
     NULL,                       /* tp_alloc */
-    p_btp_thread_new,           /* tp_new */
+    p_btp_gdb_thread_new,       /* tp_new */
     NULL,                       /* tp_free */
     NULL,                       /* tp_is_gc */
     NULL,                       /* tp_bases */
@@ -127,13 +127,13 @@ int thread_free_frame_python_list(ThreadObject *thread)
     return 0;
 }
 
-PyObject *frame_linked_list_to_python_list(struct btp_thread *thread)
+PyObject *frame_linked_list_to_python_list(struct btp_gdb_thread *thread)
 {
     PyObject *result = PyList_New(0);
     if (!result)
         return NULL;
 
-    struct btp_frame *frame = thread->frames;
+    struct btp_gdb_frame *frame = thread->frames;
     FrameObject *item;
     while (frame)
     {
@@ -153,7 +153,7 @@ PyObject *frame_linked_list_to_python_list(struct btp_thread *thread)
 
 int thread_rebuild_python_list(ThreadObject *thread)
 {
-    struct btp_frame *newlinkedlist = btp_frame_dup(thread->thread->frames, true);
+    struct btp_gdb_frame *newlinkedlist = btp_gdb_frame_dup(thread->thread->frames, true);
     if (thread_free_frame_python_list(thread) < 0)
         return -1;
     /* linked list */
@@ -162,11 +162,11 @@ int thread_rebuild_python_list(ThreadObject *thread)
     thread->frames = frame_linked_list_to_python_list(thread->thread);
     if (!thread->frames)
     {
-        struct btp_frame *next;
+        struct btp_gdb_frame *next;
         while (newlinkedlist)
         {
             next = newlinkedlist->next;
-            btp_thread_free(newlinkedlist);
+            btp_gdb_frame_free(newlinkedlist);
             newlinkedlist = next;
         }
         return -1;
@@ -176,7 +176,7 @@ int thread_rebuild_python_list(ThreadObject *thread)
 }
 
 /* constructor */
-PyObject *p_btp_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
+PyObject *p_btp_gdb_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
     ThreadObject *to = (ThreadObject *)PyObject_New(ThreadObject, &ThreadTypeObject);
     if (!to)
@@ -193,7 +193,7 @@ PyObject *p_btp_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
         {
             struct btp_location location;
             btp_location_init(&location);
-            to->thread = btp_thread_parse(&str, &location);
+            to->thread = btp_gdb_thread_parse(&str, &location);
             if (!to->thread)
             {
                 PyErr_SetString(PyExc_ValueError, location.message);
@@ -202,7 +202,7 @@ PyObject *p_btp_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
         }
         else
         {
-            to->thread = btp_thread_parse_funs(str);
+            to->thread = btp_gdb_thread_parse_funs(str);
         }
         to->frames = frame_linked_list_to_python_list(to->thread);
         if (!to->frames)
@@ -211,23 +211,23 @@ PyObject *p_btp_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
     else
     {
         to->frames = PyList_New(0);
-        to->thread = btp_thread_new();
+        to->thread = btp_gdb_thread_new();
     }
 
     return (PyObject *)to;
 }
 
 /* destructor */
-void p_btp_thread_free(PyObject *object)
+void p_btp_gdb_thread_free(PyObject *object)
 {
     ThreadObject *this = (ThreadObject *)object;
     thread_free_frame_python_list(this);
     this->thread->frames = NULL;
-    btp_thread_free(this->thread);
+    btp_gdb_thread_free(this->thread);
     PyObject_Del(object);
 }
 
-PyObject *p_btp_thread_str(PyObject *self)
+PyObject *p_btp_gdb_thread_str(PyObject *self)
 {
     ThreadObject *this = (ThreadObject *)self;
     struct btp_strbuf *buf = btp_strbuf_new();
@@ -241,13 +241,13 @@ PyObject *p_btp_thread_str(PyObject *self)
 }
 
 /* getters & setters */
-PyObject *p_btp_thread_get_number(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_thread_get_number(PyObject *self, PyObject *args)
 {
     ThreadObject *this = (ThreadObject *)self;
     return Py_BuildValue("i", this->thread->number);
 }
 
-PyObject *p_btp_thread_set_number(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_thread_set_number(PyObject *self, PyObject *args)
 {
     ThreadObject *this = (ThreadObject *)self;
     int newvalue;
@@ -265,7 +265,7 @@ PyObject *p_btp_thread_set_number(PyObject *self, PyObject *args)
 }
 
 /* methods */
-PyObject *p_btp_thread_dup(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_thread_dup(PyObject *self, PyObject *args)
 {
     ThreadObject *this = (ThreadObject *)self;
     if (thread_prepare_linked_list(this) < 0)
@@ -275,7 +275,7 @@ PyObject *p_btp_thread_dup(PyObject *self, PyObject *args)
     if (!to)
         return PyErr_NoMemory();
 
-    to->thread = btp_thread_dup(this->thread, false);
+    to->thread = btp_gdb_thread_dup(this->thread, false);
     if (!to->thread)
         return NULL;
 
@@ -284,7 +284,7 @@ PyObject *p_btp_thread_dup(PyObject *self, PyObject *args)
     return (PyObject *)to;
 }
 
-PyObject *p_btp_thread_cmp(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_thread_cmp(PyObject *self, PyObject *args)
 {
     ThreadObject *this = (ThreadObject *)self;
     PyObject *compare_to;
@@ -298,30 +298,30 @@ PyObject *p_btp_thread_cmp(PyObject *self, PyObject *args)
     if (thread_prepare_linked_list(cmp_to) < 0)
         return NULL;
 
-    return Py_BuildValue("i", btp_thread_cmp(this->thread, cmp_to->thread));
+    return Py_BuildValue("i", btp_gdb_thread_cmp(this->thread, cmp_to->thread));
 }
 
-PyObject *p_btp_thread_quality_counts(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_thread_quality_counts(PyObject *self, PyObject *args)
 {
     ThreadObject *this = (ThreadObject *)self;
     if (thread_prepare_linked_list(this) < 0)
         return NULL;
 
     int ok = 0, all = 0;
-    btp_thread_quality_counts(this->thread, &ok, &all);
+    btp_gdb_thread_quality_counts(this->thread, &ok, &all);
     return Py_BuildValue("(ii)", ok, all);
 }
 
-PyObject *p_btp_thread_quality(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_thread_quality(PyObject *self, PyObject *args)
 {
     ThreadObject *this = (ThreadObject *)self;
     if (thread_prepare_linked_list(this) < 0)
         return NULL;
 
-    return Py_BuildValue("f", btp_thread_quality(this->thread));
+    return Py_BuildValue("f", btp_gdb_thread_quality(this->thread));
 }
 
-PyObject *p_btp_thread_format_funs(PyObject *self, PyObject *args)
+PyObject *p_btp_gdb_thread_format_funs(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", btp_thread_format_funs(((ThreadObject *)self)->thread));
+    return Py_BuildValue("s", btp_gdb_thread_format_funs(((ThreadObject *)self)->thread));
 }

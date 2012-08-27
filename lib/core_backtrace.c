@@ -26,8 +26,8 @@
 #include "location.h"
 #include "normalize.h"
 #include "utils.h"
-#include "utils_strbuf.h"
-#include "utils_unstrip.h"
+#include "strbuf.h"
+#include "unstrip.h"
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdint.h>

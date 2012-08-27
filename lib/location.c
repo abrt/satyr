@@ -19,7 +19,7 @@
 */
 #include "location.h"
 #include "utils.h"
-#include "utils_strbuf.h"
+#include "strbuf.h"
 #include <stdlib.h>
 
 void

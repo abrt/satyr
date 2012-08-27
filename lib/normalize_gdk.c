@@ -32,14 +32,14 @@ btp_normalize_gdk_thread(struct btp_gdb_thread *thread)
         struct btp_gdb_frame *next_frame = frame->next;
 
         /* Remove IA__ prefix. */
-        btp_frame_remove_func_prefix(frame, "IA__gdk", strlen("IA__"));
+        btp_gdb_frame_remove_func_prefix(frame, "IA__gdk", strlen("IA__"));
 
         /* Remove frames which are not a cause of the crash. */
         bool removable =
-            btp_frame_calls_func_in_file(frame, "gdk_x_error", "gdkmain-x11.c") ||
-            btp_frame_calls_func_in_file(frame, "gdk_threads_dispatch", "gdk.c") ||
-            btp_frame_calls_func_in_file2(frame, "gdk_event_dispatch", "gdkevents-x11.c", "gdkevents.c") ||
-            btp_frame_calls_func_in_file(frame, "gdk_event_source_dispatch", "gdkeventsource.c");
+            btp_gdb_frame_calls_func_in_file(frame, "gdk_x_error", "gdkmain-x11.c") ||
+            btp_gdb_frame_calls_func_in_file(frame, "gdk_threads_dispatch", "gdk.c") ||
+            btp_gdb_frame_calls_func_in_file2(frame, "gdk_event_dispatch", "gdkevents-x11.c", "gdkevents.c") ||
+            btp_gdb_frame_calls_func_in_file(frame, "gdk_event_source_dispatch", "gdkeventsource.c");
 
         if (removable)
         {

@@ -22,7 +22,7 @@
 #include "gdb_frame.h"
 #include "gdb_sharedlib.h"
 #include "utils.h"
-#include "utils_strbuf.h"
+#include "strbuf.h"
 #include "location.h"
 #include "normalize.h"
 #include <stdlib.h>

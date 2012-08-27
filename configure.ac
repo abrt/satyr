@@ -39,12 +39,40 @@ AC_ARG_ENABLE([fingerprints],
 AC_CANONICAL_HOST
 AM_CONDITIONAL(ENABLE_DISASSEMBLY, [test "$host_cpu" = "x86_64" -a "$enable_fingerprints" != "no"])
 
+# pdflatex
+AC_PATH_PROG([PDFLATEX], [pdflatex], [no])
+[if test "$PDFLATEX" = "no"; then]
+    [echo "The pdflatex program was not found in the search path. Please ensure"]
+    [echo "that it is installed and its directory is included in the search path."]
+    [echo "Then run configure again before attempting to build Canal."]
+    [exit 1]
+[fi]
+
+# doxygen
+AC_PATH_PROG([DOXYGEN], [doxygen], [no])
+[if test "$DOXYGEN" = "no"; then]
+    [echo "The doxygen program was not found in the search path. Please ensure"]
+    [echo "that it is installed and its directory is included in the search path."]
+    [echo "Then run configure again before attempting to build Canal."]
+    [exit 1]
+[fi]
+
+# dot (part of graphviz
+AC_PATH_PROG([DOT], [dot], [no])
+[if test "DOT" = "no"; then]
+    [echo "The dot program was not found in the search path. Please ensure"]
+    [echo "that it is installed and its directory is included in the search path."]
+    [echo "Then run configure again before attempting to build Canal."]
+    [exit 1]
+[fi]
+
 AC_CONFIG_FILES([
 	btparser.spec
 	btparser.pc
 	Makefile
 	lib/Makefile
 	python/Makefile
+	docs/Makefile
 ])
 
 AC_OUTPUT
