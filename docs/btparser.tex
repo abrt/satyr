@@ -1,0 +1,59 @@
+% pdflatex canal.tex
+\documentclass[a4paper]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{a4wide}
+\usepackage{makeidx}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{import}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{txfonts}
+\usepackage{float}
+\usepackage{doxygen/doxygen}
+
+\fancyfoot[RE]{\fancyplain{}{}}
+\fancyfoot[LO]{\fancyplain{}{}}
+
+\setcounter{tocdepth}{2}
+
+\makeindex
+
+\title{Btparser\\
+\vskip 1em
+\large{A program failure analysis library}}
+\author{Karel Klíč}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\cleardoublepage
+
+\chapter{Overview}
+
+\part{Concepts}
+
+\part{Implementation}
+
+\chapter{Overview}
+
+Btparser is implemented in the C language as defined in the C99
+standard (ISO/IEC 9899:1999).  It uses the C standard library as well
+as some additional libraries:
+\begin{itemize}
+\item elfutils
+\end{itemize}
+
+\import{doxygen/}{refman}
+
+\chapter{Known Bugs}
+Empty.
+
+\clearpage
+\addcontentsline{toc}{chapter}{Index}
+\printindex
+
+\end{document}
