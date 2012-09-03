@@ -182,17 +182,17 @@ top_srcdir = @top_srcdir@
 EXTRA_DIST = backtraces package.m4 $(TESTSUITE_AT) $(TESTSUITE) \
 	atlocal.in
 TESTSUITE_AT = \
-  local.at 	\
-  testsuite.at	\
-  utils.at 	\
-  strbuf.at	\
-  frame.at 	\
-  thread.at 	\
-  backtrace.at  \
-  normalize.at  \
-  metrics.at \
-  cluster.at \
-  sharedlib.at
+  local.at 		\
+  testsuite.at		\
+  utils.at 		\
+  strbuf.at		\
+  gdb_frame.at 		\
+  gdb_thread.at 	\
+  gdb_backtrace.at  	\
+  gdb_sharedlib.at	\
+  normalize.at  	\
+  metrics.at 		\
+  cluster.at
 
 TESTSUITE = $(srcdir)/testsuite
 MAINTAINERCLEANFILES = Makefile.in $(TESTSUITE)

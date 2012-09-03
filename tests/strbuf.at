@@ -1,16 +1,17 @@
 # Checking the btparser. -*- Autotest -*-
 
-AT_BANNER([strbuf])
+AT_BANNER([String buffer])
 
 ## ---------------------- ##
 ## btp_strbuf_append_char ##
 ## ---------------------- ##
-
 AT_TESTFUN([btp_strbuf_append_char],
 [[
 #include <lib/strbuf.h>
 #include <assert.h>
-int main(void)
+
+int
+main(void)
 {
   int i;
   struct btp_strbuf *strbuf = btp_strbuf_new();
@@ -33,14 +34,14 @@ int main(void)
 ## --------------------- ##
 ## btp_strbuf_append_str ##
 ## --------------------- ##
-
 AT_TESTFUN([btp_strbuf_append_str],
 [[
 #include <lib/strbuf.h>
 #include <assert.h>
 
 /* Test appending strings of certain length. 'len' must be < 50. */
-void test(int len)
+static void
+test(int len)
 {
   int i;
   char str[50];
@@ -63,7 +64,8 @@ void test(int len)
   btp_strbuf_free(strbuf);
 }
 
-int main(void)
+int
+main(void)
 {
   int i;
   for (i = 0; i < 50; ++i)

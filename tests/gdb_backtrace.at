@@ -1,0 +1,199 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([GDB backtraces])
+
+## ------------------------------------------- ##
+## btp_gdb_backtrace_remove_threads_except_one ##
+## ------------------------------------------- ##
+AT_TESTFUN([btp_gdb_backtrace_remove_threads_except_one],
+[[
+#include <lib/gdb_backtrace.h>
+#include <lib/gdb_thread.h>
+#include <assert.h>
+#include <stdlib.h>
+
+int
+main(void)
+{
+  /* Delete the thread except the middle one. */
+  struct btp_gdb_thread *thread2 = btp_gdb_thread_new();
+  struct btp_gdb_thread *thread1 = btp_gdb_thread_new();
+  thread1->next = thread2;
+  struct btp_gdb_thread *thread0 = btp_gdb_thread_new();
+  thread0->next = thread1;
+  struct btp_gdb_backtrace *backtrace = btp_gdb_backtrace_new();
+  backtrace->threads = thread0;
+  btp_gdb_backtrace_remove_threads_except_one(backtrace, thread1);
+  assert(backtrace->threads == thread1);
+  assert(NULL == backtrace->threads->next);
+
+  /* Delete all threads except one when there is only one. */
+  btp_gdb_backtrace_remove_threads_except_one(backtrace, thread1);
+  assert(backtrace->threads == thread1);
+  assert(NULL == backtrace->threads->next);
+
+  /* Delete all threads except the first one. */
+  thread0 = btp_gdb_thread_new();
+  backtrace->threads = thread0;
+  thread0->next = thread1; // already exists
+  thread2 = btp_gdb_thread_new();
+  thread1->next = thread2;
+  btp_gdb_backtrace_remove_threads_except_one(backtrace, thread0);
+  assert(backtrace->threads == thread0);
+  assert(NULL == backtrace->threads->next);
+
+  /* Delete all threads except the last one. */
+  thread1 = btp_gdb_thread_new();
+  thread0->next = thread1;
+  thread2 = btp_gdb_thread_new();
+  thread1->next = thread2;
+  btp_gdb_backtrace_remove_threads_except_one(backtrace, thread2);
+  assert(backtrace->threads == thread2);
+  assert(NULL == backtrace->threads->next);
+
+  btp_gdb_backtrace_free(backtrace);
+  return 0;
+}
+]])
+
+## ----------------------------------- ##
+## btp_gdb_backtrace_find_crash_thread ##
+## ----------------------------------- ##
+AT_TESTFUN([btp_gdb_backtrace_find_crash_thread],
+[
+#include <lib/gdb_backtrace.h>
+#include <lib/gdb_thread.h>
+#include <lib/gdb_frame.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+
+void
+check(const char *path, const char *first_thread_function_name)
+{
+  /* Load the backtrace from a file. */
+  struct btp_location location;
+  btp_location_init(&location);
+  char *full_input = btp_file_to_string(path);
+  assert(full_input);
+  char *input = full_input;
+  struct btp_gdb_backtrace *backtrace = btp_gdb_backtrace_parse(&input, &location);
+  assert(backtrace);
+
+  /* Check that the crash thread is found. */
+  struct btp_gdb_thread *crash_thread = btp_gdb_backtrace_find_crash_thread(backtrace);
+  assert(crash_thread);
+  assert(0 == strcmp(crash_thread->frames->function_name, first_thread_function_name));
+  btp_gdb_backtrace_free(backtrace);
+  return 0;
+}
+
+int
+main(void)
+{
+  /* Test the backtrace from Red Hat Bugzilla bug #621492. */
+  check("../../backtraces/621492.bt", "raise");
+  /* Test the backtrace from Red Hat Bugzilla bug #803600. */
+  check("../../backtraces/803600.bt", "validate_row");
+  return 0;
+}
+])
+
+## ----------------------------------- ##
+## btp_gdb_backtrace_limit_frame_depth ##
+## ----------------------------------- ##
+AT_TESTFUN([btp_gdb_backtrace_limit_frame_depth],
+[[
+#include <lib/gdb_backtrace.h>
+#include <lib/gdb_thread.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+
+int
+main(void)
+{
+  /* Load the backtrace from Red Hat Bugzilla bug #621492. */
+  struct btp_location location;
+  btp_location_init(&location);
+  char *full_input = btp_file_to_string("../../backtraces/621492.bt");
+  assert(full_input);
+  char *input = full_input;
+  struct btp_gdb_backtrace *backtrace = btp_gdb_backtrace_parse(&input, &location);
+  assert(backtrace);
+
+  /* Check the frame depth limit. */
+  btp_gdb_backtrace_limit_frame_depth(backtrace, 5);
+  assert(11 == btp_gdb_backtrace_get_thread_count(backtrace));
+  struct btp_gdb_thread *thread = backtrace->threads;
+  while (thread)
+  {
+    assert(5 == btp_gdb_thread_get_frame_count(thread));
+    thread = thread->next;
+  }
+
+  btp_gdb_backtrace_free(backtrace);
+  return 0;
+}
+]])
+
+## --------------------------------- ##
+## btp_gdb_backtrace_quality_complex ##
+## --------------------------------- ##
+AT_TESTFUN([btp_gdb_backtrace_quality_complex],
+[[
+#include <lib/gdb_backtrace.h>
+#include <lib/gdb_thread.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+
+int
+main(void)
+{
+  /* Load the backtrace from Red Hat Bugzilla bug #621492. */
+  struct btp_location location;
+  btp_location_init(&location);
+  char *full_input = btp_file_to_string("../../backtraces/621492.bt");
+  assert(full_input);
+  char *input = full_input;
+  struct btp_gdb_backtrace *backtrace = btp_gdb_backtrace_parse(&input, &location);
+  assert(backtrace);
+  assert(1.0f == btp_gdb_backtrace_quality_complex(backtrace));
+  btp_gdb_backtrace_free(backtrace);
+  return 0;
+}
+]])
+
+## --------------------------------- ##
+## btp_gdb_backtrace_get_crash_frame ##
+## --------------------------------- ##
+AT_TESTFUN([btp_gdb_backtrace_get_crash_frame],
+[[
+#include <lib/gdb_backtrace.h>
+#include <lib/gdb_thread.h>
+#include <lib/gdb_frame.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdio.h>
+
+int
+main(void)
+{
+  /* Check the crash frame of backtrace from Red Hat Bugzilla bug #803600. */
+  struct btp_location location;
+  btp_location_init(&location);
+  char *full_input = btp_file_to_string("../../backtraces/803600.bt");
+  assert(full_input);
+  char *input = full_input;
+  struct btp_gdb_backtrace *backtrace = btp_gdb_backtrace_parse(&input, &location);
+  assert(backtrace);
+  struct btp_gdb_frame *crash_frame = btp_gdb_backtrace_get_crash_frame(backtrace);
+  puts(crash_frame->function_name);
+  assert(0 == strcmp(crash_frame->function_name, "validate_row"));
+  btp_gdb_frame_free(crash_frame);
+  btp_gdb_backtrace_free(backtrace);
+  return 0;
+}
+]])

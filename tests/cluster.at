@@ -1,20 +1,21 @@
-AT_BANNER([Cluster])
+AT_BANNER([Clustering])
 
 AT_TESTFUN([btp_distances_cluster_objects],
 [
 #include <lib/metrics.h>
 #include <lib/cluster.h>
 #include <assert.h>
-
 #include <stdio.h>
 
-bool is_dist_equal(float x, float y)
+bool
+is_dist_equal(float x, float y)
 {
   float epsilon = 1e-6;
   return x - epsilon <= y && x + epsilon >= y;
 }
 
-int main()
+int
+main()
 {
   struct btp_distances *distances;
   struct btp_dendrogram *dendrogram;
@@ -73,10 +74,10 @@ AT_TESTFUN([btp_dendrogram_cut],
 #include <lib/metrics.h>
 #include <lib/cluster.h>
 #include <assert.h>
-
 #include <stdio.h>
 
-int main()
+int
+main()
 {
   struct btp_dendrogram *dendrogram;
   struct btp_cluster *cluster;

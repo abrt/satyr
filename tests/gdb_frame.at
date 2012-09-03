@@ -1,20 +1,20 @@
 # Checking the btparser. -*- Autotest -*-
 
-AT_BANNER([Frames])
+AT_BANNER([GDB frames])
 
-## ------------- ##
-## btp_frame_dup ##
-## ------------- ##
-
-AT_TESTFUN([btp_frame_dup],
+## ----------------- ##
+## btp_gdb_frame_dup ##
+## ----------------- ##
+AT_TESTFUN([btp_gdb_frame_dup],
 [[
-#include <lib/frame.h>
+#include <lib/gdb_frame.h>
 #include <lib/utils.h>
 #include <assert.h>
 
-int main(void)
+int
+main(void)
 {
-  struct btp_frame *frame1 = btp_frame_new();;
+  struct btp_gdb_frame *frame1 = btp_gdb_frame_new();;
   frame1->function_name = btp_strdup("test1");
   frame1->function_type = btp_strdup("type1");
   frame1->number = 10;
@@ -22,7 +22,7 @@ int main(void)
   frame1->source_line = 11;
   frame1->address = 12;
 
-  struct btp_frame *frame0 = btp_frame_new();;
+  struct btp_gdb_frame *frame0 = btp_gdb_frame_new();;
   frame0->function_name = btp_strdup("test0");
   frame0->function_type = btp_strdup("type0");
   frame0->number = 13;
@@ -32,38 +32,37 @@ int main(void)
   frame0->next = frame1;
 
   /* Test the duplication without siblings. */
-  struct btp_frame *frame = btp_frame_dup(frame0, false);
+  struct btp_gdb_frame *frame = btp_gdb_frame_dup(frame0, false);
   assert(NULL == frame->next);
   assert(frame->function_name != frame0->function_name);
   assert(frame->function_type != frame0->function_type);
   assert(frame->source_file != frame0->source_file);
-  assert(0 == btp_frame_cmp(frame, frame0, true));
-  btp_frame_free(frame);
+  assert(0 == btp_gdb_frame_cmp(frame, frame0, true));
+  btp_gdb_frame_free(frame);
 
   /* Test the duplication with the siblings. */
-  frame = btp_frame_dup(frame0, true);
+  frame = btp_gdb_frame_dup(frame0, true);
   assert(frame->function_name != frame0->function_name);
   assert(frame->function_type != frame0->function_type);
   assert(frame->source_file != frame0->source_file);
-  assert(0 == btp_frame_cmp(frame, frame0, true));
+  assert(0 == btp_gdb_frame_cmp(frame, frame0, true));
   assert(frame->next != frame1);
-  assert(0 == btp_frame_cmp(frame->next, frame1, true));
-  btp_frame_free(frame->next);
-  btp_frame_free(frame);
+  assert(0 == btp_gdb_frame_cmp(frame->next, frame1, true));
+  btp_gdb_frame_free(frame->next);
+  btp_gdb_frame_free(frame);
 
-  btp_frame_free(frame1);
-  btp_frame_free(frame0);
+  btp_gdb_frame_free(frame1);
+  btp_gdb_frame_free(frame0);
   return 0;
 }
 ]])
 
-## --------------------------- ##
-## btp_frame_parse_frame_start ##
-## --------------------------- ##
-
-AT_TESTFUN([btp_frame_parse_frame_start],
+## ------------------------------- ##
+## btp_gdb_frame_parse_frame_start ##
+## ------------------------------- ##
+AT_TESTFUN([btp_gdb_frame_parse_frame_start],
 [[
-#include <lib/frame.h>
+#include <lib/gdb_frame.h>
 #include <assert.h>
 
 /**
@@ -74,13 +73,14 @@ AT_TESTFUN([btp_frame_parse_frame_start],
  * @param expected_frame_number
  * The expected parsed frame number.
  */
-void check(char *input,
-           int parsed_char_count,
-           unsigned expected_frame_number)
+static void
+check(char *input,
+      int parsed_char_count,
+      unsigned expected_frame_number)
 {
   int number;
   char *old_input = input;
-  assert(parsed_char_count == btp_frame_parse_frame_start(&input, &number));
+  assert(parsed_char_count == btp_gdb_frame_parse_frame_start(&input, &number));
   if (0 < parsed_char_count)
   {
     assert(number == expected_frame_number);
@@ -93,7 +93,8 @@ void check(char *input,
   }
 }
 
-int main(void)
+int
+main(void)
 {
   check("#10 "    , 4, 10);
   check("#0  "    , 4, 0);
@@ -105,23 +106,23 @@ int main(void)
 }
 ]])
 
-## --------------------------- ##
-## btp_frame_parseadd_operator ##
-## --------------------------- ##
-
-AT_TESTFUN([btp_frame_parseadd_operator],
+## ------------------------------- ##
+## btp_gdb_frame_parseadd_operator ##
+## ------------------------------- ##
+AT_TESTFUN([btp_gdb_frame_parseadd_operator],
 [[
-#include <lib/frame.h>
+#include <lib/gdb_frame.h>
 #include <lib/strbuf.h>
 #include <assert.h>
 #include <string.h>
 
-void check(char *input, int parsed_length)
+static void
+check(char *input, int parsed_length)
 {
   printf("Testing '%s' -> %d\n", input, parsed_length);
   char *old_input = input;
   struct btp_strbuf *strbuf = btp_strbuf_new();
-  assert(parsed_length == btp_frame_parseadd_operator(&input, strbuf));
+  assert(parsed_length == btp_gdb_frame_parseadd_operator(&input, strbuf));
   printf("  input = '%s', old_input = '%s'\n", input, old_input);
 
   /* Check that the input pointer was updated properly. */
@@ -134,7 +135,8 @@ void check(char *input, int parsed_length)
   btp_strbuf_free(strbuf);
 }
 
-int main(void)
+int
+main(void)
 {
   check("operator>", strlen("operator>"));
   check("operator->", strlen("operator->"));
@@ -149,20 +151,20 @@ int main(void)
 }
 ]])
 
-## ----------------------------- ##
-## btp_frame_parse_function_name ##
-## ----------------------------- ##
-
-AT_TESTFUN([btp_frame_parse_function_name],
+## --------------------------------- ##
+## btp_gdb_frame_parse_function_name ##
+## --------------------------------- ##
+AT_TESTFUN([btp_gdb_frame_parse_function_name],
 [[
-#include <lib/frame.h>
+#include <lib/gdb_frame.h>
 #include <lib/utils.h>
 #include <lib/location.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
-void check(bool success, char *input)
+static void
+check(bool success, char *input)
 {
   /* Function name must be ended with a space. */
   char *input_with_space = btp_malloc(strlen(input) + 2);
@@ -175,7 +177,7 @@ void check(bool success, char *input)
   printf("Parsing '%s'\n", input);
   struct btp_location location;
   btp_location_init(&location);
-  assert(success == btp_frame_parse_function_name(&input_with_space,
+  assert(success == btp_gdb_frame_parse_function_name(&input_with_space,
 						  &function_name,
 						  &function_type,
 						  &location));
@@ -198,7 +200,8 @@ void check(bool success, char *input)
   free(old_input_with_space);
 }
 
-int main(void)
+int
+main(void)
 {
   check(true, "??");
   check(true, "IA__g_bookmark_file_to_file");
@@ -211,22 +214,23 @@ int main(void)
 }
 ]])
 
-## ---------------------------- ##
-## btp_frame_skip_function_args ##
-## ---------------------------- ##
+## -------------------------------- ##
+## btp_gdb_frame_skip_function_args ##
+## -------------------------------- ##
 
-AT_TESTFUN([btp_frame_skip_function_args],
+AT_TESTFUN([btp_gdb_frame_skip_function_args],
 [[
-#include <lib/frame.h>
+#include <lib/gdb_frame.h>
 #include <lib/location.h>
 #include <assert.h>
 
-void check(bool success, char *input)
+static void
+check(bool success, char *input)
 {
   char *old_input = input;
   struct btp_location location;
   btp_location_init(&location);
-  assert(success == btp_frame_skip_function_args(&input, &location));
+  assert(success == btp_gdb_frame_skip_function_args(&input, &location));
   if (success)
   {
     assert(*input == '\0');
@@ -238,7 +242,8 @@ void check(bool success, char *input)
   }
 }
 
-int main(void)
+int
+main(void)
 {
   /* minimal */
   check(true, "()");
@@ -257,26 +262,27 @@ int main(void)
 }
 ]])
 
-## ----------------------------- ##
-## btp_frame_parse_function_call ##
-## ----------------------------- ##
-
-AT_TESTFUN([btp_frame_parse_function_call],
+## --------------------------------- ##
+## btp_gdb_frame_parse_function_call ##
+## --------------------------------- ##
+AT_TESTFUN([btp_gdb_frame_parse_function_call],
 [[
-#include <lib/frame.h>
+#include <lib/gdb_frame.h>
 #include <lib/location.h>
 #include <assert.h>
 #include <stdlib.h>
-void check(bool success,
-     	   char *input,
-           char *expected_function_name,
-	   char *expected_function_type)
+
+static void
+check(bool success,
+      char *input,
+      char *expected_function_name,
+      char *expected_function_type)
 {
   char *old_input = input;
   char *function_name, *function_type;
   struct btp_location location;
   btp_location_init(&location);
-  assert(success == btp_frame_parse_function_call(&input,
+  assert(success == btp_gdb_frame_parse_function_call(&input,
                                                   &function_name,
 						  &function_type,
                                                   &location));
@@ -296,7 +302,8 @@ void check(bool success,
   }
 }
 
-int main(void)
+int
+main(void)
 {
   /* minimal */
   check(true, "?? ()", "??", NULL);
@@ -362,20 +369,21 @@ int main(void)
 }
 ]])
 
-## ----------------------------------- ##
-## btp_frame_parse_address_in_function ##
-## ----------------------------------- ##
-
-AT_TESTFUN([btp_frame_parse_address_in_function],
+## --------------------------------------- ##
+## btp_gdb_frame_parse_address_in_function ##
+## --------------------------------------- ##
+AT_TESTFUN([btp_gdb_frame_parse_address_in_function],
 [[
-#include <lib/frame.h>
+#include <lib/gdb_frame.h>
 #include <lib/location.h>
 #include <assert.h>
 #include <stdlib.h>
-void check(bool success,
-           char *input,
-           uint64_t expected_address,
-           char *expected_function)
+
+static void
+check(bool success,
+      char *input,
+      uint64_t expected_address,
+      char *expected_function)
 {
   char *old_input = input;
   char *function;
@@ -383,7 +391,7 @@ void check(bool success,
   uint64_t address;
   struct btp_location location;
   btp_location_init(&location);
-  assert(success == btp_frame_parse_address_in_function(&input,
+  assert(success == btp_gdb_frame_parse_address_in_function(&input,
 						        &address,
 							&function,
 							&type,
@@ -403,7 +411,8 @@ void check(bool success,
   }
 }
 
-int main(void)
+int
+main(void)
 {
   /* minimal */
   check(true, "raise (sig=6)", -1, "raise");
@@ -419,26 +428,28 @@ int main(void)
 ]])
 
 ## ----------------------------- ##
-## btp_frame_parse_file_location ##
+## btp_gdb_frame_parse_file_location ##
 ## ----------------------------- ##
 
-AT_TESTFUN([btp_frame_parse_file_location],
+AT_TESTFUN([btp_gdb_frame_parse_file_location],
 [[
-#include <lib/frame.h>
+#include <lib/gdb_frame.h>
 #include <lib/location.h>
 #include <assert.h>
 #include <stdlib.h>
-void check(bool success,
-           char *input,
-	   char *expected_file,
-	   unsigned expected_line)
+
+static void
+check(bool success,
+      char *input,
+      char *expected_file,
+      unsigned expected_line)
 {
   char *old_input = input;
   char *file;
   unsigned line;
   struct btp_location location;
   btp_location_init(&location);
-  assert(success == btp_frame_parse_file_location(&input,
+  assert(success == btp_gdb_frame_parse_file_location(&input,
 					          &file,
                                                   &line,
 						  &location));
@@ -456,7 +467,8 @@ void check(bool success,
   }
 }
 
-int main(void)
+int
+main(void)
 {
   /* Test with a newline and without a line number. */
   check(true, "\n at gtkrecentmanager.c", "gtkrecentmanager.c", -1);
@@ -480,20 +492,20 @@ int main(void)
 }
 ]])
 
-## ---------------------- ##
-## btp_frame_parse_header ##
-## ---------------------- ##
-
-AT_TESTFUN([btp_frame_parse_header],
+## -------------------------- ##
+## btp_gdb_frame_parse_header ##
+## -------------------------- ##
+AT_TESTFUN([btp_gdb_frame_parse_header],
 [[
-#include <lib/frame.h>
+#include <lib/gdb_frame.h>
 #include <lib/location.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-void check(char *input,
-           struct btp_frame *expected_frame)
+static void
+check(char *input,
+      struct btp_gdb_frame *expected_frame)
 {
   printf("=================================================\n"
          "Testing %s\n",
@@ -502,12 +514,12 @@ void check(char *input,
   char *old_input = input;
   struct btp_location location;
   btp_location_init(&location);
-  struct btp_frame *frame = btp_frame_parse_header(&input, &location);
+  struct btp_gdb_frame *frame = btp_gdb_frame_parse_header(&input, &location);
   if (frame)
   {
     assert(*input == '\0');
-    assert(btp_frame_cmp(frame, expected_frame, true) == 0);
-    btp_frame_free(frame);
+    assert(btp_gdb_frame_cmp(frame, expected_frame, true) == 0);
+    btp_gdb_frame_free(frame);
   }
   else
   {
@@ -519,11 +531,12 @@ void check(char *input,
   }
 }
 
-int main(void)
+int
+main(void)
 {
   /* no function address - rhbz#752811 */
-  struct btp_frame frame;
-  btp_frame_init(&frame);
+  struct btp_gdb_frame frame;
+  btp_gdb_frame_init(&frame);
   frame.function_name = "slot_tp_getattr_hook";
   frame.number = 0;
   frame.source_file = "/usr/src/debug/Python-2.7.1/Objects/typeobject.c";
@@ -532,7 +545,7 @@ int main(void)
   check("#0  slot_tp_getattr_hook (self=<YumAvailableP...>) at /usr/src/debug/Python-2.7.1/Objects/typeobject.c:5436", &frame);
 
   /* basic */
-  btp_frame_init(&frame);
+  btp_gdb_frame_init(&frame);
   frame.function_name = "fsync";
   frame.number = 1;
   frame.source_file = "../sysdeps/unix/syscall-template.S";
@@ -541,7 +554,7 @@ int main(void)
   check("#1  0x000000322160e7fd in fsync () at ../sysdeps/unix/syscall-template.S:82", &frame);
 
   /* C++ */
-  btp_frame_init(&frame);
+  btp_gdb_frame_init(&frame);
   frame.function_name = "nsRegion::RgnRect::operator new";
   frame.number = 4;
   frame.source_file = "nsRegion.cpp";
@@ -551,7 +564,7 @@ int main(void)
         "    at nsRegion.cpp:214", &frame);
 
   /* Templates and no filename. */
-  btp_frame_init(&frame);
+  btp_gdb_frame_init(&frame);
   frame.function_name = "sigc::internal::slot_call0<sigc::bound_mem_functor0<void, GameWindow>, void>::call_it(sigc::internal::slot_rep*)";
   frame.number = 15;
   frame.address = 0x08201bdfULL;
@@ -559,7 +572,7 @@ int main(void)
         " void>::call_it(sigc::internal::slot_rep*) ()", &frame);
 
   /* No address, just the function call. Red Hat Bugzilla bug #530678 */
-  btp_frame_init(&frame);
+  btp_gdb_frame_init(&frame);
   frame.function_name = "handle_message";
   frame.number = 30;
   frame.source_file = "_polkitauthenticationagent.c";
@@ -571,34 +584,36 @@ int main(void)
 }
 ]])
 
-## --------------- ##
-## btp_frame_parse ##
-## --------------- ##
+## ------------------- ##
+## btp_gdb_frame_parse ##
+## ------------------- ##
 
-AT_TESTFUN([btp_frame_parse],
+AT_TESTFUN([btp_gdb_frame_parse],
 [[
-#include <lib/frame.h>
+#include <lib/gdb_frame.h>
 #include <lib/location.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-void check(char *input,
-           struct btp_frame *expected_frame,
-	   char *expected_input,
-	   struct btp_location *expected_location)
+
+static void
+check(char *input,
+      struct btp_gdb_frame *expected_frame,
+      char *expected_input,
+      struct btp_location *expected_location)
 {
   char *old_input = input;
   struct btp_location location;
   btp_location_init(&location);
-  struct btp_frame *frame = btp_frame_parse(&input, &location);
+  struct btp_gdb_frame *frame = btp_gdb_frame_parse(&input, &location);
   assert(input == expected_input);
   if (frame)
   {
-    assert(0 == btp_frame_cmp(frame, expected_frame, true));
+    assert(0 == btp_gdb_frame_cmp(frame, expected_frame, true));
     puts(btp_location_to_string(&location));
     puts(btp_location_to_string(expected_location));
     assert(0 == btp_location_cmp(&location, expected_location, true));
-    btp_frame_free(frame);
+    btp_gdb_frame_free(frame);
   }
   else
   {
@@ -609,11 +624,12 @@ void check(char *input,
   }
 }
 
-int main(void)
+int
+main(void)
 {
   /* basic */
-  struct btp_frame frame;
-  btp_frame_init(&frame);
+  struct btp_gdb_frame frame;
+  btp_gdb_frame_init(&frame);
   frame.function_name = "fsync";
   frame.number = 1;
   frame.source_file = "../sysdeps/unix/syscall-template.S";

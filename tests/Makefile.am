@@ -26,18 +26,18 @@ EXTRA_DIST += package.m4
 ## Test suite.  ##
 ## ------------ ##
 
-TESTSUITE_AT =	\
-  local.at 	\
-  testsuite.at	\
-  utils.at 	\
-  strbuf.at	\
-  frame.at 	\
-  thread.at 	\
-  backtrace.at  \
-  normalize.at  \
-  metrics.at \
-  cluster.at \
-  sharedlib.at
+TESTSUITE_AT =		\
+  local.at 		\
+  testsuite.at		\
+  utils.at 		\
+  strbuf.at		\
+  gdb_frame.at 		\
+  gdb_thread.at 	\
+  gdb_backtrace.at  	\
+  gdb_sharedlib.at	\
+  normalize.at  	\
+  metrics.at 		\
+  cluster.at
 
 EXTRA_DIST += $(TESTSUITE_AT)
 TESTSUITE = $(srcdir)/testsuite
