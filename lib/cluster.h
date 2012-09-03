@@ -35,7 +35,7 @@ extern "C" {
 struct btp_distances;
 
 /**
- * Represents a dendrogram created by clustering.
+ * @brief A dendrogram created by clustering.
  */
 struct btp_dendrogram
 {
@@ -80,7 +80,7 @@ struct btp_dendrogram *
 btp_distances_cluster_objects(struct btp_distances *distances);
 
 /**
- * Represents a cluster of objects.
+ * @brief A cluster of objects from a dendrogram.
  */
 struct btp_cluster
 {

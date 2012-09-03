@@ -36,6 +36,8 @@ struct btp_strbuf;
 struct btp_location;
 
 /**
+ * @brief A function call of a GDB-produced stack trace.
+ *
  * A frame representing a function call or a signal handler on a call
  * stack of a thread.
  */

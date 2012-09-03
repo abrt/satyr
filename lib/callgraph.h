@@ -22,11 +22,12 @@
 
 /**
  * @file
- * @brief Call graph for ELF binaries.
+ * @brief Calling relationships between subroutines.
  *
- * Call graph represents calling relationships between subroutines in
- * ELF binaries.  Only static relationships obtained from CALL-like
- * instructions with numeric offsets are handled.
+ * Call graph represents calling relationships between subroutines.
+ * In our case, we create the call graph from ELF binaries.  Only
+ * static relationships obtained from CALL-like instructions with
+ * numeric offsets are handled.
  *
  * Call graph is used by fingerprinting algorithms.
  */
@@ -40,11 +41,31 @@ extern "C" {
 struct btp_disasm_state;
 struct btp_elf_frame_description_entry;
 
+/**
+ * @brief A call graph representing calling relationships between
+ * subroutines.
+ *
+ * It's a context-insensitive static call graph specialized to
+ * low-level programs.  Functions are identified by their numeric
+ * address (an offset to a binary file).
+ */
 struct btp_callgraph
 {
+    /**
+     * @brief An offset to the start of a function executable code.
+     */
     uint64_t address;
+
+    /**
+     * @brief A list of offsets to called functions.
+     *
+     * It is terminated by a zero offset.
+     */
     uint64_t *callees;
 
+    /**
+     * @brief Next node of the call graph or NULL.
+     */
     struct btp_callgraph *next;
 };
 

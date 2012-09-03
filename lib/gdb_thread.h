@@ -36,6 +36,8 @@ struct btp_strbuf;
 struct btp_location;
 
 /**
+ * @brief A thread of execution of a GDB-produced stack trace.
+ *
  * Represents a thread containing frames.
  */
 struct btp_gdb_thread

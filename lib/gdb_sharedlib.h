@@ -39,6 +39,9 @@ enum
     SYMS_NOT_FOUND,
 };
 
+/**
+ * @brief A shared library memory location as reported by GDB.
+ */
 struct btp_gdb_sharedlib
 {
     uint64_t from;

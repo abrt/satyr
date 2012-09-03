@@ -23,9 +23,7 @@
 /**
  * @file
  * @brief Loading PLT and FDEs from ELF binaries.
- */
-
-/**
+ *
  * File name elf.h cannot be used due to collision with <elf.h> system
  * include.
  */
@@ -37,7 +35,8 @@ extern "C" {
 #include <inttypes.h>
 
 /**
- * An entry of the Procedure Linkage Table (PLT).
+ * @brief A single item of the Procedure Linkage Table present in ELF
+ * binaries.
  */
 struct btp_elf_plt_entry
 {
@@ -50,8 +49,8 @@ struct btp_elf_plt_entry
 };
 
 /**
- * A Frame Description Entry (FDE) representing items in the .eh_frame
- * section in ELF binaries.
+ * @brief A single item of the .eh_frame section present in ELF
+ * binaries.
  */
 struct btp_elf_frame_description_entry
 {

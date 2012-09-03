@@ -36,6 +36,8 @@ struct btp_gdb_frame;
 struct btp_location;
 
 /**
+ * @brief A stack trace produced by GDB.
+ *
  * A backtrace obtained at the time of a program crash, consisting of
  * several threads which contains frames.
  *

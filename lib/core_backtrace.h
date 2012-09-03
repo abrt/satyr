@@ -22,7 +22,7 @@
 
 /**
  * @file
- * @brief Low-level stack trace generated directly from core dump.
+ * @brief A stack trace of a core dump.
  */
 
 #ifdef __cplusplus
@@ -34,17 +34,11 @@ extern "C" {
 struct btp_core_thread;
 struct btp_location;
 
-enum btp_core_backtrace_type
-{
-    BTP_USERSPACE,
-    BTP_PYTHON,
-    BTP_KERNELOOPS
-};
-
+/**
+ * @brief A stack trace of a core dump.
+ */
 struct btp_core_backtrace
 {
-    enum btp_core_backtrace_type type;
-
     struct btp_core_thread *threads;
 };
 

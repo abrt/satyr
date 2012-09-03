@@ -47,6 +47,9 @@ extern "C" {
 #define BTP_SHA1_RESULT_BIN_LEN (5 * 4)
 #define BTP_SHA1_RESULT_LEN (5 * 4 * 2 + 1)
 
+/**
+ * @brief Internal state of a SHA-1 hash algorithm.
+ */
 struct btp_sha1_state
 {
     /* always correctly aligned for uint64_t */

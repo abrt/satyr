@@ -22,7 +22,7 @@
 
 /**
  * @file
- * @brief Single thread of execution of core stack trace.
+ * @brief Single thread of execution of a core stack trace.
  */
 
 #ifdef __cplusplus
@@ -36,7 +36,7 @@ struct btp_strbuf;
 struct btp_location;
 
 /**
- * Represents a thread containing frames.
+ * @brief A thread of execution on call stack of a core dump.
  */
 struct btp_core_thread
 {

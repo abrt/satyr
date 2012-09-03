@@ -32,7 +32,7 @@ extern "C" {
 #include <inttypes.h>
 
 /**
- * Output of the unstrip utility.
+ * @brief Core dump memory layout as reported by the unstrip utility.
  */
 struct btp_unstrip_entry
 {

@@ -8,22 +8,17 @@ AC_PROG_CC
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 
-dnl get rid of glib
-PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.21])
-
 # Initialize the test suite.
 AC_CONFIG_TESTDIR(tests)
-AC_CONFIG_FILES([tests/Makefile tests/atlocal])
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
 # Needed by tests/atlocal.in.
-AC_SUBST([O0CFLAGS], [`echo $CFLAGS   | sed 's/-O[[0-9]] *//'`])
+AC_SUBST([O0CFLAGS], [`echo $CFLAGS | sed 's/-O[[0-9]] *//'`])
 
 AM_PATH_PYTHON
-if test -z "$PYTHON"
-then
-    echo "*** Essential program python not found" 1>&2
-    exit 1
-fi
+[if test -z "$PYTHON"; then]
+    [echo "Essential program python not found"]
+    [exit 1]
+[fi]
 
 # Just PKG_CHECK_MODULES([PYTHON], [python]) works only with python2.7+
 # Below, if python is not found, we set up for python2.6 w/o checking:
@@ -73,6 +68,8 @@ AC_CONFIG_FILES([
 	lib/Makefile
 	python/Makefile
 	docs/Makefile
+	tests/Makefile
+	tests/atlocal
 ])
 
 AC_OUTPUT

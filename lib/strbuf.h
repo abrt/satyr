@@ -22,7 +22,7 @@
 
 /**
  * @file
- * @brief String buffer structure and related algorithms.
+ * @brief A string buffer structure and related algorithms.
  */
 
 #ifdef __cplusplus
@@ -31,6 +31,9 @@ extern "C" {
 
 #include <stdarg.h>
 
+/**
+ * @brief A resizable string buffer.
+ */
 struct btp_strbuf
 {
     /**

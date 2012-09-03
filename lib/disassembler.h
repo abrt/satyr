@@ -34,6 +34,9 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
+/**
+ * @brief Internal state of a disassembler.
+ */
 struct btp_disasm_state
 {
     bfd *bfd_file;

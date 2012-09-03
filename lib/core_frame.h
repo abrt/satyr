@@ -36,7 +36,7 @@ struct btp_strbuf;
 struct btp_location;
 
 /**
- * A frame representing a function call on a call stack of a thread.
+ * @brief A function call on call stack of a core dump.
  */
 struct btp_core_frame
 {
@@ -49,19 +49,19 @@ struct btp_core_frame
      * Some programs generate machine code during runtime (JavaScript
      * engines, JVM, the Gallium llvmpipe driver).
      */
-    uint64_t   address;
+    uint64_t address;
 
     /** Build id of the ELF binary.  It might be NULL if the frame
      * does not point to memory with code. */
-    char      *build_id;
+    char *build_id;
     // in ELF section
-    uint64_t   build_id_offset;
+    uint64_t build_id_offset;
     // function name
-    char      *function_name;
+    char *function_name;
     // so or executable
-    char      *file_name;
+    char *file_name;
     /** Hash of the function contents. */
-    char      *fingerprint;
+    char *fingerprint;
 
     /**
      * A sibling frame residing below this one, or NULL if this is the

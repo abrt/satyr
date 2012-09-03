@@ -45,7 +45,6 @@ btp_core_backtrace_new()
 void
 btp_core_backtrace_init(struct btp_core_backtrace *backtrace)
 {
-    backtrace->type = BTP_USERSPACE;
     backtrace->threads = NULL;
 }
 
@@ -102,22 +101,6 @@ char *
 btp_core_backtrace_to_text(struct btp_core_backtrace *backtrace)
 {
     struct btp_strbuf *strbuf = btp_strbuf_new();
-
-    switch (backtrace->type)
-    {
-    case BTP_USERSPACE:
-        btp_strbuf_append_str(strbuf, "type userspace\n\n");
-        break;
-    case BTP_PYTHON:
-        btp_strbuf_append_str(strbuf, "type python\n\n");
-        break;
-    case BTP_KERNELOOPS:
-        btp_strbuf_append_str(strbuf, "type kerneloops\n\n");
-        break;
-    default:
-        btp_strbuf_append_str(strbuf, "type unknown\n\n");
-        break;
-    }
 
     struct btp_core_thread *thread = backtrace->threads;
     while (thread)

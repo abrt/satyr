@@ -106,8 +106,10 @@ btp_gdb_thread_levenshtein_distance_custom(struct btp_gdb_thread *thread1,
                                            btp_gdb_frame_cmp_type compare_func);
 
 /**
- * Represents an m-by-n distance matrix.
- * (only entries (i, j) where i < j are actually stored)
+ * @brief A distance matrix of stack trace threads.
+ *
+ * The distances are stored in a m-by-n two-dimensional array, where
+ * only entries (i, j) where i < j are actually stored.
  */
 struct btp_distances
 {
