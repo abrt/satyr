@@ -81,7 +81,7 @@
 
 /* thread */
 
-#define thread_doc "btparser.Thread - class representing a thread in a backtrace\n" \
+#define thread_doc "btparser.Thread - class representing a thread in a stacktrace\n" \
                    "Usage:\n" \
                    "btparser.Thread() - creates an empty thread\n" \
                    "btparser.Thread(str) - parses str and fills the thread object\n" \
@@ -121,57 +121,57 @@
 #define t_frames_doc (char *)"A list containing btparser.Frame objects representing " \
                      "frames in a thread."
 
-/* backtrace */
+/* stacktrace */
 
-#define backtrace_doc "btparser.Backtrace - class representing a backtrace\n" \
+#define stacktrace_doc "btparser.Stacktrace - class representing a stacktrace\n" \
                       "Usage:\n" \
-                      "btparser.Backtrace() - creates an empty backtrace\n" \
-                      "btparser.Backtrace(str) - parses str and fills the backtrace object"
+                      "btparser.Stacktrace() - creates an empty stacktrace\n" \
+                      "btparser.Stacktrace(str) - parses str and fills the stacktrace object"
 
-#define b_dup_doc "Usage: backtrace.dup()\n" \
-                  "Returns: btparser.Backtrace - a new clone of backtrace\n" \
-                  "Clones the backtrace object. All new structures are independent " \
+#define b_dup_doc "Usage: stacktrace.dup()\n" \
+                  "Returns: btparser.Stacktrace - a new clone of stacktrace\n" \
+                  "Clones the stacktrace object. All new structures are independent " \
                   "on the original object."
 
-#define b_find_crash_frame_doc "Usage: backtrace.find_crash_frame()\n" \
+#define b_find_crash_frame_doc "Usage: stacktrace.find_crash_frame()\n" \
                                "Returns: btparser.Frame - crash frame\n" \
-                               "Finds crash frame in the backtrace. Also sets the " \
-                               "backtrace.crashframe field."
+                               "Finds crash frame in the stacktrace. Also sets the " \
+                               "stacktrace.crashframe field."
 
-#define b_find_crash_thread_doc "Usage: backtrace.find_crash_thread()\n" \
+#define b_find_crash_thread_doc "Usage: stacktrace.find_crash_thread()\n" \
                                 "Returns: btparser.Thread - crash thread\n" \
-                                "Finds crash thread in the backtrace. Also sets the " \
-                                "backtrace.crashthread field."
+                                "Finds crash thread in the stacktrace. Also sets the " \
+                                "stacktrace.crashthread field."
 
-#define b_limit_frame_depth_doc "Usage: backtrace.limit_frame_depth(N)\n" \
+#define b_limit_frame_depth_doc "Usage: stacktrace.limit_frame_depth(N)\n" \
                                 "N: positive integer - frame depth\n" \
                                 "Crops all threads to only contain first N frames."
 
-#define b_quality_simple_doc "Usage: backtrace.quality_simple()\n" \
-                             "Returns: float - 0..1, backtrace quality\n" \
-                             "Computes the quality from backtrace itself."
+#define b_quality_simple_doc "Usage: stacktrace.quality_simple()\n" \
+                             "Returns: float - 0..1, stacktrace quality\n" \
+                             "Computes the quality from stacktrace itself."
 
-#define b_quality_complex_doc "Usage: backtrace.quality_complex()\n" \
-                              "Returns: float - 0..1, backtrace quality\n" \
-                              "Computes the quality from backtrace, crash thread and " \
+#define b_quality_complex_doc "Usage: stacktrace.quality_complex()\n" \
+                              "Returns: float - 0..1, stacktrace quality\n" \
+                              "Computes the quality from stacktrace, crash thread and " \
                               "frames around the crash."
 
-#define b_get_duplication_hash_doc "Usage: backtrace.get_duplication_hash()\n" \
+#define b_get_duplication_hash_doc "Usage: stacktrace.get_duplication_hash()\n" \
                                    "Returns: string - duplication hash\n" \
-                                   "Computes the duplication hash used to compare backtraces."
+                                   "Computes the duplication hash used to compare stacktraces."
 
-#define b_find_address_doc "Usage: backtrace.find_address(address)\n" \
+#define b_find_address_doc "Usage: stacktrace.find_address(address)\n" \
                            "address: long - address to find" \
                            "Returns: btparser.Sharedlib object or None if not found\n" \
                            "Looks whether the given address belongs to a shared library."
 
-#define b_set_libnames_doc "Usage: backtrace.set_libnames()\n" \
+#define b_set_libnames_doc "Usage: stacktrace.set_libnames()\n" \
                            "Sets library names according to sharedlibs data."
 
-#define b_normalize_doc "Usage: backtrace.normalize()\n" \
-                        "Normalizes all threads in the backtrace."
+#define b_normalize_doc "Usage: stacktrace.normalize()\n" \
+                        "Normalizes all threads in the stacktrace."
 
-#define b_get_optimized_thread_doc "Usage: backtrace.get_optimized_thread(max_frames)\n" \
+#define b_get_optimized_thread_doc "Usage: stacktrace.get_optimized_thread(max_frames)\n" \
                         "Returns thread optimized for comparison."
 
 #define b_crashframe_doc (char *)"Readonly. By default the field contains None. After " \
@@ -183,7 +183,7 @@
                           "btparser.Thread object is stored into the field."
 
 #define b_threads_doc (char *)"A list containing the btparser.Thread objects " \
-                      "representing threads in the backtrace."
+                      "representing threads in the stacktrace."
 
 #define b_libs_doc (char *)"A list containing the btparser.Sharedlib objects " \
                    "representing shared libraries loaded at the moment of crash."

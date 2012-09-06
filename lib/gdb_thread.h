@@ -51,7 +51,7 @@ struct btp_gdb_thread
 
     /**
      * A sibling thread, or NULL if this is the last thread in a
-     * backtrace.
+     * stacktrace.
      */
     struct btp_gdb_thread *next;
 };
@@ -147,7 +147,7 @@ btp_gdb_thread_quality_counts(struct btp_gdb_thread *thread,
  * Must be a non-NULL pointer. It's not modified in this function.
  * @returns
  * A number between 0 and 1. 0 means the lowest quality, 1 means full
- * thread backtrace is known. If the thread contains no frames, this
+ * thread stacktrace is known. If the thread contains no frames, this
  * function returns 1.
  */
 float

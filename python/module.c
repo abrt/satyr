@@ -24,9 +24,9 @@ PyMODINIT_FUNC init_btparser()
         return;
     }
 
-    if (PyType_Ready(&BacktraceTypeObject) < 0)
+    if (PyType_Ready(&StacktraceTypeObject) < 0)
     {
-        puts("PyType_Ready(&BacktraceTypeObject) < 0");
+        puts("PyType_Ready(&StacktraceTypeObject) < 0");
         return;
     }
 
@@ -59,8 +59,8 @@ PyMODINIT_FUNC init_btparser()
     PyModule_AddObject(module, "Frame", (PyObject *)&FrameTypeObject);
     Py_INCREF(&ThreadTypeObject);
     PyModule_AddObject(module, "Thread", (PyObject *)&ThreadTypeObject);
-    Py_INCREF(&BacktraceTypeObject);
-    PyModule_AddObject(module, "Backtrace", (PyObject *)&BacktraceTypeObject);
+    Py_INCREF(&StacktraceTypeObject);
+    PyModule_AddObject(module, "Stacktrace", (PyObject *)&StacktraceTypeObject);
     Py_INCREF(&DistancesTypeObject);
     PyModule_AddObject(module, "Distances", (PyObject *)&DistancesTypeObject);
     Py_INCREF(&DendrogramTypeObject);

@@ -18,7 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "core_fingerprint.h"
-#include "core_backtrace.h"
+#include "core_stacktrace.h"
 #include "core_frame.h"
 #include "core_thread.h"
 #include "utils.h"
@@ -347,10 +347,10 @@ fp_calltree_leaves(struct btp_strbuf *fingerprint,
 }
 
 bool
-btp_core_fingerprint_generate(struct btp_core_backtrace *backtrace,
+btp_core_fingerprint_generate(struct btp_core_stacktrace *stacktrace,
                               char **error_message)
 {
-    struct btp_core_thread *thread = backtrace->threads;
+    struct btp_core_thread *thread = stacktrace->threads;
     while (thread)
     {
         struct btp_core_frame *frame = thread->frames;

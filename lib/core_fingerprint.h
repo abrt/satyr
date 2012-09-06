@@ -31,11 +31,11 @@ extern "C" {
 
 #include <stdbool.h>
 
-struct btp_core_backtrace;
+struct btp_core_stacktrace;
 struct btp_core_thread;
 
 bool
-btp_core_fingerprint_generate(struct btp_core_backtrace *backtrace,
+btp_core_fingerprint_generate(struct btp_core_stacktrace *stacktrace,
                               char **error_message);
 
 bool

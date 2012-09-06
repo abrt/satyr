@@ -1,5 +1,5 @@
 /*
-    btparser.c - backtrace parsing tool
+    btparser.c - stacktrace parsing tool
 
     Copyright (C) 2010  Red Hat, Inc.
 
@@ -17,7 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "lib/gdb_backtrace.h"
+#include "lib/gdb_stacktrace.h"
 #include "lib/gdb_thread.h"
 #include "lib/gdb_frame.h"
 #include "lib/utils.h"
@@ -36,20 +36,20 @@
 const char *argp_program_version = "btparser " VERSION;
 const char *argp_program_bug_address = "<kklic@redhat.com>";
 
-static char doc[] = "btparser -- backtrace parser";
+static char doc[] = "btparser -- stacktrace parser";
 
 /* A description of the arguments we accept. */
 static char args_doc[] = "[FILE...]";
 
 static struct argp_option options[] = {
     {"stdin"           , 'i', 0, 0, "Use standard input rather than input file"},
-    {"rate"            , 'r', 0, 0, "Prints the backtrace rating from 0 to 1"},
+    {"rate"            , 'r', 0, 0, "Prints the stacktrace rating from 0 to 1"},
     {"crash-function"  , 'c', 0, 0, "Prints crash function"},
     {"duplication-hash", 'h', 0, 0, "Prints normalized string useful for hash calculation"},
     {"debug"           , 'd', 0, 0, "Prints parser debug information"},
     {"verbose"         , 'v', 0, 0, "Prints human-friendly superfluous output."},
-    {"comparison-optimized", 'o', 0, 0, "Prints or parses backtrace optimized for comparison.", 1},
-    {"max-frames"      , 'm', "FRAMES", 0, "Sets maximum number of frames in optimized backtrace (default 8).", 2},
+    {"comparison-optimized", 'o', 0, 0, "Prints or parses stacktrace optimized for comparison.", 1},
+    {"max-frames"      , 'm', "FRAMES", 0, "Sets maximum number of frames in optimized stacktrace (default 8).", 2},
     {"distances"       , 's', 0, 0, "Prints distance matrix.", 3},
     {"dendrogram"      , 'g', 0, 0, "Prints ASCII dendrogram.", 4},
     {"clusters"        , 'l', "LEVEL", 0, "Prints clusters cut at LEVEL.", 5},
@@ -59,7 +59,7 @@ static struct argp_option options[] = {
 
 enum what_to_output
 {
-    BACKTRACE,
+    STACKTRACE,
     RATE,
     CRASH_FUNCTION,
     DUPLICATION_HASH,
@@ -203,32 +203,32 @@ read_file(char *filename)
     return text;
 }
 
-static struct btp_gdb_backtrace *
-parse_backtrace(char *filename)
+static struct btp_gdb_stacktrace *
+parse_stacktrace(char *filename)
 {
     char *text = read_file(filename);
     /* Parse the input string. */
     const char *ptr = text;
     struct btp_location location;
     btp_location_init(&location);
-    struct btp_gdb_backtrace *backtrace = btp_gdb_backtrace_parse(&ptr, &location);
-    if (!backtrace)
+    struct btp_gdb_stacktrace *stacktrace = btp_gdb_stacktrace_parse(&ptr, &location);
+    if (!stacktrace)
     {
         char *location_str = btp_location_to_string(&location);
-        fprintf(stderr, "Failed to parse the backtrace.\n  %s\n",
+        fprintf(stderr, "Failed to parse the stacktrace.\n  %s\n",
                 location_str);
         free(location_str);
         exit(1);
     }
     free(text);
 
-    return backtrace;
+    return stacktrace;
 }
 
 static struct btp_gdb_thread *
-get_optimized_thread(struct btp_gdb_backtrace *backtrace, int max_frames)
+get_optimized_thread(struct btp_gdb_stacktrace *stacktrace, int max_frames)
 {
-    struct btp_gdb_thread *thread = btp_gdb_backtrace_get_optimized_thread(backtrace, max_frames);
+    struct btp_gdb_thread *thread = btp_gdb_stacktrace_get_optimized_thread(stacktrace, max_frames);
 
     if (!thread)
     {
@@ -244,7 +244,7 @@ main(int argc, char **argv)
 {
     /* Set options default values and parse program command line. */
     struct arguments arguments;
-    arguments.output = BACKTRACE;
+    arguments.output = STACKTRACE;
     arguments.debug = false;
     arguments.verbose = false;
     arguments.stdin = false;
@@ -261,33 +261,33 @@ main(int argc, char **argv)
 
     switch (arguments.output)
     {
-    case BACKTRACE:
+    case STACKTRACE:
     case RATE:
     case CRASH_FUNCTION:
     case DUPLICATION_HASH:
     {
-        struct btp_gdb_backtrace *backtrace;
+        struct btp_gdb_stacktrace *stacktrace;
 
         if (arguments.stdin)
-            backtrace = parse_backtrace(NULL);
+            stacktrace = parse_stacktrace(NULL);
         else if (arguments.num_filenames == 1)
-            backtrace = parse_backtrace(arguments.filenames[0]);
+            stacktrace = parse_stacktrace(arguments.filenames[0]);
         else
             assert(0);
 
         switch (arguments.output)
         {
-        case BACKTRACE:
+        case STACKTRACE:
         {
             if (!arguments.optimized)
             {
-                char *text_parsed = btp_gdb_backtrace_to_text(backtrace, false);
+                char *text_parsed = btp_gdb_stacktrace_to_text(stacktrace, false);
                 puts(text_parsed);
                 free(text_parsed);
             }
             else
             {
-                struct btp_gdb_thread *crash_thread = get_optimized_thread(backtrace, arguments.max_frames);
+                struct btp_gdb_thread *crash_thread = get_optimized_thread(stacktrace, arguments.max_frames);
                 char *funs = btp_gdb_thread_format_funs(crash_thread);
                 printf("%s", funs);
                 free(funs);
@@ -297,13 +297,13 @@ main(int argc, char **argv)
         }
         case RATE:
         {
-            float q = btp_gdb_backtrace_quality_complex(backtrace);
+            float q = btp_gdb_stacktrace_quality_complex(stacktrace);
             printf("%.2f", q);
             break;
         }
         case CRASH_FUNCTION:
         {
-            struct btp_gdb_frame *frame = btp_gdb_backtrace_get_crash_frame(backtrace);
+            struct btp_gdb_frame *frame = btp_gdb_stacktrace_get_crash_frame(stacktrace);
             if (!frame)
             {
                 fprintf(stderr, "Failed to find the crash function.\n");
@@ -321,7 +321,7 @@ main(int argc, char **argv)
         }
         case DUPLICATION_HASH:
         {
-            char *hash = btp_gdb_backtrace_get_duplication_hash(backtrace);
+            char *hash = btp_gdb_stacktrace_get_duplication_hash(stacktrace);
             puts(hash);
             free(hash);
             break;
@@ -330,7 +330,7 @@ main(int argc, char **argv)
             assert(0);
         }
 
-        btp_gdb_backtrace_free(backtrace);
+        btp_gdb_stacktrace_free(stacktrace);
 
         break;
     }
@@ -353,9 +353,9 @@ main(int argc, char **argv)
             }
             else
             {
-                struct btp_gdb_backtrace *backtrace = parse_backtrace(arguments.filenames[i]);
-                threads[i] = get_optimized_thread(backtrace, arguments.max_frames);
-                btp_gdb_backtrace_free(backtrace);
+                struct btp_gdb_stacktrace *stacktrace = parse_stacktrace(arguments.filenames[i]);
+                threads[i] = get_optimized_thread(stacktrace, arguments.max_frames);
+                btp_gdb_stacktrace_free(stacktrace);
             }
         }
 

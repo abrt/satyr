@@ -20,7 +20,7 @@
 #include "normalize.h"
 #include "gdb_frame.h"
 #include "gdb_thread.h"
-#include "gdb_backtrace.h"
+#include "gdb_stacktrace.h"
 #include "utils.h"
 #include <string.h>
 
@@ -38,7 +38,7 @@ btp_normalize_thread(struct btp_gdb_thread *thread)
 
     /* If the first frame has address 0x0000 and its name is '??', it
      * is a dereferenced null, and we remove it. This frame is not
-     * really invalid, and it affects backtrace quality rating. See
+     * really invalid, and it affects stacktrace quality rating. See
      * Red Hat Bugzilla bug #639038.
      * @code
      * #0  0x0000000000000000 in ?? ()
@@ -58,7 +58,7 @@ btp_normalize_thread(struct btp_gdb_thread *thread)
 
     /* If the last frame has address 0x0000 and its name is '??',
      * remove it. This frame is not really invalid, and it affects
-     * backtrace quality rating. See Red Hat Bugzilla bug #592523.
+     * stacktrace quality rating. See Red Hat Bugzilla bug #592523.
      * @code
      * #2  0x00007f4dcebbd62d in clone ()
      * at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
@@ -96,9 +96,9 @@ btp_normalize_thread(struct btp_gdb_thread *thread)
 }
 
 void
-btp_normalize_backtrace(struct btp_gdb_backtrace *backtrace)
+btp_normalize_stacktrace(struct btp_gdb_stacktrace *stacktrace)
 {
-    struct btp_gdb_thread *thread = backtrace->threads;
+    struct btp_gdb_thread *thread = stacktrace->threads;
     while (thread)
     {
         btp_normalize_thread(thread);

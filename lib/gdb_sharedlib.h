@@ -120,7 +120,7 @@ btp_gdb_sharedlib_find_address(struct btp_gdb_sharedlib *first,
 /**
  * Parses the output of GDB's 'info sharedlib' command.
  * @param input
- * String representing the backtrace.
+ * String representing the stacktrace.
  * @returns
  * First element of the list of loaded libraries.
  */

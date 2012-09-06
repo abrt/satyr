@@ -31,13 +31,13 @@ extern "C" {
 
 struct btp_gdb_frame;
 struct btp_gdb_thread;
-struct btp_gdb_backtrace;
+struct btp_gdb_stacktrace;
 
 void
 btp_normalize_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_backtrace(struct btp_gdb_backtrace *backtrace);
+btp_normalize_stacktrace(struct btp_gdb_stacktrace *stacktrace);
 
 /**
  */

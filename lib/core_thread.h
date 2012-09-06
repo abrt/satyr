@@ -47,7 +47,7 @@ struct btp_core_thread
 
     /**
      * A sibling thread, or NULL if this is the last thread in a
-     * backtrace.
+     * stacktrace.
      */
     struct btp_core_thread *next;
 };

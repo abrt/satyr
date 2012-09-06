@@ -34,7 +34,7 @@ extern "C" {
 /**
  * @brief A location of a parser in the input stream.
  *
- * A location in the backtrace file with an attached message.
+ * A location in the stacktrace file with an attached message.
  * It's used for error reporting: the line and the column points to
  * the place where a parser error occurred, and the message explains
  * what the parser expected and didn't find on that place.
