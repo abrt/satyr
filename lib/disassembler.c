@@ -173,7 +173,7 @@ btp_disasm_get_function_instructions(struct btp_disasm_state *state,
 }
 
 void
-btp_disasm_function_instructions_free(char **instructions)
+btp_disasm_instructions_free(char **instructions)
 {
     size_t offset = 0;
     while (instructions[offset])
@@ -186,8 +186,8 @@ btp_disasm_function_instructions_free(char **instructions)
 }
 
 bool
-btp_disasm_function_instruction_is_one_of(const char *instruction,
-                                          const char **mnemonics)
+btp_disasm_instruction_is_one_of(char *instruction,
+                                 const char **mnemonics)
 {
     while (mnemonics)
     {
@@ -205,13 +205,13 @@ btp_disasm_function_instruction_is_one_of(const char *instruction,
 }
 
 bool
-btp_disasm_function_instruction_present(const char **instructions,
-                                        const char **mnemonics)
+btp_disasm_instruction_present(char **instructions,
+                               const char **mnemonics)
 {
     while (instructions)
     {
-        if (btp_disasm_function_instruction_is_one_of(*instructions,
-                                                      mnemonics))
+        if (btp_disasm_instruction_is_one_of(*instructions,
+                                             mnemonics))
         {
             return true;
         }
@@ -223,7 +223,7 @@ btp_disasm_function_instruction_present(const char **instructions,
 }
 
 bool
-btp_disasm_instruction_parse_single_address_operand(const char *instruction,
+btp_disasm_instruction_parse_single_address_operand(char *instruction,
                                                     uint64_t *dest)
 {
     /* Parse the mnemonic. */
@@ -250,7 +250,7 @@ btp_disasm_instruction_parse_single_address_operand(const char *instruction,
 }
 
 uint64_t *
-btp_disasm_get_callee_addresses(const char **instructions)
+btp_disasm_get_callee_addresses(char **instructions)
 {
     static const char *call_mnems[] = {"call", "callb", "callw",
                                        "calll", "callq", NULL};
@@ -259,8 +259,8 @@ btp_disasm_get_callee_addresses(const char **instructions)
     size_t result_size = 0, instruction_offset = 0;
     while (instructions[instruction_offset])
     {
-        const char *instruction = instructions[instruction_offset];
-        if (btp_disasm_function_instruction_is_one_of(instruction, call_mnems))
+        char *instruction = instructions[instruction_offset];
+        if (btp_disasm_instruction_is_one_of(instruction, call_mnems))
         {
             uint64_t address;
             if (btp_disasm_instruction_parse_single_address_operand(
@@ -277,8 +277,8 @@ btp_disasm_get_callee_addresses(const char **instructions)
     instruction_offset = 0;
     while (instructions[instruction_offset])
     {
-        const char *instruction = instructions[instruction_offset];
-        if (btp_disasm_function_instruction_is_one_of(instruction, call_mnems))
+        char *instruction = instructions[instruction_offset];
+        if (btp_disasm_instruction_is_one_of(instruction, call_mnems))
         {
             uint64_t address;
             if (btp_disasm_instruction_parse_single_address_operand(instruction, &address))

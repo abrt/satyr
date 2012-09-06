@@ -83,6 +83,10 @@ btp_elf_get_procedure_linkage_table(const char *filename,
 void
 btp_elf_procedure_linkage_table_free(struct btp_elf_plt_entry *entries);
 
+struct btp_elf_plt_entry *
+btp_elf_plt_find_for_address(struct btp_elf_plt_entry *plt,
+                             uint64_t address);
+
 
 /**
  * Reads the .eh_frame section from an ELF file.

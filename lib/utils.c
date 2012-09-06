@@ -124,6 +124,21 @@ btp_strndup(const char *s, size_t n)
     return result;
 }
 
+void
+btp_struniq(char **strings, size_t *size)
+{
+    for (size_t loop = *size - 1; loop >= 0; --loop)
+    {
+        if (0 == strcmp(strings[loop], strings[loop - 1]))
+        {
+            for (size_t loop2 = loop; loop2 < *size - 1; ++loop2)
+                strings[loop2] = strings[loop2 + 1];
+
+            --(*size);
+        }
+    }
+}
+
 int
 btp_strcmp0(const char *s1, const char *s2)
 {

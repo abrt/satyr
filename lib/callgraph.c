@@ -7,10 +7,10 @@
 
 struct btp_callgraph *
 btp_callgraph_compute(struct btp_disasm_state *disassembler,
-                      struct btp_elf_frame_description_entry *fde_entries,
+                      struct btp_elf_frame_description_entry *eh_frame,
                       char **error_message)
 {
-    struct btp_elf_frame_description_entry *fde_entry = fde_entries;
+    struct btp_elf_frame_description_entry *fde_entry = eh_frame;
     struct btp_callgraph *result = NULL, *last = NULL;
     while (fde_entry)
     {
@@ -19,7 +19,7 @@ btp_callgraph_compute(struct btp_disasm_state *disassembler,
         entry->callees = NULL;
         entry->next = NULL;
 
-        const char **instructions = (const char**)btp_disasm_get_function_instructions(
+        char **instructions = btp_disasm_get_function_instructions(
             disassembler,
             fde_entry->start_address,
             fde_entry->length,
@@ -52,20 +52,21 @@ struct btp_callgraph *
 btp_callgraph_extend(struct btp_callgraph *callgraph,
                      uint64_t start_address,
                      struct btp_disasm_state *disassembler,
-                     struct btp_elf_frame_description_entry *fde_entries,
+                     struct btp_elf_frame_description_entry *eh_frame,
                      char **error_message)
 {
     if (btp_callgraph_find(callgraph, start_address))
         return callgraph;
 
     struct btp_elf_frame_description_entry *fde =
-        btp_elf_find_fde_for_address(fde_entries,
+        btp_elf_find_fde_for_address(eh_frame,
                                      start_address);
 
     if (!fde)
     {
-        *error_message = btp_asprintf("Unable to find FDE for address 0x%"PRIx64,
-                                      start_address);
+        *error_message = btp_asprintf(
+            "Unable to find FDE for address 0x%"PRIx64,
+            start_address);
 
         return NULL;
     }
@@ -78,7 +79,7 @@ btp_callgraph_extend(struct btp_callgraph *callgraph,
     entry->callees = NULL;
     entry->next = NULL;
 
-    const char **instructions = (const char**)btp_disasm_get_function_instructions(
+    char **instructions = btp_disasm_get_function_instructions(
         disassembler,
         fde->start_address,
         fde->length,
@@ -106,7 +107,7 @@ btp_callgraph_extend(struct btp_callgraph *callgraph,
         result = btp_callgraph_extend(result,
                                       *callees,
                                       disassembler,
-                                      fde_entries,
+                                      eh_frame,
                                       error_message);
 
         if (!result)

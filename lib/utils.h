@@ -92,6 +92,9 @@ btp_strdup(const char *s);
 char *
 btp_strndup(const char *s, size_t n);
 
+void
+btp_struniq(char **strings, size_t *size);
+
 /**
  * A strcmp() variant that works also with NULL parameters.  NULL is
  * considered to be less than a string.

@@ -63,25 +63,25 @@ btp_disasm_get_function_instructions(struct btp_disasm_state *state,
                                      char **error_message);
 
 void
-btp_disasm_function_instructions_free(char **instructions);
+btp_disasm_instructions_free(char **instructions);
 
 bool
-btp_disasm_function_instruction_is_one_of(const char *instruction,
-                                          const char **mnemonics);
+btp_disasm_instruction_is_one_of(char *instruction,
+                                 const char **mnemonics);
 
 bool
-btp_disasm_function_instruction_present(const char **instructions,
-                                        const char **mnemonics);
+btp_disasm_instruction_present(char **instructions,
+                               const char **mnemonics);
 
 bool
-btp_disasm_instruction_parse_single_address_operand(const char *instruction,
+btp_disasm_instruction_parse_single_address_operand(char *instruction,
                                                     uint64_t *dest);
 
 /* Given list of instructions, returns lists of addresses that are
  * (directly) called by them.  The list is terminated by address 0.
  */
 uint64_t *
-btp_disasm_get_callee_addresses(const char **instructions);
+btp_disasm_get_callee_addresses(char **instructions);
 
 #ifdef __cplusplus
 }

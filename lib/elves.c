@@ -309,6 +309,24 @@ btp_elf_procedure_linkage_table_free(struct btp_elf_plt_entry *entries)
     }
 }
 
+struct btp_elf_plt_entry *
+btp_elf_plt_find_for_address(struct btp_elf_plt_entry *plt,
+                             uint64_t address)
+{
+    struct btp_elf_plt_entry *entry = plt;
+    while (entry)
+    {
+        if (entry->address == address)
+            return entry;
+
+        entry = entry->next;
+    }
+
+    return NULL;
+
+}
+
+
 /* Given DWARF pointer encoding, return the length of the pointer in
  * bytes.
  */
@@ -421,8 +439,8 @@ read_cie(Dwarf_CFI_Entry *cfi,
     return cie;
 }
 
-/* Read len bytes and interpret them as a number. Pointer p does not have to be
- * aligned.
+/* Read len bytes and interpret them as a number. Pointer p does not
+ * have to be aligned.
  *
  * Assumption: we'll always run on architecture the ELF is run on,
  * therefore we don't consider byte order.

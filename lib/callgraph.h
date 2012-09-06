@@ -71,7 +71,7 @@ struct btp_callgraph
 
 struct btp_callgraph *
 btp_callgraph_compute(struct btp_disasm_state *disassembler,
-                      struct btp_elf_frame_description_entry *fde_entries,
+                      struct btp_elf_frame_description_entry *eh_frame,
                       char **error_message);
 
 /// Assumption: when a fde is included in the callgraph, we assume
@@ -80,7 +80,7 @@ struct btp_callgraph *
 btp_callgraph_extend(struct btp_callgraph *callgraph,
                      uint64_t start_address,
                      struct btp_disasm_state *disassembler,
-                     struct btp_elf_frame_description_entry *fde_entries,
+                     struct btp_elf_frame_description_entry *eh_frame,
                      char **error_message);
 
 void
