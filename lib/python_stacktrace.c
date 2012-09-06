@@ -1,5 +1,5 @@
 /*
-    python_backtrace.c
+    python_stacktrace.c
 
     Copyright (C) 2012  Red Hat, Inc.
 
@@ -17,7 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "python_backtrace.h"
+#include "python_stacktrace.h"
 #include "core_thread.h"
 #include "core_frame.h"
 #include "utils.h"
@@ -61,24 +61,24 @@ regexp would be "^  File \"([^\"]+)\", line ([0-9]+), in (.*)$"
 \1 = file name; \2 = offset; \3 = function name
 */
 
-struct btp_core_backtrace *
-btp_core_python_parse_backtrace(const char *text)
+struct btp_core_stacktrace *
+btp_core_python_parse_stacktrace(const char *text)
 {
     /* there may be other lines that match the regexp,
-       the actual backtrace always has "Traceback" header */
+       the actual stacktrace always has "Traceback" header */
     char *line = strstr(text, "\nTraceback");
     if (!line)
         return NULL;
 
-    /* jump to the first line of the actual backtrace */
+    /* jump to the first line of the actual stacktrace */
     line = strchr(++line, '\n');
     if (!line)
         return NULL;
 
     ++line;
 
-    struct btp_core_backtrace *backtrace = btp_core_backtrace_new();
-    backtrace->threads = btp_core_thread_new();
+    struct btp_core_stacktrace *stacktrace = btp_core_stacktrace_new();
+    stacktrace->threads = btp_core_thread_new();
 
     /* iterate line by line
        best effort - continue on error */
@@ -162,7 +162,7 @@ btp_core_python_parse_backtrace(const char *text)
         funcname += strlen(", in ");
         frame->function_name = btp_strdup(funcname);
 
-        backtrace->threads->frames = btp_core_frame_append(backtrace->threads->frames,
+        stacktrace->threads->frames = btp_core_frame_append(stacktrace->threads->frames,
                                                            frame);
         line = nextline;
     }
@@ -170,5 +170,5 @@ btp_core_python_parse_backtrace(const char *text)
     if (nextline)
         *(nextline - 1) = '\n';
 
-    return backtrace;
+    return stacktrace;
 }

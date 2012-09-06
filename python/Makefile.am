@@ -9,7 +9,7 @@ _btparser_la_SOURCES = \
     module.c \
     frame.c \
     thread.c \
-    backtrace.c \
+    stacktrace.c \
     dendrogram.c \
     distances.c \
     sharedlib.c \

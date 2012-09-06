@@ -1,5 +1,5 @@
 /*
-    gdb_backtrace.c
+    gdb_stacktrace.c
 
     Copyright (C) 2010, 2011, 2012  Red Hat, Inc.
 
@@ -17,7 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "gdb_backtrace.h"
+#include "gdb_stacktrace.h"
 #include "gdb_thread.h"
 #include "gdb_frame.h"
 #include "gdb_sharedlib.h"
@@ -30,68 +30,68 @@
 #include <string.h>
 #include <assert.h>
 
-struct btp_gdb_backtrace *
-btp_gdb_backtrace_new()
+struct btp_gdb_stacktrace *
+btp_gdb_stacktrace_new()
 {
-    struct btp_gdb_backtrace *backtrace = btp_malloc(sizeof(struct btp_gdb_backtrace));
-    btp_gdb_backtrace_init(backtrace);
-    return backtrace;
+    struct btp_gdb_stacktrace *stacktrace = btp_malloc(sizeof(struct btp_gdb_stacktrace));
+    btp_gdb_stacktrace_init(stacktrace);
+    return stacktrace;
 }
 
 void
-btp_gdb_backtrace_init(struct btp_gdb_backtrace *backtrace)
+btp_gdb_stacktrace_init(struct btp_gdb_stacktrace *stacktrace)
 {
-    backtrace->threads = NULL;
-    backtrace->crash = NULL;
-    backtrace->libs = NULL;
+    stacktrace->threads = NULL;
+    stacktrace->crash = NULL;
+    stacktrace->libs = NULL;
 }
 
 void
-btp_gdb_backtrace_free(struct btp_gdb_backtrace *backtrace)
+btp_gdb_stacktrace_free(struct btp_gdb_stacktrace *stacktrace)
 {
-    if (!backtrace)
+    if (!stacktrace)
         return;
 
-    while (backtrace->threads)
+    while (stacktrace->threads)
     {
-        struct btp_gdb_thread *thread = backtrace->threads;
-        backtrace->threads = thread->next;
+        struct btp_gdb_thread *thread = stacktrace->threads;
+        stacktrace->threads = thread->next;
         btp_gdb_thread_free(thread);
     }
 
-    while (backtrace->libs)
+    while (stacktrace->libs)
     {
-        struct btp_gdb_sharedlib *sharedlib = backtrace->libs;
-        backtrace->libs = sharedlib->next;
+        struct btp_gdb_sharedlib *sharedlib = stacktrace->libs;
+        stacktrace->libs = sharedlib->next;
         btp_gdb_sharedlib_free(sharedlib);
     }
 
-    if (backtrace->crash)
-        btp_gdb_frame_free(backtrace->crash);
+    if (stacktrace->crash)
+        btp_gdb_frame_free(stacktrace->crash);
 
-    free(backtrace);
+    free(stacktrace);
 }
 
-struct btp_gdb_backtrace *
-btp_gdb_backtrace_dup(struct btp_gdb_backtrace *backtrace)
+struct btp_gdb_stacktrace *
+btp_gdb_stacktrace_dup(struct btp_gdb_stacktrace *stacktrace)
 {
-    struct btp_gdb_backtrace *result = btp_gdb_backtrace_new();
-    memcpy(result, backtrace, sizeof(struct btp_gdb_backtrace));
+    struct btp_gdb_stacktrace *result = btp_gdb_stacktrace_new();
+    memcpy(result, stacktrace, sizeof(struct btp_gdb_stacktrace));
 
-    if (backtrace->crash)
-        result->crash = btp_gdb_frame_dup(backtrace->crash, false);
-    if (backtrace->threads)
-        result->threads = btp_gdb_thread_dup(backtrace->threads, true);
-    if (backtrace->libs)
-        result->libs = btp_gdb_sharedlib_dup(backtrace->libs, true);
+    if (stacktrace->crash)
+        result->crash = btp_gdb_frame_dup(stacktrace->crash, false);
+    if (stacktrace->threads)
+        result->threads = btp_gdb_thread_dup(stacktrace->threads, true);
+    if (stacktrace->libs)
+        result->libs = btp_gdb_sharedlib_dup(stacktrace->libs, true);
 
     return result;
 }
 
 int
-btp_gdb_backtrace_get_thread_count(struct btp_gdb_backtrace *backtrace)
+btp_gdb_stacktrace_get_thread_count(struct btp_gdb_stacktrace *stacktrace)
 {
-    struct btp_gdb_thread *thread = backtrace->threads;
+    struct btp_gdb_thread *thread = stacktrace->threads;
     int count = 0;
     while (thread)
     {
@@ -102,19 +102,19 @@ btp_gdb_backtrace_get_thread_count(struct btp_gdb_backtrace *backtrace)
 }
 
 void
-btp_gdb_backtrace_remove_threads_except_one(struct btp_gdb_backtrace *backtrace,
+btp_gdb_stacktrace_remove_threads_except_one(struct btp_gdb_stacktrace *stacktrace,
                                             struct btp_gdb_thread *thread)
 {
-    while (backtrace->threads)
+    while (stacktrace->threads)
     {
-        struct btp_gdb_thread *delete_thread = backtrace->threads;
-        backtrace->threads = delete_thread->next;
+        struct btp_gdb_thread *delete_thread = stacktrace->threads;
+        stacktrace->threads = delete_thread->next;
         if (delete_thread != thread)
             btp_gdb_thread_free(delete_thread);
     }
 
     thread->next = NULL;
-    backtrace->threads = thread;
+    stacktrace->threads = thread;
 }
 
 /**
@@ -128,24 +128,24 @@ btp_gdb_backtrace_remove_threads_except_one(struct btp_gdb_backtrace *backtrace,
  * succeed.
  */
 static struct btp_gdb_thread *
-find_crash_thread_from_crash_frame(struct btp_gdb_backtrace *backtrace,
+find_crash_thread_from_crash_frame(struct btp_gdb_stacktrace *stacktrace,
                                    bool require_abort)
 {
     if (btp_debug_parser)
-        printf("%s(backtrace, %s)\n", __FUNCTION__, require_abort ? "true" : "false");
+        printf("%s(stacktrace, %s)\n", __FUNCTION__, require_abort ? "true" : "false");
 
-    assert(backtrace->threads); /* checked by the caller */
-    if (!backtrace->crash || !backtrace->crash->function_name)
+    assert(stacktrace->threads); /* checked by the caller */
+    if (!stacktrace->crash || !stacktrace->crash->function_name)
         return NULL;
 
     struct btp_gdb_thread *result = NULL;
-    struct btp_gdb_thread *thread = backtrace->threads;
+    struct btp_gdb_thread *thread = stacktrace->threads;
     while (thread)
     {
         struct btp_gdb_frame *top_frame = thread->frames;
         bool same_name = top_frame &&
             top_frame->function_name &&
-            0 == strcmp(top_frame->function_name, backtrace->crash->function_name);
+            0 == strcmp(top_frame->function_name, stacktrace->crash->function_name);
         bool abort_requirement_satisfied = !require_abort ||
             btp_glibc_thread_find_exit_frame(thread);
         if (btp_debug_parser)
@@ -174,21 +174,21 @@ find_crash_thread_from_crash_frame(struct btp_gdb_backtrace *backtrace,
 }
 
 struct btp_gdb_thread *
-btp_gdb_backtrace_find_crash_thread(struct btp_gdb_backtrace *backtrace)
+btp_gdb_stacktrace_find_crash_thread(struct btp_gdb_stacktrace *stacktrace)
 {
     /* If there is no thread, be silent and report NULL. */
-    if (!backtrace->threads)
+    if (!stacktrace->threads)
         return NULL;
 
     /* If there is just one thread, it is simple. */
-    if (!backtrace->threads->next)
-        return backtrace->threads;
+    if (!stacktrace->threads->next)
+        return stacktrace->threads;
 
     /* If we have a crash frame *and* there is just one thread which has
      * this frame on the top, it is also simple.
      */
     struct btp_gdb_thread *thread;
-    thread = find_crash_thread_from_crash_frame(backtrace, false);
+    thread = find_crash_thread_from_crash_frame(stacktrace, false);
     if (thread)
         return thread;
 
@@ -196,7 +196,7 @@ btp_gdb_backtrace_find_crash_thread(struct btp_gdb_backtrace *backtrace)
      * the crash frame on the top of stack.
      * Try to search for known abort functions.
      */
-    thread = find_crash_thread_from_crash_frame(backtrace, true);
+    thread = find_crash_thread_from_crash_frame(stacktrace, true);
 
     /* We might want to search a thread with known abort function, and
      * without the crash frame here. However, it hasn't been needed so
@@ -207,11 +207,11 @@ btp_gdb_backtrace_find_crash_thread(struct btp_gdb_backtrace *backtrace)
 
 
 void
-btp_gdb_backtrace_limit_frame_depth(struct btp_gdb_backtrace *backtrace,
+btp_gdb_stacktrace_limit_frame_depth(struct btp_gdb_stacktrace *stacktrace,
                                     int depth)
 {
     assert(depth > 0);
-    struct btp_gdb_thread *thread = backtrace->threads;
+    struct btp_gdb_thread *thread = stacktrace->threads;
     while (thread)
     {
         btp_gdb_thread_remove_frames_below_n(thread, depth);
@@ -220,10 +220,10 @@ btp_gdb_backtrace_limit_frame_depth(struct btp_gdb_backtrace *backtrace,
 }
 
 float
-btp_gdb_backtrace_quality_simple(struct btp_gdb_backtrace *backtrace)
+btp_gdb_stacktrace_quality_simple(struct btp_gdb_stacktrace *stacktrace)
 {
     int ok_count = 0, all_count = 0;
-    struct btp_gdb_thread *thread = backtrace->threads;
+    struct btp_gdb_thread *thread = stacktrace->threads;
     while (thread)
     {
         btp_gdb_thread_quality_counts(thread, &ok_count, &all_count);
@@ -237,23 +237,23 @@ btp_gdb_backtrace_quality_simple(struct btp_gdb_backtrace *backtrace)
 }
 
 float
-btp_gdb_backtrace_quality_complex(struct btp_gdb_backtrace *backtrace)
+btp_gdb_stacktrace_quality_complex(struct btp_gdb_stacktrace *stacktrace)
 {
-    backtrace = btp_gdb_backtrace_dup(backtrace);
+    stacktrace = btp_gdb_stacktrace_dup(stacktrace);
 
-    /* Find the crash thread, and then normalize the backtrace. It is
-     * not possible to find the crash thread after the backtrace has
+    /* Find the crash thread, and then normalize the stacktrace. It is
+     * not possible to find the crash thread after the stacktrace has
      * been normalized.
      */
-    struct btp_gdb_thread *crash_thread = btp_gdb_backtrace_find_crash_thread(backtrace);
-    btp_normalize_backtrace(backtrace);
+    struct btp_gdb_thread *crash_thread = btp_gdb_stacktrace_find_crash_thread(stacktrace);
+    btp_normalize_stacktrace(stacktrace);
 
-    /* Get the quality q1 of the full backtrace. */
-    float q1 = btp_gdb_backtrace_quality_simple(backtrace);
+    /* Get the quality q1 of the full stacktrace. */
+    float q1 = btp_gdb_stacktrace_quality_simple(stacktrace);
 
     if (!crash_thread)
     {
-        btp_gdb_backtrace_free(backtrace);
+        btp_gdb_stacktrace_free(stacktrace);
         return q1;
     }
 
@@ -269,29 +269,29 @@ btp_gdb_backtrace_quality_complex(struct btp_gdb_backtrace *backtrace)
     btp_gdb_thread_remove_frames_below_n(crash_thread, 5);
     float q3 = btp_gdb_thread_quality(crash_thread);
 
-    btp_gdb_backtrace_free(backtrace);
+    btp_gdb_stacktrace_free(stacktrace);
 
-    /* Compute and return the final backtrace quality q. */
+    /* Compute and return the final stacktrace quality q. */
     return 0.25f * q1 + 0.35f * q2 + 0.4f * q3;
 }
 
 char *
-btp_gdb_backtrace_to_text(struct btp_gdb_backtrace *backtrace, bool verbose)
+btp_gdb_stacktrace_to_text(struct btp_gdb_stacktrace *stacktrace, bool verbose)
 {
     struct btp_strbuf *str = btp_strbuf_new();
     if (verbose)
     {
         btp_strbuf_append_strf(str, "Thread count: %d\n",
-                               btp_gdb_backtrace_get_thread_count(backtrace));
+                               btp_gdb_stacktrace_get_thread_count(stacktrace));
     }
 
-    if (backtrace->crash && verbose)
+    if (stacktrace->crash && verbose)
     {
         btp_strbuf_append_str(str, "Crash frame: ");
-        btp_gdb_frame_append_to_str(backtrace->crash, str, verbose);
+        btp_gdb_frame_append_to_str(stacktrace->crash, str, verbose);
     }
 
-    struct btp_gdb_thread *thread = backtrace->threads;
+    struct btp_gdb_thread *thread = stacktrace->threads;
     while (thread)
     {
         btp_gdb_thread_append_to_str(thread, str, verbose);
@@ -302,57 +302,57 @@ btp_gdb_backtrace_to_text(struct btp_gdb_backtrace *backtrace, bool verbose)
 }
 
 struct btp_gdb_frame *
-btp_gdb_backtrace_get_crash_frame(struct btp_gdb_backtrace *backtrace)
+btp_gdb_stacktrace_get_crash_frame(struct btp_gdb_stacktrace *stacktrace)
 {
-    backtrace = btp_gdb_backtrace_dup(backtrace);
+    stacktrace = btp_gdb_stacktrace_dup(stacktrace);
 
-    struct btp_gdb_thread *crash_thread = btp_gdb_backtrace_find_crash_thread(backtrace);
+    struct btp_gdb_thread *crash_thread = btp_gdb_stacktrace_find_crash_thread(stacktrace);
     if (!crash_thread)
     {
-        btp_gdb_backtrace_free(backtrace);
+        btp_gdb_stacktrace_free(stacktrace);
         return NULL;
     }
 
-    btp_normalize_backtrace(backtrace);
+    btp_normalize_stacktrace(stacktrace);
     struct btp_gdb_frame *crash_frame = crash_thread->frames;
     crash_frame = btp_gdb_frame_dup(crash_frame, false);
-    btp_gdb_backtrace_free(backtrace);
+    btp_gdb_stacktrace_free(stacktrace);
     return crash_frame;
 }
 
 char *
-btp_gdb_backtrace_get_duplication_hash(struct btp_gdb_backtrace *backtrace)
+btp_gdb_stacktrace_get_duplication_hash(struct btp_gdb_stacktrace *stacktrace)
 {
-    backtrace = btp_gdb_backtrace_dup(backtrace);
-    struct btp_gdb_thread *crash_thread = btp_gdb_backtrace_find_crash_thread(backtrace);
+    stacktrace = btp_gdb_stacktrace_dup(stacktrace);
+    struct btp_gdb_thread *crash_thread = btp_gdb_stacktrace_find_crash_thread(stacktrace);
     if (crash_thread)
-        btp_gdb_backtrace_remove_threads_except_one(backtrace, crash_thread);
+        btp_gdb_stacktrace_remove_threads_except_one(stacktrace, crash_thread);
 
-    btp_normalize_backtrace(backtrace);
-    btp_gdb_backtrace_limit_frame_depth(backtrace, 3);
-    char *hash = btp_gdb_backtrace_to_text(backtrace, false);
-    btp_gdb_backtrace_free(backtrace);
+    btp_normalize_stacktrace(stacktrace);
+    btp_gdb_stacktrace_limit_frame_depth(stacktrace, 3);
+    char *hash = btp_gdb_stacktrace_to_text(stacktrace, false);
+    btp_gdb_stacktrace_free(stacktrace);
     return hash;
 }
 
-struct btp_gdb_backtrace *
-btp_gdb_backtrace_parse(const char **input,
+struct btp_gdb_stacktrace *
+btp_gdb_stacktrace_parse(const char **input,
                         struct btp_location *location)
 {
     const char *local_input = *input;
     /* im - intermediate */
-    struct btp_gdb_backtrace *imbacktrace = btp_gdb_backtrace_new();
-    imbacktrace->libs = btp_gdb_sharedlib_parse(*input);
+    struct btp_gdb_stacktrace *imstacktrace = btp_gdb_stacktrace_new();
+    imstacktrace->libs = btp_gdb_sharedlib_parse(*input);
 
     /* The header is mandatory, but it might contain no frame header,
-     * in some broken backtraces. In that case, backtrace.crash value
+     * in some broken stacktraces. In that case, stacktrace.crash value
      * is kept as NULL.
      */
-    if (!btp_gdb_backtrace_parse_header(&local_input,
-                                        &imbacktrace->crash,
+    if (!btp_gdb_stacktrace_parse_header(&local_input,
+                                        &imstacktrace->crash,
                                         location))
     {
-        btp_gdb_backtrace_free(imbacktrace);
+        btp_gdb_stacktrace_free(imstacktrace);
         return NULL;
     }
 
@@ -365,20 +365,20 @@ btp_gdb_backtrace_parse(const char **input,
             prevthread = thread;
         }
         else
-            imbacktrace->threads = prevthread = thread;
+            imstacktrace->threads = prevthread = thread;
     }
-    if (!imbacktrace->threads)
+    if (!imstacktrace->threads)
     {
-        btp_gdb_backtrace_free(imbacktrace);
+        btp_gdb_stacktrace_free(imstacktrace);
         return NULL;
     }
 
     *input = local_input;
-    return imbacktrace;
+    return imstacktrace;
 }
 
 bool
-btp_gdb_backtrace_parse_header(const char **input,
+btp_gdb_stacktrace_parse_header(const char **input,
                                struct btp_gdb_frame **frame,
                                struct btp_location *location)
 {
@@ -423,7 +423,7 @@ btp_gdb_backtrace_parse_header(const char **input,
         else
         {
 	    /* Uncommon case (caused by some kernel bug) where the
-             * frame is missing from the header.  The backtrace
+             * frame is missing from the header.  The stacktrace
              * contains just threads.  We silently skip the header and
              * return true.
              */
@@ -437,7 +437,7 @@ btp_gdb_backtrace_parse_header(const char **input,
     }
     else if (first_frame)
     {
-        /* Degenerate case when the backtrace contains no thread, but
+        /* Degenerate case when the stacktrace contains no thread, but
          * the frame is there.
          */
         *input = first_frame;
@@ -458,15 +458,15 @@ btp_gdb_backtrace_parse_header(const char **input,
 }
 
 void
-btp_gdb_backtrace_set_libnames(struct btp_gdb_backtrace *backtrace)
+btp_gdb_stacktrace_set_libnames(struct btp_gdb_stacktrace *stacktrace)
 {
-    struct btp_gdb_thread *thread = backtrace->threads;
+    struct btp_gdb_thread *thread = stacktrace->threads;
     while (thread)
     {
         struct btp_gdb_frame *frame = thread->frames;
         while (frame)
         {
-            struct btp_gdb_sharedlib *lib = btp_gdb_sharedlib_find_address(backtrace->libs,
+            struct btp_gdb_sharedlib *lib = btp_gdb_sharedlib_find_address(stacktrace->libs,
                                                                            frame->address);
             if (lib)
             {
@@ -495,22 +495,22 @@ btp_gdb_backtrace_set_libnames(struct btp_gdb_backtrace *backtrace)
 }
 
 struct btp_gdb_thread *
-btp_gdb_backtrace_get_optimized_thread(struct btp_gdb_backtrace *backtrace,
+btp_gdb_stacktrace_get_optimized_thread(struct btp_gdb_stacktrace *stacktrace,
                                        int max_frames)
 {
     struct btp_gdb_thread *crash_thread;
 
-    backtrace = btp_gdb_backtrace_dup(backtrace);
-    crash_thread = btp_gdb_backtrace_find_crash_thread(backtrace);
+    stacktrace = btp_gdb_stacktrace_dup(stacktrace);
+    crash_thread = btp_gdb_stacktrace_find_crash_thread(stacktrace);
 
     if (!crash_thread)
     {
-        btp_gdb_backtrace_free(backtrace);
+        btp_gdb_stacktrace_free(stacktrace);
         return NULL;
     }
 
-    btp_gdb_backtrace_remove_threads_except_one(backtrace, crash_thread);
-    btp_gdb_backtrace_set_libnames(backtrace);
+    btp_gdb_stacktrace_remove_threads_except_one(stacktrace, crash_thread);
+    btp_gdb_stacktrace_set_libnames(stacktrace);
     btp_normalize_thread(crash_thread);
     btp_normalize_optimize_thread(crash_thread);
 
@@ -528,7 +528,7 @@ btp_gdb_backtrace_get_optimized_thread(struct btp_gdb_backtrace *backtrace,
         btp_gdb_thread_remove_frames_below_n(crash_thread, max_frames);
 
     crash_thread = btp_gdb_thread_dup(crash_thread, false);
-    btp_gdb_backtrace_free(backtrace);
+    btp_gdb_stacktrace_free(stacktrace);
 
     return crash_thread;
 }

@@ -1,5 +1,5 @@
 /*
-    gdb_backtrace.h
+    gdb_stacktrace.h
 
     Copyright (C) 2010, 2011, 2012  Red Hat, Inc.
 
@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_GDB_BACKTRACE_H
-#define BTPARSER_GDB_BACKTRACE_H
+#ifndef BTPARSER_GDB_STACKTRACE_H
+#define BTPARSER_GDB_STACKTRACE_H
 
 /**
  * @file
@@ -38,13 +38,13 @@ struct btp_location;
 /**
  * @brief A stack trace produced by GDB.
  *
- * A backtrace obtained at the time of a program crash, consisting of
+ * A stacktrace obtained at the time of a program crash, consisting of
  * several threads which contains frames.
  *
- * This structure represents a backtrace as produced by the GNU
+ * This structure represents a stacktrace as produced by the GNU
  * Debugger.
  */
-struct btp_gdb_backtrace
+struct btp_gdb_stacktrace
 {
     struct btp_gdb_thread *threads;
 
@@ -63,118 +63,118 @@ struct btp_gdb_backtrace
 };
 
 /**
- * Creates and initializes a new backtrace structure.
+ * Creates and initializes a new stacktrace structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_gdb_backtrace_free().
+ * calling the function btp_gdb_stacktrace_free().
  */
-struct btp_gdb_backtrace *
-btp_gdb_backtrace_new();
+struct btp_gdb_stacktrace *
+btp_gdb_stacktrace_new();
 
 /**
- * Initializes all members of the backtrace structure to their default
+ * Initializes all members of the stacktrace structure to their default
  * values.  No memory is released, members are simply overwritten.
- * This is useful for initializing a backtrace structure placed on the
+ * This is useful for initializing a stacktrace structure placed on the
  * stack.
  */
 void
-btp_gdb_backtrace_init(struct btp_gdb_backtrace *backtrace);
+btp_gdb_stacktrace_init(struct btp_gdb_stacktrace *stacktrace);
 
 /**
- * Releases the memory held by the backtrace, its threads, frames,
+ * Releases the memory held by the stacktrace, its threads, frames,
  * shared libraries.
- * @param backtrace
- * If the backtrace is NULL, no operation is performed.
+ * @param stacktrace
+ * If the stacktrace is NULL, no operation is performed.
  */
 void
-btp_gdb_backtrace_free(struct btp_gdb_backtrace *backtrace);
+btp_gdb_stacktrace_free(struct btp_gdb_stacktrace *stacktrace);
 
 /**
- * Creates a duplicate of the backtrace.
- * @param backtrace
- * The backtrace to be copied. It's not modified by this function.
+ * Creates a duplicate of the stacktrace.
+ * @param stacktrace
+ * The stacktrace to be copied. It's not modified by this function.
  * @returns
  * This function never returns NULL.  The returned duplicate must be
- * released by calling the function btp_gdb_backtrace_free().
+ * released by calling the function btp_gdb_stacktrace_free().
  */
-struct btp_gdb_backtrace *
-btp_gdb_backtrace_dup(struct btp_gdb_backtrace *backtrace);
+struct btp_gdb_stacktrace *
+btp_gdb_stacktrace_dup(struct btp_gdb_stacktrace *stacktrace);
 
 /**
- * Returns a number of threads in the backtrace.
- * @param backtrace
+ * Returns a number of threads in the stacktrace.
+ * @param stacktrace
  * It's not modified by calling this function.
  */
 int
-btp_gdb_backtrace_get_thread_count(struct btp_gdb_backtrace *backtrace);
+btp_gdb_stacktrace_get_thread_count(struct btp_gdb_stacktrace *stacktrace);
 
 /**
- * Removes all threads from the backtrace and deletes them, except the
+ * Removes all threads from the stacktrace and deletes them, except the
  * one provided as a parameter.
  * @param thread
  * This function does not check whether the thread is a member of the
- * backtrace.  If it's not, all threads are removed from the backtrace
+ * stacktrace.  If it's not, all threads are removed from the stacktrace
  * and then deleted.
  */
 void
-btp_gdb_backtrace_remove_threads_except_one(struct btp_gdb_backtrace *backtrace,
+btp_gdb_stacktrace_remove_threads_except_one(struct btp_gdb_stacktrace *stacktrace,
                                             struct btp_gdb_thread *thread);
 
 /**
  * Searches all threads and tries to find the one that caused the
  * crash.  It might return NULL if the thread cannot be determined.
- * @param backtrace
+ * @param stacktrace
  * It must be non-NULL pointer. It's not modified by calling this
  * function.
  */
 struct btp_gdb_thread *
-btp_gdb_backtrace_find_crash_thread(struct btp_gdb_backtrace *backtrace);
+btp_gdb_stacktrace_find_crash_thread(struct btp_gdb_stacktrace *stacktrace);
 
 /**
- * Remove frames from the bottom of threads in the backtrace, until
+ * Remove frames from the bottom of threads in the stacktrace, until
  * all threads have at most 'depth' frames.
- * @param backtrace
+ * @param stacktrace
  * Must be non-NULL pointer.
  */
 void
-btp_gdb_backtrace_limit_frame_depth(struct btp_gdb_backtrace *backtrace,
+btp_gdb_stacktrace_limit_frame_depth(struct btp_gdb_stacktrace *stacktrace,
                                     int depth);
 
 /**
- * Evaluates the quality of the backtrace. The quality is the ratio of
+ * Evaluates the quality of the stacktrace. The quality is the ratio of
  * the number of frames with function name fully known to the number
  * of all frames.  This function does not take into account that some
  * frames are more important than others.
- * @param backtrace
+ * @param stacktrace
  * It must be non-NULL pointer. It's not modified by calling this
  * function.
  * @returns
  * A number between 0 and 1. 0 means the lowest quality, 1 means full
- * backtrace is known (all function names are known).
+ * stacktrace is known (all function names are known).
  */
 float
-btp_gdb_backtrace_quality_simple(struct btp_gdb_backtrace *backtrace);
+btp_gdb_stacktrace_quality_simple(struct btp_gdb_stacktrace *stacktrace);
 
 /**
- * Evaluates the quality of the backtrace. The quality is determined
+ * Evaluates the quality of the stacktrace. The quality is determined
  * depending on the ratio of frames with function name fully known to
  * all frames.
- * @param backtrace
+ * @param stacktrace
  * It must be non-NULL pointer. It's not modified by calling this
  * function.
  * @returns
  * A number between 0 and 1. 0 means the lowest quality, 1 means full
- * backtrace is known.  The returned value takes into account that the
+ * stacktrace is known.  The returned value takes into account that the
  * thread which caused the crash is more important than the other
  * threads, and the frames around the crash frame are more important
  * than distant frames.
  */
 float
-btp_gdb_backtrace_quality_complex(struct btp_gdb_backtrace *backtrace);
+btp_gdb_stacktrace_quality_complex(struct btp_gdb_stacktrace *stacktrace);
 
 /**
- * Returns textual representation of the backtrace.
- * @param backtrace
+ * Returns textual representation of the stacktrace.
+ * @param stacktrace
  * It must be non-NULL pointer. It's not modified by calling this
  * function.
  * @returns
@@ -182,26 +182,26 @@ btp_gdb_backtrace_quality_complex(struct btp_gdb_backtrace *backtrace);
  * releasing the returned memory using function free().
  */
 char *
-btp_gdb_backtrace_to_text(struct btp_gdb_backtrace *backtrace,
+btp_gdb_stacktrace_to_text(struct btp_gdb_stacktrace *stacktrace,
                           bool verbose);
 
 /**
- * Analyzes the backtrace to get the frame where a crash occurred.
- * @param backtrace
+ * Analyzes the stacktrace to get the frame where a crash occurred.
+ * @param stacktrace
  * It must be non-NULL pointer. It's not modified by calling this
  * function.
  * @returns
  * The returned value must be released by calling btp_gdb_frame_free()
  * when it's no longer needed, because it is a deep copy of the crash
- * frame from the backtrace.  NULL is returned if the crash frame is
+ * frame from the stacktrace.  NULL is returned if the crash frame is
  * not found.
  */
 struct btp_gdb_frame *
-btp_gdb_backtrace_get_crash_frame(struct btp_gdb_backtrace *backtrace);
+btp_gdb_stacktrace_get_crash_frame(struct btp_gdb_stacktrace *stacktrace);
 
 /**
- * Calculates the duplication hash string of the backtrace.
- * @param backtrace
+ * Calculates the duplication hash string of the stacktrace.
+ * @param stacktrace
  * It must be non-NULL pointer. It's not modified by calling this
  * function.
  * @returns
@@ -209,33 +209,33 @@ btp_gdb_backtrace_get_crash_frame(struct btp_gdb_backtrace *backtrace);
  * releasing the returned memory using function free().
  */
 char *
-btp_gdb_backtrace_get_duplication_hash(struct btp_gdb_backtrace *backtrace);
+btp_gdb_stacktrace_get_duplication_hash(struct btp_gdb_stacktrace *stacktrace);
 
 /**
- * Parses a textual backtrace and puts it into a structure.  If
+ * Parses a textual stacktrace and puts it into a structure.  If
  * parsing fails, the input parameter is not changed and NULL is
  * returned.
  * @code
  * struct btp_location location;
  * btp_location_init(&location);
  * char *input = "...";
- * struct btp_gdb_backtrace *backtrace;
- * backtrace = btp_gdb_backtrace_parse(input, location);
- * if (!backtrace)
+ * struct btp_gdb_stacktrace *stacktrace;
+ * stacktrace = btp_gdb_stacktrace_parse(input, location);
+ * if (!stacktrace)
  * {
  *   fprintf(stderr,
- *           "Failed to parse the backtrace.\n"
+ *           "Failed to parse the stacktrace.\n"
  *           "Line %d, column %d: %s\n",
  *           location.line,
  *           location.column,
  *           location.message);
  *   exit(-1);
  * }
- * btp_gdb_backtrace_free(backtrace);
+ * btp_gdb_stacktrace_free(stacktrace);
  * @endcode
  * @param input
- * Pointer to the string with the backtrace. If this function returns
- * true, this pointer is modified to point after the backtrace that
+ * Pointer to the string with the stacktrace. If this function returns
+ * true, this pointer is modified to point after the stacktrace that
  * was just parsed.
  * @param location
  * The caller must provide a pointer to an instance of btp_location
@@ -246,17 +246,17 @@ btp_gdb_backtrace_get_duplication_hash(struct btp_gdb_backtrace *backtrace);
  * error occurred), the structure will contain the error line, column,
  * and message.
  * @returns
- * A newly allocated backtrace structure or NULL. A backtrace struct
+ * A newly allocated stacktrace structure or NULL. A stacktrace struct
  * is returned when at least one thread was parsed from the input and
  * no error occurred. The returned structure should be released by
- * btp_gdb_backtrace_free().
+ * btp_gdb_stacktrace_free().
  */
-struct btp_gdb_backtrace *
-btp_gdb_backtrace_parse(const char **input,
+struct btp_gdb_stacktrace *
+btp_gdb_stacktrace_parse(const char **input,
                         struct btp_location *location);
 
 /**
- * Parse backtrace header if it is available in the backtrace.  The
+ * Parse stacktrace header if it is available in the stacktrace.  The
  * header usually contains frame where the program crashed.
  * @param input
  * Pointer that will be moved to point behind the header if the header
@@ -278,22 +278,22 @@ btp_gdb_backtrace_parse(const char **input,
  * @endcode
  */
 bool
-btp_gdb_backtrace_parse_header(const char **input,
+btp_gdb_stacktrace_parse_header(const char **input,
                                struct btp_gdb_frame **frame,
                                struct btp_location *location);
 
 /**
- * Set library names in all frames in the backtrace according to the
+ * Set library names in all frames in the stacktrace according to the
  * the sharedlib data.
  */
 void
-btp_gdb_backtrace_set_libnames(struct btp_gdb_backtrace *backtrace);
+btp_gdb_stacktrace_set_libnames(struct btp_gdb_stacktrace *stacktrace);
 
 /**
  * Return crash thread optimized for comparison. It's normalized, with
  * library names set and functions without names (signal handlers) are
  * removed.
- * @param backtrace
+ * @param stacktrace
  * It must be non-NULL pointer. It's not modified by calling this
  * function.
  * @param max_frames
@@ -305,7 +305,7 @@ btp_gdb_backtrace_set_libnames(struct btp_gdb_backtrace *backtrace);
  * released by btp_gdb_thread_free() by the caller.
  */
 struct btp_gdb_thread *
-btp_gdb_backtrace_get_optimized_thread(struct btp_gdb_backtrace *backtrace,
+btp_gdb_stacktrace_get_optimized_thread(struct btp_gdb_stacktrace *stacktrace,
                                        int max_frames);
 
 #ifdef __cplusplus

@@ -1,5 +1,5 @@
 /*
-    python_backtrace.h
+    python_stacktrace.h
 
     Copyright (C) 2012  ABRT Team
     Copyright (C) 2012  Red Hat, Inc.
@@ -18,8 +18,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_PYTHON_BACKTRACE_H
-#define BTPARSER_PYTHON_BACKTRACE_H
+#ifndef BTPARSER_PYTHON_STACKTRACE_H
+#define BTPARSER_PYTHON_STACKTRACE_H
 
 /**
  * @file
@@ -30,10 +30,10 @@
 extern "C" {
 #endif
 
-#include "core_backtrace.h"
+#include "core_stacktrace.h"
 
-struct btp_core_backtrace *
-btp_core_python_parse_backtrace(const char *text);
+struct btp_core_stacktrace *
+btp_core_python_parse_stacktrace(const char *text);
 
 #ifdef __cplusplus
 }

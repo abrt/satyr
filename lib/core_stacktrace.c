@@ -1,5 +1,5 @@
 /*
-    core_backtrace.c
+    core_stacktrace.c
 
     Copyright (C) 2012  Red Hat, Inc.
 
@@ -17,10 +17,10 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "core_backtrace.h"
+#include "core_stacktrace.h"
 #include "core_frame.h"
 #include "core_thread.h"
-#include "gdb_backtrace.h"
+#include "gdb_stacktrace.h"
 #include "gdb_frame.h"
 #include "gdb_thread.h"
 #include "location.h"
@@ -34,52 +34,52 @@
 #include <stdio.h>
 #include <string.h>
 
-struct btp_core_backtrace *
-btp_core_backtrace_new()
+struct btp_core_stacktrace *
+btp_core_stacktrace_new()
 {
-    struct btp_core_backtrace *backtrace = btp_malloc(sizeof(struct btp_core_backtrace));
-    btp_core_backtrace_init(backtrace);
-    return backtrace;
+    struct btp_core_stacktrace *stacktrace = btp_malloc(sizeof(struct btp_core_stacktrace));
+    btp_core_stacktrace_init(stacktrace);
+    return stacktrace;
 }
 
 void
-btp_core_backtrace_init(struct btp_core_backtrace *backtrace)
+btp_core_stacktrace_init(struct btp_core_stacktrace *stacktrace)
 {
-    backtrace->threads = NULL;
+    stacktrace->threads = NULL;
 }
 
 void
-btp_core_backtrace_free(struct btp_core_backtrace *backtrace)
+btp_core_stacktrace_free(struct btp_core_stacktrace *stacktrace)
 {
-    if (!backtrace)
+    if (!stacktrace)
         return;
 
-    while (backtrace->threads)
+    while (stacktrace->threads)
     {
-        struct btp_core_thread *thread = backtrace->threads;
-        backtrace->threads = thread->next;
+        struct btp_core_thread *thread = stacktrace->threads;
+        stacktrace->threads = thread->next;
         btp_core_thread_free(thread);
     }
 
-    free(backtrace);
+    free(stacktrace);
 }
 
-struct btp_core_backtrace *
-btp_core_backtrace_dup(struct btp_core_backtrace *backtrace)
+struct btp_core_stacktrace *
+btp_core_stacktrace_dup(struct btp_core_stacktrace *stacktrace)
 {
-    struct btp_core_backtrace *result = btp_core_backtrace_new();
-    memcpy(result, backtrace, sizeof(struct btp_core_backtrace));
+    struct btp_core_stacktrace *result = btp_core_stacktrace_new();
+    memcpy(result, stacktrace, sizeof(struct btp_core_stacktrace));
 
-    if (backtrace->threads)
-        result->threads = btp_core_thread_dup(backtrace->threads, true);
+    if (stacktrace->threads)
+        result->threads = btp_core_thread_dup(stacktrace->threads, true);
 
     return result;
 }
 
 int
-btp_core_backtrace_get_thread_count(struct btp_core_backtrace *backtrace)
+btp_core_stacktrace_get_thread_count(struct btp_core_stacktrace *stacktrace)
 {
-    struct btp_core_thread *thread = backtrace->threads;
+    struct btp_core_thread *thread = stacktrace->threads;
     int count = 0;
     while (thread)
     {
@@ -89,8 +89,8 @@ btp_core_backtrace_get_thread_count(struct btp_core_backtrace *backtrace)
     return count;
 }
 
-struct btp_core_backtrace *
-btp_core_backtrace_parse(const char **input,
+struct btp_core_stacktrace *
+btp_core_stacktrace_parse(const char **input,
                          struct btp_location *location)
 {
     // TODO
@@ -98,11 +98,11 @@ btp_core_backtrace_parse(const char **input,
 }
 
 char *
-btp_core_backtrace_to_text(struct btp_core_backtrace *backtrace)
+btp_core_stacktrace_to_text(struct btp_core_stacktrace *stacktrace)
 {
     struct btp_strbuf *strbuf = btp_strbuf_new();
 
-    struct btp_core_thread *thread = backtrace->threads;
+    struct btp_core_thread *thread = stacktrace->threads;
     while (thread)
     {
         btp_core_thread_append_to_str(thread, strbuf);
@@ -112,21 +112,21 @@ btp_core_backtrace_to_text(struct btp_core_backtrace *backtrace)
     return btp_strbuf_free_nobuf(strbuf);
 }
 
-struct btp_core_backtrace *
-btp_core_backtrace_create(const char *gdb_backtrace_text,
+struct btp_core_stacktrace *
+btp_core_stacktrace_create(const char *gdb_stacktrace_text,
                           const char *unstrip_text,
                           const char *executable_path)
 {
-    // Parse the GDB backtrace.
+    // Parse the GDB stacktrace.
     struct btp_location location;
     btp_location_init(&location);
 
-    struct btp_gdb_backtrace *gdb_backtrace = btp_gdb_backtrace_parse(&gdb_backtrace_text, &location);
-    if (!gdb_backtrace)
+    struct btp_gdb_stacktrace *gdb_stacktrace = btp_gdb_stacktrace_parse(&gdb_stacktrace_text, &location);
+    if (!gdb_stacktrace)
     {
         if (btp_debug_parser)
         {
-            fprintf(stderr, "Unable to parse backtrace: %d:%d: %s\n",
+            fprintf(stderr, "Unable to parse stacktrace: %d:%d: %s\n",
                     location.line, location.column, location.message);
         }
 
@@ -143,10 +143,10 @@ btp_core_backtrace_create(const char *gdb_backtrace_text,
         return NULL;
     }
 
-    // Create the core backtrace
-    struct btp_core_backtrace *core_backtrace = btp_core_backtrace_new();
+    // Create the core stacktrace
+    struct btp_core_stacktrace *core_stacktrace = btp_core_stacktrace_new();
 
-    struct btp_gdb_thread *gdb_thread = gdb_backtrace->threads;
+    struct btp_gdb_thread *gdb_thread = gdb_stacktrace->threads;
     while (gdb_thread)
     {
         struct btp_core_thread *core_thread = btp_core_thread_new();
@@ -175,11 +175,11 @@ btp_core_backtrace_create(const char *gdb_backtrace_text,
             }
         }
 
-        core_backtrace->threads = btp_core_thread_append(core_backtrace->threads,
+        core_stacktrace->threads = btp_core_thread_append(core_stacktrace->threads,
                                                          core_thread);
 
         gdb_thread = gdb_thread->next;
     }
 
-    return core_backtrace;
+    return core_stacktrace;
 }

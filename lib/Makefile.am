@@ -1,20 +1,20 @@
 pkginclude_HEADERS = \
 	callgraph.h \
 	cluster.h \
-	core_backtrace.h \
+	core_stacktrace.h \
 	core_fingerprint.h \
 	core_frame.h \
 	core_thread.h \
 	disassembler.h \
 	elves.h \
-	gdb_backtrace.h \
+	gdb_stacktrace.h \
 	gdb_frame.h \
 	gdb_sharedlib.h \
 	gdb_thread.h \
 	location.h \
 	metrics.h \
 	normalize.h \
-	python_backtrace.h \
+	python_stacktrace.h \
 	sha1.h \
 	strbuf.h \
 	unstrip.h \
@@ -25,13 +25,13 @@ libbtparser_la_SOURCES = \
 	$(pkginclude_HEADERS) \
 	callgraph.c \
 	cluster.c \
-	core_backtrace.c \
+	core_stacktrace.c \
 	core_fingerprint.c \
 	core_frame.c \
 	core_thread.c \
 	disassembler.c \
 	elves.c \
-	gdb_backtrace.c \
+	gdb_stacktrace.c \
 	gdb_frame.c \
 	gdb_sharedlib.c \
 	gdb_thread.c \
@@ -46,7 +46,7 @@ libbtparser_la_SOURCES = \
 	normalize_libstdcpp.c \
 	normalize_linux.c \
 	normalize_xorg.c \
-	python_backtrace.c \
+	python_stacktrace.c \
 	sha1.c \
 	strbuf.c \
 	unstrip.c \

@@ -33,7 +33,7 @@ TESTSUITE_AT =		\
   strbuf.at		\
   gdb_frame.at 		\
   gdb_thread.at 	\
-  gdb_backtrace.at  	\
+  gdb_stacktrace.at  	\
   gdb_sharedlib.at	\
   normalize.at  	\
   metrics.at 		\

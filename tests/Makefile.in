@@ -75,8 +75,6 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
-GLIB_CFLAGS = @GLIB_CFLAGS@
-GLIB_LIBS = @GLIB_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -188,7 +186,7 @@ TESTSUITE_AT = \
   strbuf.at		\
   gdb_frame.at 		\
   gdb_thread.at 	\
-  gdb_backtrace.at  	\
+  gdb_stacktrace.at  	\
   gdb_sharedlib.at	\
   normalize.at  	\
   metrics.at 		\
