@@ -72,10 +72,11 @@ am__installdirs = "$(DESTDIR)$(clientexecdir)" \
 	"$(DESTDIR)$(clientexecdir)"
 LTLIBRARIES = $(clientexec_LTLIBRARIES)
 _btparser_la_LIBADD =
-am__btparser_la_OBJECTS = _btparser_la-module.lo _btparser_la-frame.lo \
-	_btparser_la-thread.lo _btparser_la-stacktrace.lo \
-	_btparser_la-dendrogram.lo _btparser_la-distances.lo \
-	_btparser_la-sharedlib.lo
+am__btparser_la_OBJECTS = _btparser_la-py_cluster.lo \
+	_btparser_la-py_gdb_frame.lo _btparser_la-py_gdb_sharedlib.lo \
+	_btparser_la-py_gdb_stacktrace.lo \
+	_btparser_la-py_gdb_thread.lo _btparser_la-py_metrics.lo \
+	_btparser_la-py_module.lo
 _btparser_la_OBJECTS = $(am__btparser_la_OBJECTS)
 _btparser_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -233,18 +234,17 @@ clientexec_PYTHON = \
 
 clientexec_LTLIBRARIES = _btparser.la
 _btparser_la_SOURCES = \
-    module.c \
-    frame.c \
-    thread.c \
-    stacktrace.c \
-    dendrogram.c \
-    distances.c \
-    sharedlib.c \
-    common.h doc.h
+    py_cluster.c \
+    py_gdb_frame.c \
+    py_gdb_sharedlib.c \
+    py_gdb_stacktrace.c \
+    py_gdb_thread.c \
+    py_metrics.c \
+    py_module.c
 
 _btparser_la_CPPFLAGS = \
     -DLOCALSTATEDIR='"$(localstatedir)"' \
-    -I../lib/ \
+    -I.. \
     $(PYTHON_CFLAGS) \
     -D_GNU_SOURCE \
     -Wall -Wwrite-strings \
@@ -330,13 +330,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-dendrogram.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-distances.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-frame.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-module.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-sharedlib.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-stacktrace.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-thread.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-py_cluster.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-py_gdb_frame.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-py_gdb_sharedlib.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-py_gdb_stacktrace.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-py_gdb_thread.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-py_metrics.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_btparser_la-py_module.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -359,54 +359,54 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-_btparser_la-module.lo: module.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-module.lo -MD -MP -MF $(DEPDIR)/_btparser_la-module.Tpo -c -o _btparser_la-module.lo `test -f 'module.c' || echo '$(srcdir)/'`module.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-module.Tpo $(DEPDIR)/_btparser_la-module.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module.c' object='_btparser_la-module.lo' libtool=yes @AMDEPBACKSLASH@
+_btparser_la-py_cluster.lo: py_cluster.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-py_cluster.lo -MD -MP -MF $(DEPDIR)/_btparser_la-py_cluster.Tpo -c -o _btparser_la-py_cluster.lo `test -f 'py_cluster.c' || echo '$(srcdir)/'`py_cluster.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-py_cluster.Tpo $(DEPDIR)/_btparser_la-py_cluster.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='py_cluster.c' object='_btparser_la-py_cluster.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-module.lo `test -f 'module.c' || echo '$(srcdir)/'`module.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-py_cluster.lo `test -f 'py_cluster.c' || echo '$(srcdir)/'`py_cluster.c
 
-_btparser_la-frame.lo: frame.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-frame.lo -MD -MP -MF $(DEPDIR)/_btparser_la-frame.Tpo -c -o _btparser_la-frame.lo `test -f 'frame.c' || echo '$(srcdir)/'`frame.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-frame.Tpo $(DEPDIR)/_btparser_la-frame.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='frame.c' object='_btparser_la-frame.lo' libtool=yes @AMDEPBACKSLASH@
+_btparser_la-py_gdb_frame.lo: py_gdb_frame.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-py_gdb_frame.lo -MD -MP -MF $(DEPDIR)/_btparser_la-py_gdb_frame.Tpo -c -o _btparser_la-py_gdb_frame.lo `test -f 'py_gdb_frame.c' || echo '$(srcdir)/'`py_gdb_frame.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-py_gdb_frame.Tpo $(DEPDIR)/_btparser_la-py_gdb_frame.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='py_gdb_frame.c' object='_btparser_la-py_gdb_frame.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-frame.lo `test -f 'frame.c' || echo '$(srcdir)/'`frame.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-py_gdb_frame.lo `test -f 'py_gdb_frame.c' || echo '$(srcdir)/'`py_gdb_frame.c
 
-_btparser_la-thread.lo: thread.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-thread.lo -MD -MP -MF $(DEPDIR)/_btparser_la-thread.Tpo -c -o _btparser_la-thread.lo `test -f 'thread.c' || echo '$(srcdir)/'`thread.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-thread.Tpo $(DEPDIR)/_btparser_la-thread.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='thread.c' object='_btparser_la-thread.lo' libtool=yes @AMDEPBACKSLASH@
+_btparser_la-py_gdb_sharedlib.lo: py_gdb_sharedlib.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-py_gdb_sharedlib.lo -MD -MP -MF $(DEPDIR)/_btparser_la-py_gdb_sharedlib.Tpo -c -o _btparser_la-py_gdb_sharedlib.lo `test -f 'py_gdb_sharedlib.c' || echo '$(srcdir)/'`py_gdb_sharedlib.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-py_gdb_sharedlib.Tpo $(DEPDIR)/_btparser_la-py_gdb_sharedlib.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='py_gdb_sharedlib.c' object='_btparser_la-py_gdb_sharedlib.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-thread.lo `test -f 'thread.c' || echo '$(srcdir)/'`thread.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-py_gdb_sharedlib.lo `test -f 'py_gdb_sharedlib.c' || echo '$(srcdir)/'`py_gdb_sharedlib.c
 
-_btparser_la-stacktrace.lo: stacktrace.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-stacktrace.lo -MD -MP -MF $(DEPDIR)/_btparser_la-stacktrace.Tpo -c -o _btparser_la-stacktrace.lo `test -f 'stacktrace.c' || echo '$(srcdir)/'`stacktrace.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-stacktrace.Tpo $(DEPDIR)/_btparser_la-stacktrace.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stacktrace.c' object='_btparser_la-stacktrace.lo' libtool=yes @AMDEPBACKSLASH@
+_btparser_la-py_gdb_stacktrace.lo: py_gdb_stacktrace.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-py_gdb_stacktrace.lo -MD -MP -MF $(DEPDIR)/_btparser_la-py_gdb_stacktrace.Tpo -c -o _btparser_la-py_gdb_stacktrace.lo `test -f 'py_gdb_stacktrace.c' || echo '$(srcdir)/'`py_gdb_stacktrace.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-py_gdb_stacktrace.Tpo $(DEPDIR)/_btparser_la-py_gdb_stacktrace.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='py_gdb_stacktrace.c' object='_btparser_la-py_gdb_stacktrace.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-stacktrace.lo `test -f 'stacktrace.c' || echo '$(srcdir)/'`stacktrace.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-py_gdb_stacktrace.lo `test -f 'py_gdb_stacktrace.c' || echo '$(srcdir)/'`py_gdb_stacktrace.c
 
-_btparser_la-dendrogram.lo: dendrogram.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-dendrogram.lo -MD -MP -MF $(DEPDIR)/_btparser_la-dendrogram.Tpo -c -o _btparser_la-dendrogram.lo `test -f 'dendrogram.c' || echo '$(srcdir)/'`dendrogram.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-dendrogram.Tpo $(DEPDIR)/_btparser_la-dendrogram.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dendrogram.c' object='_btparser_la-dendrogram.lo' libtool=yes @AMDEPBACKSLASH@
+_btparser_la-py_gdb_thread.lo: py_gdb_thread.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-py_gdb_thread.lo -MD -MP -MF $(DEPDIR)/_btparser_la-py_gdb_thread.Tpo -c -o _btparser_la-py_gdb_thread.lo `test -f 'py_gdb_thread.c' || echo '$(srcdir)/'`py_gdb_thread.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-py_gdb_thread.Tpo $(DEPDIR)/_btparser_la-py_gdb_thread.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='py_gdb_thread.c' object='_btparser_la-py_gdb_thread.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-dendrogram.lo `test -f 'dendrogram.c' || echo '$(srcdir)/'`dendrogram.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-py_gdb_thread.lo `test -f 'py_gdb_thread.c' || echo '$(srcdir)/'`py_gdb_thread.c
 
-_btparser_la-distances.lo: distances.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-distances.lo -MD -MP -MF $(DEPDIR)/_btparser_la-distances.Tpo -c -o _btparser_la-distances.lo `test -f 'distances.c' || echo '$(srcdir)/'`distances.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-distances.Tpo $(DEPDIR)/_btparser_la-distances.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='distances.c' object='_btparser_la-distances.lo' libtool=yes @AMDEPBACKSLASH@
+_btparser_la-py_metrics.lo: py_metrics.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-py_metrics.lo -MD -MP -MF $(DEPDIR)/_btparser_la-py_metrics.Tpo -c -o _btparser_la-py_metrics.lo `test -f 'py_metrics.c' || echo '$(srcdir)/'`py_metrics.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-py_metrics.Tpo $(DEPDIR)/_btparser_la-py_metrics.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='py_metrics.c' object='_btparser_la-py_metrics.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-distances.lo `test -f 'distances.c' || echo '$(srcdir)/'`distances.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-py_metrics.lo `test -f 'py_metrics.c' || echo '$(srcdir)/'`py_metrics.c
 
-_btparser_la-sharedlib.lo: sharedlib.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-sharedlib.lo -MD -MP -MF $(DEPDIR)/_btparser_la-sharedlib.Tpo -c -o _btparser_la-sharedlib.lo `test -f 'sharedlib.c' || echo '$(srcdir)/'`sharedlib.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-sharedlib.Tpo $(DEPDIR)/_btparser_la-sharedlib.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sharedlib.c' object='_btparser_la-sharedlib.lo' libtool=yes @AMDEPBACKSLASH@
+_btparser_la-py_module.lo: py_module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _btparser_la-py_module.lo -MD -MP -MF $(DEPDIR)/_btparser_la-py_module.Tpo -c -o _btparser_la-py_module.lo `test -f 'py_module.c' || echo '$(srcdir)/'`py_module.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_btparser_la-py_module.Tpo $(DEPDIR)/_btparser_la-py_module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='py_module.c' object='_btparser_la-py_module.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-sharedlib.lo `test -f 'sharedlib.c' || echo '$(srcdir)/'`sharedlib.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_btparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _btparser_la-py_module.lo `test -f 'py_module.c' || echo '$(srcdir)/'`py_module.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

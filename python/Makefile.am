@@ -6,21 +6,22 @@ clientexec_PYTHON = \
 clientexec_LTLIBRARIES = _btparser.la
 
 _btparser_la_SOURCES = \
-    module.c \
-    frame.c \
-    thread.c \
-    stacktrace.c \
-    dendrogram.c \
-    distances.c \
-    sharedlib.c \
-    common.h doc.h
+    py_cluster.c \
+    py_gdb_frame.c \
+    py_gdb_sharedlib.c \
+    py_gdb_stacktrace.c \
+    py_gdb_thread.c \
+    py_metrics.c \
+    py_module.c
+
 _btparser_la_CPPFLAGS = \
     -DLOCALSTATEDIR='"$(localstatedir)"' \
-    -I../lib/ \
+    -I.. \
     $(PYTHON_CFLAGS) \
     -D_GNU_SOURCE \
     -Wall -Wwrite-strings \
     -fno-strict-aliasing
+
 _btparser_la_LDFLAGS = \
     -module \
     -avoid-version \

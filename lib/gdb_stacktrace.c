@@ -245,7 +245,9 @@ btp_gdb_stacktrace_quality_complex(struct btp_gdb_stacktrace *stacktrace)
      * not possible to find the crash thread after the stacktrace has
      * been normalized.
      */
-    struct btp_gdb_thread *crash_thread = btp_gdb_stacktrace_find_crash_thread(stacktrace);
+    struct btp_gdb_thread *crash_thread =
+        btp_gdb_stacktrace_find_crash_thread(stacktrace);
+
     btp_normalize_stacktrace(stacktrace);
 
     /* Get the quality q1 of the full stacktrace. */
@@ -306,7 +308,9 @@ btp_gdb_stacktrace_get_crash_frame(struct btp_gdb_stacktrace *stacktrace)
 {
     stacktrace = btp_gdb_stacktrace_dup(stacktrace);
 
-    struct btp_gdb_thread *crash_thread = btp_gdb_stacktrace_find_crash_thread(stacktrace);
+    struct btp_gdb_thread *crash_thread =
+        btp_gdb_stacktrace_find_crash_thread(stacktrace);
+
     if (!crash_thread)
     {
         btp_gdb_stacktrace_free(stacktrace);

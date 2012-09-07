@@ -82,8 +82,10 @@ am_libbtparser_la_OBJECTS = $(am__objects_1) \
 	libbtparser_la-disassembler.lo libbtparser_la-elves.lo \
 	libbtparser_la-gdb_stacktrace.lo libbtparser_la-gdb_frame.lo \
 	libbtparser_la-gdb_sharedlib.lo libbtparser_la-gdb_thread.lo \
-	libbtparser_la-location.lo libbtparser_la-metrics.lo \
-	libbtparser_la-normalize.lo libbtparser_la-normalize_dbus.lo \
+	libbtparser_la-koops_frame.lo \
+	libbtparser_la-koops_stacktrace.lo libbtparser_la-location.lo \
+	libbtparser_la-metrics.lo libbtparser_la-normalize.lo \
+	libbtparser_la-normalize_dbus.lo \
 	libbtparser_la-normalize_gdk.lo \
 	libbtparser_la-normalize_glib.lo \
 	libbtparser_la-normalize_glibc.lo \
@@ -91,6 +93,7 @@ am_libbtparser_la_OBJECTS = $(am__objects_1) \
 	libbtparser_la-normalize_libstdcpp.lo \
 	libbtparser_la-normalize_linux.lo \
 	libbtparser_la-normalize_xorg.lo \
+	libbtparser_la-python_frame.lo \
 	libbtparser_la-python_stacktrace.lo libbtparser_la-sha1.lo \
 	libbtparser_la-strbuf.lo libbtparser_la-unstrip.lo \
 	libbtparser_la-utils.lo
@@ -248,19 +251,22 @@ top_srcdir = @top_srcdir@
 pkginclude_HEADERS = \
 	callgraph.h \
 	cluster.h \
-	core_stacktrace.h \
 	core_fingerprint.h \
 	core_frame.h \
+	core_stacktrace.h \
 	core_thread.h \
 	disassembler.h \
 	elves.h \
-	gdb_stacktrace.h \
 	gdb_frame.h \
 	gdb_sharedlib.h \
+	gdb_stacktrace.h \
 	gdb_thread.h \
+	koops_frame.h \
+	koops_stacktrace.h \
 	location.h \
 	metrics.h \
 	normalize.h \
+	python_frame.h \
 	python_stacktrace.h \
 	sha1.h \
 	strbuf.h \
@@ -282,6 +288,8 @@ libbtparser_la_SOURCES = \
 	gdb_frame.c \
 	gdb_sharedlib.c \
 	gdb_thread.c \
+	koops_frame.c \
+	koops_stacktrace.c \
 	location.c \
 	metrics.c \
 	normalize.c \
@@ -293,6 +301,7 @@ libbtparser_la_SOURCES = \
 	normalize_libstdcpp.c \
 	normalize_linux.c \
 	normalize_xorg.c \
+	python_frame.c \
 	python_stacktrace.c \
 	sha1.c \
 	strbuf.c \
@@ -389,6 +398,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-gdb_sharedlib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-gdb_stacktrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-gdb_thread.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-koops_frame.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-koops_stacktrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-location.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-metrics.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize.Plo@am__quote@
@@ -400,6 +411,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_libstdcpp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_linux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_xorg.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-python_frame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-python_stacktrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-sha1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-strbuf.Plo@am__quote@
@@ -511,6 +523,20 @@ libbtparser_la-gdb_thread.lo: gdb_thread.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-gdb_thread.lo `test -f 'gdb_thread.c' || echo '$(srcdir)/'`gdb_thread.c
 
+libbtparser_la-koops_frame.lo: koops_frame.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-koops_frame.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-koops_frame.Tpo -c -o libbtparser_la-koops_frame.lo `test -f 'koops_frame.c' || echo '$(srcdir)/'`koops_frame.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-koops_frame.Tpo $(DEPDIR)/libbtparser_la-koops_frame.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='koops_frame.c' object='libbtparser_la-koops_frame.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-koops_frame.lo `test -f 'koops_frame.c' || echo '$(srcdir)/'`koops_frame.c
+
+libbtparser_la-koops_stacktrace.lo: koops_stacktrace.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-koops_stacktrace.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-koops_stacktrace.Tpo -c -o libbtparser_la-koops_stacktrace.lo `test -f 'koops_stacktrace.c' || echo '$(srcdir)/'`koops_stacktrace.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-koops_stacktrace.Tpo $(DEPDIR)/libbtparser_la-koops_stacktrace.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='koops_stacktrace.c' object='libbtparser_la-koops_stacktrace.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-koops_stacktrace.lo `test -f 'koops_stacktrace.c' || echo '$(srcdir)/'`koops_stacktrace.c
+
 libbtparser_la-location.lo: location.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-location.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-location.Tpo -c -o libbtparser_la-location.lo `test -f 'location.c' || echo '$(srcdir)/'`location.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-location.Tpo $(DEPDIR)/libbtparser_la-location.Plo
@@ -587,6 +613,13 @@ libbtparser_la-normalize_xorg.lo: normalize_xorg.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize_xorg.c' object='libbtparser_la-normalize_xorg.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize_xorg.lo `test -f 'normalize_xorg.c' || echo '$(srcdir)/'`normalize_xorg.c
+
+libbtparser_la-python_frame.lo: python_frame.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-python_frame.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-python_frame.Tpo -c -o libbtparser_la-python_frame.lo `test -f 'python_frame.c' || echo '$(srcdir)/'`python_frame.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-python_frame.Tpo $(DEPDIR)/libbtparser_la-python_frame.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='python_frame.c' object='libbtparser_la-python_frame.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-python_frame.lo `test -f 'python_frame.c' || echo '$(srcdir)/'`python_frame.c
 
 libbtparser_la-python_stacktrace.lo: python_stacktrace.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-python_stacktrace.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-python_stacktrace.Tpo -c -o libbtparser_la-python_stacktrace.lo `test -f 'python_stacktrace.c' || echo '$(srcdir)/'`python_stacktrace.c

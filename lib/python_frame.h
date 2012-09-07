@@ -1,5 +1,5 @@
 /*
-    python_stacktrace.h
+    python_frame.h
 
     Copyright (C) 2012  ABRT Team
     Copyright (C) 2012  Red Hat, Inc.
@@ -18,31 +18,34 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_PYTHON_STACKTRACE_H
-#define BTPARSER_PYTHON_STACKTRACE_H
+#ifndef BTPARSER_PYTHON_FRAME_H
+#define BTPARSER_PYTHON_FRAME_H
 
 /**
  * @file
- * @brief Python stack trace structure and related algorithms.
+ * @brief Python frame structure and related algorithms.
  */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct btp_python_frame;
-
+#include <stdbool.h>
 #include <stdint.h>
 
-struct btp_python_stacktrace
+struct btp_python_frame
 {
     char *file_name;
 
     uint32_t file_line;
 
-    char *exception_name;
+    bool is_module;
 
-    struct btp_python_frame *frames;
+    char *function_name;
+
+    char *line;
+
+    struct btp_python_frame *next;
 };
 
 #ifdef __cplusplus

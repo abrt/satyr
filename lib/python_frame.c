@@ -1,7 +1,6 @@
 /*
-    python_stacktrace.h
+    python_frame.c
 
-    Copyright (C) 2012  ABRT Team
     Copyright (C) 2012  Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
@@ -18,35 +17,4 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_PYTHON_STACKTRACE_H
-#define BTPARSER_PYTHON_STACKTRACE_H
-
-/**
- * @file
- * @brief Python stack trace structure and related algorithms.
- */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct btp_python_frame;
-
-#include <stdint.h>
-
-struct btp_python_stacktrace
-{
-    char *file_name;
-
-    uint32_t file_line;
-
-    char *exception_name;
-
-    struct btp_python_frame *frames;
-};
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#include "python_frame.h"

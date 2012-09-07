@@ -1,6 +1,6 @@
 dist_doc_DATA = btparser.tex btparser.pdf
 
-CLEANFILES = *.aux btparser.log btparser.out btparser.toc btparser.pdf
+CLEANFILES = *.aux btparser.log btparser.out btparser.toc btparser.idx btparser.ilg btparser.ind
 
 btparser.pdf: btparser.tex doxygen/refman.tex
 	echo Calling pdflatex twice to handle all references.

@@ -1,19 +1,22 @@
 pkginclude_HEADERS = \
 	callgraph.h \
 	cluster.h \
-	core_stacktrace.h \
 	core_fingerprint.h \
 	core_frame.h \
+	core_stacktrace.h \
 	core_thread.h \
 	disassembler.h \
 	elves.h \
-	gdb_stacktrace.h \
 	gdb_frame.h \
 	gdb_sharedlib.h \
+	gdb_stacktrace.h \
 	gdb_thread.h \
+	koops_frame.h \
+	koops_stacktrace.h \
 	location.h \
 	metrics.h \
 	normalize.h \
+	python_frame.h \
 	python_stacktrace.h \
 	sha1.h \
 	strbuf.h \
@@ -35,6 +38,8 @@ libbtparser_la_SOURCES = \
 	gdb_frame.c \
 	gdb_sharedlib.c \
 	gdb_thread.c \
+	koops_frame.c \
+	koops_stacktrace.c \
 	location.c \
 	metrics.c \
 	normalize.c \
@@ -46,6 +51,7 @@ libbtparser_la_SOURCES = \
 	normalize_libstdcpp.c \
 	normalize_linux.c \
 	normalize_xorg.c \
+	python_frame.c \
 	python_stacktrace.c \
 	sha1.c \
 	strbuf.c \

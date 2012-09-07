@@ -135,9 +135,8 @@ btp_gdb_frame_free(struct btp_gdb_frame *frame);
  * false, frame->next is not duplicated for the new frame, but it is
  * set to NULL.
  * @returns
- * This function never returns NULL. If the returned duplicate is not
- * shallow, it must be released by calling the function
- * btp_gdb_frame_free().
+ * This function never returns NULL. The returned duplicate frame must
+ * be released by calling the function btp_gdb_frame_free().
  */
 struct btp_gdb_frame *
 btp_gdb_frame_dup(struct btp_gdb_frame *frame,

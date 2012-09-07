@@ -1,23 +1,49 @@
-#include "common.h"
-#include "strbuf.h"
+#include "py_metrics.h"
+#include "py_gdb_thread.h"
+#include "lib/strbuf.h"
+#include "lib/metrics.h"
 
-static PyMethodDef DistancesMethods[] = {
+#define distances_doc "btparser.Distances - class representing distances between objects\n" \
+                      "Usage:\n" \
+                      "btparser.Distances(m, n) - creates an m-by-n distance matrix\n" \
+                      "btparser.Distances(dist_name, [threads], m) - compares first m threads with others\n" \
+                      "dist_name: \"jaccard\" or \"levenshtein\"\n"
+
+#define di_get_size_doc "Usage: distances.get_size()\n" \
+                       "Returns: (m, n) - size of the distance matrix"
+
+#define di_get_distance_doc "Usage: distances.get_distance(i, j)\n" \
+                            "Returns: positive float - distance between objects i and j"
+
+#define di_set_distance_doc "Usage: distances.set_distance(i, j, d)\n" \
+                            "Sets distance between objects i and j to d"
+
+#define di_dup_doc "Usage: distances.dup()\n" \
+                   "Returns: btparser.Distances - a new clone of the distances\n" \
+                   "Clones the distances object. All new structures are independent\n" \
+                   "on the original object."
+
+static PyMethodDef
+distances_methods[] =
+{
     /* getters & setters */
-    { "get_size",       p_btp_distances_get_size,     METH_NOARGS,  di_get_size_doc      },
-    { "get_distance",   p_btp_distances_get_distance, METH_VARARGS, di_get_distance_doc  },
-    { "set_distance",   p_btp_distances_set_distance, METH_VARARGS, di_set_distance_doc  },
+    { "get_size",       btp_py_distances_get_size,     METH_NOARGS,  di_get_size_doc      },
+    { "get_distance",   btp_py_distances_get_distance, METH_VARARGS, di_get_distance_doc  },
+    { "set_distance",   btp_py_distances_set_distance, METH_VARARGS, di_set_distance_doc  },
     /* methods */
-    { "dup",            p_btp_distances_dup,          METH_NOARGS,  di_dup_doc           },
+    { "dup",            btp_py_distances_dup,          METH_NOARGS,  di_dup_doc           },
     { NULL },
 };
 
-PyTypeObject DistancesTypeObject = {
+PyTypeObject
+btp_py_distances_type =
+{
     PyObject_HEAD_INIT(NULL)
     0,
     "btparser.Distances",       /* tp_name */
-    sizeof(DistancesObject),    /* tp_basicsize */
+    sizeof(struct btp_py_distances),    /* tp_basicsize */
     0,                          /* tp_itemsize */
-    p_btp_distances_free,       /* tp_dealloc */
+    btp_py_distances_free,       /* tp_dealloc */
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
@@ -28,7 +54,7 @@ PyTypeObject DistancesTypeObject = {
     NULL,                       /* tp_as_mapping */
     NULL,                       /* tp_hash */
     NULL,                       /* tp_call */
-    p_btp_distances_str,        /* tp_str */
+    btp_py_distances_str,        /* tp_str */
     NULL,                       /* tp_getattro */
     NULL,                       /* tp_setattro */
     NULL,                       /* tp_as_buffer */
@@ -40,7 +66,7 @@ PyTypeObject DistancesTypeObject = {
     0,                          /* tp_weaklistoffset */
     NULL,                       /* tp_iter */
     NULL,                       /* tp_iternext */
-    DistancesMethods,           /* tp_methods */
+    distances_methods,           /* tp_methods */
     NULL,                       /* tp_members */
     NULL,                       /* tp_getset */
     NULL,                       /* tp_base */
@@ -50,7 +76,7 @@ PyTypeObject DistancesTypeObject = {
     0,                          /* tp_dictoffset */
     NULL,                       /* tp_init */
     NULL,                       /* tp_alloc */
-    p_btp_distances_new,        /* tp_new */
+    btp_py_distances_new,        /* tp_new */
     NULL,                       /* tp_free */
     NULL,                       /* tp_is_gc */
     NULL,                       /* tp_bases */
@@ -61,9 +87,12 @@ PyTypeObject DistancesTypeObject = {
 };
 
 /* constructor */
-PyObject *p_btp_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
+PyObject *
+btp_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
-    DistancesObject *o = (DistancesObject *)PyObject_New(DistancesObject, &DistancesTypeObject);
+    struct btp_py_distances *o = (struct btp_py_distances*)
+        PyObject_New(struct btp_py_distances, &btp_py_distances_type);
+
     if (!o)
         return PyErr_NoMemory();
 
@@ -79,12 +108,12 @@ PyObject *p_btp_distances_new(PyTypeObject *object, PyObject *args, PyObject *kw
         for (i = 0; i < n; i++)
         {
             PyObject *obj = PyList_GetItem(thread_list, i);
-            if (!PyObject_TypeCheck(obj, &ThreadTypeObject))
+            if (!PyObject_TypeCheck(obj, &btp_py_gdb_thread_type))
             {
                 PyErr_SetString(PyExc_TypeError, "Must be a list of btparser.Thread objects");
                 return NULL;
             }
-            threads[i] = ((ThreadObject *)obj)->thread;
+            threads[i] = ((struct btp_py_gdb_thread*)obj)->thread;
         }
         if (m < 1 || n < 2)
         {
@@ -124,16 +153,18 @@ PyObject *p_btp_distances_new(PyTypeObject *object, PyObject *args, PyObject *kw
 }
 
 /* destructor */
-void p_btp_distances_free(PyObject *object)
+void
+btp_py_distances_free(PyObject *object)
 {
-    DistancesObject *this = (DistancesObject *)object;
+    struct btp_py_distances *this = (struct btp_py_distances *)object;
     btp_distances_free(this->distances);
     PyObject_Del(object);
 }
 
-PyObject *p_btp_distances_str(PyObject *self)
+PyObject *
+btp_py_distances_str(PyObject *self)
 {
-    DistancesObject *this = (DistancesObject *)self;
+    struct btp_py_distances *this = (struct btp_py_distances *)self;
     struct btp_strbuf *buf = btp_strbuf_new();
     btp_strbuf_append_strf(buf, "%d-by-%d distance matrix",
                            this->distances->m, this->distances->n);
@@ -144,15 +175,17 @@ PyObject *p_btp_distances_str(PyObject *self)
 }
 
 /* getters & setters */
-PyObject *p_btp_distances_get_size(PyObject *self, PyObject *args)
+PyObject *
+btp_py_distances_get_size(PyObject *self, PyObject *args)
 {
-    DistancesObject *this = (DistancesObject *)self;
+    struct btp_py_distances *this = (struct btp_py_distances *)self;
     return Py_BuildValue("ii", this->distances->m, this->distances->n);
 }
 
-PyObject *p_btp_distances_get_distance(PyObject *self, PyObject *args)
+PyObject *
+btp_py_distances_get_distance(PyObject *self, PyObject *args)
 {
-    DistancesObject *this = (DistancesObject *)self;
+    struct btp_py_distances *this = (struct btp_py_distances *)self;
     int i, j;
     if (!PyArg_ParseTuple(args, "ii", &i, &j))
         return NULL;
@@ -166,9 +199,10 @@ PyObject *p_btp_distances_get_distance(PyObject *self, PyObject *args)
     return Py_BuildValue("f", btp_distances_get_distance(this->distances, i, j));
 }
 
-PyObject *p_btp_distances_set_distance(PyObject *self, PyObject *args)
+PyObject *
+btp_py_distances_set_distance(PyObject *self, PyObject *args)
 {
-    DistancesObject *this = (DistancesObject *)self;
+    struct btp_py_distances *this = (struct btp_py_distances *)self;
     int i, j;
     float f;
     if (!PyArg_ParseTuple(args, "iif", &i, &j, &f))
@@ -185,10 +219,13 @@ PyObject *p_btp_distances_set_distance(PyObject *self, PyObject *args)
 }
 
 /* methods */
-PyObject *p_btp_distances_dup(PyObject *self, PyObject *args)
+PyObject *
+btp_py_distances_dup(PyObject *self, PyObject *args)
 {
-    DistancesObject *this = (DistancesObject *)self;
-    DistancesObject *o = (DistancesObject *)PyObject_New(DistancesObject, &DistancesTypeObject);
+    struct btp_py_distances *this = (struct btp_py_distances*)self;
+    struct btp_py_distances *o = (struct btp_py_distances*)
+        PyObject_New(struct btp_py_distances, &btp_py_distances_type);
+
     if (!o)
         return PyErr_NoMemory();
 
@@ -196,5 +233,5 @@ PyObject *p_btp_distances_dup(PyObject *self, PyObject *args)
     if (!o->distances)
         return NULL;
 
-    return (PyObject *)o;
+    return (PyObject*)o;
 }

@@ -75,7 +75,7 @@ btp_gdb_frame_dup(struct btp_gdb_frame *frame, bool siblings)
     else
         result->next = NULL; /* Do not copy that. */
 
-    /* Duplicate all strings if the copy is not shallow. */
+    /* Duplicate all strings. */
     if (result->function_name)
         result->function_name = btp_strdup(result->function_name);
     if (result->function_type)

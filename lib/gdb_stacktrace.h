@@ -63,7 +63,7 @@ struct btp_gdb_stacktrace
 };
 
 /**
- * Creates and initializes a new stacktrace structure.
+ * Creates and initializes a new stack trace structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
  * calling the function btp_gdb_stacktrace_free().
@@ -90,7 +90,7 @@ void
 btp_gdb_stacktrace_free(struct btp_gdb_stacktrace *stacktrace);
 
 /**
- * Creates a duplicate of the stacktrace.
+ * Creates a duplicate of a stacktrace.
  * @param stacktrace
  * The stacktrace to be copied. It's not modified by this function.
  * @returns
@@ -138,7 +138,7 @@ btp_gdb_stacktrace_find_crash_thread(struct btp_gdb_stacktrace *stacktrace);
  */
 void
 btp_gdb_stacktrace_limit_frame_depth(struct btp_gdb_stacktrace *stacktrace,
-                                    int depth);
+                                     int depth);
 
 /**
  * Evaluates the quality of the stacktrace. The quality is the ratio of
@@ -212,7 +212,7 @@ char *
 btp_gdb_stacktrace_get_duplication_hash(struct btp_gdb_stacktrace *stacktrace);
 
 /**
- * Parses a textual stacktrace and puts it into a structure.  If
+ * Parses a textual stack trace and puts it into a structure.  If
  * parsing fails, the input parameter is not changed and NULL is
  * returned.
  * @code
@@ -235,8 +235,8 @@ btp_gdb_stacktrace_get_duplication_hash(struct btp_gdb_stacktrace *stacktrace);
  * @endcode
  * @param input
  * Pointer to the string with the stacktrace. If this function returns
- * true, this pointer is modified to point after the stacktrace that
- * was just parsed.
+ * a non-NULL value, this pointer is modified to point after the
+ * stacktrace that was just parsed.
  * @param location
  * The caller must provide a pointer to an instance of btp_location
  * here.  The line and column members of the location are gradually
@@ -253,7 +253,7 @@ btp_gdb_stacktrace_get_duplication_hash(struct btp_gdb_stacktrace *stacktrace);
  */
 struct btp_gdb_stacktrace *
 btp_gdb_stacktrace_parse(const char **input,
-                        struct btp_location *location);
+                         struct btp_location *location);
 
 /**
  * Parse stacktrace header if it is available in the stacktrace.  The
@@ -306,7 +306,7 @@ btp_gdb_stacktrace_set_libnames(struct btp_gdb_stacktrace *stacktrace);
  */
 struct btp_gdb_thread *
 btp_gdb_stacktrace_get_optimized_thread(struct btp_gdb_stacktrace *stacktrace,
-                                       int max_frames);
+                                        int max_frames);
 
 #ifdef __cplusplus
 }
