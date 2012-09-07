@@ -1,0 +1,47 @@
+===================================================
+[ INFO: suspicious rcu_dereference_check() usage. ]
+---------------------------------------------------
+net/mac80211/agg-rx.c:148 invoked rcu_dereference_check() without protection!
+
+other info that might help us debug this:
+
+rcu_scheduler_active = 1, debug_locks = 1
+1 lock held by arecord/11226:
+ #0:  (&tid_agg_rx->session_timer){+.-...}, at: [<ffffffff81066bb0>] call_timer_fn+0x0/0x360
+
+stack backtrace:
+Pid: 11226, comm: arecord Not tainted 3.1.0-kml #16
+Call Trace:
+ <IRQ>  [<ffffffff81093454>] lockdep_rcu_dereference+0xa4/0xc0
+ [<ffffffffa02778c9>] sta_rx_agg_session_timer_expired+0xc9/0x110 [mac80211]
+ [<ffffffffa0277800>] ? ieee80211_process_addba_resp+0x220/0x220 [mac80211]
+ [<ffffffff81066c3a>] call_timer_fn+0x8a/0x360
+ [<ffffffff81066bb0>] ? init_timer_deferrable_key+0x30/0x30
+ [<ffffffff81477bb0>] ? _raw_spin_unlock_irq+0x30/0x70
+ [<ffffffff81067049>] run_timer_softirq+0x139/0x310
+ [<ffffffff81091d5e>] ? put_lock_stats.isra.25+0xe/0x40
+ [<ffffffff810922ac>] ? lock_release_holdtime.part.26+0xdc/0x160
+ [<ffffffffa0277800>] ? ieee80211_process_addba_resp+0x220/0x220 [mac80211]
+ [<ffffffff8105cb78>] __do_softirq+0xc8/0x3c0
+ [<ffffffff8108f088>] ? tick_dev_program_event+0x48/0x110
+ [<ffffffff8108f16f>] ? tick_program_event+0x1f/0x30
+ [<ffffffff81153b15>] ? putname+0x35/0x50
+ [<ffffffff8147a43c>] call_softirq+0x1c/0x30
+ [<ffffffff81004c55>] do_softirq+0xa5/0xe0
+ [<ffffffff8105d1ee>] irq_exit+0xae/0xe0
+ [<ffffffff8147ac6b>] smp_apic_timer_interrupt+0x6b/0x98
+ [<ffffffff81479ab3>] apic_timer_interrupt+0x73/0x80
+ <EOI>  [<ffffffff8146aac6>] ? free_debug_processing+0x1a1/0x1d5
+ [<ffffffff81153b15>] ? putname+0x35/0x50
+ [<ffffffff8146ab2b>] __slab_free+0x31/0x2ca
+ [<ffffffff81477c3a>] ? _raw_spin_unlock_irqrestore+0x4a/0x90
+ [<ffffffff81253b8f>] ? __debug_check_no_obj_freed+0x15f/0x210
+ [<ffffffff81097054>] ? lock_release_nested+0x84/0xc0
+ [<ffffffff8113ec55>] ? kmem_cache_free+0x105/0x250
+ [<ffffffff81153b15>] ? putname+0x35/0x50
+ [<ffffffff81153b15>] ? putname+0x35/0x50
+ [<ffffffff8113ed8f>] kmem_cache_free+0x23f/0x250
+ [<ffffffff81153b15>] putname+0x35/0x50
+ [<ffffffff81146d8d>] do_sys_open+0x16d/0x1d0
+ [<ffffffff81146e10>] sys_open+0x20/0x30
+ [<ffffffff81478f42>] system_call_fastpath+0x16/0x1b

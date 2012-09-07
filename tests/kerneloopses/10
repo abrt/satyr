@@ -1,0 +1,21 @@
+============================================
+ INFO: possible recursive locking detected ]
+.4.4-Cavium-Octeon+ #313 Not tainted
+--------------------------------------------
+worker/u:1/36 is trying to acquire lock:
+&bus->mdio_lock){+.+...}, at: [<ffffffff813da7e8>] mdio_mux_read+0x38/0xa0
+
+ut task is already holding lock:
+(&bus->mdio_lock){+.+...}, at: [<ffffffff813d79e4>] mdiobus_read+0x44/0x88
+
+ther info that might help us debug this:
+Possible unsafe locking scenario:
+
+      CPU0
+      ----
+ lock(&bus->mdio_lock);
+ lock(&bus->mdio_lock);
+
+*** DEADLOCK ***
+
+May be due to missing lock nesting notation

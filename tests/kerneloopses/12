@@ -1,0 +1,34 @@
+=============================================
+[ INFO: possible recursive locking detected ]
+3.4.0 #3257 Tainted: G        W
+---------------------------------------------
+swapper/0/1 is trying to acquire lock:
+ (&rdev->mutex){+.+.+.}, at: [<c036e9e0>] regulator_get_voltage+0x18/0x38
+
+but task is already holding lock:
+ (&rdev->mutex){+.+.+.}, at: [<c036ef38>] regulator_set_optimum_mode+0x24/0x224
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&rdev->mutex);
+  lock(&rdev->mutex);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+3 locks held by swapper/0/1:
+ #0:  (&__lockdep_no_validate__){......}, at: [<c03dbb48>] __driver_attach+0x40/0x8c
+ #1:  (&__lockdep_no_validate__){......}, at: [<c03dbb58>] __driver_attach+0x50/0x8c
+ #2:  (&rdev->mutex){+.+.+.}, at: [<c036ef38>] regulator_set_optimum_mode+0x24/0x224
+
+stack backtrace:
+[<c001521c>] (unwind_backtrace+0x0/0x12c) from [<c00cc4d4>] (validate_chain+0x760/0x1080)
+[<c00cc4d4>] (validate_chain+0x760/0x1080) from [<c00cd744>] (__lock_acquire+0x950/0xa10)
+[<c00cd744>] (__lock_acquire+0x950/0xa10) from [<c00cd990>] (lock_acquire+0x18c/0x1e8)
+[<c00cd990>] (lock_acquire+0x18c/0x1e8) from [<c080c248>] (mutex_lock_nested+0x68/0x3c4)
+[<c080c248>] (mutex_lock_nested+0x68/0x3c4) from [<c036e9e0>] (regulator_get_voltage+0x18/0x38)
+[<c036e9e0>] (regulator_get_voltage+0x18/0x38) from [<c036efb8>] (regulator_set_optimum_mode+0xa4/0x224)

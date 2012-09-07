@@ -1,0 +1,40 @@
+=============================================
+[ INFO: possible recursive locking detected ]
+3.4.0 #37 Tainted: G        W
+---------------------------------------------
+filemonkey/122 is trying to acquire lock:
+ (s_active#13){++++.+}, at: [<c01a3d28>] sysfs_remove_dir+0x9c/0xb4
+
+but task is already holding lock:
+ (s_active#13){++++.+}, at: [<c01a22f0>] sysfs_write_file+0xe8/0x140
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(s_active#13);
+  lock(s_active#13);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+2 locks held by filemonkey/122:
+ #0:  (&buffer->mutex){+.+.+.}, at: [<c01a2230>] sysfs_write_file+0x28/0x140
+ #1:  (s_active#13){++++.+}, at: [<c01a22f0>] sysfs_write_file+0xe8/0x140
+
+stack backtrace:
+[<c0014fcc>] (unwind_backtrace+0x0/0x120) from [<c00ca600>] (validate_chain+0x6f8/0x1054)
+[<c00ca600>] (validate_chain+0x6f8/0x1054) from [<c00cb778>] (__lock_acquire+0x81c/0x8d8)
+[<c00cb778>] (__lock_acquire+0x81c/0x8d8) from [<c00cb9c0>] (lock_acquire+0x18c/0x1e8)
+[<c00cb9c0>] (lock_acquire+0x18c/0x1e8) from [<c01a3ba8>] (sysfs_addrm_finish+0xd0/0x180)
+[<c01a3ba8>] (sysfs_addrm_finish+0xd0/0x180) from [<c01a3d28>] (sysfs_remove_dir+0x9c/0xb4)
+[<c01a3d28>] (sysfs_remove_dir+0x9c/0xb4) from [<c02d0e5c>] (kobject_del+0x10/0x38)
+[<c02d0e5c>] (kobject_del+0x10/0x38) from [<c02d0f74>] (kobject_release+0xf0/0x194)
+[<c02d0f74>] (kobject_release+0xf0/0x194) from [<c0565a98>] (cpufreq_cpu_put+0xc/0x24)
+[<c0565a98>] (cpufreq_cpu_put+0xc/0x24) from [<c05683f0>] (store+0x6c/0x74)
+[<c05683f0>] (store+0x6c/0x74) from [<c01a2314>] (sysfs_write_file+0x10c/0x140)
+[<c01a2314>] (sysfs_write_file+0x10c/0x140) from [<c014af44>] (vfs_write+0xb0/0x128)
+[<c014af44>] (vfs_write+0xb0/0x128) from [<c014b06c>] (sys_write+0x3c/0x68)
+[<c014b06c>] (sys_write+0x3c/0x68) from [<c000e0e0>] (ret_fast_syscall+0x0/0x3c)

@@ -1,0 +1,7 @@
+[   45.153294] =====================================
+[   45.154784] [ BUG: bad unlock balance detected! ]
+[   45.155591] 3.5.0-rc1-00002-gb22b1f1 #124 Not tainted
+[   45.155591] -------------------------------------
+[   45.155591] flush-254:16/2499 is trying to release lock (&(&wb->list_lock)->rlock) at:
+[   45.155591] [<c022c3da>] writeback_sb_inodes+0x160/0x327
+[   45.155591] but there are no more locks to release!

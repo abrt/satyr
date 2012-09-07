@@ -1,0 +1,30 @@
+=============================================================================
+BUG sas_task: Objects remaining on kmem_cache_close()
+-----------------------------------------------------------------------------
+
+INFO: Slab 0xffffea001f0eba00 objects=34 used=1 fp=0xffff8807c3aecb00 flags=0x8000000000004080
+Pid: 22919, comm: modprobe Not tainted 3.2.0-isci+ #2
+Call Trace:
+ [<ffffffff810fcdcd>] slab_err+0xb0/0xd2
+ [<ffffffff810e1c50>] ? free_percpu+0x31/0x117
+ [<ffffffff81100122>] ? kzalloc+0x14/0x16
+ [<ffffffff81100122>] ? kzalloc+0x14/0x16
+ [<ffffffff81100486>] kmem_cache_destroy+0x11d/0x270
+ [<ffffffffa0112bdc>] sas_class_exit+0x10/0x12 [libsas]
+ [<ffffffff81078fba>] sys_delete_module+0x1c4/0x23c
+ [<ffffffff814797ba>] ? sysret_check+0x2e/0x69
+ [<ffffffff8126479e>] ? trace_hardirqs_on_thunk+0x3a/0x3f
+ [<ffffffff81479782>] system_call_fastpath+0x16/0x1b
+INFO: Object 0xffff8807c3aed280 @offset=21120
+INFO: Allocated in sas_alloc_task+0x22/0x90 [libsas] age=4615311 cpu=2 pid=12966
+ __slab_alloc.clone.3+0x1d1/0x234
+ kmem_cache_alloc+0x52/0x10d
+ sas_alloc_task+0x22/0x90 [libsas]
+ sas_queuecommand+0x20e/0x230 [libsas]
+ scsi_send_eh_cmnd+0xd1/0x30c
+ scsi_eh_try_stu+0x4f/0x6b
+ scsi_eh_ready_devs+0xba/0x6ef
+ sas_scsi_recover_host+0xa35/0xab1 [libsas]
+ scsi_error_handler+0x14b/0x5fa
+ kthread+0x9d/0xa5
+ kernel_thread_helper+0x4/0x10

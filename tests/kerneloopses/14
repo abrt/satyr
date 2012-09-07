@@ -1,0 +1,48 @@
+====================================
+ BUG: bad unlock balance detected! ]
+.4.0+ #288 Not tainted
+------------------------------------
+io/17706 is trying to release lock (&(&q->__queue_lock)->rlock) at:
+<ffffffff81329372>] blk_queue_bio+0x2a2/0x380
+ut there are no more locks to release!
+
+ther info that might help us debug this:
+ lock held by fio/17706:
+#0:  (&(&vblk->lock)->rlock){......}, at: [<ffffffff81327f1a>]
+et_request_wait+0x19a/0x250
+
+tack backtrace:
+id: 17706, comm: fio Not tainted 3.4.0+ #288
+all Trace:
+[<ffffffff81329372>] ? blk_queue_bio+0x2a2/0x380
+[<ffffffff810dea49>] print_unlock_inbalance_bug+0xf9/0x100
+[<ffffffff810dfe4f>] lock_release_non_nested+0x1df/0x330
+[<ffffffff811dae24>] ? dio_bio_end_aio+0x34/0xc0
+[<ffffffff811d6935>] ? bio_check_pages_dirty+0x85/0xe0
+[<ffffffff811daea1>] ? dio_bio_end_aio+0xb1/0xc0
+[<ffffffff81329372>] ? blk_queue_bio+0x2a2/0x380
+[<ffffffff81329372>] ? blk_queue_bio+0x2a2/0x380
+[<ffffffff810e0079>] lock_release+0xd9/0x250
+[<ffffffff81a74553>] _raw_spin_unlock_irq+0x23/0x40
+[<ffffffff81329372>] blk_queue_bio+0x2a2/0x380
+[<ffffffff81328faa>] generic_make_request+0xca/0x100
+[<ffffffff81329056>] submit_bio+0x76/0xf0
+[<ffffffff8115470c>] ? set_page_dirty_lock+0x3c/0x60
+[<ffffffff811d69e1>] ? bio_set_pages_dirty+0x51/0x70
+[<ffffffff811dd1a8>] do_blockdev_direct_IO+0xbf8/0xee0
+[<ffffffff811d8620>] ? blkdev_get_block+0x80/0x80
+[<ffffffff811dd4e5>] __blockdev_direct_IO+0x55/0x60
+[<ffffffff811d8620>] ? blkdev_get_block+0x80/0x80
+[<ffffffff811d92e7>] blkdev_direct_IO+0x57/0x60
+[<ffffffff811d8620>] ? blkdev_get_block+0x80/0x80
+[<ffffffff8114c6ae>] generic_file_aio_read+0x70e/0x760
+[<ffffffff810df7c5>] ? __lock_acquire+0x215/0x5a0
+[<ffffffff811e9924>] ? aio_run_iocb+0x54/0x1a0
+[<ffffffff8114bfa0>] ? grab_cache_page_nowait+0xc0/0xc0
+[<ffffffff811e82cc>] aio_rw_vect_retry+0x7c/0x1e0
+[<ffffffff811e8250>] ? aio_fsync+0x30/0x30
+[<ffffffff811e9936>] aio_run_iocb+0x66/0x1a0
+[<ffffffff811ea9b0>] do_io_submit+0x6f0/0xb80
+[<ffffffff8134de2e>] ? trace_hardirqs_on_thunk+0x3a/0x3f
+[<ffffffff811eae50>] sys_io_submit+0x10/0x20
+[<ffffffff81a7c9e9>] system_call_fastpath+0x16/0x1b

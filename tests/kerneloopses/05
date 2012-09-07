@@ -1,0 +1,50 @@
+[  447.627232] =================================
+[  447.627237] [ INFO: inconsistent lock state ]
+[  447.627244] 3.6.0-rc1-wl+ #296 Tainted: G        W
+[  447.627248] ---------------------------------
+[  447.627253] inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
+[  447.627260] swapper/0/0 [HC0[0]:SC1[1]:HE1:SE0] takes:
+[  447.627264]  (&(&ah->block)->rlock){+.?...}, at: [<f7fdd2d1>] ath5k_tasklet_beacon+0x91/0xa7 [ath5k]
+[  447.627299] {SOFTIRQ-ON-W} state was registered at:
+[  447.627304]   [<c047cdbf>] mark_held_locks+0x59/0x77
+[  447.627316]   [<c047ceeb>] trace_hardirqs_on_caller+0x10e/0x13f
+[  447.627324]   [<c047cf27>] trace_hardirqs_on+0xb/0xd
+[  447.627332]   [<c0439a3d>] _local_bh_enable_ip+0x9e/0xa6
+[  447.627342]   [<c0439a52>] local_bh_enable_ip+0xd/0xf
+[  447.627349]   [<c088004f>] _raw_spin_unlock_bh+0x34/0x37
+[  447.627359]   [<f7f9ae3b>] mesh_sync_offset_adjust_tbtt+0x95/0x99 [mac80211]
+[  447.627451]   [<f7f7650f>] ieee80211_beacon_get_tim+0x28f/0x4e0 [mac80211]
+[  447.627526]   [<f7fdc541>] ath5k_beacon_update+0x40/0x26b [ath5k]
+[  447.627547]   [<f7fdfa09>] ath5k_bss_info_changed+0x175/0x1b2 [ath5k]
+[  447.627569]   [<f7f5d8f7>] ieee80211_bss_info_change_notify+0x1ed/0x21a [mac80211]
+[  447.627628]   [<f7f95fa4>] ieee80211_start_mesh+0xb9/0xbd [mac80211]
+[  447.627712]   [<f7f6e610>] ieee80211_join_mesh+0x10c/0x116 [mac80211]
+[  447.627782]   [<f7a96b90>] __cfg80211_join_mesh+0x176/0x1b3 [cfg80211]
+[  447.627816]   [<f7a96c1c>] cfg80211_join_mesh+0x4f/0x6a [cfg80211]
+[  447.627845]   [<f7a89891>] nl80211_join_mesh+0x1de/0x1ed [cfg80211]
+[  447.627872]   [<c07cfa36>] genl_rcv_msg+0x1d5/0x1f3
+[  447.627881]   [<c07cf009>] netlink_rcv_skb+0x37/0x78
+[  447.627891]   [<c07cf85a>] genl_rcv+0x1e/0x25
+[  447.627898]   [<c07cebf3>] netlink_unicast+0xc3/0x12d
+[  447.627907]   [<c07cee46>] netlink_sendmsg+0x1e9/0x213
+[  447.627915]   [<c079f282>] sock_sendmsg+0x79/0x96
+[  447.627926]   [<c079f4d8>] __sys_sendmsg+0x180/0x215
+[  447.627934]   [<c07a01f3>] sys_sendmsg+0x3b/0x52
+[  447.627941]   [<c07a07b4>] sys_socketcall+0x238/0x2a2
+[  447.627949]   [<c0885edf>] sysenter_do_call+0x12/0x38
+[  447.627959] irq event stamp: 1929200
+[  447.627963] hardirqs last  enabled at (1929200): [<c043a0e9>] tasklet_hi_action+0x3e/0xbf
+[  447.627972] hardirqs last disabled at (1929199): [<c043a0c0>] tasklet_hi_action+0x15/0xbf
+[  447.627981] softirqs last  enabled at (1929196): [<c043999d>] _local_bh_enable+0x12/0x14
+[  447.627989] softirqs last disabled at (1929197): [<c040443b>] do_softirq+0x63/0xb8
+[  447.627999]
+[  447.627999] other info that might help us debug this:
+[  447.628004]  Possible unsafe locking scenario:
+[  447.628004]
+[  447.628009]        CPU0
+[  447.628012]        ----
+[  447.628016]   lock(&(&ah->block)->rlock);
+[  447.628023]   <Interrupt>
+[  447.628027]     lock(&(&ah->block)->rlock);
+[  447.628034]
+[  447.628034]  *** DEADLOCK ***

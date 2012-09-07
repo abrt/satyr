@@ -1,0 +1,7 @@
+[  130.891594] ================================================
+[  130.894569] [ BUG: lock held when returning to user space! ]
+[  130.897257] 3.4.0-rc5-next-20120501-sasha #104 Tainted: G        W
+[  130.900336] ------------------------------------------------
+[  130.902996] trinity/8384 is leaving the kernel with locks still held!
+[  130.906106] 1 lock held by trinity/8384:
+[  130.907924]  #0:  (sk_lock-AF_INET){+.+.+.}, at: [<ffffffff82b9503f>] l2tp_ip_sendmsg+0x2f/0x550

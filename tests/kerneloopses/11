@@ -1,0 +1,30 @@
+[ 1526.520230] ===============================
+[ 1526.520230] [ INFO: suspicious RCU usage. ]
+[ 1526.520230] 3.5.0-rc1+ #12 Not tainted
+[ 1526.520230] -------------------------------
+[ 1526.520230] /c/kernel-tests/mm/include/linux/rcupdate.h:436 Illegal context switch in RCU read-side critical section!
+[ 1526.520230]
+[ 1526.520230] other info that might help us debug this:
+[ 1526.520230]
+[ 1526.520230]
+[ 1526.520230] rcu_scheduler_active = 1, debug_locks = 0
+[ 1526.520230] 3 locks held by net.agent/3279:
+[ 1526.520230]  #0:  (&mm->mmap_sem){++++++}, at: [<ffffffff82f85962>] do_page_fault+0x193/0x390
+[ 1526.520230]  #1:  (panic_lock){+.+...}, at: [<ffffffff82ed2830>] panic+0x37/0x1d3
+[ 1526.520230]  #2:  (rcu_read_lock){.+.+..}, at: [<ffffffff810b9b28>] rcu_lock_acquire+0x0/0x29
+[ 1526.520230]
+[ 1526.520230] stack backtrace:
+[ 1526.520230] Pid: 3279, comm: net.agent Not tainted 3.5.0-rc1+ #12
+[ 1526.520230] Call Trace:
+[ 1526.520230]  [<ffffffff810e1570>] lockdep_rcu_suspicious+0x109/0x112
+[ 1526.520230]  [<ffffffff810bfe3a>] rcu_preempt_sleep_check+0x45/0x47
+[ 1526.520230]  [<ffffffff810bfe5a>] __might_sleep+0x1e/0x19a
+[ 1526.520230]  [<ffffffff82f8010e>] down_write+0x26/0x81
+[ 1526.520230]  [<ffffffff8276a966>] led_trigger_unregister+0x1f/0x9c
+[ 1526.520230]  [<ffffffff8276def5>] heartbeat_reboot_notifier+0x15/0x19
+[ 1526.520230]  [<ffffffff82f85bf5>] notifier_call_chain+0x96/0xcd
+[ 1526.520230]  [<ffffffff82f85cba>] __atomic_notifier_call_chain+0x8e/0xff
+[ 1526.520230]  [<ffffffff81094b7c>] ? kmsg_dump+0x37/0x1eb
+[ 1526.520230]  [<ffffffff82f85d3f>] atomic_notifier_call_chain+0x14/0x16
+[ 1526.520230]  [<ffffffff82ed28e1>] panic+0xe8/0x1d3
+[ 1526.520230]  [<ffffffff811473e2>] out_of_memory+0x15d/0x1d3

@@ -1,0 +1,29 @@
+===============================
+[ INFO: suspicious RCU usage. ]
+3.4.0 #3275 Tainted: G        W
+-------------------------------
+include/linux/rcupdate.h:729 rcu_read_lock() used illegally while idle!
+
+other info that might help us debug this:
+
+RCU used illegally from idle CPU!
+rcu_scheduler_active = 1, debug_locks = 0
+RCU used illegally from extended quiescent state!
+4 locks held by swapper/2/0:
+ #0:  ((cpu_died).wait.lock){......}, at: [<c00ab128>] complete+0x1c/0x5c
+ #1:  (&p->pi_lock){-.-.-.}, at: [<c00b275c>] try_to_wake_up+0x2c/0x388
+ #2:  (&rq->lock){-.-.-.}, at: [<c00b2860>] try_to_wake_up+0x130/0x388
+ #3:  (rcu_read_lock){.+.+..}, at: [<c00abe5c>] cpuacct_charge+0x28/0x1f4
+
+stack backtrace:
+[<c001521c>] (unwind_backtrace+0x0/0x12c) from [<c00abec8>] (cpuacct_charge+0x94/0x1f4)
+[<c00abec8>] (cpuacct_charge+0x94/0x1f4) from [<c00b395c>] (update_curr+0x24c/0x2c8)
+[<c00b395c>] (update_curr+0x24c/0x2c8) from [<c00b59c4>] (enqueue_task_fair+0x50/0x194)
+[<c00b59c4>] (enqueue_task_fair+0x50/0x194) from [<c00afea4>] (enqueue_task+0x30/0x34)
+[<c00afea4>] (enqueue_task+0x30/0x34) from [<c00b0908>] (ttwu_activate+0x14/0x38)
+[<c00b0908>] (ttwu_activate+0x14/0x38) from [<c00b28a8>] (try_to_wake_up+0x178/0x388)
+[<c00b28a8>] (try_to_wake_up+0x178/0x388) from [<c00a82a0>] (__wake_up_common+0x34/0x78)
+[<c00a82a0>] (__wake_up_common+0x34/0x78) from [<c00ab154>] (complete+0x48/0x5c)
+[<c00ab154>] (complete+0x48/0x5c) from [<c07db7cc>] (cpu_die+0x2c/0x58)
+[<c07db7cc>] (cpu_die+0x2c/0x58) from [<c000f954>] (cpu_idle+0x64/0xfc)
+[<c000f954>] (cpu_idle+0x64/0xfc) from [<80208160>] (0x80208160)

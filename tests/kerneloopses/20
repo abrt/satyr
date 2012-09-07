@@ -1,0 +1,49 @@
+======================================================
+[ INFO: possible circular locking dependency detected ]
+3.4.0-rc4-24406-g841e6a6 #121 Not tainted
+-------------------------------------------------------
+bash/1556 is trying to acquire lock:
+ (&sb->s_type->i_mutex_key#8){+.+.+.}, at: do_lookup+0x267/0x2b1
+
+but task is already holding lock:
+ (&sig->cred_guard_mutex){+.+.+.}, at: prepare_bprm_creds+0x2d/0x69
+
+which lock already depends on the new lock.
+
+the existing dependency chain (in reverse order) is:
+
+-> #1 (&sig->cred_guard_mutex){+.+.+.}:
+       validate_chain+0x444/0x4f4
+       __lock_acquire+0x387/0x3f8
+       lock_acquire+0x12b/0x158
+       __mutex_lock_common+0x56/0x3a9
+       mutex_lock_killable_nested+0x40/0x45
+       lock_trace+0x24/0x59
+       proc_map_files_lookup+0x5a/0x165
+       __lookup_hash+0x52/0x73
+       do_lookup+0x276/0x2b1
+       walk_component+0x3d/0x114
+       do_last+0xfc/0x540
+       path_openat+0xd3/0x306
+       do_filp_open+0x3d/0x89
+       do_sys_open+0x74/0x106
+       sys_open+0x21/0x23
+       tracesys+0xdd/0xe2
+
+-> #0 (&sb->s_type->i_mutex_key#8){+.+.+.}:
+       check_prev_add+0x6a/0x1ef
+       validate_chain+0x444/0x4f4
+       __lock_acquire+0x387/0x3f8
+       lock_acquire+0x12b/0x158
+       __mutex_lock_common+0x56/0x3a9
+       mutex_lock_nested+0x40/0x45
+       do_lookup+0x267/0x2b1
+       walk_component+0x3d/0x114
+       link_path_walk+0x1f9/0x48f
+       path_openat+0xb6/0x306
+       do_filp_open+0x3d/0x89
+       open_exec+0x25/0xa0
+       do_execve_common+0xea/0x2f9
+       do_execve+0x43/0x45
+       sys_execve+0x43/0x5a
+       stub_execve+0x6c/0xc0
