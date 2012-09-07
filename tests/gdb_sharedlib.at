@@ -15,7 +15,7 @@ AT_TESTFUN([btp_gdb_sharedlib_parse],
 int
 main(void)
 {
-  char *bt = btp_file_to_string("../../stacktraces/621492.bt");
+  char *bt = btp_file_to_string("../../gdb_stacktraces/rhbz-621492");
   assert(bt);
   struct btp_gdb_sharedlib *libs = btp_gdb_sharedlib_parse(bt);
   assert(libs);
@@ -41,7 +41,7 @@ AT_TESTFUN([btp_gdb_sharedlib_count],
 int
 main(void)
 {
-  char *bt = btp_file_to_string("../../stacktraces/621492.bt");
+  char *bt = btp_file_to_string("../../gdb_stacktraces/rhbz-621492");
   assert(bt);
   struct btp_gdb_sharedlib *libs = btp_gdb_sharedlib_parse(bt);
   assert(libs);
@@ -90,7 +90,7 @@ AT_TESTFUN([btp_gdb_sharedlib_find_address],
 int
 main(void)
 {
-  char *bt = btp_file_to_string("../../stacktraces/621492.bt");
+  char *bt = btp_file_to_string("../../gdb_stacktraces/rhbz-621492");
   assert(bt);
   struct btp_gdb_sharedlib *libs = btp_gdb_sharedlib_parse(bt);
   assert(libs);

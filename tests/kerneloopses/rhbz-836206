@@ -1,0 +1,34 @@
+[  120.825464] BUG: sleeping function called from invalid context at mm/memory.c:3927 
+[  120.833021] in_atomic(): 1, irqs_disabled(): 0, pid: 1109, name: NetworkManager 
+[  120.833023] INFO: lockdep is turned off. 
+[  120.833025] Pid: 1109, comm: NetworkManager Not tainted 3.3.0-0.15.el7.x86_64 #1 
+[  120.833026] Call Trace: 
+[  120.833031]  [<ffffffff81099a6c>] __might_sleep+0x13c/0x200 
+[  120.833035]  [<ffffffff81177d48>] might_fault+0x38/0xb0 
+[  120.833039]  [<ffffffff81511f30>] ? sock_def_readable+0x30/0x1c0 
+[  120.833041]  [<ffffffff8151ce1f>] put_cmsg+0x6f/0x110 
+[  120.833044]  [<ffffffff8155406b>] netlink_recvmsg+0x34b/0x4a0 
+[  120.833047]  [<ffffffff81511604>] ? sock_update_classid+0xe4/0x280 
+[  120.833050]  [<ffffffff8150b55d>] sock_recvmsg+0xfd/0x130 
+[  120.833053]  [<ffffffff81177db5>] ? might_fault+0xa5/0xb0 
+[  120.833056]  [<ffffffff81177d6c>] ? might_fault+0x5c/0xb0 
+[  120.833058]  [<ffffffff8150b186>] __sys_recvmsg+0x146/0x2f0 
+[  120.833062]  [<ffffffff811bf2d2>] ? fget_light+0x62/0x4a0 
+[  120.833065]  [<ffffffff811bf360>] ? fget_light+0xf0/0x4a0 
+[  120.833067]  [<ffffffff811bf2d2>] ? fget_light+0x62/0x4a0 
+[  120.833070]  [<ffffffff8150e959>] sys_recvmsg+0x49/0x90 
+--2012-06-28 06:[  120.833075]  [<ffffffff8166bbe9>] system_call_fastpath+0x16/0x1b 
+[  120.836197] BUG: scheduling while atomic: NetworkManager/1109/0x00000003 
+[  120.836198] INFO: lockdep is turned off. 
+[  120.836199] Modules linked in: pcspkr dcdbas nfs nfs_acl auth_rpcgss fscache lockd sr_mod cdrom sd_mod crc_t10dif ata_generic pata_acpi bnx2x ata_piix bfa mdio libata libcrc32c bnx2 scsi_transport_fc e1000e megaraid_sas bna scsi_tgt sunrpc xts lrw gf128mul dm_crypt dm_round_robin dm_multipath dm_snapshot dm_mirror dm_region_hash dm_log dm_zero dm_mod linear raid10 raid456 async_raid6_recov async_memcpy async_pq raid6_pq async_xor xor async_tx raid1 raid0 iscsi_ibft iscsi_boot_sysfs edd iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi squashfs cramfs 
+[  120.836229] Pid: 1109, comm: NetworkManager Not tainted 3.3.0-0.15.el7.x86_64 #1 
+[  120.836230] Call Trace: 
+[  120.836234]  [<ffffffff81656174>] __schedule_bug+0x80/0x85 
+[  120.836239]  [<ffffffff81660ffd>] __schedule+0x8dd/0x9a0 
+[  120.836241]  [<ffffffff8166140f>] schedule+0x3f/0x60 
+[  120.836243]  [<ffffffff816600bc>] do_nanosleep+0x9c/0xd0 
+[  120.836247]  [<ffffffff81093aab>] hrtimer_nanosleep+0xbb/0x190 
+[  120.836249]  [<ffffffff81092050>] ? update_rmtp+0x70/0x70 
+[  120.836251]  [<ffffffff810933c4>] ? hrtimer_start_range_ns+0x14/0x20 
+[  120.836254]  [<ffffffff81093bdf>] sys_nanosleep+0x5f/0x80
+[  120.836256]  [<ffffffff8166bbe9>] system_call_fastpath+0x16/0x1b
