@@ -32,7 +32,7 @@
 #include "backtrace.h"
 #include "frame.h"
 
-#define BACKTRACE_TRUNCATE_LENGTH 7
+#define BACKTRACE_TRUNCATE_LENGTH 127
 #define OR_UNKNOWN(s) ((s) ? (s) : "-")
 
 void
