@@ -258,6 +258,8 @@ btp_frame_append_to_str(struct btp_frame *frame,
         if (frame->function_name)
             btp_strbuf_append_str(str, " at");
         btp_strbuf_append_strf(str, " %s", frame->source_file);
+        if (frame->source_line != -1)
+            btp_strbuf_append_strf(str, ":%u", frame->source_line);
     }
 
     if (frame->signal_handler_called)
