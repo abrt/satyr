@@ -1,7 +1,7 @@
 /*
     rpm.h
 
-    Copyright (C) 2010  Red Hat, Inc.
+    Copyright (C) 2012  Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ struct btp_rpm_info *rpm_get_package_by_path(const char *path);
  * Takes 0.06 second for bash package consisting of 92 files.
  * Takes 0.75 second for emacs-common package consisting of 2585 files.
  */
-strict btp_rpm_verify *rpm_verify_package_by_name(const char *name);
+struct btp_rpm_verify *rpm_verify_package_by_name(const char *name);
 
 #ifdef __cplusplus
 }

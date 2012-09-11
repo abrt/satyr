@@ -26,6 +26,50 @@
 #include <stdio.h>
 #include <string.h>
 
+struct btp_python_stacktrace *
+btp_python_stacktrace_new()
+{
+    struct btp_python_stacktrace *stacktrace =
+        btp_malloc(sizeof(struct btp_python_stacktrace));
+
+    btp_python_stacktrace_init(stacktrace);
+    return stacktrace;
+}
+
+void
+btp_python_stacktrace_init(struct btp_python_stacktrace *stacktrace)
+{
+    memset(stacktrace, 0, sizeof(struct btp_python_stacktrace));
+}
+
+void
+btp_python_stacktrace_free(struct btp_python_stacktrace *stacktrace)
+{
+    if (!stacktrace)
+        return;
+
+    free(stacktrace);
+}
+
+struct btp_python_stacktrace *
+btp_python_stacktrace_dup(struct btp_python_stacktrace *stacktrace)
+{
+    struct btp_python_stacktrace *result = btp_python_stacktrace_new();
+    memcpy(result, stacktrace, sizeof(struct btp_python_stacktrace));
+
+    if (result->file_name)
+        result->file_name = btp_strdup(result->file_name);
+
+    if (result->exception_name)
+        result->exception_name = btp_strdup(result->exception_name);
+
+    if (result->frames)
+        result->frames = btp_python_frame_dup(result->frames, true);
+
+    return result;
+}
+
+
 /*
 Example input:
 

@@ -35,9 +35,7 @@ btp_koops_stacktrace_new()
 void
 btp_koops_stacktrace_init(struct btp_koops_stacktrace *stacktrace)
 {
-    stacktrace->version = NULL;
-    stacktrace->taint = NULL;
-    stacktrace->frames = NULL;
+    memset(stacktrace, 0, sizeof(struct btp_koops_stacktrace));
 }
 
 void
@@ -54,7 +52,6 @@ btp_koops_stacktrace_free(struct btp_koops_stacktrace *stacktrace)
     }
 
     free(stacktrace->version);
-    free(stacktrace->taint);
     free(stacktrace);
 }
 
@@ -69,9 +66,6 @@ btp_koops_stacktrace_dup(struct btp_koops_stacktrace *stacktrace)
 
     if (result->version)
         result->version = btp_strdup(result->version);
-
-    if (result->taint)
-        result->taint = btp_strdup(result->taint);
 
     return result;
 }

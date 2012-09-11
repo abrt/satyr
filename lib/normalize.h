@@ -34,24 +34,24 @@ struct btp_gdb_thread;
 struct btp_gdb_stacktrace;
 
 void
-btp_normalize_thread(struct btp_gdb_thread *thread);
+btp_gdb_normalize_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_stacktrace(struct btp_gdb_stacktrace *stacktrace);
+btp_gdb_normalize_stacktrace(struct btp_gdb_stacktrace *stacktrace);
 
 /**
  */
 void
-btp_normalize_dbus_thread(struct btp_gdb_thread *thread);
+btp_gdb_normalize_dbus_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_gdk_thread(struct btp_gdb_thread *thread);
+btp_gdb_normalize_gdk_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_gtk_thread(struct btp_gdb_thread *thread);
+btp_gdb_normalize_gtk_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_glib_thread(struct btp_gdb_thread *thread);
+btp_gdb_normalize_glib_thread(struct btp_gdb_thread *thread);
 
 /**
  * Checks whether the thread it contains some function used to exit
@@ -65,16 +65,16 @@ struct btp_gdb_frame *
 btp_glibc_thread_find_exit_frame(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_glibc_thread(struct btp_gdb_thread *thread);
+btp_gdb_normalize_glibc_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_libstdcpp_thread(struct btp_gdb_thread *thread);
+btp_gdb_normalize_libstdcpp_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_linux_thread(struct btp_gdb_thread *thread);
+btp_gdb_normalize_linux_thread(struct btp_gdb_thread *thread);
 
 void
-btp_normalize_xorg_thread(struct btp_gdb_thread *thread);
+btp_gdb_normalize_xorg_thread(struct btp_gdb_thread *thread);
 
 /**
  * Renames unknown function names ("??") that are between the same function names
@@ -83,14 +83,14 @@ btp_normalize_xorg_thread(struct btp_gdb_thread *thread);
  */
 
 void
-btp_normalize_paired_unknown_function_names(struct btp_gdb_thread *thread1,
+btp_gdb_normalize_paired_unknown_function_names(struct btp_gdb_thread *thread1,
                                             struct btp_gdb_thread *thread2);
 
 /**
  * Remove frames which are not interesting in comparison with other threads.
  */
 void
-btp_normalize_optimize_thread(struct btp_gdb_thread *thread);
+btp_gdb_normalize_optimize_thread(struct btp_gdb_thread *thread);
 
 #ifdef __cplusplus
 }

@@ -25,16 +25,16 @@
 #include <string.h>
 
 void
-btp_normalize_thread(struct btp_gdb_thread *thread)
+btp_gdb_normalize_thread(struct btp_gdb_thread *thread)
 {
-    btp_normalize_dbus_thread(thread);
-    btp_normalize_gdk_thread(thread);
-    btp_normalize_glib_thread(thread);
-    btp_normalize_glibc_thread(thread);
-    btp_normalize_gtk_thread(thread);
-    btp_normalize_libstdcpp_thread(thread);
-    btp_normalize_linux_thread(thread);
-    btp_normalize_xorg_thread(thread);
+    btp_gdb_normalize_dbus_thread(thread);
+    btp_gdb_normalize_gdk_thread(thread);
+    btp_gdb_normalize_glib_thread(thread);
+    btp_gdb_normalize_glibc_thread(thread);
+    btp_gdb_normalize_gtk_thread(thread);
+    btp_gdb_normalize_libstdcpp_thread(thread);
+    btp_gdb_normalize_linux_thread(thread);
+    btp_gdb_normalize_xorg_thread(thread);
 
     /* If the first frame has address 0x0000 and its name is '??', it
      * is a dereferenced null, and we remove it. This frame is not
@@ -96,12 +96,12 @@ btp_normalize_thread(struct btp_gdb_thread *thread)
 }
 
 void
-btp_normalize_stacktrace(struct btp_gdb_stacktrace *stacktrace)
+btp_gdb_normalize_stacktrace(struct btp_gdb_stacktrace *stacktrace)
 {
     struct btp_gdb_thread *thread = stacktrace->threads;
     while (thread)
     {
-        btp_normalize_thread(thread);
+        btp_gdb_normalize_thread(thread);
         thread = thread->next;
     }
 }
@@ -123,7 +123,7 @@ next_functions_similar(struct btp_gdb_frame *frame1,
 }
 
 void
-btp_normalize_paired_unknown_function_names(struct btp_gdb_thread *thread1,
+btp_gdb_normalize_paired_unknown_function_names(struct btp_gdb_thread *thread1,
                                             struct btp_gdb_thread *thread2)
 
 {
@@ -189,7 +189,7 @@ btp_normalize_paired_unknown_function_names(struct btp_gdb_thread *thread1,
 }
 
 void
-btp_normalize_optimize_thread(struct btp_gdb_thread *thread)
+btp_gdb_normalize_optimize_thread(struct btp_gdb_thread *thread)
 {
     struct btp_gdb_frame *frame = thread->frames;
     while (frame)

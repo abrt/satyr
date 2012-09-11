@@ -24,7 +24,7 @@
 #include <stdbool.h>
 
 void
-btp_normalize_linux_thread(struct btp_gdb_thread *thread)
+btp_gdb_normalize_linux_thread(struct btp_gdb_thread *thread)
 {
     struct btp_gdb_frame *frame = thread->frames;
     while (frame)

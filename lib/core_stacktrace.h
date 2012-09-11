@@ -39,6 +39,9 @@ struct btp_location;
  */
 struct btp_core_stacktrace
 {
+    /** Signal number. */
+    int signal;
+
     /**
      * @brief Thread responsible for the crash.
      *

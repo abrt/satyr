@@ -45,6 +45,44 @@ struct btp_python_stacktrace
     struct btp_python_frame *frames;
 };
 
+/**
+ * Creates and initializes a new stacktrace structure.
+ * @returns
+ * It never returns NULL. The returned pointer must be released by
+ * calling the function btp_python_stacktrace_free().
+ */
+struct btp_python_stacktrace *
+btp_python_stacktrace_new();
+
+/**
+ * Initializes all members of the stacktrace structure to their default
+ * values.  No memory is released, members are simply overwritten.
+ * This is useful for initializing a stacktrace structure placed on the
+ * stack.
+ */
+void
+btp_python_stacktrace_init(struct btp_python_stacktrace *stacktrace);
+
+/**
+ * Releases the memory held by the stacktrace and its frames.
+ * @param stacktrace
+ * If the stacktrace is NULL, no operation is performed.
+ */
+void
+btp_python_stacktrace_free(struct btp_python_stacktrace *stacktrace);
+
+/**
+ * Creates a duplicate of the stacktrace.
+ * @param stacktrace
+ * The stacktrace to be copied. It's not modified by this function.
+ * @returns
+ * This function never returns NULL.  The returned duplicate must be
+ * released by calling the function btp_python_stacktrace_free().
+ */
+struct btp_python_stacktrace *
+btp_python_stacktrace_dup(struct btp_python_stacktrace *stacktrace);
+
+
 #ifdef __cplusplus
 }
 #endif

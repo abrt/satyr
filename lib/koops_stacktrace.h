@@ -30,6 +30,8 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+
 struct btp_location;
 
 struct btp_koops_stacktrace
@@ -39,7 +41,26 @@ struct btp_koops_stacktrace
      */
     char *version;
 
-    char *taint;
+    /**
+     * http://www.mjmwired.net/kernel/Documentation/oops-tracing.txt
+     */
+
+    bool taint_module_proprietary;
+    bool taint_module_gpl;
+    bool taint_module_out_of_tree;
+    bool taint_forced_module;
+    bool taint_forced_removal;
+    bool taint_smp_unsafe;
+    /** A machine check exception has been raised. */
+    bool taint_mce;
+    /** A process has been found in a bad page state.*/
+    bool taint_page_release;
+    bool taint_userspace;
+    bool taint_died_recently;
+    bool taint_acpi_overridden;
+    bool taint_warning;
+    bool taint_staging_driver;
+    bool taint_firmware_workaround;
 
     char **modules;
 

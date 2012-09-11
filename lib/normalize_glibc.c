@@ -55,7 +55,7 @@ btp_glibc_thread_find_exit_frame(struct btp_gdb_thread *thread)
 
 
 void
-btp_normalize_glibc_thread(struct btp_gdb_thread *thread)
+btp_gdb_normalize_glibc_thread(struct btp_gdb_thread *thread)
 {
     /* Find the exit frame and remove everything above it. */
     struct btp_gdb_frame *exit_frame = btp_glibc_thread_find_exit_frame(thread);

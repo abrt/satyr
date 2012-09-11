@@ -355,7 +355,7 @@ btp_gdb_threads_compare(struct btp_gdb_thread **threads, int m, int n, btp_dist_
                  * the threads need to be copied first. */
                 thread1 = btp_gdb_thread_dup(threads[i], false);
                 thread2 = btp_gdb_thread_dup(threads[j], false);
-                btp_normalize_paired_unknown_function_names(thread1, thread2);
+                btp_gdb_normalize_paired_unknown_function_names(thread1, thread2);
             }
 
             distances->distances[get_distance_position(distances, i, j)] = dist_func(thread1, thread2);
