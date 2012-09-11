@@ -1,5 +1,5 @@
 /*
-    metrics.h
+    metrics.c
 
     Copyright (C) 2010  Red Hat, Inc.
 

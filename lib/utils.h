@@ -285,6 +285,9 @@ btp_skip_unsigned_integer(const char **input);
 int
 btp_parse_unsigned_integer(const char **input, unsigned *result);
 
+int
+btp_parse_uint64(const char **input, uint64_t *result);
+
 /**
  * If the input contains 0x[0-9a-f]+, move the input pointer
  * after that.

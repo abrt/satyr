@@ -37,7 +37,9 @@
 struct btp_core_stacktrace *
 btp_core_stacktrace_new()
 {
-    struct btp_core_stacktrace *stacktrace = btp_malloc(sizeof(struct btp_core_stacktrace));
+    struct btp_core_stacktrace *stacktrace =
+        btp_malloc(sizeof(struct btp_core_stacktrace));
+
     btp_core_stacktrace_init(stacktrace);
     return stacktrace;
 }
@@ -121,7 +123,9 @@ btp_core_stacktrace_create(const char *gdb_stacktrace_text,
     struct btp_location location;
     btp_location_init(&location);
 
-    struct btp_gdb_stacktrace *gdb_stacktrace = btp_gdb_stacktrace_parse(&gdb_stacktrace_text, &location);
+    struct btp_gdb_stacktrace *gdb_stacktrace =
+        btp_gdb_stacktrace_parse(&gdb_stacktrace_text, &location);
+
     if (!gdb_stacktrace)
     {
         if (btp_debug_parser)
@@ -144,7 +148,8 @@ btp_core_stacktrace_create(const char *gdb_stacktrace_text,
     }
 
     // Create the core stacktrace
-    struct btp_core_stacktrace *core_stacktrace = btp_core_stacktrace_new();
+    struct btp_core_stacktrace *core_stacktrace =
+        btp_core_stacktrace_new();
 
     struct btp_gdb_thread *gdb_thread = gdb_stacktrace->threads;
     while (gdb_thread)
@@ -159,7 +164,8 @@ btp_core_stacktrace_create(const char *gdb_stacktrace_text,
             struct btp_core_frame *core_frame = btp_core_frame_new();
             core_frame->address = gdb_frame->address;
 
-            struct btp_unstrip_entry *unstrip_entry = btp_unstrip_find_address(unstrip, gdb_frame->address);
+            struct btp_unstrip_entry *unstrip_entry =
+                btp_unstrip_find_address(unstrip, gdb_frame->address);
 
             if (unstrip_entry)
             {
@@ -171,12 +177,14 @@ btp_core_stacktrace_create(const char *gdb_stacktrace_text,
             if (gdb_frame->function_name &&
                 0 != strcmp(gdb_frame->function_name, "??"))
             {
-                core_frame->function_name = btp_strdup(gdb_frame->function_name);
+                core_frame->function_name =
+                    btp_strdup(gdb_frame->function_name);
             }
         }
 
-        core_stacktrace->threads = btp_core_thread_append(core_stacktrace->threads,
-                                                         core_thread);
+        core_stacktrace->threads =
+            btp_core_thread_append(core_stacktrace->threads,
+                                   core_thread);
 
         gdb_thread = gdb_thread->next;
     }

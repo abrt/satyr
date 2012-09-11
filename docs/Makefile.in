@@ -34,9 +34,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@am__append_1 = btparser.pdf
 subdir = docs
-DIST_COMMON = $(dist_doc_DATA) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -71,7 +71,7 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(docdir)"
-DATA = $(dist_doc_DATA)
+DATA = $(doc_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -201,7 +201,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-dist_doc_DATA = btparser.tex btparser.pdf
+doc_DATA = btparser.tex $(am__append_1)
 CLEANFILES = *.aux btparser.log btparser.out btparser.toc btparser.idx btparser.ilg btparser.ind
 all: all-am
 
@@ -242,10 +242,10 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-dist_docDATA: $(dist_doc_DATA)
+install-docDATA: $(doc_DATA)
 	@$(NORMAL_INSTALL)
 	test -z "$(docdir)" || $(MKDIR_P) "$(DESTDIR)$(docdir)"
-	@list='$(dist_doc_DATA)'; test -n "$(docdir)" || list=; \
+	@list='$(doc_DATA)'; test -n "$(docdir)" || list=; \
 	for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  echo "$$d$$p"; \
@@ -255,9 +255,9 @@ install-dist_docDATA: $(dist_doc_DATA)
 	  $(INSTALL_DATA) $$files "$(DESTDIR)$(docdir)" || exit $$?; \
 	done
 
-uninstall-dist_docDATA:
+uninstall-docDATA:
 	@$(NORMAL_UNINSTALL)
-	@list='$(dist_doc_DATA)'; test -n "$(docdir)" || list=; \
+	@list='$(doc_DATA)'; test -n "$(docdir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	test -n "$$files" || exit 0; \
 	echo " ( cd '$(DESTDIR)$(docdir)' && rm -f" $$files ")"; \
@@ -352,7 +352,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-dist_docDATA
+install-data-am: install-docDATA
 
 install-dvi: install-dvi-am
 
@@ -396,41 +396,41 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-dist_docDATA
+uninstall-am: uninstall-docDATA
 
 .MAKE: install-am install-strip
 
 .PHONY: all all-am check check-am clean clean-generic clean-libtool \
 	clean-local distclean distclean-generic distclean-libtool \
 	distdir dvi dvi-am html html-am info info-am install \
-	install-am install-data install-data-am install-dist_docDATA \
+	install-am install-data install-data-am install-docDATA \
 	install-dvi install-dvi-am install-exec install-exec-am \
 	install-html install-html-am install-info install-info-am \
 	install-man install-pdf install-pdf-am install-ps \
 	install-ps-am install-strip installcheck installcheck-am \
 	installdirs maintainer-clean maintainer-clean-generic \
 	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
-	ps ps-am uninstall uninstall-am uninstall-dist_docDATA
+	ps ps-am uninstall uninstall-am uninstall-docDATA
 
 
-btparser.pdf: btparser.tex doxygen/refman.tex
-	echo Calling pdflatex twice to handle all references.
-	$(PDFLATEX) btparser.tex
-	makeindex btparser.idx
-	$(PDFLATEX) btparser.tex
-	latex_count=5 ; \
-	while egrep -s 'Rerun (LaTeX|to get cross-references right)' btparser.log && [ $$latex_count -gt 0 ] ;\
-	    do \
-	      echo "Rerunning latex...." ;\
-	      $(PDFLATEX) btparser.tex ;\
-	      latex_count=`expr $$latex_count - 1` ;\
-	    done
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@btparser.pdf: btparser.tex doxygen/refman.tex
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	echo Calling pdflatex twice to handle all references.
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	$(PDFLATEX) btparser.tex
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	makeindex btparser.idx
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	$(PDFLATEX) btparser.tex
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	latex_count=5 ; \
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	while egrep -s 'Rerun (LaTeX|to get cross-references right)' btparser.log && [ $$latex_count -gt 0 ] ;\
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	    do \
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	      echo "Rerunning latex...." ;\
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	      $(PDFLATEX) btparser.tex ;\
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	      latex_count=`expr $$latex_count - 1` ;\
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	    done
 
-doxygen/refman.tex: doxygen.conf ../lib/*.h
-	$(DOXYGEN) doxygen.conf
-	sed -i'~' '4d' doxygen/refman.tex
-	sed -i'~' '/\\printindex$$/d' doxygen/refman.tex
-	sed -i'~' '/\\end{document}$$/d' doxygen/refman.tex
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@doxygen/refman.tex: doxygen.conf ../lib/*.h
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	$(DOXYGEN) doxygen.conf
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	sed -i'~' '4d' doxygen/refman.tex
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	sed -i'~' '/\\printindex$$/d' doxygen/refman.tex
+@HAVE_DOT_TRUE@@HAVE_DOXYGEN_TRUE@@HAVE_PDFLATEX_TRUE@	sed -i'~' '/\\end{document}$$/d' doxygen/refman.tex
 
 clean-local:
 	-rm -rf doxygen

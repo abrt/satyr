@@ -1,5 +1,5 @@
 /*
-    utils_sha1.h
+    sha1.h
 
     Copyright (C) 2002  Dr Brian Gladman <brg@gladman.me.uk>, Worcester, UK.
     Copyright (C) 2003  Glenn L. McGrath

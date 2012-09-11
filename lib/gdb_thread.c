@@ -1,5 +1,5 @@
 /*
-    thread.c
+    gdb_thread.c
 
     Copyright (C) 2010  Red Hat, Inc.
 

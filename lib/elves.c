@@ -1,5 +1,5 @@
 /*
-    utils_elf.c
+    elves.c
 
     Copyright (C) 2012  Red Hat, Inc.
 

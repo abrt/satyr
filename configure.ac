@@ -15,9 +15,12 @@ AM_MISSING_PROG([AUTOM4TE], [autom4te])
 AC_SUBST([O0CFLAGS], [`echo $CFLAGS | sed 's/-O[[0-9]] *//'`])
 
 AM_PATH_PYTHON
+AM_CONDITIONAL([HAVE_PYTHON], test -n "$PYTHON")
 [if test -z "$PYTHON"; then]
-    [echo "Essential program python not found"]
-    [exit 1]
+    [echo "The python interpreter was not found in the search path. The Python language bindings"]
+    [echo "will not be built.  If you want to build the Python language bindings, please ensure"]
+    [echo "that python is installed and its directory is included in the search path."]
+    [echo "Then run configure again before attempting to build Btparser."]
 [fi]
 
 # Just PKG_CHECK_MODULES([PYTHON], [python]) works only with python2.7+
@@ -36,29 +39,33 @@ AM_CONDITIONAL(ENABLE_DISASSEMBLY, [test "$host_cpu" = "x86_64" -a "$enable_fing
 
 # pdflatex
 AC_PATH_PROG([PDFLATEX], [pdflatex], [no])
+AM_CONDITIONAL([HAVE_PDFLATEX], test "$PDFLATEX" != "no")
 [if test "$PDFLATEX" = "no"; then]
-    [echo "The pdflatex program was not found in the search path. Please ensure"]
-    [echo "that it is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Canal."]
-    [exit 1]
+    [echo "The pdflatex program was not found in the search path. The documentation"]
+    [echo "will not be built.  If you want to build the documentation, please ensure"]
+    [echo "that pdflatex is installed and its directory is included in the search path."]
+    [echo "Then run configure again before attempting to build Btparser."]
 [fi]
 
 # doxygen
 AC_PATH_PROG([DOXYGEN], [doxygen], [no])
+AM_CONDITIONAL([HAVE_DOXYGEN], test "$DOXYGEN" != "no")
 [if test "$DOXYGEN" = "no"; then]
-    [echo "The doxygen program was not found in the search path. Please ensure"]
-    [echo "that it is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Canal."]
+    [echo "The doxygen program was not found in the search path. The documentation"]
+    [echo "will not be built.  If you want to build the documentation, please ensure"]
+    [echo "that doxygen is installed and its directory is included in the search path."]
+    [echo "Then run configure again before attempting to build Btparser."]
     [exit 1]
 [fi]
 
 # dot (part of graphviz
 AC_PATH_PROG([DOT], [dot], [no])
+AM_CONDITIONAL([HAVE_DOT], test "$DOT" != "no")
 [if test "DOT" = "no"; then]
-    [echo "The dot program was not found in the search path. Please ensure"]
-    [echo "that it is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Canal."]
-    [exit 1]
+    [echo "The dot program was not found in the search path. The documentation"]
+    [echo "will not be built.  If you want to build the documentation, please ensure"]
+    [echo "that dot is installed and its directory is included in the search path."]
+    [echo "Then run configure again before attempting to build Btparser."]
 [fi]
 
 AC_CONFIG_FILES([

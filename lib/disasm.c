@@ -1,5 +1,5 @@
 /*
-    disassembler.c
+    disasm.c
 
     Copyright (C) 2011, 2012  Red Hat, Inc.
 
@@ -17,7 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "disassembler.h"
+#include "disasm.h"
 #include "utils.h"
 #include "strbuf.h"
 #include <string.h>

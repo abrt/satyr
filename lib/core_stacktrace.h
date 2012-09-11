@@ -39,6 +39,13 @@ struct btp_location;
  */
 struct btp_core_stacktrace
 {
+    /**
+     * @brief Thread responsible for the crash.
+     *
+     * It might be NULL if the crash thread is not detected.
+     */
+    struct btp_core_thread *crash_thread;
+
     struct btp_core_thread *threads;
 };
 
@@ -85,7 +92,8 @@ btp_core_stacktrace_dup(struct btp_core_stacktrace *stacktrace);
  * It's not modified by calling this function.
  */
 int
-btp_core_stacktrace_get_thread_count(struct btp_core_stacktrace *stacktrace);
+btp_core_stacktrace_get_thread_count(
+    struct btp_core_stacktrace *stacktrace);
 
 /**
  * Parses a textual stacktrace and puts it into a structure.  If

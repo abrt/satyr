@@ -41,6 +41,8 @@ struct btp_koops_stacktrace
 
     char *taint;
 
+    char **modules;
+
     /**
      * @brief Call trace
      */

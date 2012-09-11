@@ -1,5 +1,5 @@
 /*
-    disassembler.h
+    disasm.h
 
     Copyright (C) 2011, 2012  Red Hat, Inc.
 

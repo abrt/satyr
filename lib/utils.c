@@ -431,6 +431,30 @@ btp_parse_unsigned_integer(const char **input, unsigned *result)
 }
 
 int
+btp_parse_uint64(const char **input, uint64_t *result)
+{
+    const char *local_input = *input;
+    char *numstr;
+    int length = btp_parse_char_span(&local_input,
+                                     "0123456789",
+                                     &numstr);
+    if (0 == length)
+        return 0;
+
+    char *endptr;
+    errno = 0;
+    unsigned long long result_tmp = strtoull(numstr, &endptr, 10);
+    bool failure = (errno || numstr == endptr || *endptr != '\0'
+                    || result_tmp == ULLONG_MAX);
+    free(numstr);
+    if (failure) /* number too big or some other error */
+        return 0;
+    *result = result_tmp;
+    *input = local_input;
+    return length;
+}
+
+int
 btp_skip_hexadecimal_number(const char **input)
 {
     const char *local_input = *input;
@@ -452,8 +476,10 @@ btp_parse_hexadecimal_number(const char **input, uint64_t *result)
     const char *local_input = *input;
     if (!btp_skip_char(&local_input, '0'))
         return 0;
+
     if (!btp_skip_char(&local_input, 'x'))
         return 0;
+
     int count = 2;
     char *numstr;
     count += btp_parse_char_span(&local_input,

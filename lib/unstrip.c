@@ -1,5 +1,5 @@
 /*
-    utils_unstrip.c
+    unstrip.c
 
     Copyright (C) 2011, 2012  Red Hat, Inc.
 

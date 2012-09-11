@@ -35,8 +35,15 @@ extern "C" {
 
 struct btp_koops_frame
 {
+    /**
+     * Address of the function in memory.
+     */
     uint64_t address;
 
+    /**
+     * http://git.kernel.org/?p=linux/kernel/git/torvalds/linux.git;a=blob;f=arch/x86/kernel/dumpstack.c
+     * printk_address(unsigned long address, int reliable)
+     */
     bool reliable;
 
     char *name;

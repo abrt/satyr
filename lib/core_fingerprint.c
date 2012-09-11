@@ -24,7 +24,7 @@
 #include "utils.h"
 #include "strbuf.h"
 #include "elves.h"
-#include "disassembler.h"
+#include "disasm.h"
 #include "callgraph.h"
 #include <ctype.h>
 #include <string.h>

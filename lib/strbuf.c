@@ -1,5 +1,5 @@
 /*
-    utils_strbuf.c - string buffer
+    strbuf.c - string buffer
 
     Copyright (C) 2010  Red Hat, Inc.
 

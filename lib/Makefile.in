@@ -79,7 +79,7 @@ am_libbtparser_la_OBJECTS = $(am__objects_1) \
 	libbtparser_la-core_stacktrace.lo \
 	libbtparser_la-core_fingerprint.lo \
 	libbtparser_la-core_frame.lo libbtparser_la-core_thread.lo \
-	libbtparser_la-disassembler.lo libbtparser_la-elves.lo \
+	libbtparser_la-disasm.lo libbtparser_la-elves.lo \
 	libbtparser_la-gdb_stacktrace.lo libbtparser_la-gdb_frame.lo \
 	libbtparser_la-gdb_sharedlib.lo libbtparser_la-gdb_thread.lo \
 	libbtparser_la-koops_frame.lo \
@@ -255,7 +255,7 @@ pkginclude_HEADERS = \
 	core_frame.h \
 	core_stacktrace.h \
 	core_thread.h \
-	disassembler.h \
+	disasm.h \
 	elves.h \
 	gdb_frame.h \
 	gdb_sharedlib.h \
@@ -282,7 +282,7 @@ libbtparser_la_SOURCES = \
 	core_fingerprint.c \
 	core_frame.c \
 	core_thread.c \
-	disassembler.c \
+	disasm.c \
 	elves.c \
 	gdb_stacktrace.c \
 	gdb_frame.c \
@@ -392,7 +392,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core_frame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core_stacktrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core_thread.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-disassembler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-disasm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-elves.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-gdb_frame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-gdb_sharedlib.Plo@am__quote@
@@ -481,12 +481,12 @@ libbtparser_la-core_thread.lo: core_thread.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-core_thread.lo `test -f 'core_thread.c' || echo '$(srcdir)/'`core_thread.c
 
-libbtparser_la-disassembler.lo: disassembler.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-disassembler.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-disassembler.Tpo -c -o libbtparser_la-disassembler.lo `test -f 'disassembler.c' || echo '$(srcdir)/'`disassembler.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-disassembler.Tpo $(DEPDIR)/libbtparser_la-disassembler.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='disassembler.c' object='libbtparser_la-disassembler.lo' libtool=yes @AMDEPBACKSLASH@
+libbtparser_la-disasm.lo: disasm.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-disasm.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-disasm.Tpo -c -o libbtparser_la-disasm.lo `test -f 'disasm.c' || echo '$(srcdir)/'`disasm.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-disasm.Tpo $(DEPDIR)/libbtparser_la-disasm.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='disasm.c' object='libbtparser_la-disasm.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-disassembler.lo `test -f 'disassembler.c' || echo '$(srcdir)/'`disassembler.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-disasm.lo `test -f 'disasm.c' || echo '$(srcdir)/'`disasm.c
 
 libbtparser_la-elves.lo: elves.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-elves.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-elves.Tpo -c -o libbtparser_la-elves.lo `test -f 'elves.c' || echo '$(srcdir)/'`elves.c
