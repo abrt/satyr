@@ -183,9 +183,52 @@ btp_load_core_backtrace(const char *text)
         frame->address = (uint64_t)off;
 
         /* SYMBOL */
-        char *symbol = read_string(&cur);
+        /* may contain spaces! RHBZ #857475 */
+        /* if ( character is found, we do not stop on white space, but on ) */
+        /* parentheses may be nested, we need to consider the depth */
+        btp_skip_whitespace(cur);
+        char lastchar = ' ';
+        char *end;
+        int depth = 0;
+        for (end = cur; *end && *end != '\n' && (*end != lastchar || depth > 1); ++end)
+        {
+            switch (*end)
+            {
+                case '(':
+                    lastchar = ')';
+                    ++depth;
+                    break;
+
+                case ')':
+                    --depth;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        switch (*end)
+        {
+            /* jump one character to also show ) */
+            case ')':
+                ++end;
+                break;
+
+            case ' ':
+                break;
+
+            /* error - we are on \n or \0 */
+            default:
+                btp_thread_free(thread);
+                return NULL;
+        }
+
         /* btparser uses "??" to denote unknown function name */
-        frame->function_name = (symbol ? symbol : btp_strdup("??"));
+        *end = '\0';
+        frame->function_name = btp_strdup(strcmp(cur, "-") ? cur : "??");
+        *end = ' ';
+        cur = end;
 
         /* FILENAME */
         aux->filename = read_string(&cur);
