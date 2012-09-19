@@ -1,4 +1,11 @@
+== btparser 0.19
+
 == btparser 0.18
+Released 2012-08-02
+
+- Fix memory leaks in python bindings
+- Add support for python core-backtraces
+- Add support for kerneloops core-backtraces
 
 == btparser 0.17
 Released 2011-03-19.
