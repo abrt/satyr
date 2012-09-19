@@ -165,7 +165,9 @@ btp_parse_python_backtrace(char *text)
             frame->build_id = NULL;
         }
 
-        result = g_list_append(result, frame);
+        /* need prepend to flip the backtrace upside-down */
+        /* the last frame should be on top */
+        result = g_list_prepend(result, frame);
         line = nextline;
     }
 
