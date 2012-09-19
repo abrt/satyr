@@ -1,4 +1,15 @@
+== btparser 0.20
+Release 2012-10-11
+
+- Add support for kerneloops normalization
+
 == btparser 0.19
+Release 2012-09-21
+
+- Core-backtrace: parse C++ functions correctly
+- Flip python core-backtrace upside-down
+- Add source line to frame string output
+- Increase max length of core-backtrace
 
 == btparser 0.18
 Released 2012-08-02
