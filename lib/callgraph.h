@@ -32,6 +32,10 @@
  * Call graph is used by fingerprinting algorithms.
  */
 
+#include "config.h"
+
+#if HAVE_LIBOPCODES
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,7 +43,7 @@ extern "C" {
 #include <inttypes.h>
 
 struct btp_disasm_state;
-struct btp_elf_frame_description_entry;
+struct btp_elf_fde;
 
 /**
  * @brief A call graph representing calling relationships between
@@ -71,7 +75,7 @@ struct btp_callgraph
 
 struct btp_callgraph *
 btp_callgraph_compute(struct btp_disasm_state *disassembler,
-                      struct btp_elf_frame_description_entry *eh_frame,
+                      struct btp_elf_fde *eh_frame,
                       char **error_message);
 
 /// Assumption: when a fde is included in the callgraph, we assume
@@ -80,7 +84,7 @@ struct btp_callgraph *
 btp_callgraph_extend(struct btp_callgraph *callgraph,
                      uint64_t start_address,
                      struct btp_disasm_state *disassembler,
-                     struct btp_elf_frame_description_entry *eh_frame,
+                     struct btp_elf_fde *eh_frame,
                      char **error_message);
 
 void
@@ -97,4 +101,5 @@ btp_callgraph_last(struct btp_callgraph *callgraph);
 }
 #endif
 
-#endif
+#endif // HAVE_LIBOPCODES
+#endif // BTPARSER_CALLGRAPH_H

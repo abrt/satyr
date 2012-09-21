@@ -48,6 +48,51 @@ struct btp_python_frame
     struct btp_python_frame *next;
 };
 
+/**
+ * Creates and initializes a new frame structure.
+ * @returns
+ * It never returns NULL. The returned pointer must be released by
+ * calling the function btp_python_frame_free().
+ */
+struct btp_python_frame *
+btp_python_frame_new();
+
+/**
+ * Initializes all members of the frame structure to their default
+ * values.  No memory is released, members are simply overwritten.
+ * This is useful for initializing a frame structure placed on the
+ * stack.
+ */
+void
+btp_python_frame_init(struct btp_python_frame *frame);
+
+/**
+ * Releases the memory held by the frame. The frame siblings are not
+ * released.
+ * @param frame
+ * If the frame is NULL, no operation is performed.
+ */
+void
+btp_python_frame_free(struct btp_python_frame *frame);
+
+/**
+ * Creates a duplicate of the frame.
+ * @param frame
+ * It must be non-NULL pointer. The frame is not modified by calling
+ * this function.
+ * @param siblings
+ * Whether to duplicate also siblings referenced by frame->next.  If
+ * false, frame->next is not duplicated for the new frame, but it is
+ * set to NULL.
+ * @returns
+ * This function never returns NULL. The returned duplicate frame must
+ * be released by calling the function btp_python_frame_free().
+ */
+struct btp_python_frame *
+btp_python_frame_dup(struct btp_python_frame *frame,
+                     bool siblings);
+
+
 #ifdef __cplusplus
 }
 #endif

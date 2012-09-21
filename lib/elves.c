@@ -462,7 +462,7 @@ fde_read_address(const uint8_t *p, unsigned len)
     return (len == 4 ? (uintptr_t)u.n4 : (uintptr_t)u.n8);
 }
 
-struct btp_elf_frame_description_entry *
+struct btp_elf_fde *
 btp_elf_get_eh_frame(const char *filename,
                      char **error_message)
 {
@@ -578,7 +578,7 @@ btp_elf_get_eh_frame(const char *filename,
      * on .eh_frame_hdr -- see http://www.airs.com/blog/archives/462
      */
 
-    struct btp_elf_frame_description_entry *result = NULL, *last = NULL;
+    struct btp_elf_fde *result = NULL, *last = NULL;
     struct cie *cie_list = NULL, *cie_list_last = NULL;
 
     Dwarf_Off cfi_offset_next = 0;
@@ -711,7 +711,7 @@ btp_elf_get_eh_frame(const char *filename,
                 initial_location -= exec_base;
             }
 
-            struct btp_elf_frame_description_entry *fde = btp_malloc(sizeof(struct btp_elf_frame_description_entry));
+            struct btp_elf_fde *fde = btp_malloc(sizeof(struct btp_elf_fde));
             fde->start_address = initial_location + exec_base;
             fde->length = address_range;
 
@@ -735,21 +735,21 @@ btp_elf_get_eh_frame(const char *filename,
 }
 
 void
-btp_elf_eh_frame_free(struct btp_elf_frame_description_entry *entries)
+btp_elf_eh_frame_free(struct btp_elf_fde *entries)
 {
     while (entries)
     {
-        struct btp_elf_frame_description_entry *entry = entries;
+        struct btp_elf_fde *entry = entries;
         entries = entry->next;
         free(entry);
     }
 }
 
-struct btp_elf_frame_description_entry *
-btp_elf_find_fde_for_address(struct btp_elf_frame_description_entry *eh_frame,
+struct btp_elf_fde *
+btp_elf_find_fde_for_address(struct btp_elf_fde *eh_frame,
                              uint64_t build_id_offset)
 {
-    struct btp_elf_frame_description_entry *fde = eh_frame;
+    struct btp_elf_fde *fde = eh_frame;
     while (fde)
     {
         if (build_id_offset >= fde->start_address &&

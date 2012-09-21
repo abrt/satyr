@@ -33,6 +33,9 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
+/**
+ * @brief Kernel oops stack frame.
+ */
 struct btp_koops_frame
 {
     /**

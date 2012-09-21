@@ -128,68 +128,63 @@ parse_address(const char **input, uint64_t *address)
  * format.
  */
 static bool
-parse_frame_line(const char *line)
+parse_frame_line(const char **input)
 {
-    /* Skip timestamp if it's present. */
-    skip_timestamp(&line);
+    const char *local_input = *input;
 
-    btp_skip_char_span(&line, BTP_space);
+    btp_skip_char_span(&local_input, BTP_space);
+
+    /* Skip timestamp if it's present. */
+    skip_timestamp(&local_input);
+
+    btp_skip_char_span(&local_input, BTP_space);
 
     uint64_t address;
-    if (!parse_address(&line, &address))
+    if (!parse_address(&local_input, &address))
         return false;
+
+    btp_skip_char_span(&local_input, BTP_space);
+
+    /* Question mark? */
+    bool reliable = (0 != btp_skip_char(&local_input, '?'));
+
+    btp_skip_char_span(&local_input, BTP_space);
+
+    char *function_name;
+    if (!btp_parse_char_cspan(&local_input, BTP_space "+",
+                              &function_name))
+    {
+        return false;
+    }
+
+    if (btp_skip_char(&local_input, '+'))
+    {
+        uint64_t function_offset;
+        btp_parse_hexadecimal_number(&local_input,
+                                     &function_offset);
+
+        if (!btp_skip_char(&local_input, '/'))
+        {
+            free(function_name);
+            return false;
+        }
+
+        uint64_t function_length;
+        btp_parse_hexadecimal_number(&local_input,
+                                     &function_length);
+    }
+
+    btp_skip_char_span(&local_input, " \t");
+
+    if (!btp_skip_char(&local_input, '\n'))
+    {
+        free(function_name);
+        return false;
+    }
+
+    return true;
+
 /*
-    // function name
-    char *funcname = strchr(line, ' ');
-    if (!funcname)
-    {
-        btp_backtrace_entry_free(frame);
-        fprintf(stderr, "Unable to find functon name: '%s'\n", line);
-        line = nextline;
-        continue;
-    }
-    ++funcname;
-
-    while (*funcname && !isalpha(*funcname))
-    {
-        // threre is no correct place for the '?' flag in
-        // struct backtrace_entry. took function_initial_loc
-        // because it was unused
-        if (*funcname == '?')
-            frame->function_initial_loc = -1;
-        ++funcname;
-    }
-
-    if (!*funcname)
-    {
-        btp_backtrace_entry_free(frame);
-        fprintf(stderr, "Unable to find functon name: '%s'\n", line);
-        line = nextline;
-        continue;
-    }
-
-    char *splitter = strchr(funcname, '+');
-    if (!splitter)
-    {
-        btp_backtrace_entry_free(frame);
-        fprintf(stderr, "Unable to find offset & function length: '%s'\n", line);
-        line = nextline;
-        continue;
-    }
-    *splitter = '\0';
-    frame->symbol = btp_strdup(funcname);
-    *splitter = '+';
-    ++splitter;
-
-    // offset, function legth
-    if (sscanf(splitter, "0x%x/0x%x", &frame->build_id_offset, &frame->function_length) != 2)
-    {
-        btp_backtrace_entry_free(frame);
-        fprintf(stderr, "Unable to read offset & function length: '%s'\n", line);
-        line = nextline;
-        continue;
-    }
-
     // module
     // in the 2nd example mentioned above, [] also matches
     // the address part of line's 2nd half (callback).
@@ -206,17 +201,6 @@ parse_frame_line(const char *line)
             *splitter = ']';
         }
     }
-
-    if (!frame->filename)
-        frame->filename = btp_strdup("vmlinux");
-
-    // build-id
-    // there is no actual "build-id" for kernel
-    if (!frame->build_id && kernelver)
-        frame->build_id = btp_strdup(kernelver);
-
-    result = g_list_append(result, frame);
-    line = nextline;
 */
 
     return true;

@@ -37,13 +37,7 @@ btp_koops_frame_new()
 void
 btp_koops_frame_init(struct btp_koops_frame *frame)
 {
-    frame->address = 0;
-    frame->reliable = false;
-    frame->name = NULL;
-    frame->offset = 0;
-    frame->len = 0;
-    frame->module = NULL;
-    frame->next = NULL;
+    memset(frame, 0, sizeof(struct btp_koops_frame));
 }
 
 void

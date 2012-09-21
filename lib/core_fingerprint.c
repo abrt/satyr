@@ -18,6 +18,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "core_fingerprint.h"
+
+#if HAVE_LIBOPCODES
 #include "core_stacktrace.h"
 #include "core_frame.h"
 #include "core_thread.h"
@@ -151,7 +153,7 @@ get_libcalls(char ***symbol_list,
              uint64_t function_start_address,
              int depth,
              struct btp_elf_plt_entry *plt,
-             struct btp_elf_frame_description_entry *eh_frame,
+             struct btp_elf_fde *eh_frame,
              struct btp_disasm_state *disassembler,
              struct btp_callgraph **callgraph,
              char **error_message)
@@ -272,7 +274,7 @@ static bool
 fp_libcalls(struct btp_strbuf *fingerprint,
             uint64_t function_start_address,
             struct btp_elf_plt_entry *plt,
-            struct btp_elf_frame_description_entry *eh_frame,
+            struct btp_elf_fde *eh_frame,
             struct btp_disasm_state *disassembler,
             struct btp_callgraph **callgraph,
             char **error_message)
@@ -311,7 +313,7 @@ static bool
 fp_calltree_leaves(struct btp_strbuf *fingerprint,
                    uint64_t function_start_address,
                    struct btp_elf_plt_entry *plt,
-                   struct btp_elf_frame_description_entry *eh_frame,
+                   struct btp_elf_fde *eh_frame,
                    struct btp_disasm_state *disassembler,
                    struct btp_callgraph **callgraph,
                    char **error_message)
@@ -377,12 +379,12 @@ btp_core_fingerprint_generate(struct btp_core_stacktrace *stacktrace,
 static bool
 compute_fingerprint(struct btp_core_frame *frame,
                     struct btp_elf_plt_entry *plt,
-                    struct btp_elf_frame_description_entry *eh_frame,
+                    struct btp_elf_fde *eh_frame,
                     struct btp_disasm_state *disassembler,
                     struct btp_callgraph **callgraph,
                     char **error_message)
 {
-    struct btp_elf_frame_description_entry *fde =
+    struct btp_elf_fde *fde =
         btp_elf_find_fde_for_address(eh_frame, frame->build_id_offset);
 
     if (!fde)
@@ -453,7 +455,7 @@ btp_core_fingerprint_generate_for_binary(struct btp_core_thread *thread,
     if (!plt)
         return false;
 
-    struct btp_elf_frame_description_entry *eh_frame =
+    struct btp_elf_fde *eh_frame =
         btp_elf_get_eh_frame(binary_path, error_message);
 
     if (!eh_frame)
@@ -509,3 +511,5 @@ btp_core_fingerprint_generate_for_binary(struct btp_core_thread *thread,
     btp_elf_eh_frame_free(eh_frame);
     return true;
 }
+
+#endif HAVE_LIBOPCODES

@@ -18,6 +18,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "disasm.h"
+
+#if HAVE_LIBOPCODES
 #include "utils.h"
 #include "strbuf.h"
 #include <string.h>
@@ -305,3 +307,5 @@ btp_disasm_get_callee_addresses(char **instructions)
     result[result_offset] = 0;
     return result;
 }
+
+#endif // HAVE_LIBOPCODES

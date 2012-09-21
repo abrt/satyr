@@ -82,7 +82,6 @@ btp_python_stacktrace_free(struct btp_python_stacktrace *stacktrace);
 struct btp_python_stacktrace *
 btp_python_stacktrace_dup(struct btp_python_stacktrace *stacktrace);
 
-
 #ifdef __cplusplus
 }
 #endif

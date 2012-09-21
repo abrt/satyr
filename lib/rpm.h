@@ -20,6 +20,11 @@
 #ifndef BTPARSER_RPM_H
 #define BTPARSER_RPM_H
 
+/**
+ * @file
+ * @brief RPM-related structures and utilities.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

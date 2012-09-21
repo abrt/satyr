@@ -2,7 +2,6 @@ doc_DATA = btparser.tex
 
 CLEANFILES = *.aux btparser.log btparser.out btparser.toc btparser.idx btparser.ilg btparser.ind
 
-
 if HAVE_PDFLATEX
 if HAVE_DOXYGEN
 if HAVE_DOT

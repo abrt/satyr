@@ -25,6 +25,10 @@
  * @brief BFD-based function disassembler.
  */
 
+#include "config.h"
+
+#if HAVE_LIBOPCODES
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -87,4 +91,5 @@ btp_disasm_get_callee_addresses(char **instructions);
 }
 #endif
 
-#endif
+#endif // HAVE_LIBOPCODES
+#endif // BTPARSER_DISASSEMBLER_H

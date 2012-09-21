@@ -279,8 +279,8 @@ btp_gdb_stacktrace_parse(const char **input,
  */
 bool
 btp_gdb_stacktrace_parse_header(const char **input,
-                               struct btp_gdb_frame **frame,
-                               struct btp_location *location);
+                                struct btp_gdb_frame **frame,
+                                struct btp_location *location);
 
 /**
  * Set library names in all frames in the stacktrace according to the

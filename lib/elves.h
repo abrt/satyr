@@ -49,10 +49,10 @@ struct btp_elf_plt_entry
 };
 
 /**
- * @brief A single item of the .eh_frame section present in ELF
- * binaries.
+ * @brief A single Frame Description Entry of the .eh_frame section
+ * present in ELF binaries.
  */
-struct btp_elf_frame_description_entry
+struct btp_elf_fde
 {
     /**
      * Offset where a function starts.  If the function is present in
@@ -63,7 +63,7 @@ struct btp_elf_frame_description_entry
     /** Length of the function in bytes. */
     uint64_t length;
 
-    struct btp_elf_frame_description_entry *next;
+    struct btp_elf_fde *next;
 };
 
 /**
@@ -87,7 +87,6 @@ struct btp_elf_plt_entry *
 btp_elf_plt_find_for_address(struct btp_elf_plt_entry *plt,
                              uint64_t address);
 
-
 /**
  * Reads the .eh_frame section from an ELF file.
  * @param error_message
@@ -99,15 +98,15 @@ btp_elf_plt_find_for_address(struct btp_elf_plt_entry *plt,
  *   Returns a linked list of function ranges (function offset and
  *   size) on success. Otherwise NULL.
  */
-struct btp_elf_frame_description_entry *
+struct btp_elf_fde *
 btp_elf_get_eh_frame(const char *filename,
                      char **error_message);
 
 void
-btp_elf_eh_frame_free(struct btp_elf_frame_description_entry *entries);
+btp_elf_eh_frame_free(struct btp_elf_fde *entries);
 
-struct btp_elf_frame_description_entry *
-btp_elf_find_fde_for_address(struct btp_elf_frame_description_entry *eh_frame,
+struct btp_elf_fde *
+btp_elf_find_fde_for_address(struct btp_elf_fde *eh_frame,
                              uint64_t build_id_offset);
 
 #ifdef __cplusplus

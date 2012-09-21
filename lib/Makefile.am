@@ -1,6 +1,7 @@
 pkginclude_HEADERS = \
 	callgraph.h \
 	cluster.h \
+	config.h \
 	core_fingerprint.h \
 	core_frame.h \
 	core_stacktrace.h \
@@ -60,10 +61,10 @@ libbtparser_la_SOURCES = \
 
 libbtparser_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE $(GLIB_CFLAGS)
 libbtparser_la_LDFLAGS = -version-info 4:2:2 $(GLIB_LIBS)
+libbtparser_la_LIBADD = -lelf -ldw -ldl
 
-if ENABLE_DISASSEMBLY
-libbtparser_la_CFLAGS += -DENABLE_DISASSEMBLY
-libbtparser_la_LIBADD = -lelf -ldw -ldl -lbfd -lopcodes
+if HAVE_LIBOPCODES
+libbtparser_la_LIBADD += -lbfd -lopcodes
 endif
 
 # From http://www.seul.org/docs/autotut/
