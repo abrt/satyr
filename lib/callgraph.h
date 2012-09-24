@@ -34,8 +34,6 @@
 
 #include "config.h"
 
-#if HAVE_LIBOPCODES
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -101,5 +99,4 @@ btp_callgraph_last(struct btp_callgraph *callgraph);
 }
 #endif
 
-#endif // HAVE_LIBOPCODES
 #endif // BTPARSER_CALLGRAPH_H

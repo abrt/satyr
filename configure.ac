@@ -70,6 +70,14 @@ have_good_libopcodes=$?
 AM_CONDITIONAL(HAVE_LIBOPCODES, test $have_good_libopcodes -eq 1)
 AC_DEFINE_UNQUOTED(HAVE_LIBOPCODES, $have_good_libopcodes, [Have libopcodes compiled with -fPIC])
 
+AC_HAVE_LIBRARY([bfd])
+
+# elfutils
+AC_CHECK_HEADERS([dwarf.h elfutils/libdw.h gelf.h libelf.h])
+AC_HAVE_LIBRARY([elf])
+AC_HAVE_LIBRARY([dw])
+AC_HAVE_LIBRARY([dl])
+
 # pdflatex
 AC_PATH_PROG([PDFLATEX], [pdflatex], [no])
 AM_CONDITIONAL([HAVE_PDFLATEX], test "$PDFLATEX" != "no")
@@ -88,7 +96,6 @@ AM_CONDITIONAL([HAVE_DOXYGEN], test "$DOXYGEN" != "no")
     [echo "will not be built.  If you want to build the documentation, please ensure"]
     [echo "that doxygen is installed and its directory is included in the search path."]
     [echo "Then run configure again before attempting to build Btparser."]
-    [exit 1]
 [fi]
 
 # dot (part of graphviz
@@ -100,6 +107,10 @@ AM_CONDITIONAL([HAVE_DOT], test "$DOT" != "no")
     [echo "that dot is installed and its directory is included in the search path."]
     [echo "Then run configure again before attempting to build Btparser."]
 [fi]
+
+AM_CONDITIONAL([BUILD_DOCUMENTATION], test \( "$DOXYGEN" != "no" \) \
+				      	-a \( "$DOT" != "no" \) \
+					-a \( "$PDFLATEX" != "no" \))
 
 AC_CONFIG_FILES([
 	btparser.spec

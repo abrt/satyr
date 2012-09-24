@@ -35,7 +35,6 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@HAVE_LIBOPCODES_TRUE@am__append_1 = -lbfd -lopcodes
 subdir = lib
 DIST_COMMON = $(pkginclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in
@@ -73,8 +72,7 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgincludedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-am__DEPENDENCIES_1 =
-libbtparser_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+libbtparser_la_DEPENDENCIES =
 am__objects_1 =
 am_libbtparser_la_OBJECTS = $(am__objects_1) \
 	libbtparser_la-callgraph.lo libbtparser_la-cluster.lo \
@@ -313,7 +311,7 @@ libbtparser_la_SOURCES = \
 
 libbtparser_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE $(GLIB_CFLAGS)
 libbtparser_la_LDFLAGS = -version-info 4:2:2 $(GLIB_LIBS)
-libbtparser_la_LIBADD = -lelf -ldw -ldl $(am__append_1)
+@HAVE_LIBOPCODES_TRUE@libbtparser_la_LIBADD = -lopcodes
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 

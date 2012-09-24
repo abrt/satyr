@@ -18,12 +18,29 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "disasm.h"
-
-#if HAVE_LIBOPCODES
 #include "utils.h"
 #include "strbuf.h"
 #include <string.h>
+#include <stdio.h>
 
+#if HAVE_LIBOPCODES
+#include <bfd.h>
+#include <dis-asm.h>
+#endif // HAVE_LIBOPCODES
+
+/**
+ * @brief Internal state of a disassembler.
+ */
+struct btp_disasm_state
+{
+#if HAVE_LIBOPCODES
+    bfd *bfd_file;
+    disassembler_ftype disassembler;
+    struct disassemble_info info;
+#endif // HAVE_LIBOPCODES
+};
+
+#if HAVE_LIBOPCODES
 /**
  * Captures disassembler output into a strbuf.  This is used as a hook
  * in init_disassemble_info() of libopcodes, which is called from
@@ -42,11 +59,13 @@ buffer_printf(void *buffer, const char *fmt, ...)
 
     return (strbuf->len - orig_len);
 }
+#endif // HAVE_LIBOPCODES
 
 struct btp_disasm_state *
 btp_disasm_init(const char *file_name,
                 char **error_message)
 {
+#if HAVE_LIBOPCODES
     struct btp_disasm_state *state =
         btp_malloc(sizeof(struct btp_disasm_state));
 
@@ -109,6 +128,10 @@ btp_disasm_init(const char *file_name,
 
     disassemble_init_for_target(&state->info);
     return state;
+#else // HAVE_LIBOPCODES
+    *error_message = btp_asprintf("btparser compiled without libopcodes");
+    return NULL;
+#endif // HAVE_LIBOPCODES
 }
 
 void
@@ -117,9 +140,10 @@ btp_disasm_free(struct btp_disasm_state *state)
     if (!state)
         return;
 
+#if HAVE_LIBOPCODES
     bfd_close(state->bfd_file);
-    free(state->error_message);
-    free(state);
+#endif // HAVE_LIBOPCODES
+   free(state);
 }
 
 char **
@@ -128,6 +152,7 @@ btp_disasm_get_function_instructions(struct btp_disasm_state *state,
                                      uint64_t size,
                                      char **error_message)
 {
+#if HAVE_LIBOPCODES
     asection *section = state->info.section;
     if (start_offset < section->vma
         || (start_offset + size) > section->vma + section->size)
@@ -172,6 +197,10 @@ btp_disasm_get_function_instructions(struct btp_disasm_state *state,
 
     result[result_count] = NULL;
     return result;
+#else // HAVE_LIBOPCODES
+    *error_message = btp_asprintf("btparser compiled without libopcodes");
+    return NULL;
+#endif // HAVE_LIBOPCODES
 }
 
 void
@@ -308,4 +337,3 @@ btp_disasm_get_callee_addresses(char **instructions)
     return result;
 }
 
-#endif // HAVE_LIBOPCODES

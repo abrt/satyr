@@ -19,6 +19,13 @@
 */
 #include "elves.h"
 #include "utils.h"
+#include "config.h"
+
+#if (defined HAVE_DWARF_H && defined HAVE_ELFUTILS_LIBDW_H && defined HAVE_LIBELF_H && defined HAVE_GELF_H)
+#  define WITH_ELFUTILS
+#endif
+
+#ifdef WITH_ELFUTILS
 #include <dwarf.h>
 #include <elfutils/libdw.h>
 #include <errno.h>
@@ -103,11 +110,13 @@ find_elf_section_by_name(Elf *elf,
     *error_message = btp_asprintf("Section %s not found", section_name);
     return 0;
 }
+#endif /* WITH_ELFUTILS */
 
 struct btp_elf_plt_entry *
 btp_elf_get_procedure_linkage_table(const char *filename,
                                     char **error_message)
 {
+#ifdef WITH_ELFUTILS
     /* Open the input file. */
     int fd = open(filename, O_RDONLY);
     if (fd < 0)
@@ -295,6 +304,10 @@ btp_elf_get_procedure_linkage_table(const char *filename,
     elf_end(elf);
     close(fd);
     return result;
+#else /* WITH_ELFUTILS */
+    *error_message = btp_asprintf("btparser compiled without elfutils");
+    return NULL;
+#endif /* WITH_ELFUTILS */
 }
 
 void
@@ -327,6 +340,7 @@ btp_elf_plt_find_for_address(struct btp_elf_plt_entry *plt,
 }
 
 
+#ifdef WITH_ELFUTILS
 /* Given DWARF pointer encoding, return the length of the pointer in
  * bytes.
  */
@@ -461,11 +475,13 @@ fde_read_address(const uint8_t *p, unsigned len)
 
     return (len == 4 ? (uintptr_t)u.n4 : (uintptr_t)u.n8);
 }
+#endif /* WITH_ELFUTILS */
 
 struct btp_elf_fde *
 btp_elf_get_eh_frame(const char *filename,
                      char **error_message)
 {
+#ifdef WITH_ELFUTILS
     /* Open the input file. */
     int fd = open(filename, O_RDONLY);
     if (fd < 0)
@@ -732,6 +748,10 @@ btp_elf_get_eh_frame(const char *filename,
     elf_end(elf);
     close(fd);
     return result;
+#else /* WITH_ELFUTILS */
+    *error_message = btp_asprintf("btparser compiled without elfutils");
+    return NULL;
+#endif /* WITH_ELFUTILS */
 }
 
 void

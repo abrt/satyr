@@ -18,8 +18,6 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "callgraph.h"
-
-#if HAVE_LIBOPCODES
 #include "elves.h"
 #include "disasm.h"
 #include "utils.h"
@@ -178,5 +176,3 @@ btp_callgraph_last(struct btp_callgraph *callgraph)
 
     return last;
 }
-
-#endif // HAVE_LIBOPCODES

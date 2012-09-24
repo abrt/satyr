@@ -61,10 +61,11 @@ libbtparser_la_SOURCES = \
 
 libbtparser_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE $(GLIB_CFLAGS)
 libbtparser_la_LDFLAGS = -version-info 4:2:2 $(GLIB_LIBS)
-libbtparser_la_LIBADD = -lelf -ldw -ldl
 
 if HAVE_LIBOPCODES
-libbtparser_la_LIBADD += -lbfd -lopcodes
+# Conditional link is required to avoid linking to a library without
+# -fPIC.
+libbtparser_la_LIBADD = -lopcodes
 endif
 
 # From http://www.seul.org/docs/autotut/

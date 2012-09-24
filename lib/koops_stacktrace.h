@@ -31,6 +31,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <inttypes.h>
 
 struct btp_location;
 
@@ -119,6 +120,36 @@ btp_koops_stacktrace_dup(struct btp_koops_stacktrace *stacktrace);
 struct btp_koops_stacktrace *
 btp_koops_stacktrace_parse(const char **input,
                            struct btp_location *location);
+
+/**
+ * Timestamp may be present in the oops lines.
+ * @example
+ * [123456.654321]
+ * [   65.470000]
+ */
+bool
+btp_koops_skip_timestamp(const char **input);
+
+bool
+btp_koops_parse_address(const char **input, uint64_t *address);
+
+bool
+btp_koops_parse_module_name(const char **input,
+                            char **module_name);
+
+bool
+btp_koops_parse_function_name(const char **input,
+                              char **function_name,
+                              uint64_t *function_offset,
+                              uint64_t *function_length);
+
+/**
+ * @returns
+ * True if line was successfully parsed, false if line is in unknown
+ * format.
+ */
+bool
+btp_koops_parse_frame_line(const char **input);
 
 #ifdef __cplusplus
 }

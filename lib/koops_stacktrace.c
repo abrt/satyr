@@ -70,14 +70,20 @@ btp_koops_stacktrace_dup(struct btp_koops_stacktrace *stacktrace)
     return result;
 }
 
-/**
- * Timestamp may be present in the oops lines.
- * @example
- * [123456.654321]
- * [   65.470000]
- */
-static bool
-skip_timestamp(const char **input)
+struct btp_koops_stacktrace *
+btp_koops_stacktrace_parse(const char **input,
+                           struct btp_location *location)
+{
+    const char *line = *input;
+
+    while (line)
+        btp_koops_parse_frame_line(line);
+
+    return NULL;
+}
+
+bool
+btp_koops_skip_timestamp(const char **input)
 {
     const char *local_input = *input;
     if (!btp_skip_char(&local_input, '['))
@@ -103,8 +109,8 @@ skip_timestamp(const char **input)
     return true;
 }
 
-static bool
-parse_address(const char **input, uint64_t *address)
+bool
+btp_koops_parse_address(const char **input, uint64_t *address)
 {
     const char *local_input = *input;
 
@@ -122,98 +128,150 @@ parse_address(const char **input, uint64_t *address)
     return true;
 }
 
-/**
- * @returns
- * True if line was successfully parsed, false if line is in unknown
- * format.
- */
-static bool
-parse_frame_line(const char **input)
+bool
+btp_koops_parse_module_name(const char **input,
+                            char **module_name)
 {
     const char *local_input = *input;
 
-    btp_skip_char_span(&local_input, BTP_space);
-
-    /* Skip timestamp if it's present. */
-    skip_timestamp(&local_input);
-
-    btp_skip_char_span(&local_input, BTP_space);
-
-    uint64_t address;
-    if (!parse_address(&local_input, &address))
+    if (!btp_skip_char(&local_input, '['))
         return false;
 
-    btp_skip_char_span(&local_input, BTP_space);
+    if (!btp_parse_char_cspan(&local_input, " \t\n]",
+                              module_name))
+    {
+        return false;
+    }
 
-    /* Question mark? */
-    bool reliable = (0 != btp_skip_char(&local_input, '?'));
+    if (!btp_skip_char(&local_input, ']'))
+    {
+        free(*module_name);
+        return false;
+    }
 
-    btp_skip_char_span(&local_input, BTP_space);
+    *input = local_input;
+    return true;
+}
 
-    char *function_name;
-    if (!btp_parse_char_cspan(&local_input, BTP_space "+",
-                              &function_name))
+bool
+btp_koops_parse_function_name(const char **input,
+                              char **function_name,
+                              uint64_t *function_offset,
+                              uint64_t *function_length)
+{
+    const char *local_input = *input;
+
+    bool parenthesis = btp_skip_char(&local_input, '(');
+
+    if (!btp_parse_char_cspan(&local_input, " \t+",
+                              function_name))
     {
         return false;
     }
 
     if (btp_skip_char(&local_input, '+'))
     {
-        uint64_t function_offset;
         btp_parse_hexadecimal_number(&local_input,
-                                     &function_offset);
+                                     function_offset);
 
         if (!btp_skip_char(&local_input, '/'))
+        {
+            free(*function_name);
+            return false;
+        }
+
+        btp_parse_hexadecimal_number(&local_input,
+                                     function_length);
+    }
+    else
+    {
+        *function_offset = -1;
+        *function_length = -1;
+    }
+
+    if (parenthesis && !btp_skip_char(&local_input, ')'))
+    {
+        free(*function_name);
+        return false;
+    }
+
+    *input = local_input;
+    return true;
+}
+
+bool
+btp_koops_parse_frame_line(const char **input)
+{
+    const char *local_input = *input;
+
+    btp_skip_char_span(&local_input, " \t");
+
+    /* Skip timestamp if it's present. */
+    btp_koops_skip_timestamp(&local_input);
+
+    btp_skip_char_span(&local_input, " \t");
+
+    uint64_t address;
+    if (!btp_koops_parse_address(&local_input, &address))
+        return false;
+
+    btp_skip_char_span(&local_input, " \t");
+
+    /* Question mark? */
+    bool reliable = (0 != btp_skip_char(&local_input, '?'));
+
+    btp_skip_char_span(&local_input, " \t");
+
+    char *function_name;
+    uint64_t function_offset, function_length;
+    if (!btp_koops_parse_function_name(&local_input,
+                                       &function_name,
+                                       &function_offset,
+                                       &function_length))
+    {
+        return false;
+    }
+
+    btp_skip_char_span(&local_input, " \t");
+
+    if (btp_skip_string(&local_input, "from"))
+    {
+        btp_skip_char_span(&local_input, " \t");
+
+        uint64_t from_address;
+        if (!btp_koops_parse_address(&local_input, &from_address))
+            return false;
+
+        btp_skip_char_span(&local_input, " \t");
+
+        char *from_function_name;
+        uint64_t from_function_offset, from_function_length;
+        if (!btp_koops_parse_function_name(&local_input,
+                                           &function_name,
+                                           &function_offset,
+                                           &function_length))
         {
             free(function_name);
             return false;
         }
 
-        uint64_t function_length;
-        btp_parse_hexadecimal_number(&local_input,
-                                     &function_length);
+        btp_skip_char_span(&local_input, " \t");
     }
 
-    btp_skip_char_span(&local_input, " \t");
+
+    char *module_name = NULL;
+    if (btp_koops_parse_module_name(&local_input, &module_name))
+    {
+        btp_skip_char_span(&local_input, " \t");
+    }
 
     if (!btp_skip_char(&local_input, '\n'))
     {
         free(function_name);
+        free(module_name);
         return false;
     }
 
+    *input = local_input;
     return true;
-
-/*
-    // module
-    // in the 2nd example mentioned above, [] also matches
-    // the address part of line's 2nd half (callback).
-    char *callback = strstr(splitter, "from");
-    char *module = strchr(splitter, '[');
-    if (module && (!callback || callback > module))
-    {
-        ++module;
-        splitter = strchr(module, ']');
-        if (splitter)
-        {
-            *splitter = '\0';
-            frame->filename = btp_strdup(module);
-            *splitter = ']';
-        }
-    }
-*/
-
-    return true;
-}
-
-struct btp_koops_stacktrace *
-btp_koops_stacktrace_parse(const char **input,
-                           struct btp_location *location)
-{
-    const char *line = *input;
-
-    while (line)
-        parse_frame_line(line);
-
-    return NULL;
 }
