@@ -311,6 +311,9 @@ libbtparser_la_SOURCES = \
 
 libbtparser_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE $(GLIB_CFLAGS)
 libbtparser_la_LDFLAGS = -version-info 4:2:2 $(GLIB_LIBS)
+
+# Conditional link is required to avoid linking to a library without
+# -fPIC.
 @HAVE_LIBOPCODES_TRUE@libbtparser_la_LIBADD = -lopcodes
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am

@@ -345,6 +345,16 @@ btp_parse_char_span(const char **input, const char *accept, char **result)
     return count;
 }
 
+int
+btp_skip_char_cspan(const char **input, const char *reject)
+{
+    size_t count = strcspn(*input, reject);
+    if (0 == count)
+        return count;
+    *input += count;
+    return count;
+}
+
 bool
 btp_parse_char_cspan(const char **input, const char *reject, char **result)
 {

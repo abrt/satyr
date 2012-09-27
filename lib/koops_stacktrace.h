@@ -109,6 +109,12 @@ struct btp_koops_stacktrace *
 btp_koops_stacktrace_dup(struct btp_koops_stacktrace *stacktrace);
 
 /**
+ * Returns the number of frames in the Kerneloops stacktrace.
+ */
+int
+btp_koops_stacktrace_get_frame_count(struct btp_koops_stacktrace *stacktrace);
+
+/**
  * Parses a textual kernel oops and puts it into a structure.  If
  * parsing fails, the input parameter is not changed and NULL is
  * returned.
@@ -120,31 +126,6 @@ btp_koops_stacktrace_dup(struct btp_koops_stacktrace *stacktrace);
 struct btp_koops_stacktrace *
 btp_koops_stacktrace_parse(const char **input,
                            struct btp_location *location);
-
-/**
- * Timestamp may be present in the oops lines.
- * @example
- * [123456.654321]
- * [   65.470000]
- */
-bool
-btp_koops_skip_timestamp(const char **input);
-
-bool
-btp_koops_parse_address(const char **input, uint64_t *address);
-
-bool
-btp_koops_parse_module_name(const char **input,
-                            char **module_name);
-
-bool
-btp_koops_parse_function_name(const char **input,
-                              char **function_name,
-                              uint64_t *function_offset,
-                              uint64_t *function_length);
-
-struct btp_koops_frame *
-btp_koops_parse_frame(const char **input);
 
 #ifdef __cplusplus
 }

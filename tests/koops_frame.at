@@ -1,0 +1,239 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([Kerneloops frames])
+
+## ------------------------ ##
+## btp_koops_skip_timestamp ##
+## ------------------------ ##
+
+AT_TESTFUN([btp_koops_skip_timestamp],
+[[
+#include <lib/koops_frame.h>
+#include <assert.h>
+#include <stdlib.h>
+
+static void
+check(bool success,
+      char *input)
+{
+  char *old_input = input;
+  assert(success == btp_koops_skip_timestamp(&input));
+
+  if (success)
+    assert(*input == '\0');
+  else
+  {
+    /* Check that the pointer is not moved. */
+    assert(old_input == input);
+  }
+}
+
+int
+main(void)
+{
+  check(true, "[  120.836230]");
+  check(true, "[110417.280595]");
+  check(false, "--2012-06-28 ");
+  check(false, "[<ffffffff81479782>]");
+  return 0;
+}
+]])
+
+## ----------------------- ##
+## btp_koops_parse_address ##
+## ----------------------- ##
+
+AT_TESTFUN([btp_koops_parse_address],
+[[
+#include <lib/koops_frame.h>
+#include <assert.h>
+#include <stdlib.h>
+
+static void
+check(bool success,
+      char *input,
+      uint64_t expected_address)
+{
+  char *old_input = input;
+  uint64_t address;
+  assert(success == btp_koops_parse_address(&input, &address));
+
+  if (success)
+  {
+    assert(*input == '\0');
+    assert(address == expected_address);
+  }
+  else
+  {
+    /* Check that the pointer is not moved. */
+    assert(old_input == input);
+  }
+}
+
+int
+main(void)
+{
+  check(true, "[<ffffffff81479782>]", 0xffffffff81479782);
+  return 0;
+}
+]])
+
+## --------------------------- ##
+## btp_koops_parse_module_name ##
+## --------------------------- ##
+
+AT_TESTFUN([btp_koops_parse_module_name],
+[[
+#include <lib/koops_frame.h>
+#include <assert.h>
+#include <stdlib.h>
+
+static void
+check(bool success,
+      char *input,
+      char *expected_module_name)
+{
+  char *old_input = input;
+  char *module_name;
+  assert(success == btp_koops_parse_module_name(&input,
+				                &module_name));
+
+  if (success)
+  {
+    assert(strcmp(module_name, expected_module_name) == 0);
+    assert(*input == '\0');
+    free(module_name);
+  }
+  else
+  {
+    /* Check that the pointer is not moved. */
+    assert(old_input == input);
+  }
+}
+
+int
+main(void)
+{
+  check(true, "[ppp_generic]", "ppp_generic");
+  check(false, "ppp_generic", NULL);
+  return 0;
+}
+]])
+
+## ------------------------ ##
+## btp_koops_parse_function ##
+## ------------------------ ##
+
+AT_TESTFUN([btp_koops_parse_function],
+[[
+#include <lib/koops_frame.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdint.h>
+
+static void
+check(bool success,
+      char *input,
+      char *expected_function_name,
+      uint64_t expected_function_offset,
+      uint64_t expected_function_length,
+      char *expected_module_name)
+{
+  char *old_input = input;
+  char *function_name = NULL, *module_name = NULL;
+  uint64_t function_offset, function_length;
+  assert(success == btp_koops_parse_function(&input,
+				             &function_name,
+					     &function_offset,
+					     &function_length,
+					     &module_name));
+
+  if (success)
+  {
+    assert(strcmp(function_name, expected_function_name) == 0);
+    assert(function_offset == expected_function_offset);
+    assert(function_length == expected_function_length);
+    assert(btp_strcmp0(module_name, expected_module_name) == 0);
+    assert(*input == '\0');
+    free(function_name);
+    free(module_name);
+  }
+  else
+  {
+    /* Check that the pointer is not moved. */
+    assert(old_input == input);
+  }
+}
+
+int
+main(void)
+{
+  check(true, "warn_slowpath_common+0x7f/0xc0", "warn_slowpath_common", 0x7f, 0xc0, NULL);
+  check(true, "(_raw_spin_lock_irqsave+0x48/0x5c)", "_raw_spin_lock_irqsave", 0x48, 0x5c, NULL);
+  return 0;
+}
+]])
+
+## --------------------- ##
+## btp_koops_frame_parse ##
+## --------------------- ##
+
+AT_TESTFUN([btp_koops_frame_parse],
+[[
+#include <lib/koops_frame.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdint.h>
+
+static void
+check(bool success,
+      char *input,
+      struct btp_koops_frame *expected_frame)
+{
+  char *old_input = input;
+
+  struct btp_koops_frame *frame = btp_koops_frame_parse(&input);
+  assert(!!frame == success);
+
+  if (success)
+  {
+    assert(0 == btp_koops_frame_cmp(frame, expected_frame));
+    assert(*input == '\0');
+    btp_koops_frame_free(frame);
+  }
+  else
+  {
+    /* Check that the pointer is not moved. */
+    assert(old_input == input);
+  }
+}
+
+int
+main(void)
+{
+  struct btp_koops_frame frame;
+  btp_koops_frame_init(&frame);
+  frame.address = 0xffffffff8151f860;
+  frame.reliable = false;
+  frame.function_name = "ip_forward_options";
+  frame.function_offset = 0x1f0;
+  frame.function_length = 0x1f0;
+
+  check(true, "[110417.280555]  [<ffffffff8151f860>] ? ip_forward_options+0x1f0/0x1f0", &frame);
+
+  frame.address = 0xc02f671c;
+  frame.reliable = true;
+  frame.function_name = "_raw_spin_lock_irqsave";
+  frame.function_offset = 0x48;
+  frame.function_length = 0x5c;
+  frame.from_address = 0xbf054120;
+  frame.from_function_name = "mxs_mmc_enable_sdio_irq";
+  frame.from_function_offset = 0x18;
+  frame.from_function_length = 0xdc;
+  frame.from_module_name = "mxs_mmc";
+
+  check(true, "[   65.470000] [<c02f671c>] (_raw_spin_lock_irqsave+0x48/0x5c) from [<bf054120>] (mxs_mmc_enable_sdio_irq+0x18/0xdc [mxs_mmc])", &frame);
+  return 0;
+}
+]])
+

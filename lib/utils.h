@@ -226,6 +226,16 @@ int
 btp_parse_char_span(const char **input, const char *accept, char **result);
 
 /**
+ * If the input contains one or more characters which are not
+ * presentin string reject, move the input pointer after the
+ * sequence. Otherwise do not modify the input.
+ * @returns
+ * The number of characters skipped.
+ */
+int
+btp_skip_char_cspan(const char **input, const char *reject);
+
+/**
  * If the input contains characters which are not in string reject,
  * create a string from this sequence and store it to the result,
  * move the input pointer after the sequence, and return true.

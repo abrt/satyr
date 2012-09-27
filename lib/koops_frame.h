@@ -55,6 +55,8 @@ struct btp_koops_frame
 
     uint64_t function_length;
 
+    char *module_name;
+
     uint64_t from_address;
 
     char *from_function_name;
@@ -63,7 +65,7 @@ struct btp_koops_frame
 
     uint64_t from_function_length;
 
-    char *module_name;
+    char *from_module_name;
 
     struct btp_koops_frame *next;
 };
@@ -128,6 +130,42 @@ btp_koops_frame_dup(struct btp_koops_frame *frame,
 int
 btp_koops_frame_cmp(struct btp_koops_frame *frame1,
                     struct btp_koops_frame *frame2);
+
+/**
+ * Appends 'item' at the end of the list 'dest'.
+ * @returns
+ * This function returns the 'dest' frame.  If 'dest' is NULL, it
+ * returns the 'item' frame.
+ */
+struct btp_koops_frame *
+btp_koops_frame_append(struct btp_koops_frame *dest,
+                       struct btp_koops_frame *item);
+
+struct btp_koops_frame *
+btp_koops_frame_parse(const char **input);
+
+/**
+ * Timestamp may be present in the oops lines.
+ * @example
+ * [123456.654321]
+ * [   65.470000]
+ */
+bool
+btp_koops_skip_timestamp(const char **input);
+
+bool
+btp_koops_parse_address(const char **input, uint64_t *address);
+
+bool
+btp_koops_parse_module_name(const char **input,
+                            char **module_name);
+
+bool
+btp_koops_parse_function(const char **input,
+                         char **function_name,
+                         uint64_t *function_offset,
+                         uint64_t *function_length,
+                         char **module_name);
 
 #ifdef __cplusplus
 }

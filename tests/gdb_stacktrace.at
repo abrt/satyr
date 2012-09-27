@@ -85,6 +85,7 @@ check(const char *path, const char *first_thread_function_name)
   assert(crash_thread);
   assert(0 == strcmp(crash_thread->frames->function_name, first_thread_function_name));
   btp_gdb_stacktrace_free(stacktrace);
+  free(full_input);
   return 0;
 }
 
