@@ -365,36 +365,37 @@ int main(void)
 }
 ]])
 
-## ------------------------- ##
-## btp_skip_unsigned_integer ##
-## ------------------------- ##
+## ------------- ##
+## btp_skip_uint ##
+## ------------- ##
 
-AT_TESTFUN([btp_skip_unsigned_integer],
+AT_TESTFUN([btp_skip_uint],
 [[
 #include <lib/utils.h>
 #include <assert.h>
 int main(void)
 {
   char *input = "10";
-  assert(2 == btp_skip_unsigned_integer(&input));
+  assert(2 == btp_skip_uint(&input));
   assert(*input == '\0');
   return 0;
 }
 ]])
 
-## ------------------------- ##
-## btp_parse_unsigned_integer ##
-## ------------------------- ##
+## ---------------- ##
+## btp_parse_uint32 ##
+## ---------------- ##
 
-AT_TESTFUN([btp_parse_unsigned_integer],
+AT_TESTFUN([btp_parse_uint32],
 [[
 #include <lib/utils.h>
 #include <assert.h>
+#include <stdint.h>
 int main(void)
 {
   char *input = "10";
-  unsigned result;
-  assert(2 == btp_parse_unsigned_integer(&input, &result));
+  uint32_t result;
+  assert(2 == btp_parse_uint32(&input, &result));
   assert('\0' == *input);
   assert(10 == result);
   return 0;
@@ -402,39 +403,40 @@ int main(void)
 ]])
 
 ## --------------------------- ##
-## btp_skip_hexadecimal_number ##
+## btp_skip_hexadecimal_0xuint ##
 ## --------------------------- ##
 
-AT_TESTFUN([btp_skip_hexadecimal_number],
+AT_TESTFUN([btp_skip_hexadecimal_0xuint],
 [[
 #include <lib/utils.h>
 #include <assert.h>
 int main(void)
 {
   char *input = "0xffddffddff";
-  assert(12 == btp_skip_hexadecimal_number(&input));
+  assert(12 == btp_skip_hexadecimal_0xuint(&input));
   assert(*input == '\0');
   return 0;
 }
 ]])
 
-## ---------------------------- ##
-## btp_parse_hexadecimal_number ##
-## ---------------------------- ##
+## ------------------------------ ##
+## btp_parse_hexadecimal_0xuint64 ##
+## ------------------------------ ##
 
-AT_TESTFUN([btp_parse_hexadecimal_number],
+AT_TESTFUN([btp_parse_hexadecimal_0xuint64],
 [[
 #include <lib/utils.h>
 #include <assert.h>
+#include <stdint.h>
 int main(void)
 {
   char *input = "0x0fafaffff 0x2badf00dbaadf00d";
   uint64_t num;
-  assert(11 == btp_parse_hexadecimal_number(&input, &num));
+  assert(11 == btp_parse_hexadecimal_0xuint64(&input, &num));
   assert(*input == ' ');
   assert(num == 0xfafaffff);
   *input++;
-  assert(18 == btp_parse_hexadecimal_number(&input, &num));
+  assert(18 == btp_parse_hexadecimal_0xuint64(&input, &num));
   assert(*input == '\0');
   assert(num == 0x2badf00dbaadf00d);
   return 0;

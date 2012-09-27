@@ -59,7 +59,7 @@ struct btp_gdb_frame
      * actual position in the thread, as this number is set by the
      * parser and never updated.
      */
-    unsigned number;
+    uint32_t number;
 
     /**
      * The name of the source file containing the function definition,
@@ -72,7 +72,7 @@ struct btp_gdb_frame
      * A line number in the source file, determining the position of
      * the function definition, or -1 when unknown.
      */
-    unsigned source_line;
+    uint32_t source_line;
 
     /**
      * Signal handler was called on this frame.
@@ -310,7 +310,7 @@ btp_gdb_frame_parse(const char **input,
  */
 int
 btp_gdb_frame_parse_frame_start(const char **input,
-                                unsigned *number);
+                                uint32_t *number);
 
 /**
  * Parses C++ operator on input.  Supports even 'operator new[]' and
@@ -477,7 +477,7 @@ btp_gdb_frame_parse_address_in_function(const char **input,
 bool
 btp_gdb_frame_parse_file_location(const char **input,
                                   char **file,
-                                  unsigned *fileline,
+                                  uint32_t *file_line,
                                   struct btp_location *location);
 
 /**

@@ -337,7 +337,7 @@ btp_gdb_frame_parse(const char **input,
 }
 
 int
-btp_gdb_frame_parse_frame_start(const char **input, unsigned *number)
+btp_gdb_frame_parse_frame_start(const char **input, uint32_t *number)
 {
     const char *local_input = *input;
 
@@ -347,7 +347,7 @@ btp_gdb_frame_parse_frame_start(const char **input, unsigned *number)
     int count = 1;
 
     /* Read the frame position. */
-    int digits = btp_parse_unsigned_integer(&local_input, number);
+    int digits = btp_parse_uint32(&local_input, number);
     count += digits;
     if (0 == digits)
         return 0;
@@ -860,7 +860,7 @@ btp_gdb_frame_parse_address_in_function(const char **input,
     const char *local_input = *input;
 
     /* Read memory address in hexadecimal format. */
-    int digits = btp_parse_hexadecimal_number(&local_input, address);
+    int digits = btp_parse_hexadecimal_0xuint64(&local_input, address);
     location->column += digits;
     /* Memory address is optional. It is not present for inlined frames. */
     if (digits == 0)
@@ -942,7 +942,7 @@ btp_gdb_frame_parse_address_in_function(const char **input,
 bool
 btp_gdb_frame_parse_file_location(const char **input,
                                   char **file,
-                                  unsigned *fileline,
+                                  uint32_t *file_line,
                                   struct btp_location *location)
 {
     const char *local_input = *input;
@@ -986,7 +986,7 @@ btp_gdb_frame_parse_file_location(const char **input,
     if (btp_skip_char(&local_input, ':'))
     {
         location->column += 1;
-        int digits = btp_parse_unsigned_integer(&local_input, fileline);
+        int digits = btp_parse_uint32(&local_input, file_line);
         location->column += digits;
         if (0 == digits)
         {
@@ -996,7 +996,7 @@ btp_gdb_frame_parse_file_location(const char **input,
         }
     }
     else
-        *fileline = -1;
+        *file_line = -1;
 
     *file = file_name;
     *input = local_input;

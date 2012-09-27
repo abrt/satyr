@@ -46,7 +46,9 @@ btp_koops_frame_free(struct btp_koops_frame *frame)
     if (!frame)
         return;
 
-    free(frame->module);
+    free(frame->function_name);
+    free(frame->from_function_name);
+    free(frame->module_name);
     free(frame);
 }
 
@@ -66,8 +68,27 @@ btp_koops_frame_dup(struct btp_koops_frame *frame, bool siblings)
         result->next = NULL; /* Do not copy that. */
 
     /* Duplicate all strings. */
-    if (result->module)
-        result->module = btp_strdup(result->module);
+    if (result->function_name)
+        result->function_name = btp_strdup(result->function_name);
+
+    if (result->from_function_name)
+        result->from_function_name = btp_strdup(result->from_function_name);
+
+    if (result->module_name)
+        result->module_name = btp_strdup(result->module_name);
 
     return result;
+}
+
+int
+btp_koops_frame_cmp(struct btp_koops_frame *frame1,
+                    struct btp_koops_frame *frame2)
+{
+    /* Function. */
+    int function_name = btp_strcmp0(frame1->function_name,
+                                    frame2->function_name);
+    if (function_name != 0)
+        return function_name;
+
+    return 0;
 }

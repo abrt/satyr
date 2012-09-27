@@ -49,13 +49,21 @@ struct btp_koops_frame
      */
     bool reliable;
 
-    char *name;
+    char *function_name;
 
-    uint64_t offset;
+    uint64_t function_offset;
 
-    uint64_t len;
+    uint64_t function_length;
 
-    char *module;
+    uint64_t from_address;
+
+    char *from_function_name;
+
+    uint64_t from_function_offset;
+
+    uint64_t from_function_length;
+
+    char *module_name;
 
     struct btp_koops_frame *next;
 };
@@ -103,6 +111,23 @@ btp_koops_frame_free(struct btp_koops_frame *frame);
 struct btp_koops_frame *
 btp_koops_frame_dup(struct btp_koops_frame *frame,
                     bool siblings);
+
+/**
+ * Compares two frames.
+ * @param frame1
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @param frame2
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @returns
+ * Returns 0 if the frames are same.  Returns negative number if
+ * frame1 is found to be 'less' than frame2.  Returns positive number
+ * if frame1 is found to be 'greater' than frame2.
+ */
+int
+btp_koops_frame_cmp(struct btp_koops_frame *frame1,
+                    struct btp_koops_frame *frame2);
 
 #ifdef __cplusplus
 }

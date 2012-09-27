@@ -274,7 +274,7 @@ btp_parse_digit(const char **input);
  * digit.
  */
 int
-btp_skip_unsigned_integer(const char **input);
+btp_skip_uint(const char **input);
 
 /**
  * If the input contains [0-9]+, parse it, move the input pointer
@@ -283,10 +283,20 @@ btp_skip_unsigned_integer(const char **input);
  * Number of parsed characters. 0 if input does not contain a number.
  */
 int
-btp_parse_unsigned_integer(const char **input, unsigned *result);
+btp_parse_uint32(const char **input, uint32_t *result);
 
 int
 btp_parse_uint64(const char **input, uint64_t *result);
+
+/**
+ * If the input contains [0-9a-f]+, move the input pointer
+ * after that.
+ * @returns
+ * The number of characters processed from input. 0 if the input does
+ * not contain a hexadecimal number.
+ */
+int
+btp_skip_hexadecimal_uint(const char **input);
 
 /**
  * If the input contains 0x[0-9a-f]+, move the input pointer
@@ -296,7 +306,17 @@ btp_parse_uint64(const char **input, uint64_t *result);
  * not contain a hexadecimal number.
  */
 int
-btp_skip_hexadecimal_number(const char **input);
+btp_skip_hexadecimal_0xuint(const char **input);
+
+/**
+ * If the input contains [0-9a-f]+, parse the number, and move the
+ * input pointer after it.  Otherwise do not modify the input.
+ * @returns
+ * The number of characters read from input. 0 if the input does not
+ * contain a hexadecimal number.
+ */
+int
+btp_parse_hexadecimal_uint64(const char **input, uint64_t *result);
 
 /**
  * If the input contains 0x[0-9a-f]+, parse the number, and move the
@@ -306,7 +326,7 @@ btp_skip_hexadecimal_number(const char **input);
  * contain a hexadecimal number.
  */
 int
-btp_parse_hexadecimal_number(const char **input, uint64_t *result);
+btp_parse_hexadecimal_0xuint64(const char **input, uint64_t *result);
 
 char *
 btp_skip_whitespace(const char *s);

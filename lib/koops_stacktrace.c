@@ -77,7 +77,7 @@ btp_koops_stacktrace_parse(const char **input,
     const char *line = *input;
 
     while (line)
-        btp_koops_parse_frame_line(line);
+        btp_koops_parse_frame(&line);
 
     return NULL;
 }
@@ -91,14 +91,14 @@ btp_koops_skip_timestamp(const char **input)
 
     btp_skip_char_span(&local_input, BTP_space);
 
-    int num = btp_skip_unsigned_integer(&local_input);
+    int num = btp_skip_uint(&local_input);
     if (0 == num)
         return false;
 
     if (!btp_skip_char(&local_input, '.'))
         return false;
 
-    num = btp_skip_unsigned_integer(&local_input);
+    num = btp_skip_uint(&local_input);
     if (0 == num)
         return false;
 
@@ -117,7 +117,7 @@ btp_koops_parse_address(const char **input, uint64_t *address)
     if (!btp_skip_string(&local_input, "[<"))
         return false;
 
-    int len = btp_parse_uint64(&local_input, address);
+    int len = btp_parse_hexadecimal_uint64(&local_input, address);
     if (!len)
         return false;
 
@@ -163,7 +163,7 @@ btp_koops_parse_function_name(const char **input,
 
     bool parenthesis = btp_skip_char(&local_input, '(');
 
-    if (!btp_parse_char_cspan(&local_input, " \t+",
+    if (!btp_parse_char_cspan(&local_input, " \t)+",
                               function_name))
     {
         return false;
@@ -171,8 +171,8 @@ btp_koops_parse_function_name(const char **input,
 
     if (btp_skip_char(&local_input, '+'))
     {
-        btp_parse_hexadecimal_number(&local_input,
-                                     function_offset);
+        btp_parse_hexadecimal_0xuint64(&local_input,
+                                       function_offset);
 
         if (!btp_skip_char(&local_input, '/'))
         {
@@ -180,8 +180,8 @@ btp_koops_parse_function_name(const char **input,
             return false;
         }
 
-        btp_parse_hexadecimal_number(&local_input,
-                                     function_length);
+        btp_parse_hexadecimal_0xuint64(&local_input,
+                                       function_length);
     }
     else
     {
@@ -199,8 +199,8 @@ btp_koops_parse_function_name(const char **input,
     return true;
 }
 
-bool
-btp_koops_parse_frame_line(const char **input)
+struct btp_koops_frame *
+btp_koops_parse_frame(const char **input)
 {
     const char *local_input = *input;
 
@@ -222,14 +222,16 @@ btp_koops_parse_frame_line(const char **input)
 
     btp_skip_char_span(&local_input, " \t");
 
-    char *function_name;
-    uint64_t function_offset, function_length;
+    struct btp_koops_frame *frame = btp_koops_frame_new();
+    frame->address = address;
+    frame->reliable = reliable;
     if (!btp_koops_parse_function_name(&local_input,
-                                       &function_name,
-                                       &function_offset,
-                                       &function_length))
+                                       &frame->function_name,
+                                       &frame->function_offset,
+                                       &frame->function_length))
     {
-        return false;
+        btp_koops_frame_free(frame);
+        return NULL;
     }
 
     btp_skip_char_span(&local_input, " \t");
@@ -238,40 +240,39 @@ btp_koops_parse_frame_line(const char **input)
     {
         btp_skip_char_span(&local_input, " \t");
 
-        uint64_t from_address;
-        if (!btp_koops_parse_address(&local_input, &from_address))
-            return false;
+        if (!btp_koops_parse_address(&local_input,
+                                     &frame->from_address))
+        {
+            btp_koops_frame_free(frame);
+            return NULL;
+        }
 
         btp_skip_char_span(&local_input, " \t");
 
-        char *from_function_name;
-        uint64_t from_function_offset, from_function_length;
         if (!btp_koops_parse_function_name(&local_input,
-                                           &function_name,
-                                           &function_offset,
-                                           &function_length))
+                                           &frame->from_function_name,
+                                           &frame->from_function_offset,
+                                           &frame->from_function_length))
         {
-            free(function_name);
-            return false;
+            btp_koops_frame_free(frame);
+            return NULL;
         }
 
         btp_skip_char_span(&local_input, " \t");
     }
 
 
-    char *module_name = NULL;
-    if (btp_koops_parse_module_name(&local_input, &module_name))
+    if (btp_koops_parse_module_name(&local_input, &frame->module_name))
     {
         btp_skip_char_span(&local_input, " \t");
     }
 
-    if (!btp_skip_char(&local_input, '\n'))
+    if (*local_input != '\0' && !btp_skip_char(&local_input, '\n'))
     {
-        free(function_name);
-        free(module_name);
-        return false;
+        btp_koops_frame_free(frame);
+        return NULL;
     }
 
     *input = local_input;
-    return true;
+    return frame;
 }

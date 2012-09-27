@@ -143,13 +143,8 @@ btp_koops_parse_function_name(const char **input,
                               uint64_t *function_offset,
                               uint64_t *function_length);
 
-/**
- * @returns
- * True if line was successfully parsed, false if line is in unknown
- * format.
- */
-bool
-btp_koops_parse_frame_line(const char **input);
+struct btp_koops_frame *
+btp_koops_parse_frame(const char **input);
 
 #ifdef __cplusplus
 }

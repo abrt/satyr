@@ -30,6 +30,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <stdint.h>
 
 struct btp_gdb_frame;
 struct btp_strbuf;
@@ -42,7 +43,7 @@ struct btp_location;
  */
 struct btp_gdb_thread
 {
-    unsigned number;
+    uint32_t number;
 
     /**
      * Thread's frames, starting from the top of the stack.

@@ -512,4 +512,4 @@ btp_core_fingerprint_generate_for_binary(struct btp_core_thread *thread,
     return true;
 }
 
-#endif HAVE_LIBOPCODES
+#endif // HAVE_LIBOPCODES
