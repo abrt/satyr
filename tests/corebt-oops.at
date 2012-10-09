@@ -1,0 +1,239 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([Core-level backtrace for kerneloops])
+
+## --------------------------- ##
+## btp_parse_kerneloops_x86_64 ##
+## --------------------------- ##
+
+AT_TESTFUN([btp_parse_kerneloops_x86_64],
+[[
+#include <lib/core-backtrace-oops.h>
+#include <lib/utils.h>
+#include <glib.h>
+#include <assert.h>
+
+char *kver = "3.2.2-1.fc16.x86_64";
+GList *oops = NULL;
+
+void t(uint64_t addr, char *sym, char *mod)
+{
+  assert(oops);
+  struct backtrace_entry *f = oops->data;
+
+  assert(f->address == addr);
+  assert(strcmp(f->symbol, sym) == 0);
+  assert(strcmp(f->filename, mod) == 0);
+  oops = g_list_next(oops);
+}
+
+int main(void)
+{
+  char *str = btp_file_to_string("../../oopses/oops.x86_64");
+  assert(str);
+  oops = btp_parse_kerneloops(str, kver);
+  assert(oops);
+
+  t(0xffffffff8106dd1f, "warn_slowpath_common", "vmlinux");
+  t(0xffffffff8106dd7a, "warn_slowpath_null", "vmlinux");
+  t(0xffffffffa03eb6b8, "ath_rc_get_highest_rix", "ath9k");
+  t(0xffffffffa03eb88c, "ath_get_rate", "ath9k");
+  t(0xffffffff81088610, "insert_work", "vmlinux");
+  t(0xffffffffa04e7aa6, "rate_control_get_rate", "mac80211");
+  t(0xffffffffa04f389f, "invoke_tx_handlers", "mac80211");
+  t(0xffffffffa04d2dac, "sta_info_get", "mac80211");
+  t(0xffffffffa04f46d0, "ieee80211_tx", "mac80211");
+  t(0xffffffffa04f47b1, "ieee80211_xmit", "mac80211");
+  t(0xffffffffa04f4e5f, "ieee80211_subif_start_xmit", "mac80211");
+  t(0xffffffff810992f7, "getnstimeofday", "vmlinux");
+  t(0xffffffff814d48a2, "dev_hard_start_xmit", "vmlinux");
+  t(0xffffffff814f03af, "sch_direct_xmit", "vmlinux");
+  t(0xffffffff814d4de4, "dev_queue_xmit", "vmlinux");
+  t(0xffffffff814fdf85, "nf_hook_slow", "vmlinux");
+  t(0xffffffff8150cec0, "ip_fragment", "vmlinux");
+  t(0xffffffff8150d02b, "ip_finish_output", "vmlinux");
+  t(0xffffffff8150db88, "ip_output", "vmlinux");
+  t(0xffffffff8150d254, "ip_local_out", "vmlinux");
+  t(0xffffffff8150d289, "ip_local_out", "vmlinux");
+  t(0xffffffff8150d3df, "ip_queue_xmit", "vmlinux");
+  t(0xffffffff81524804, "tcp_transmit_skb", "vmlinux");
+  t(0xffffffff81525f31, "tcp_retransmit_skb", "vmlinux");
+  t(0xffffffff81113056, "perf_event_task_tick", "vmlinux");
+  t(0xffffffff8152789d, "tcp_retransmit_timer", "vmlinux");
+  t(0xffffffff81527ed8, "tcp_write_timer", "vmlinux");
+  t(0xffffffff8107d35b, "run_timer_softirq", "vmlinux");
+  t(0xffffffff812bf1d4, "timerqueue_add", "vmlinux");
+  t(0xffffffff81527d50, "tcp_retransmit_timer", "vmlinux");
+  t(0xffffffff8101b8d3, "native_sched_clock", "vmlinux");
+  t(0xffffffff81075348, "do_softirq", "vmlinux");
+  t(0xffffffff8101b3b9, "read_tsc", "vmlinux");
+  t(0xffffffff810a09d4, "tick_program_event", "vmlinux");
+  t(0xffffffff815eba2c, "call_softirq", "vmlinux");
+  t(0xffffffff81016275, "do_softirq", "vmlinux");
+  t(0xffffffff8107575e, "irq_exit", "vmlinux");
+  t(0xffffffff815ec3ce, "smp_apic_timer_interrupt", "vmlinux");
+  t(0xffffffff815ea29e, "apic_timer_interrupt", "vmlinux");
+  t(0xffffffff8130fd2d, "intel_idle", "vmlinux");
+  t(0xffffffff8130fd0f, "intel_idle", "vmlinux");
+  t(0xffffffff814927f1, "cpuidle_idle_call", "vmlinux");
+  t(0xffffffff8101322a, "cpu_idle", "vmlinux");
+  t(0xffffffff815d01b6, "start_secondary", "vmlinux");
+  assert(oops == NULL);
+
+  return 0;
+}
+]])
+
+## ------------------------- ##
+## btp_parse_kerneloops_i386 ##
+## ------------------------- ##
+
+AT_TESTFUN([btp_parse_kerneloops_i386],
+[[
+#include <lib/core-backtrace-oops.h>
+#include <lib/utils.h>
+#include <glib.h>
+#include <assert.h>
+
+char *kver = "3.3.1-3.fc16.i686.PAE";
+GList *oops = NULL;
+
+void t(uint64_t addr, char *sym)
+{
+  assert(oops);
+  struct backtrace_entry *f = oops->data;
+
+  assert(f->address == addr);
+  assert(strcmp(f->symbol, sym) == 0);
+  assert(strcmp(f->filename, "vmlinux") == 0);
+  oops = g_list_next(oops);
+}
+
+int main(void)
+{
+  char *str = btp_file_to_string("../../oopses/oops.i386");
+  assert(str);
+  oops = btp_parse_kerneloops(str, kver);
+  assert(oops);
+
+  t(0xc0446902, "warn_slowpath_common");
+  t(0xc087237a, "dev_watchdog");
+  t(0xc087237a, "dev_watchdog");
+  t(0xc04469d3, "warn_slowpath_fmt");
+  t(0xc087237a, "dev_watchdog");
+  t(0xc044d410, "tasklet_hi_schedule_first");
+  t(0xc0454827, "run_timer_softirq");
+  t(0xc0477a2f, "sched_clock_cpu");
+  t(0xc08721a0, "qdisc_reset");
+  t(0xc044d410, "tasklet_hi_schedule_first");
+  t(0xc044d4a1, "do_softirq");
+  t(0xc044d410, "tasklet_hi_schedule_first");
+  t(0xc044d7fe, "irq_exit");
+  t(0xc042ea79, "smp_apic_timer_interrupt");
+  t(0xc094b865, "apic_timer_interrupt");
+  t(0xc0437ee5, "native_safe_halt");
+  t(0xc041975c, "default_idle");
+  t(0xc0411308, "cpu_idle");
+  t(0xc092ac05, "rest_init");
+  t(0xc0be278b, "start_kernel");
+  t(0xc0be21c5, "loglevel");
+  t(0xc0be20ac, "i386_start_kernel");
+  assert(oops == NULL);
+
+  return 0;
+}
+]])
+
+## -------------------------- ##
+## btp_parse_kerneloops_s390x ##
+## -------------------------- ##
+
+AT_TESTFUN([btp_parse_kerneloops_s390x],
+[[
+#include <lib/core-backtrace-oops.h>
+#include <lib/utils.h>
+#include <glib.h>
+#include <assert.h>
+
+char *kver = "2.6.41.4-1.fc15.s390x";
+GList *oops = NULL;
+
+void t(uint64_t addr, char *sym)
+{
+  assert(oops);
+  struct backtrace_entry *f = oops->data;
+
+  assert(f->address == addr);
+  assert(strcmp(f->symbol, sym) == 0);
+  assert(strcmp(f->filename, "vmlinux") == 0);
+  oops = g_list_next(oops);
+}
+
+int main(void)
+{
+  char *str = btp_file_to_string("../../oopses/oops.s390x");
+  assert(str);
+  oops = btp_parse_kerneloops(str, kver);
+  assert(oops);
+
+  t(0x000000000045400c, "list_add");
+  t(0x000000000024798e, "anon_vma_fork");
+  t(0x0000000000149786, "dup_mm");
+  t(0x000000000014a860, "copy_process");
+  t(0x000000000014b14c, "do_fork");
+  t(0x0000000000106c16, "SyS_clone");
+  t(0x0000000000631e08, "sysc_tracego");
+  /* XXX: the rest is not parsed correctly? */
+
+  return 0;
+}
+]])
+
+## -------------------------- ##
+## btp_parse_kerneloops_armv7 ##
+## -------------------------- ##
+
+AT_TESTFUN([btp_parse_kerneloops_armv7],
+[[
+#include <lib/core-backtrace-oops.h>
+#include <lib/utils.h>
+#include <glib.h>
+#include <assert.h>
+
+char *kver = "N/A";
+GList *oops = NULL;
+
+void t(uint64_t addr, char *sym)
+{
+  assert(oops);
+  struct backtrace_entry *f = oops->data;
+
+  assert(f->address == addr);
+  assert(strcmp(f->symbol, sym) == 0);
+  assert(strcmp(f->filename, "vmlinux") == 0);
+  oops = g_list_next(oops);
+}
+
+int main(void)
+{
+  char *str = btp_file_to_string("../../oopses/oops.armv7");
+  assert(str);
+  oops = btp_parse_kerneloops(str, kver);
+  assert(oops);
+
+  t(0xc0014210, "unwind_backtrace");
+  t(0xc004c7bc, "warn_slowpath_common");
+  t(0xc004c7f0, "warn_slowpath_null");
+  t(0xc024c208, "dss_driver_probe");
+  t(0xc0294520, "driver_probe_device");
+  t(0xc02946b8, "driver_attach");
+  t(0xc0293788, "bus_for_each_dev");
+  t(0xc0293ef4, "bus_add_driver");
+  t(0xc0294b64, "driver_register");
+  t(0xc0008858, "do_one_initcall");
+  t(0xc06c48bc, "kernel_init");
+  assert(oops == NULL);
+
+  return 0;
+}
+]])

@@ -1,4 +1,4 @@
-EXTRA_DIST = backtraces
+EXTRA_DIST = backtraces oopses
 
 ## ------------ ##
 ## package.m4.  ##
