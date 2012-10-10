@@ -152,3 +152,52 @@ int main()
   return 0;
 }
 ])
+
+AT_TESTFUN([btp_normalize_oops],
+[
+UTILS
+
+#define t(name) (assert(f), assert(btp_strcmp0(f->function_name, name) == 0), f = f->next);
+
+int main()
+{
+  struct btp_thread *thread;
+  struct btp_frame *f;
+
+  thread = create_thread(14,
+    "warn_slowpath_common",
+    "warn_slowpath_null",
+    "brcms_c_wait_for_tx_completion",
+    "brcms_ops_flush",
+    "ieee80211_scan_work",
+    "switch_to",
+    "process_one_work",
+    "ieee80211_run_deferred_scan",
+    "worker_thread",
+    "manage_workers",
+    "kthread",
+    "kernel_thread_helper",
+    "kthread_freezable_should_stop",
+    "gs_change"
+  );
+
+  for (f = thread->frames; f; f = f->next)
+  {
+    f->library_name = btp_strdup("vmlinux");
+  }
+
+  btp_normalize_oops_thread(thread);
+
+  f = thread->frames;
+  t("brcms_c_wait_for_tx_completion");
+  t("brcms_ops_flush");
+  t("ieee80211_scan_work");
+  t("switch_to");
+  t("ieee80211_run_deferred_scan");
+  t("manage_workers");
+  t("kthread_freezable_should_stop");
+  assert(f == NULL);
+
+  return 0;
+}
+])

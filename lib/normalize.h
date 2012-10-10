@@ -85,6 +85,13 @@ btp_normalize_paired_unknown_function_names(struct btp_thread *thread1, struct b
 void
 btp_normalize_optimize_thread(struct btp_thread *thread);
 
+/**
+ * Normalize thread created from kerneloops backtrace. NOT for use with
+ * userspace threads.
+ */
+void
+btp_normalize_oops_thread(struct btp_thread *thread);
+
 #ifdef __cplusplus
 }
 #endif

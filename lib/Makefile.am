@@ -36,6 +36,7 @@ libbtparser_la_SOURCES = \
 	normalize_libstdcpp.c \
 	normalize_linux.c \
 	normalize_xorg.c \
+	normalize_oops.c \
 	sharedlib.c \
 	strbuf.c \
 	thread.c \
