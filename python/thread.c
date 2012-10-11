@@ -325,7 +325,11 @@ PyObject *p_btp_thread_quality(PyObject *self, PyObject *args)
 
 PyObject *p_btp_thread_format_funs(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", btp_thread_format_funs(((ThreadObject *)self)->thread));
+    ThreadObject *this = (ThreadObject *)self;
+    if (thread_prepare_linked_list(this) < 0)
+        return NULL;
+
+    return Py_BuildValue("s", btp_thread_format_funs(this->thread));
 }
 
 PyObject *p_btp_thread_normalize_userspace(PyObject *self, PyObject *args)
