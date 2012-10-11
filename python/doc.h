@@ -121,6 +121,12 @@
 #define t_frames_doc (char *)"A list containing btparser.Frame objects representing " \
                      "frames in a thread."
 
+#define t_normalize_userspace_doc "Usage: thread.normalize_userspace()\n" \
+                                  "Drops common userspace frames that break clustering."
+
+#define t_normalize_kerneloops_doc "Usage: thread.normalize_kerneloops()\n" \
+                                   "Drops common kernel frames that break clustering."
+
 /* backtrace */
 
 #define backtrace_doc "btparser.Backtrace - class representing a backtrace\n" \

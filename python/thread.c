@@ -3,14 +3,16 @@
 
 static PyMethodDef ThreadMethods[] = {
     /* getters & setters */
-    { "get_number",     p_btp_thread_get_number,     METH_NOARGS,  t_get_number_doc     },
-    { "set_number",     p_btp_thread_set_number,     METH_VARARGS, t_set_number_doc     },
+    { "get_number",           p_btp_thread_get_number,           METH_NOARGS,  t_get_number_doc           },
+    { "set_number",           p_btp_thread_set_number,           METH_VARARGS, t_set_number_doc           },
     /* methods */
-    { "cmp",            p_btp_thread_cmp,            METH_VARARGS, t_cmp_doc            },
-    { "dup",            p_btp_thread_dup,            METH_NOARGS,  t_dup_doc            },
-    { "quality_counts", p_btp_thread_quality_counts, METH_NOARGS,  t_quality_counts_doc },
-    { "quality",        p_btp_thread_quality,        METH_NOARGS,  t_quality_doc        },
-    { "format_funs",    p_btp_thread_format_funs,    METH_NOARGS, t_format_funs_doc    },
+    { "cmp",                  p_btp_thread_cmp,                  METH_VARARGS, t_cmp_doc                  },
+    { "dup",                  p_btp_thread_dup,                  METH_NOARGS,  t_dup_doc                  },
+    { "quality_counts",       p_btp_thread_quality_counts,       METH_NOARGS,  t_quality_counts_doc       },
+    { "quality",              p_btp_thread_quality,              METH_NOARGS,  t_quality_doc              },
+    { "format_funs",          p_btp_thread_format_funs,          METH_NOARGS,  t_format_funs_doc          },
+    { "normalize_userspace",  p_btp_thread_normalize_userspace,  METH_NOARGS,  t_normalize_userspace_doc  },
+    { "normalize_kerneloops", p_btp_thread_normalize_kerneloops, METH_NOARGS,  t_normalize_kerneloops_doc },
     { NULL },
 };
 
@@ -324,4 +326,32 @@ PyObject *p_btp_thread_quality(PyObject *self, PyObject *args)
 PyObject *p_btp_thread_format_funs(PyObject *self, PyObject *args)
 {
     return Py_BuildValue("s", btp_thread_format_funs(((ThreadObject *)self)->thread));
+}
+
+PyObject *p_btp_thread_normalize_userspace(PyObject *self, PyObject *args)
+{
+    ThreadObject *this = (ThreadObject *)self;
+    if (thread_prepare_linked_list(this) < 0)
+        return NULL;
+
+    btp_normalize_thread(this->thread);
+    this->frames = frame_linked_list_to_python_list(this->thread);
+    if (!this->frames)
+        return NULL;
+
+    Py_RETURN_NONE;
+}
+
+PyObject *p_btp_thread_normalize_kerneloops(PyObject *self, PyObject *args)
+{
+    ThreadObject *this = (ThreadObject *)self;
+    if (thread_prepare_linked_list(this) < 0)
+        return NULL;
+
+    btp_normalize_oops_thread(this->thread);
+    this->frames = frame_linked_list_to_python_list(this->thread);
+    if (!this->frames)
+        return NULL;
+
+    Py_RETURN_NONE;
 }

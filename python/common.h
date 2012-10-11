@@ -93,6 +93,8 @@ PyObject *p_btp_thread_cmp(PyObject *self, PyObject *args);
 PyObject *p_btp_thread_quality_counts(PyObject *self, PyObject *args);
 PyObject *p_btp_thread_quality(PyObject *self, PyObject *args);
 PyObject *p_btp_thread_format_funs(PyObject *self, PyObject *args);
+PyObject *p_btp_thread_normalize_userspace(PyObject *self, PyObject *args);
+PyObject *p_btp_thread_normalize_kerneloops(PyObject *self, PyObject *args);
 
 /*************/
 /* backtrace */
