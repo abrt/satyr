@@ -168,7 +168,7 @@ int thread_rebuild_python_list(ThreadObject *thread)
         while (newlinkedlist)
         {
             next = newlinkedlist->next;
-            btp_thread_free(newlinkedlist);
+            btp_frame_free(newlinkedlist);
             newlinkedlist = next;
         }
         return -1;
