@@ -109,3 +109,44 @@ btp_koops_stacktrace_parse(const char **input,
     *input = local_input;
     return stacktrace;
 }
+
+char **
+btp_koops_stacktrace_parse_modules(const char **input)
+{
+    const char *local_input = *input;
+    btp_skip_char_span(&local_input, " \t");
+
+    /* Skip timestamp if it's present. */
+    btp_koops_skip_timestamp(&local_input);
+    btp_skip_char_span(&local_input, " \t");
+
+    if (!btp_skip_string(&local_input, "Modules linked in:"))
+        return NULL;
+
+    btp_skip_char_span(&local_input, " \t");
+
+    int result_size = 20, result_offset = 0;
+    char **result = btp_malloc(result_size * sizeof(char*));
+
+    char *module;
+    bool success;
+    while(success = btp_parse_char_cspan(&local_input, " \t\n[", &module))
+    {
+        // result_size is lowered by 1 because we need to terminate
+        // the list by a NULL pointer.
+        if (result_offset == result_size - 1)
+        {
+            result_size *= 2;
+            result = btp_realloc(result,
+                                 result_size * sizeof(char*));
+        }
+
+        result[result_offset] = module;
+        ++result_offset;
+        btp_skip_char_span(&local_input, " \t");
+    }
+
+    result[result_offset] = NULL;
+    *input = local_input;
+    return result;
+}

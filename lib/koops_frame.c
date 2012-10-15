@@ -116,28 +116,30 @@ struct btp_koops_frame *
 btp_koops_frame_parse(const char **input)
 {
     const char *local_input = *input;
-
     btp_skip_char_span(&local_input, " \t");
 
     /* Skip timestamp if it's present. */
     btp_koops_skip_timestamp(&local_input);
-
     btp_skip_char_span(&local_input, " \t");
 
-    uint64_t address;
-    if (!btp_koops_parse_address(&local_input, &address))
-        return false;
+    struct btp_koops_frame *frame = btp_koops_frame_new();
+
+    if (!btp_koops_parse_address(&local_input, &frame->address))
+    {
+        int len = btp_parse_hexadecimal_0xuint64(&local_input,
+                                                 &frame->address);
+
+        if (len > 0)
+            goto done;
+    }
 
     btp_skip_char_span(&local_input, " \t");
 
     /* Question mark? */
-    bool reliable = (0 != btp_skip_char(&local_input, '?'));
+    frame->reliable = (0 != btp_skip_char(&local_input, '?'));
 
     btp_skip_char_span(&local_input, " \t");
 
-    struct btp_koops_frame *frame = btp_koops_frame_new();
-    frame->address = address;
-    frame->reliable = reliable;
     if (!btp_koops_parse_function(&local_input,
                                   &frame->function_name,
                                   &frame->function_offset,
@@ -176,11 +178,13 @@ btp_koops_frame_parse(const char **input)
         btp_skip_char_span(&local_input, " \t");
     }
 
-    if (!frame->module_name && btp_koops_parse_module_name(&local_input, &frame->module_name))
+    if (!frame->module_name && btp_koops_parse_module_name(&local_input,
+                                                           &frame->module_name))
     {
         btp_skip_char_span(&local_input, " \t");
     }
 
+done:
     if (*local_input != '\0' && !btp_skip_char(&local_input, '\n'))
     {
         btp_koops_frame_free(frame);

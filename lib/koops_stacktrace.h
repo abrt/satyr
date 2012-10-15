@@ -63,10 +63,16 @@ struct btp_koops_stacktrace
     bool taint_staging_driver;
     bool taint_firmware_workaround;
 
+    /**
+     * @brief List of loaded modules.
+     *
+     * It might be NULL as it is sometimes not included in a
+     * kerneloops.
+     */
     char **modules;
 
     /**
-     * @brief Call trace
+     * @brief Call trace.  It might be NULL as it is not mandatory.
      */
     struct btp_koops_frame *frames;
 };
@@ -126,6 +132,9 @@ btp_koops_stacktrace_get_frame_count(struct btp_koops_stacktrace *stacktrace);
 struct btp_koops_stacktrace *
 btp_koops_stacktrace_parse(const char **input,
                            struct btp_location *location);
+
+char **
+btp_koops_stacktrace_parse_modules(const char **input);
 
 #ifdef __cplusplus
 }

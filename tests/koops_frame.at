@@ -221,6 +221,7 @@ main(void)
 
   check(true, "[110417.280555]  [<ffffffff8151f860>] ? ip_forward_options+0x1f0/0x1f0", &frame);
 
+  btp_koops_frame_init(&frame);
   frame.address = 0xc02f671c;
   frame.reliable = true;
   frame.function_name = "_raw_spin_lock_irqsave";
@@ -233,6 +234,14 @@ main(void)
   frame.from_module_name = "mxs_mmc";
 
   check(true, "[   65.470000] [<c02f671c>] (_raw_spin_lock_irqsave+0x48/0x5c) from [<bf054120>] (mxs_mmc_enable_sdio_irq+0x18/0xdc [mxs_mmc])", &frame);
+
+  btp_koops_frame_init(&frame);
+  frame.reliable = true;
+  frame.function_name = "sys_delete_module";
+  frame.function_offset = 0x11f;
+  frame.function_length = 0x280;
+
+  check(true, "[   99.408443]  sys_delete_module+0x11f/0x280", &frame);
   return 0;
 }
 ]])

@@ -39,7 +39,9 @@ extern "C" {
 struct btp_koops_frame
 {
     /**
-     * Address of the function in memory.
+     * Address of the function in memory.  It is set to 0 when the
+     * address is not available.  In such a case, function_name is
+     * available.
      */
     uint64_t address;
 
@@ -49,22 +51,37 @@ struct btp_koops_frame
      */
     bool reliable;
 
+    /**
+     * Might be NULL.  If it is null, address must be set.
+     */
     char *function_name;
 
     uint64_t function_offset;
 
     uint64_t function_length;
 
+    /**
+     * Might be NULL.
+     */
     char *module_name;
 
+    /**
+     * It is set to 0 when the address is not available.
+     */
     uint64_t from_address;
 
+    /**
+     * Might be NULL.
+     */
     char *from_function_name;
 
     uint64_t from_function_offset;
 
     uint64_t from_function_length;
 
+    /**
+     * Might be NULL.
+     */
     char *from_module_name;
 
     struct btp_koops_frame *next;
