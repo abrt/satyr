@@ -6,6 +6,7 @@ pkginclude_HEADERS = \
 	core_frame.h \
 	core_stacktrace.h \
 	core_thread.h \
+	core_unwind.h \
 	disasm.h \
 	elves.h \
 	gdb_frame.h \
@@ -33,6 +34,7 @@ libbtparser_la_SOURCES = \
 	core_fingerprint.c \
 	core_frame.c \
 	core_thread.c \
+	core_unwind.c \
 	disasm.c \
 	elves.c \
 	gdb_stacktrace.c \
