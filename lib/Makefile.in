@@ -85,14 +85,6 @@ am_libbtparser_la_OBJECTS = $(am__objects_1) \
 	libbtparser_la-koops_frame.lo \
 	libbtparser_la-koops_stacktrace.lo libbtparser_la-location.lo \
 	libbtparser_la-metrics.lo libbtparser_la-normalize.lo \
-	libbtparser_la-normalize_dbus.lo \
-	libbtparser_la-normalize_gdk.lo \
-	libbtparser_la-normalize_glib.lo \
-	libbtparser_la-normalize_glibc.lo \
-	libbtparser_la-normalize_gtk.lo \
-	libbtparser_la-normalize_libstdcpp.lo \
-	libbtparser_la-normalize_linux.lo \
-	libbtparser_la-normalize_xorg.lo \
 	libbtparser_la-python_frame.lo \
 	libbtparser_la-python_stacktrace.lo libbtparser_la-sha1.lo \
 	libbtparser_la-strbuf.lo libbtparser_la-unstrip.lo \
@@ -294,14 +286,6 @@ libbtparser_la_SOURCES = \
 	location.c \
 	metrics.c \
 	normalize.c \
-	normalize_dbus.c \
-	normalize_gdk.c \
-	normalize_glib.c \
-	normalize_glibc.c \
-	normalize_gtk.c \
-	normalize_libstdcpp.c \
-	normalize_linux.c \
-	normalize_xorg.c \
 	python_frame.c \
 	python_stacktrace.c \
 	sha1.c \
@@ -424,14 +408,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-location.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-metrics.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_dbus.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_gdk.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_glib.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_glibc.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_gtk.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_libstdcpp.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_linux.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize_xorg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-python_frame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-python_stacktrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-sha1.Plo@am__quote@
@@ -578,62 +554,6 @@ libbtparser_la-normalize.lo: normalize.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize.c' object='libbtparser_la-normalize.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize.lo `test -f 'normalize.c' || echo '$(srcdir)/'`normalize.c
-
-libbtparser_la-normalize_dbus.lo: normalize_dbus.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-normalize_dbus.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-normalize_dbus.Tpo -c -o libbtparser_la-normalize_dbus.lo `test -f 'normalize_dbus.c' || echo '$(srcdir)/'`normalize_dbus.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-normalize_dbus.Tpo $(DEPDIR)/libbtparser_la-normalize_dbus.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize_dbus.c' object='libbtparser_la-normalize_dbus.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize_dbus.lo `test -f 'normalize_dbus.c' || echo '$(srcdir)/'`normalize_dbus.c
-
-libbtparser_la-normalize_gdk.lo: normalize_gdk.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-normalize_gdk.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-normalize_gdk.Tpo -c -o libbtparser_la-normalize_gdk.lo `test -f 'normalize_gdk.c' || echo '$(srcdir)/'`normalize_gdk.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-normalize_gdk.Tpo $(DEPDIR)/libbtparser_la-normalize_gdk.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize_gdk.c' object='libbtparser_la-normalize_gdk.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize_gdk.lo `test -f 'normalize_gdk.c' || echo '$(srcdir)/'`normalize_gdk.c
-
-libbtparser_la-normalize_glib.lo: normalize_glib.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-normalize_glib.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-normalize_glib.Tpo -c -o libbtparser_la-normalize_glib.lo `test -f 'normalize_glib.c' || echo '$(srcdir)/'`normalize_glib.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-normalize_glib.Tpo $(DEPDIR)/libbtparser_la-normalize_glib.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize_glib.c' object='libbtparser_la-normalize_glib.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize_glib.lo `test -f 'normalize_glib.c' || echo '$(srcdir)/'`normalize_glib.c
-
-libbtparser_la-normalize_glibc.lo: normalize_glibc.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-normalize_glibc.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-normalize_glibc.Tpo -c -o libbtparser_la-normalize_glibc.lo `test -f 'normalize_glibc.c' || echo '$(srcdir)/'`normalize_glibc.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-normalize_glibc.Tpo $(DEPDIR)/libbtparser_la-normalize_glibc.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize_glibc.c' object='libbtparser_la-normalize_glibc.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize_glibc.lo `test -f 'normalize_glibc.c' || echo '$(srcdir)/'`normalize_glibc.c
-
-libbtparser_la-normalize_gtk.lo: normalize_gtk.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-normalize_gtk.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-normalize_gtk.Tpo -c -o libbtparser_la-normalize_gtk.lo `test -f 'normalize_gtk.c' || echo '$(srcdir)/'`normalize_gtk.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-normalize_gtk.Tpo $(DEPDIR)/libbtparser_la-normalize_gtk.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize_gtk.c' object='libbtparser_la-normalize_gtk.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize_gtk.lo `test -f 'normalize_gtk.c' || echo '$(srcdir)/'`normalize_gtk.c
-
-libbtparser_la-normalize_libstdcpp.lo: normalize_libstdcpp.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-normalize_libstdcpp.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-normalize_libstdcpp.Tpo -c -o libbtparser_la-normalize_libstdcpp.lo `test -f 'normalize_libstdcpp.c' || echo '$(srcdir)/'`normalize_libstdcpp.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-normalize_libstdcpp.Tpo $(DEPDIR)/libbtparser_la-normalize_libstdcpp.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize_libstdcpp.c' object='libbtparser_la-normalize_libstdcpp.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize_libstdcpp.lo `test -f 'normalize_libstdcpp.c' || echo '$(srcdir)/'`normalize_libstdcpp.c
-
-libbtparser_la-normalize_linux.lo: normalize_linux.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-normalize_linux.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-normalize_linux.Tpo -c -o libbtparser_la-normalize_linux.lo `test -f 'normalize_linux.c' || echo '$(srcdir)/'`normalize_linux.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-normalize_linux.Tpo $(DEPDIR)/libbtparser_la-normalize_linux.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize_linux.c' object='libbtparser_la-normalize_linux.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize_linux.lo `test -f 'normalize_linux.c' || echo '$(srcdir)/'`normalize_linux.c
-
-libbtparser_la-normalize_xorg.lo: normalize_xorg.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-normalize_xorg.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-normalize_xorg.Tpo -c -o libbtparser_la-normalize_xorg.lo `test -f 'normalize_xorg.c' || echo '$(srcdir)/'`normalize_xorg.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-normalize_xorg.Tpo $(DEPDIR)/libbtparser_la-normalize_xorg.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize_xorg.c' object='libbtparser_la-normalize_xorg.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize_xorg.lo `test -f 'normalize_xorg.c' || echo '$(srcdir)/'`normalize_xorg.c
 
 libbtparser_la-python_frame.lo: python_frame.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-python_frame.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-python_frame.Tpo -c -o libbtparser_la-python_frame.lo `test -f 'python_frame.c' || echo '$(srcdir)/'`python_frame.c

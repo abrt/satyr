@@ -44,14 +44,6 @@ libbtparser_la_SOURCES = \
 	location.c \
 	metrics.c \
 	normalize.c \
-	normalize_dbus.c \
-	normalize_gdk.c \
-	normalize_glib.c \
-	normalize_glibc.c \
-	normalize_gtk.c \
-	normalize_libstdcpp.c \
-	normalize_linux.c \
-	normalize_xorg.c \
 	python_frame.c \
 	python_stacktrace.c \
 	sha1.c \

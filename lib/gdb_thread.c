@@ -174,6 +174,7 @@ btp_gdb_thread_remove_frame(struct btp_gdb_thread *thread,
 {
     struct btp_gdb_frame *loop_frame = thread->frames,
         *prev_frame = NULL;
+
     while (loop_frame)
     {
         if (loop_frame == frame)
@@ -186,9 +187,11 @@ btp_gdb_thread_remove_frame(struct btp_gdb_thread *thread,
             btp_gdb_frame_free(loop_frame);
             return true;
         }
+
         prev_frame = loop_frame;
         loop_frame = loop_frame->next;
     }
+
     return false;
 }
 

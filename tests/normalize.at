@@ -40,12 +40,12 @@ create_thread(int count, ...)
 }
 ])
 
-## ------------------------------------ ##
-## btp_gdb_normalize_thread_removes_zeroes  ##
-## ------------------------------------ ##
+## ---------------------------------------- ##
+## btp_normalize_gdb_thread_removes_zeroes  ##
+## ---------------------------------------- ##
 # Checks that btp_gdb_normalize_thread removes the first and the last
 # frame if they have address 0x0000 and function ??.
-AT_TESTFUN([btp_gdb_normalize_thread_removes_zeroes],
+AT_TESTFUN([btp_normalize_gdb_thread_removes_zeroes],
 [[
 #include <lib/normalize.h>
 #include <lib/gdb_frame.h>
@@ -81,7 +81,7 @@ main(void)
   thread.number = 0;
   thread.frames = frame0;
 
-  btp_gdb_normalize_thread(&thread);
+  btp_normalize_gdb_thread(&thread);
   assert(thread.frames == frame1);
   assert(thread.frames->next == NULL);
 
@@ -90,7 +90,7 @@ main(void)
 }
 ]])
 
-AT_TESTFUN([btp_gdb_normalize_paired_unknown_function_names],
+AT_TESTFUN([btp_normalize_gdb_paired_unknown_function_names],
 [
 UTILS
 
@@ -106,13 +106,13 @@ main()
 
   threads[[4]] = btp_gdb_thread_dup(threads[[0]], false);
   threads[[5]] = btp_gdb_thread_dup(threads[[1]], false);
-  btp_gdb_normalize_paired_unknown_function_names(threads[[4]], threads[[5]]);
+  btp_normalize_gdb_paired_unknown_function_names(threads[[4]], threads[[5]]);
   assert(!btp_gdb_thread_cmp(threads[[2]], threads[[4]]));
   assert(!btp_gdb_thread_cmp(threads[[3]], threads[[5]]));
 
   threads[[4]] = btp_gdb_thread_dup(threads[[0]], false);
   threads[[5]] = btp_gdb_thread_dup(threads[[1]], false);
-  btp_gdb_normalize_paired_unknown_function_names(threads[[5]], threads[[4]]);
+  btp_normalize_gdb_paired_unknown_function_names(threads[[5]], threads[[4]]);
   assert(!btp_gdb_thread_cmp(threads[[2]], threads[[4]]));
   assert(!btp_gdb_thread_cmp(threads[[3]], threads[[5]]));
 
@@ -123,7 +123,7 @@ main()
 
   threads[[4]] = btp_gdb_thread_dup(threads[[0]], false);
   threads[[5]] = btp_gdb_thread_dup(threads[[1]], false);
-  btp_gdb_normalize_paired_unknown_function_names(threads[[4]], threads[[5]]);
+  btp_normalize_gdb_paired_unknown_function_names(threads[[4]], threads[[5]]);
   assert(!btp_gdb_thread_cmp(threads[[2]], threads[[4]]));
   assert(!btp_gdb_thread_cmp(threads[[3]], threads[[5]]));
 
@@ -134,7 +134,7 @@ main()
 
   threads[[4]] = btp_gdb_thread_dup(threads[[0]], false);
   threads[[5]] = btp_gdb_thread_dup(threads[[1]], false);
-  btp_gdb_normalize_paired_unknown_function_names(threads[[4]], threads[[5]]);
+  btp_normalize_gdb_paired_unknown_function_names(threads[[4]], threads[[5]]);
   assert(!btp_gdb_thread_cmp(threads[[2]], threads[[4]]));
   assert(!btp_gdb_thread_cmp(threads[[3]], threads[[5]]));
 
@@ -145,13 +145,13 @@ main()
 
   threads[[4]] = btp_gdb_thread_dup(threads[[0]], false);
   threads[[5]] = btp_gdb_thread_dup(threads[[1]], false);
-  btp_gdb_normalize_paired_unknown_function_names(threads[[4]], threads[[5]]);
+  btp_normalize_gdb_paired_unknown_function_names(threads[[4]], threads[[5]]);
   assert(!btp_gdb_thread_cmp(threads[[2]], threads[[4]]));
   assert(!btp_gdb_thread_cmp(threads[[3]], threads[[5]]));
 
   threads[[4]] = btp_gdb_thread_dup(threads[[0]], false);
   threads[[5]] = btp_gdb_thread_dup(threads[[1]], false);
-  btp_gdb_normalize_paired_unknown_function_names(threads[[5]], threads[[4]]);
+  btp_normalize_gdb_paired_unknown_function_names(threads[[5]], threads[[4]]);
   assert(!btp_gdb_thread_cmp(threads[[2]], threads[[4]]));
   assert(!btp_gdb_thread_cmp(threads[[3]], threads[[5]]));
 

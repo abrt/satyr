@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 struct btp_gdb_frame *
 btp_gdb_frame_new()
@@ -90,66 +91,35 @@ btp_gdb_frame_dup(struct btp_gdb_frame *frame, bool siblings)
 
 bool
 btp_gdb_frame_calls_func(struct btp_gdb_frame *frame,
-                         const char *function_name)
+                         const char *function_name,
+                         ...)
 {
-    return frame->function_name &&
-        0 == strcmp(frame->function_name, function_name);
-}
+    if (!frame->function_name ||
+        0 != strcmp(frame->function_name, function_name))
+    {
+        return false;
+    }
 
-bool
-btp_gdb_frame_calls_func_in_file(struct btp_gdb_frame *frame,
-                                 const char *function_name,
-                                 const char *source_file)
-{
-    return frame->function_name &&
-        0 == strcmp(frame->function_name, function_name) &&
-        frame->source_file &&
-        NULL != strstr(frame->source_file, source_file);
-}
+    va_list source_files;
+    va_start(source_files, function_name);
+    bool success = false;
 
-bool
-btp_gdb_frame_calls_func_in_file2(struct btp_gdb_frame *frame,
-                                  const char *function_name,
-                                  const char *source_file0,
-                                  const char *source_file1)
-{
-    return frame->function_name &&
-        0 == strcmp(frame->function_name, function_name) &&
-        frame->source_file &&
-        (NULL != strstr(frame->source_file, source_file0) ||
-         NULL != strstr(frame->source_file, source_file1));
-}
+    while (true)
+    {
+        char *source_file = va_arg(source_files, char*);
+        if (!source_file)
+            break;
 
-bool
-btp_gdb_frame_calls_func_in_file3(struct btp_gdb_frame *frame,
-                                  const char *function_name,
-                                  const char *source_file0,
-                                  const char *source_file1,
-                                  const char *source_file2)
-{
-    return frame->function_name &&
-        0 == strcmp(frame->function_name, function_name) &&
-        frame->source_file &&
-        (NULL != strstr(frame->source_file, source_file0) ||
-         NULL != strstr(frame->source_file, source_file1) ||
-         NULL != strstr(frame->source_file, source_file2));
-}
+        if (frame->source_file &&
+            NULL != strstr(frame->source_file, source_file))
+        {
+            success = true;
+            break;
+        }
+    }
 
-bool
-btp_gdb_frame_calls_func_in_file4(struct btp_gdb_frame *frame,
-                                  const char *function_name,
-                                  const char *source_file0,
-                                  const char *source_file1,
-                                  const char *source_file2,
-                                  const char *source_file3)
-{
-    return frame->function_name &&
-        0 == strcmp(frame->function_name, function_name) &&
-        frame->source_file &&
-        (NULL != strstr(frame->source_file, source_file0) ||
-         NULL != strstr(frame->source_file, source_file1) ||
-         NULL != strstr(frame->source_file, source_file2) ||
-         NULL != strstr(frame->source_file, source_file3));
+   va_end(source_files);
+   return success;
 }
 
 int

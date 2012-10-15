@@ -183,7 +183,7 @@ btp_gdb_stacktrace_quality_complex(struct btp_gdb_stacktrace *stacktrace);
  */
 char *
 btp_gdb_stacktrace_to_text(struct btp_gdb_stacktrace *stacktrace,
-                          bool verbose);
+                           bool verbose);
 
 /**
  * Analyzes the stacktrace to get the frame where a crash occurred.
@@ -289,6 +289,7 @@ btp_gdb_stacktrace_parse_header(const char **input,
 void
 btp_gdb_stacktrace_set_libnames(struct btp_gdb_stacktrace *stacktrace);
 
+// TODO: move somewhere else and refactor
 /**
  * Return crash thread optimized for comparison. It's normalized, with
  * library names set and functions without names (signal handlers) are

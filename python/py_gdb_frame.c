@@ -471,5 +471,5 @@ btp_py_gdb_frame_calls_func_in_file(PyObject *self, PyObject *args)
         return NULL;
 
     struct btp_gdb_frame *frame = ((struct btp_py_gdb_frame*)self)->frame;
-    return Py_BuildValue("i", btp_gdb_frame_calls_func_in_file(frame, func_name, file_name));
+    return Py_BuildValue("i", btp_gdb_frame_calls_func(frame, func_name, file_name, NULL));
 }

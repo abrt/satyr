@@ -83,6 +83,34 @@ btp_koops_stacktrace_get_frame_count(struct btp_koops_stacktrace *stacktrace)
     return count;
 }
 
+bool
+btp_koops_stacktrace_remove_frame(struct btp_koops_stacktrace *stacktrace,
+                                  struct btp_koops_frame *frame)
+{
+    struct btp_koops_frame *loop_frame = stacktrace->frames,
+        *prev_frame = NULL;
+
+    while (loop_frame)
+    {
+        if (loop_frame == frame)
+        {
+            if (prev_frame)
+                prev_frame->next = loop_frame->next;
+            else
+                stacktrace->frames = loop_frame->next;
+
+            btp_koops_frame_free(loop_frame);
+            return true;
+        }
+
+        prev_frame = loop_frame;
+        loop_frame = loop_frame->next;
+    }
+
+    return false;
+
+}
+
 struct btp_koops_stacktrace *
 btp_koops_stacktrace_parse(const char **input,
                            struct btp_location *location)
@@ -130,7 +158,7 @@ btp_koops_stacktrace_parse_modules(const char **input)
 
     char *module;
     bool success;
-    while(success = btp_parse_char_cspan(&local_input, " \t\n[", &module))
+    while ((success = btp_parse_char_cspan(&local_input, " \t\n[", &module)))
     {
         // result_size is lowered by 1 because we need to terminate
         // the list by a NULL pointer.

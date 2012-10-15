@@ -21,24 +21,295 @@
 #include "gdb_frame.h"
 #include "gdb_thread.h"
 #include "gdb_stacktrace.h"
+#include "koops_frame.h"
+#include "koops_stacktrace.h"
 #include "utils.h"
 #include <string.h>
+#include <assert.h>
+
+static bool
+call_match(const char *function_name,
+           const char *source_file,
+           const char *expected_function_name,
+           ...)
+{
+    if (!function_name)
+        return false;
+
+    if (0 != strcmp(function_name, expected_function_name))
+        return false;
+
+    va_list source_files;
+    va_start(source_files, expected_function_name);
+    bool success = false;
+
+    while (true)
+    {
+        char *expected_source_file = va_arg(source_files, char*);
+        if (!expected_source_file)
+            break;
+
+        if (source_file &&
+            NULL != strstr(expected_source_file, source_file))
+        {
+            success = true;
+            break;
+        }
+    }
+
+    va_end(source_files);
+    return success;
+}
+
+static bool
+is_removable_dbus(const char *function_name,
+                  const char *source_file)
+{
+    return
+        call_match(function_name, source_file, "gerror_to_dbus_error_message", "dbus-gobject.c", NULL) ||
+        call_match(function_name, source_file, "dbus_g_method_return_error", "dbus-gobject.c", NULL) ||
+        call_match(function_name, source_file, "message_queue_dispatch", "dbus-gmain.c", NULL) ||
+        call_match(function_name, source_file, "dbus_connection_dispatch", "dbus-connection.c", "libdbus", NULL);
+}
+
+static bool
+is_removable_gdk(const char *function_name,
+                 const char *source_file)
+{
+    return
+        call_match(function_name, source_file, "gdk_x_error", "gdkmain-x11.c", NULL) ||
+        call_match(function_name, source_file, "gdk_threads_dispatch", "gdk.c", NULL) ||
+        call_match(function_name, source_file, "gdk_event_dispatch", "gdkevents-x11.c", "gdkevents.c", NULL) ||
+        call_match(function_name, source_file, "gdk_event_source_dispatch", "gdkeventsource.c", NULL);
+}
+
+static bool
+is_removable_glib(const char *function_name,
+                  const char *source_file)
+{
+    return
+        call_match(function_name, source_file, "g_log", "gmessages.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_logv", "gmessages.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_assertion_message", "gtestutils.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_assertion_message_expr", "gtestutils.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_closure_invoke", "gclosure.c", "libgobject", NULL) ||
+        call_match(function_name, source_file, "g_free", "gmem.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_type_class_meta_marshal", "gclosure.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_signal_emit_valist", "gsignal.c", "libgobject", NULL) ||
+        call_match(function_name, source_file, "signal_emit_unlocked_R", "gsignal.c", "libgobject", NULL) ||
+        call_match(function_name, source_file, "g_signal_emit", "gsignal.c", "libgobject", NULL) ||
+        call_match(function_name, source_file, "g_idle_dispatch", "gmain.c", "gutf8.c", NULL) ||
+        call_match(function_name, source_file, "g_object_dispatch_properties_changed", "gobject.c", "libgobject", NULL) ||
+        call_match(function_name, source_file, "g_object_notify_dispatcher", "gobject.c", "libgobject", NULL) ||
+        call_match(function_name, source_file, "g_object_unref", "gobject.c", "libgobject", NULL) ||
+        call_match(function_name, source_file, "g_object_run_dispose", "gobject.c", "libgobject", NULL) ||
+        call_match(function_name, source_file, "g_object_new", "gobject.c", "libgobject", NULL) ||
+        call_match(function_name, source_file, "g_object_newv", "gobject.c", "libgobject", NULL) ||
+        call_match(function_name, source_file, "g_main_context_dispatch", "gmain.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_main_context_iterate", "gmain.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_main_dispatch", "gmain.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_main_loop_run", "gmain.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_timeout_dispatch", "gmain.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_thread_pool_thread_proxy", "gthreadpool.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_thread_create_proxy", "gthread.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_cclosure_marshal_VOID__BOXED", "gmarshal.c", "libgobject", NULL) ||
+        call_match(function_name, source_file, "g_cclosure_marshal_VOID__VOID", "gclosure.c", "gmarshal.c", "libgobject", NULL);
+}
+
+static bool
+is_removable_libstdcpp(const char *function_name,
+                       const char *source_file)
+{
+    return
+        call_match(function_name, source_file, "__gnu_cxx::__verbose_terminate_handler", "vterminate.cc", NULL) ||
+        call_match(function_name, source_file, "__cxxabiv1::__terminate", "eh_terminate.cc", NULL) ||
+        call_match(function_name, source_file, "std::terminate", "eh_terminate.cc", NULL) ||
+        call_match(function_name, source_file, "__cxxabiv1::__cxa_throw", "eh_throw.cc", NULL);
+}
+
+static bool
+is_removable_linux(const char *function_name,
+                   const char *source_file)
+{
+    return call_match(function_name, source_file, "__kernel_vsyscall", "", NULL);
+}
+
+static bool
+is_removable_xorg(const char *function_name,
+                  const char *source_file)
+{
+    return
+        call_match(function_name, source_file, "_XReply", "xcb_io.c", NULL) ||
+        call_match(function_name, source_file, "_XError", "XlibInt.c", NULL) ||
+        call_match(function_name, source_file, "XSync", "Sync.c", NULL) ||
+        call_match(function_name, source_file, "process_responses", "xcb_io.c", NULL);
+}
+
+static bool
+is_removable_glibc(const char *function_name,
+                   const char *source_file)
+{
+    return
+        call_match(function_name, source_file, "_start", "", NULL) ||
+        call_match(function_name, source_file, "__libc_start_main", "libc", NULL) ||
+        call_match(function_name, source_file, "clone", "clone.S", "libc", NULL) ||
+        call_match(function_name, source_file, "start_thread", "pthread_create.c", "libpthread", NULL);
+}
+
+static bool
+is_removable_glibc_with_above(const char *function_name,
+                              const char *source_file)
+{
+    return
+        call_match(function_name, source_file, "__assert_fail", "", NULL) ||
+        call_match(function_name, source_file, "__chk_fail", "", NULL) ||
+        call_match(function_name, source_file, "__longjmp_chk", "", NULL) ||
+        call_match(function_name, source_file, "__malloc_assert", "", NULL) ||
+        call_match(function_name, source_file, "__strcat_chk", "", NULL) ||
+        call_match(function_name, source_file, "__strcpy_chk", "", NULL) ||
+        call_match(function_name, source_file, "__strncpy_chk", "", NULL) ||
+        call_match(function_name, source_file, "__vsnprintf_chk", "", NULL) ||
+        call_match(function_name, source_file, "___vsnprintf_chk", "", NULL) ||
+        call_match(function_name, source_file, "__snprintf_chk", "", NULL) ||
+        call_match(function_name, source_file, "___snprintf_chk", "", NULL) ||
+        call_match(function_name, source_file, "__vasprintf_chk", "", NULL) ||
+        call_match(function_name, source_file, "malloc_consolidate", "malloc.c", "libc", NULL) ||
+        call_match(function_name, source_file, "malloc_printerr", "malloc.c", "libc", NULL) ||
+        call_match(function_name, source_file, "_int_malloc", "malloc.c", "libc", NULL) ||
+        call_match(function_name, source_file, "_int_free", "malloc.c", "libc", NULL) ||
+        call_match(function_name, source_file, "_int_realloc", "malloc.c", "libc", NULL) ||
+        call_match(function_name, source_file, "_int_memalign", "malloc.c", NULL) ||
+        call_match(function_name, source_file, "__libc_free", "malloc.c", NULL) ||
+        call_match(function_name, source_file, "__libc_malloc", "malloc.c", NULL) ||
+        call_match(function_name, source_file, "__libc_memalign", "malloc.c", NULL) ||
+        call_match(function_name, source_file, "__libc_realloc", "malloc.c", NULL) ||
+        call_match(function_name, source_file, "__posix_memalign", "malloc.c", NULL) ||
+        call_match(function_name, source_file, "__libc_calloc", "malloc.c", NULL);
+}
+
+static char *
+find_new_function_name_glibc(const char *function_name,
+                             const char *source_file)
+{
+    /* Normalize frame names. */
+#define NORMALIZE_ARCH_SPECIFIC(func)                                   \
+    if (call_match(function_name, source_file, "__" func "_sse2", func, "/sysdeps/", "libc.so", NULL) || \
+        call_match(function_name, source_file, "__" func "_sse2_bsf", func, "/sysdeps/", "libc.so", NULL) || \
+        call_match(function_name, source_file, "__" func "_ssse3", func, "/sysdeps/", "libc.so", NULL) /* ssse3, not sse3! */ || \
+        call_match(function_name, source_file, "__" func "_ssse3_rep", func, "/sysdeps/", "libc.so", NULL) || \
+        call_match(function_name, source_file, "__" func "_sse42", func, "/sysdeps/", "libc.so", NULL) || \
+        call_match(function_name, source_file, "__" func "_ia32", func, "/sysdeps", "libc.so", NULL)) \
+        {                                                               \
+            return btp_strdup(func);                                    \
+        }
+
+        NORMALIZE_ARCH_SPECIFIC("memchr");
+        NORMALIZE_ARCH_SPECIFIC("memcmp");
+        NORMALIZE_ARCH_SPECIFIC("memcpy");
+        NORMALIZE_ARCH_SPECIFIC("memmove");
+        NORMALIZE_ARCH_SPECIFIC("memset");
+        NORMALIZE_ARCH_SPECIFIC("rawmemchr");
+        NORMALIZE_ARCH_SPECIFIC("strcasecmp");
+        NORMALIZE_ARCH_SPECIFIC("strcasecmp_l");
+        NORMALIZE_ARCH_SPECIFIC("strcat");
+        NORMALIZE_ARCH_SPECIFIC("strchr");
+        NORMALIZE_ARCH_SPECIFIC("strchrnul");
+        NORMALIZE_ARCH_SPECIFIC("strcmp");
+        NORMALIZE_ARCH_SPECIFIC("strcpy");
+        NORMALIZE_ARCH_SPECIFIC("strcspn");
+        NORMALIZE_ARCH_SPECIFIC("strlen");
+        NORMALIZE_ARCH_SPECIFIC("strncmp");
+        NORMALIZE_ARCH_SPECIFIC("strncpy");
+        NORMALIZE_ARCH_SPECIFIC("strpbrk");
+        NORMALIZE_ARCH_SPECIFIC("strrchr");
+        NORMALIZE_ARCH_SPECIFIC("strspn");
+        NORMALIZE_ARCH_SPECIFIC("strstr");
+        NORMALIZE_ARCH_SPECIFIC("strtok");
+        return NULL;
+}
 
 void
-btp_gdb_normalize_thread(struct btp_gdb_thread *thread)
+btp_normalize_gdb_thread(struct btp_gdb_thread *thread)
 {
-    btp_gdb_normalize_dbus_thread(thread);
-    btp_gdb_normalize_gdk_thread(thread);
-    btp_gdb_normalize_glib_thread(thread);
-    btp_gdb_normalize_glibc_thread(thread);
-    btp_gdb_normalize_gtk_thread(thread);
-    btp_gdb_normalize_libstdcpp_thread(thread);
-    btp_gdb_normalize_linux_thread(thread);
-    btp_gdb_normalize_xorg_thread(thread);
+    /* Find the exit frame and remove everything above it. */
+    struct btp_gdb_frame *exit_frame = btp_glibc_thread_find_exit_frame(thread);
+    if (exit_frame)
+    {
+        bool success = btp_gdb_thread_remove_frames_above(thread, exit_frame);
+        assert(success); /* if this fails, some code become broken */
+        success = btp_gdb_thread_remove_frame(thread, exit_frame);
+        assert(success); /* if this fails, some code become broken */
+    }
+
+    /* Normalize function names by removing various prefixes that
+     * occur only in some cases.
+     */
+    struct btp_gdb_frame *frame = thread->frames;
+    while (frame)
+    {
+        /* Remove IA__ prefix used in GLib, GTK and GDK. */
+        btp_gdb_frame_remove_func_prefix(frame, "IA__gdk", strlen("IA__"));
+        btp_gdb_frame_remove_func_prefix(frame, "IA__g_", strlen("IA__"));
+        btp_gdb_frame_remove_func_prefix(frame, "IA__gtk", strlen("IA__"));
+
+        /* Remove __GI_ (glibc internal) prefix. */
+        btp_gdb_frame_remove_func_prefix(frame, "__GI_", strlen("__GI_"));
+
+        frame = frame->next;
+    }
+
+    /* Unify some functions by renaming them.
+     */
+    frame = thread->frames;
+    while (frame)
+    {
+        char *new_function_name =
+            find_new_function_name_glibc(frame->function_name, frame->source_file);
+
+        if (new_function_name)
+        {
+            free(frame->function_name);
+            frame->function_name = new_function_name;
+        }
+
+        frame = frame->next;
+    }
+
+    /* Remove redundant frames from the thread.
+     */
+    frame = thread->frames;
+    while (frame)
+    {
+        struct btp_gdb_frame *next_frame = frame->next;
+
+        /* Remove frames which are not a cause of the crash. */
+        bool removable =
+            is_removable_dbus(frame->function_name, frame->source_file) ||
+            is_removable_gdk(frame->function_name, frame->source_file) ||
+            is_removable_glib(frame->function_name, frame->source_file) ||
+            is_removable_glibc(frame->function_name, frame->source_file) ||
+            is_removable_libstdcpp(frame->function_name, frame->source_file) ||
+            is_removable_linux(frame->function_name, frame->source_file) ||
+            is_removable_xorg(frame->function_name, frame->source_file);
+
+        bool removable_with_above =
+            is_removable_glibc_with_above(frame->function_name, frame->source_file);
+
+        if (removable_with_above)
+        {
+            bool success = btp_gdb_thread_remove_frames_above(thread, frame);
+            assert(success);
+        }
+
+        if (removable || removable_with_above)
+            btp_gdb_thread_remove_frame(thread, frame);
+
+        frame = next_frame;
+    }
 
     /* If the first frame has address 0x0000 and its name is '??', it
      * is a dereferenced null, and we remove it. This frame is not
-     * really invalid, and it affects stacktrace quality rating. See
+     * really invalid, but it affects stacktrace quality rating. See
      * Red Hat Bugzilla bug #639038.
      * @code
      * #0  0x0000000000000000 in ?? ()
@@ -57,7 +328,7 @@ btp_gdb_normalize_thread(struct btp_gdb_thread *thread)
     }
 
     /* If the last frame has address 0x0000 and its name is '??',
-     * remove it. This frame is not really invalid, and it affects
+     * remove it. This frame is not really invalid, but it affects
      * stacktrace quality rating. See Red Hat Bugzilla bug #592523.
      * @code
      * #2  0x00007f4dcebbd62d in clone ()
@@ -82,27 +353,78 @@ btp_gdb_normalize_thread(struct btp_gdb_thread *thread)
     struct btp_gdb_frame *prev_frame = NULL;
     while (curr_frame)
     {
-        if(prev_frame && 0 != btp_strcmp0(prev_frame->function_name, "??") &&
-           0 == btp_strcmp0(prev_frame->function_name, curr_frame->function_name))
+        if (prev_frame &&
+            0 != btp_strcmp0(prev_frame->function_name, "??") &&
+            0 == btp_strcmp0(prev_frame->function_name, curr_frame->function_name))
         {
             prev_frame->next = curr_frame->next;
             btp_gdb_frame_free(curr_frame);
             curr_frame = prev_frame->next;
             continue;
         }
+
         prev_frame = curr_frame;
         curr_frame = curr_frame->next;
     }
 }
 
 void
-btp_gdb_normalize_stacktrace(struct btp_gdb_stacktrace *stacktrace)
+btp_normalize_gdb_stacktrace(struct btp_gdb_stacktrace *stacktrace)
 {
     struct btp_gdb_thread *thread = stacktrace->threads;
     while (thread)
     {
-        btp_gdb_normalize_thread(thread);
+        btp_normalize_gdb_thread(thread);
         thread = thread->next;
+    }
+}
+
+static int
+ptrstrcmp(const void *s1, const void *s2)
+{
+    return btp_strcmp0(*(const char**)s1, *(const char**)s2);
+}
+
+void
+btp_normalize_koops_stacktrace(struct btp_koops_stacktrace *stacktrace)
+{
+    /* !!! MUST BE SORTED !!! */
+    const char *blacklist[] = {
+        "do_softirq",
+        "do_vfs_ioctl",
+        "flush_kthread_worker",
+        "gs_change",
+        "irq_exit",
+        "kernel_thread_helper",
+        "kthread",
+        "process_one_work",
+        "system_call_fastpath",
+        "warn_slowpath_common",
+        "warn_slowpath_fmt",
+        "warn_slowpath_fmt_taint",
+        "warn_slowpath_null",
+        "worker_thread"
+    };
+
+    struct btp_koops_frame *frame = stacktrace->frames;
+    while (frame)
+    {
+        struct btp_koops_frame *next_frame = frame->next;
+
+        /* do not drop frames belonging to a module */
+        bool in_module = (btp_strcmp0(frame->module_name, "vmlinux") != 0);
+        bool in_blacklist = bsearch(&(frame->function_name),
+                                    blacklist,
+                                    sizeof(blacklist)/sizeof(blacklist[0]),
+                                    sizeof(blacklist[0]), ptrstrcmp);
+
+        if (!in_module && in_blacklist)
+        {
+            bool success = btp_koops_stacktrace_remove_frame(stacktrace, frame);
+            assert(success || !"failed to remove frame");
+        }
+
+        frame = next_frame;
     }
 }
 
@@ -123,8 +445,8 @@ next_functions_similar(struct btp_gdb_frame *frame1,
 }
 
 void
-btp_gdb_normalize_paired_unknown_function_names(struct btp_gdb_thread *thread1,
-                                            struct btp_gdb_thread *thread2)
+btp_normalize_gdb_paired_unknown_function_names(struct btp_gdb_thread *thread1,
+                                                struct btp_gdb_thread *thread2)
 
 {
     if (!thread1->frames || !thread2->frames)
@@ -154,7 +476,7 @@ btp_gdb_normalize_paired_unknown_function_names(struct btp_gdb_thread *thread1,
     curr_frame1 = curr_frame1->next;
     curr_frame2 = curr_frame2->next;
 
- while (curr_frame1)
+    while (curr_frame1)
     {
         if (0 == btp_strcmp0(curr_frame1->function_name, "??"))
         {
@@ -203,4 +525,32 @@ btp_gdb_normalize_optimize_thread(struct btp_gdb_thread *thread)
 
         frame = next_frame;
     }
+}
+
+struct btp_gdb_frame *
+btp_glibc_thread_find_exit_frame(struct btp_gdb_thread *thread)
+{
+    struct btp_gdb_frame *frame = thread->frames;
+    struct btp_gdb_frame *result = NULL;
+    while (frame)
+    {
+        bool is_exit_frame =
+            btp_gdb_frame_calls_func(frame, "__run_exit_handlers", "exit.c", NULL) ||
+            btp_gdb_frame_calls_func(frame, "raise", "pt-raise.c", "libc.so", "libc-", "libpthread.so", NULL) ||
+            btp_gdb_frame_calls_func(frame, "__GI_raise", "raise.c", NULL) ||
+            btp_gdb_frame_calls_func(frame, "exit", "exit.c", NULL) ||
+            btp_gdb_frame_calls_func(frame, "abort", "abort.c", "libc.so", "libc-", NULL) ||
+            btp_gdb_frame_calls_func(frame, "__GI_abort", "abort.c", NULL) ||
+            /* Terminates a function in case of buffer overflow. */
+            btp_gdb_frame_calls_func(frame, "__chk_fail", "chk_fail.c", "libc.so", NULL) ||
+            btp_gdb_frame_calls_func(frame, "__stack_chk_fail", "stack_chk_fail.c", "libc.so", NULL) ||
+            btp_gdb_frame_calls_func(frame, "kill", "syscall-template.S", NULL);
+
+        if (is_exit_frame)
+            result = frame;
+
+        frame = frame->next;
+    }
+
+    return result;
 }

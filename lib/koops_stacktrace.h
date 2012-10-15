@@ -121,6 +121,16 @@ int
 btp_koops_stacktrace_get_frame_count(struct btp_koops_stacktrace *stacktrace);
 
 /**
+ * Removes the frame from the stack trace and then deletes it.
+ * @returns
+ * True if the frame was found in the thread and removed and deleted.
+ * False if the frame was not found in the thread.
+ */
+bool
+btp_koops_stacktrace_remove_frame(struct btp_koops_stacktrace *stacktrace,
+                                  struct btp_koops_frame *frame);
+
+/**
  * Parses a textual kernel oops and puts it into a structure.  If
  * parsing fails, the input parameter is not changed and NULL is
  * returned.
