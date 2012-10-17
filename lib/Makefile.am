@@ -13,6 +13,7 @@ pkginclude_HEADERS = \
 	gdb_sharedlib.h \
 	gdb_stacktrace.h \
 	gdb_thread.h \
+	json.h \
 	koops_frame.h \
 	koops_stacktrace.h \
 	location.h \
@@ -41,6 +42,7 @@ libbtparser_la_SOURCES = \
 	gdb_frame.c \
 	gdb_sharedlib.c \
 	gdb_thread.c \
+	json.c \
 	koops_frame.c \
 	koops_stacktrace.c \
 	location.c \
