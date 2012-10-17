@@ -350,6 +350,12 @@ btp_skip_non_whitespace(const char *s);
 char *
 btp_bin2hex(char *dst, const char *str, int count);
 
+char *
+btp_indent(const char *input, int spaces);
+
+char *
+btp_indent_except_first_line(const char *input, int spaces);
+
 #ifdef __cplusplus
 }
 #endif

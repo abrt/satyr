@@ -144,15 +144,13 @@ btp_core_frame_append(struct btp_core_frame *dest,
                       struct btp_core_frame *item);
 
 /**
- * Appends the textual representation of the frame to the string
- * buffer.
+ * Returns a textual representation of the frame.
  * @param frame
  * It must be a non-NULL pointer.  It's not modified by calling this
  * function.
  */
-void
-btp_core_frame_append_to_str(struct btp_core_frame *frame,
-                             struct btp_strbuf *dest);
+char *
+btp_core_frame_to_json(struct btp_core_frame *frame);
 
 #ifdef __cplusplus
 }

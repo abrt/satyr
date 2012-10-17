@@ -19,6 +19,7 @@
 */
 #include "utils.h"
 #include "location.h"
+#include "strbuf.h"
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -572,4 +573,49 @@ btp_bin2hex(char *dst, const char *str, int count)
     }
 
     return dst;
+}
+
+char *
+btp_indent(const char *input, int spaces)
+{
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+    if (*input)
+    {
+        for (int i = 0; i < spaces; ++i)
+            btp_strbuf_append_char(strbuf, ' ');
+    }
+
+    char *indented = btp_indent_except_first_line(input, spaces);
+    btp_strbuf_append_str(strbuf, indented);
+    free(indented);
+
+    return btp_strbuf_free_nobuf(strbuf);
+}
+
+char *
+btp_indent_except_first_line(const char *input, int spaces)
+{
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+
+    const char *c = input;
+    while (*c)
+    {
+        if (*c == '\n')
+        {
+            btp_strbuf_append_char(strbuf, '\n');
+            if (*++c)
+            {
+                for (int i = 0; i < spaces; ++i)
+                    btp_strbuf_append_char(strbuf, ' ');
+            }
+
+            continue;
+        }
+        else
+            btp_strbuf_append_char(strbuf, *c);
+
+        ++c;
+    }
+
+    return btp_strbuf_free_nobuf(strbuf);
 }

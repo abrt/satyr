@@ -191,6 +191,7 @@ TESTSUITE_AT = \
   gdb_sharedlib.at	\
   koops_frame.at	\
   koops_stacktrace.at   \
+  core_frame.at         \
   normalize.at  	\
   metrics.at 		\
   cluster.at

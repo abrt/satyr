@@ -442,3 +442,21 @@ int main(void)
   return 0;
 }
 ]])
+
+## ---------- ##
+## btp_indent ##
+## ---------- ##
+
+AT_TESTFUN([btp_indent],
+[[
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdint.h>
+int main(void)
+{
+  assert(0 == strcmp(btp_indent("text", 2), "  text"));
+  assert(0 == strcmp(btp_indent("text\n", 2), "  text\n"));
+  assert(0 == strcmp(btp_indent("text\n\n", 2), "  text\n  \n"));
+  return 0;
+}
+]])

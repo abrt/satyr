@@ -121,12 +121,8 @@ btp_core_thread_append(struct btp_core_thread *dest,
 int
 btp_core_thread_get_frame_count(struct btp_core_thread *thread);
 
-/**
- * Appends a textual representation of a thread to a string buffer.
- */
-void
-btp_core_thread_append_to_str(struct btp_core_thread *thread,
-                              struct btp_strbuf *dest);
+char *
+btp_core_thread_to_json(struct btp_core_thread *thread);
 
 #ifdef __cplusplus
 }
