@@ -21,6 +21,11 @@
 #include "core_frame.h"
 #include "core_thread.h"
 #include "core_stacktrace.h"
+#include "config.h"
+
+#if (defined HAVE_LIBUNWIND && defined HAVE_LIBUNWIND_COREDUMP && defined HAVE_LIBUNWIND_GENERIC && defined HAVE_LIBUNWIND_COREDUMP_H && defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF)
+#  define WITH_LIBUNWIND
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -31,9 +36,23 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#ifdef WITH_LIBUNWIND
 #include <libelf.h>
 #include <gelf.h>
 #include <libunwind-coredump.h>
+#endif
+
+/* Error/warning reporting macros. Allows the error reporting code to be less
+ * verbose with the restrictions that:
+ *  - pointer to error message pointer must be always named "error_msg"
+ *  - the variable "elf_file" must always contain the filename that is operated
+ *    on by the libelf
+ */
+#define set_error(fmt, ...) _set_error(error_msg, fmt, ##__VA_ARGS__)
+#define set_error_elf(func) _set_error(error_msg, "%s failed for '%s': %s", \
+        func, elf_file, elf_errmsg(-1))
+#define warn_elf(func) warn("%s failed for '%s': %s", \
+        func, elf_file, elf_errmsg(-1))
 
 struct mapping_data
 {
@@ -79,6 +98,8 @@ _set_error(char **error_msg, const char *fmt, ...)
     va_end(ap);
 }
 
+#ifdef WITH_LIBUNWIND
+
 static void
 warn(const char *fmt, ...)
 {
@@ -93,18 +114,6 @@ warn(const char *fmt, ...)
     va_end(ap);
 
 }
-
-/* Error/warning reporting macros. Allows the error reporting code to be less
- * verbose with the restrictions that:
- *  - pointer to error message pointer must be always named "error_msg"
- *  - the variable "elf_file" must always contain the filename that is operated
- *    on by the libelf
- */
-#define set_error(fmt, ...) _set_error(error_msg, fmt, ##__VA_ARGS__)
-#define set_error_elf(func) _set_error(error_msg, "%s failed for '%s': %s", \
-        func, elf_file, elf_errmsg(-1))
-#define warn_elf(func) warn("%s failed for '%s': %s", \
-        func, elf_file, elf_errmsg(-1))
 
 static void
 mapping_data_free(struct mapping_data *map)
@@ -208,7 +217,9 @@ load_map_file(const char *maps_file)
  * to if there is no error.
  */
 static char *
-build_id_from_file(const char *elf_file, time_t core_mtime, char **error_msg)
+build_id_from_file(const char *elf_file,
+                   time_t core_mtime,
+                   char **error_msg)
 {
     int i;
     int fd;
@@ -243,7 +254,7 @@ build_id_from_file(const char *elf_file, time_t core_mtime, char **error_msg)
     }
 
     e = elf_begin(fd, ELF_C_READ, NULL);
-    if (e == NULL)
+    if (!e)
     {
         warn_elf("elf_begin");
         goto fail_close;
@@ -446,7 +457,7 @@ fail_close:
 fail:
     close(fd);
 
-    if (*error_msg == NULL && head == NULL)
+    if (!*error_msg && !head)
     {
         set_error("No segments found in coredump '%s'", elf_file);
     }
@@ -559,11 +570,14 @@ unwind_thread(struct UCD_info *ui,
     return thread;
 }
 
+#endif /* WITH_LIBUNWIND */
+
 struct btp_core_stacktrace *
 btp_parse_coredump(const char *core_file,
                    const char *maps_file,
                    char **error_msg)
 {
+#ifdef WITH_LIBUNWIND
     struct btp_core_thread *trace = NULL;
 
     /* Initialize error_msg to 'no error'. */
@@ -644,4 +658,8 @@ fail_free_maps:
     }
 
     return NULL;
+#else /* WITH_LIBUNWIND */
+    set_error("Btparser is built without libunwind support");
+    return NULL;
+#endif /* WITH_LIBUNWIND */
 }

@@ -40,6 +40,9 @@
    */
 #undef HAVE_LIBUNWIND_COREDUMP
 
+/* Define to 1 if you have the <libunwind-coredump.h> header file. */
+#undef HAVE_LIBUNWIND_COREDUMP_H
+
 /* Define to 1 if you have the `unwind-generic' library (-lunwind-generic). */
 #undef HAVE_LIBUNWIND_GENERIC
 

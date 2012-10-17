@@ -32,8 +32,8 @@ PKG_CHECK_MODULES([PYTHON], [python2],,[
 
 AC_CHECK_LIB([opcodes], [main], [have_libopcodes=yes], [have_libopcodes=no])
 [if test "$have_libopcodes" = "no"; then]
-    [echo "The libopcodes library was not found in the search path. The core backtrace support "]
-    [echo "will not be built.  If you want to build core backtrace support, please ensure"]
+    [echo "The libopcodes library was not found in the search path. The core stacktrace support "]
+    [echo "will not be built.  If you want to build core stacktrace support, please ensure"]
     [echo "that libopcodes is installed and its directory is included in the search path."]
     [echo "Then run configure again before attempting to build Btparser."]
 [fi]
@@ -80,6 +80,7 @@ AC_CHECK_LIB([dw], [main])
 AC_CHECK_LIB([dl], [main])
 
 # libunwind
+AC_CHECK_HEADERS([libunwind-coredump.h])
 AC_CHECK_LIB([unwind], [main])
 AC_CHECK_LIB([unwind-generic], [main])
 AC_CHECK_LIB([unwind-coredump], [main])
