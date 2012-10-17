@@ -17,18 +17,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-/* Based on code written by Denys Vlasenko:
-   https://fedorahosted.org/pipermail/crash-catcher/2012-March/002529.html */
-/*
- * TODO segv handler?
- * TODO think about tests
- * TODO think about integration
- */
-
 #include "utils.h"
+#include "core_frame.h"
+#include "core_thread.h"
 #include "core_stacktrace.h"
 
 #include <stdio.h>
+#include <string.h>
 #include <stdarg.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -40,7 +35,8 @@
 #include <gelf.h>
 #include <libunwind-coredump.h>
 
-struct mapping_data {
+struct mapping_data
+{
     uintptr_t start;
     char *filename;
     struct mapping_data *next;
@@ -211,7 +207,7 @@ load_map_file(const char *maps_file)
  * string pointed to by error_msg contains the error message, or is not written
  * to if there is no error.
  */
-static char*
+static char *
 build_id_from_file(const char *elf_file, time_t core_mtime, char **error_msg)
 {
     int i;
@@ -458,14 +454,16 @@ fail:
     return head;
 }
 
-static GList *
-unwind_thread(struct UCD_info *ui, unw_addr_space_t as,
-              struct core_segment_data *segments, int thread_no,
+static struct btp_core_thread *
+unwind_thread(struct UCD_info *ui,
+              unw_addr_space_t as,
+              struct core_segment_data *segments,
+              int thread_no,
               char **error_msg)
 {
     int ret;
     unw_cursor_t c;
-    GList *trace = NULL;
+    struct btp_core_frame *trace = NULL;
 
     _UCD_select_thread(ui, thread_no);
 
@@ -499,12 +497,12 @@ unwind_thread(struct UCD_info *ui, unw_addr_space_t as,
             }
         }
 
-        struct backtrace_entry *entry = btp_mallocz(sizeof(*entry));
+        struct btp_core_frame *entry = btp_core_frame_new();
         entry->address = ip;
         entry->build_id = (ip_seg && ip_seg->build_id) ?
             btp_strdup(ip_seg->build_id) : NULL;
         entry->build_id_offset = ip_seg ? (ip - ip_seg->vaddr) : ip;
-        entry->filename = (ip_seg && ip_seg->filename) ?
+        entry->file_name = (ip_seg && ip_seg->filename) ?
             btp_strdup(ip_seg->filename) : NULL;
 
         unw_proc_info_t pi;
@@ -513,8 +511,8 @@ unwind_thread(struct UCD_info *ui, unw_addr_space_t as,
         ret = unw_get_proc_info(&c, &pi);
         if (ret >= 0 && pi.start_ip + 1 != pi.end_ip)
         {
-            entry->function_initial_loc = pi.start_ip;
-            entry->function_length = pi.end_ip - pi.start_ip - 1;
+            //entry->function_initial_loc = pi.start_ip;
+            //entry->function_length = pi.end_ip - pi.start_ip - 1;
 
             /* NOTE: unw_get_proc_name returns the closest label when the
              * symbols are stripped from the file, which is usually incorrect
@@ -528,21 +526,22 @@ unwind_thread(struct UCD_info *ui, unw_addr_space_t as,
             ret = unw_get_proc_name(&c, funcname, sizeof(funcname)-1, &off);
             if (ret == 0 && ip-off >= pi.start_ip)
             {
-                entry->symbol = btp_strdup(funcname);
+                entry->function_name = btp_strdup(funcname);
             }
         }
 
-        trace = g_list_append(trace, entry);
+        trace = btp_core_frame_append(trace, entry);
+        /*
         printf("%s 0x%llx %s %s -\n",
                 (ip_seg && ip_seg->build_id) ? ip_seg->build_id : "-",
                 (unsigned long long)(ip_seg ? ip - ip_seg->vaddr : ip),
                 (entry->symbol ? entry->symbol : "-"),
-                (ip_seg && ip_seg->filename) ? ip_seg->filename : "-"
-        );
-
+                (ip_seg && ip_seg->filename) ? ip_seg->filename : "-");
+        */
         ret = unw_step(&c);
         if (ret == 0)
             break;
+
         if (ret < 0)
         {
             warn("unw_step failed: %s", unw_strerror(ret));
@@ -550,33 +549,38 @@ unwind_thread(struct UCD_info *ui, unw_addr_space_t as,
         }
     }
 
-    if (error_msg == NULL && trace == NULL)
+    if (!error_msg && !trace)
     {
         set_error("No frames found for thread %d", thread_no);
     }
 
-    return trace;
+    struct btp_core_thread *thread = btp_core_thread_new();
+    thread->frames = trace;
+    return thread;
 }
 
-GList *
-btp_parse_coredump(const char *core_file, const char *maps_file,
+struct btp_core_stacktrace *
+btp_parse_coredump(const char *core_file,
+                   const char *maps_file,
                    char **error_msg)
 {
-    GList *trace = NULL;
+    struct btp_core_thread *trace = NULL;
 
     /* Initialize error_msg to 'no error'. */
     if (error_msg)
         *error_msg = NULL;
 
     struct mapping_data *mappings = load_map_file(maps_file);
-    if (mappings == NULL)
+    if (!mappings)
     {
         set_error("Failed to read maps file");
         return NULL;
     }
 
-    struct core_segment_data *segments = analyze_coredump(core_file, mappings,
+    struct core_segment_data *segments = analyze_coredump(core_file,
+                                                          mappings,
                                                           error_msg);
+
     if (*error_msg)
         goto fail_free_maps;
 
@@ -597,7 +601,7 @@ btp_parse_coredump(const char *core_file, const char *maps_file,
     }
 
     struct mapping_data *map;
-    for (map = mappings; map != NULL; map = map->next)
+    for (map = mappings; map; map = map->next)
     {
         if (_UCD_add_backing_file_at_vaddr(ui, map->start, map->filename) < 0)
         {
@@ -632,16 +636,12 @@ fail_free_both:
 fail_free_maps:
     mapping_data_free(mappings);
 
-    return trace;
-}
+    if (trace)
+    {
+        struct btp_core_stacktrace *stacktrace = btp_core_stacktrace_new();
+        stacktrace->threads = trace;
+        return stacktrace;
+    }
 
-void
-print_mapping_data(const char *core_file, const char *maps_file)
-{
-    //printf("%p\n", _UCD_add_backing_file_at_vaddr);
-
-    char *error;
-    btp_parse_coredump(core_file, maps_file, &error);
-    if (error)
-        printf("ERROR: %s\n", error);
+    return NULL;
 }

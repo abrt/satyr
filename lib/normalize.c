@@ -388,6 +388,20 @@ ptrstrcmp(const void *s1, const void *s2)
 void
 btp_normalize_koops_stacktrace(struct btp_koops_stacktrace *stacktrace)
 {
+    /* Normalize function names by removing the suffixes identified by
+     * the dot character.
+     */
+    struct btp_koops_frame *frame = stacktrace->frames;
+    while (frame)
+    {
+        char *dot = strchr(frame->function_name, '.');
+        if (dot)
+            *dot = '\0';
+
+        frame = frame->next;
+    }
+
+    /* Remove blacklisted frames. */
     /* !!! MUST BE SORTED !!! */
     const char *blacklist[] = {
         "do_softirq",
@@ -406,17 +420,18 @@ btp_normalize_koops_stacktrace(struct btp_koops_stacktrace *stacktrace)
         "worker_thread"
     };
 
-    struct btp_koops_frame *frame = stacktrace->frames;
+    frame = stacktrace->frames;
     while (frame)
     {
         struct btp_koops_frame *next_frame = frame->next;
 
         /* do not drop frames belonging to a module */
         bool in_module = (btp_strcmp0(frame->module_name, "vmlinux") != 0);
-        bool in_blacklist = bsearch(&(frame->function_name),
+        bool in_blacklist = bsearch(&frame->function_name,
                                     blacklist,
-                                    sizeof(blacklist)/sizeof(blacklist[0]),
-                                    sizeof(blacklist[0]), ptrstrcmp);
+                                    sizeof(blacklist) / sizeof(blacklist[0]),
+                                    sizeof(blacklist[0]),
+                                    ptrstrcmp);
 
         if (!in_module && in_blacklist)
         {

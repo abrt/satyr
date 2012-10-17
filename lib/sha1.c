@@ -47,8 +47,6 @@
 /* for sha512: */
 #define rotr64(x,n) (((x) >> (n)) | ((x) << (64 - (n))))
 
-static const char hexdigits_locase[] = "0123456789abcdef";
-
 /* Generic 64-byte helpers for 64-byte block hashes */
 static void
 common64_hash(struct btp_sha1_state *state, const void *buffer, size_t len);
@@ -238,20 +236,4 @@ common64_end(struct btp_sha1_state *state,
             break;
         bufpos = 0;
     }
-}
-
-/* Emit a string of hex representation of bytes */
-char *
-btp_bin2hex(char *dst, const char *str, int count)
-{
-    while (count)
-    {
-        unsigned char c = *str++;
-        /* put lowercase hex digits */
-        *dst++ = hexdigits_locase[c >> 4];
-        *dst++ = hexdigits_locase[c & 0xf];
-        count--;
-    }
-
-    return dst;
 }

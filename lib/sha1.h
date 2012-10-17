@@ -72,9 +72,6 @@ btp_sha1_hash(struct btp_sha1_state *state,
 void
 btp_sha1_end(struct btp_sha1_state *state, void *resbuf);
 
-char *
-btp_bin2hex(char *dst, const char *str, int count);
-
 #ifdef __cplusplus
 }
 #endif

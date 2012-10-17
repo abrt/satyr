@@ -30,7 +30,11 @@
 #include <fcntl.h>
 #include <ctype.h>
 
-bool btp_debug_parser = false;
+bool
+btp_debug_parser = false;
+
+static const char
+hexdigits_locase[] = "0123456789abcdef";
 
 void *
 btp_malloc(size_t size)
@@ -553,4 +557,19 @@ btp_skip_non_whitespace(const char *s)
             ++s;
 
 	return (char *) s;
+}
+
+char *
+btp_bin2hex(char *dst, const char *str, int count)
+{
+    while (count)
+    {
+        unsigned char c = *str++;
+        /* put lowercase hex digits */
+        *dst++ = hexdigits_locase[c >> 4];
+        *dst++ = hexdigits_locase[c & 0xf];
+        count--;
+    }
+
+    return dst;
 }

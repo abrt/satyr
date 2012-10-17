@@ -30,7 +30,7 @@ PKG_CHECK_MODULES([PYTHON], [python2],,[
     PYTHON_CFLAGS='-I/usr/include/python2.6'
 ])
 
-AC_HAVE_LIBRARY(opcodes, [have_libopcodes=yes], [have_libopcodes=no])
+AC_CHECK_LIB([opcodes], [main], [have_libopcodes=yes], [have_libopcodes=no])
 [if test "$have_libopcodes" = "no"; then]
     [echo "The libopcodes library was not found in the search path. The core backtrace support "]
     [echo "will not be built.  If you want to build core backtrace support, please ensure"]
@@ -70,13 +70,19 @@ have_good_libopcodes=$?
 AM_CONDITIONAL(HAVE_LIBOPCODES, test $have_good_libopcodes -eq 1)
 AC_DEFINE_UNQUOTED(HAVE_LIBOPCODES, $have_good_libopcodes, [Have libopcodes compiled with -fPIC])
 
-AC_HAVE_LIBRARY([bfd])
+# Check BFD
+AC_CHECK_LIB([bfd], [main])
 
 # elfutils
 AC_CHECK_HEADERS([dwarf.h elfutils/libdw.h gelf.h libelf.h])
-AC_HAVE_LIBRARY([elf])
-AC_HAVE_LIBRARY([dw])
-AC_HAVE_LIBRARY([dl])
+AC_CHECK_LIB([elf], [main])
+AC_CHECK_LIB([dw], [main])
+AC_CHECK_LIB([dl], [main])
+
+# libunwind
+AC_CHECK_LIB([unwind], [main])
+AC_CHECK_LIB([unwind-generic], [main])
+AC_CHECK_LIB([unwind-coredump], [main])
 
 # pdflatex
 AC_PATH_PROG([PDFLATEX], [pdflatex], [no])
@@ -98,7 +104,7 @@ AM_CONDITIONAL([HAVE_DOXYGEN], test "$DOXYGEN" != "no")
     [echo "Then run configure again before attempting to build Btparser."]
 [fi]
 
-# dot (part of graphviz
+# dot (part of graphviz)
 AC_PATH_PROG([DOT], [dot], [no])
 AM_CONDITIONAL([HAVE_DOT], test "$DOT" != "no")
 [if test "DOT" = "no"; then]

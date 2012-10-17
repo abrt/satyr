@@ -344,6 +344,12 @@ btp_skip_whitespace(const char *s);
 char *
 btp_skip_non_whitespace(const char *s);
 
+/**
+ * Emit a string of hex representation of bytes.
+ */
+char *
+btp_bin2hex(char *dst, const char *str, int count);
+
 #ifdef __cplusplus
 }
 #endif

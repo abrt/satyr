@@ -33,6 +33,16 @@
 /* Have libopcodes compiled with -fPIC */
 #undef HAVE_LIBOPCODES
 
+/* Define to 1 if you have the `unwind' library (-lunwind). */
+#undef HAVE_LIBUNWIND
+
+/* Define to 1 if you have the `unwind-coredump' library (-lunwind-coredump).
+   */
+#undef HAVE_LIBUNWIND_COREDUMP
+
+/* Define to 1 if you have the `unwind-generic' library (-lunwind-generic). */
+#undef HAVE_LIBUNWIND_GENERIC
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
