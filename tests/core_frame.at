@@ -57,3 +57,39 @@ main(void)
   return 0;
 }
 ]])
+
+## ---------------------- ##
+## btp_core_frame_to_json ##
+## ---------------------- ##
+
+AT_TESTFUN([btp_core_frame_to_json],
+[[
+#include <lib/core_frame.h>
+#include <lib/utils.h>
+#include <assert.h>
+
+int
+main(void)
+{
+  struct btp_core_frame *frame = btp_core_frame_new();;
+  frame->address = 0xffffffff1;
+  frame->build_id = btp_strdup("aabbccddeeff1");
+  frame->build_id_offset = 2561;
+  frame->function_name = btp_strdup("test1");
+  frame->file_name = btp_strdup("executable1");
+  frame->fingerprint = btp_strdup("ab");
+
+  char *json = btp_core_frame_to_json(frame);
+  assert(0 == strcmp(json,
+  	   "{   \"address\": 68719476721\n"
+	   ",   \"build_id\": \"aabbccddeeff1\"\n"
+	   ",   \"build_id_offset\": 2561\n"
+	   ",   \"function_name\": \"test1\"\n"
+	   ",   \"file_name\": \"executable1\"\n"
+	   ",   \"fingerprint\": \"ab\"\n"
+	   "}"));
+
+  btp_core_frame_free(frame);
+  return 0;
+}
+]])

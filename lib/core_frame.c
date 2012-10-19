@@ -19,6 +19,7 @@
 */
 #include "core_frame.h"
 #include "utils.h"
+#include "strbuf.h"
 #include <string.h>
 
 struct btp_core_frame *
@@ -138,7 +139,7 @@ btp_core_frame_to_json(struct btp_core_frame *frame)
 {
     struct btp_strbuf *strbuf = btp_strbuf_new();
     btp_strbuf_append_strf(strbuf,
-                           "{   \"address\": %"PRIx64"\n",
+                           "{   \"address\": %"PRIu64"\n",
                            frame->address);
     if (frame->build_id)
     {
@@ -148,7 +149,7 @@ btp_core_frame_to_json(struct btp_core_frame *frame)
     }
 
     btp_strbuf_append_strf(strbuf,
-                           ",   \"build_id_offset\": %"PRIx64"\n",
+                           ",   \"build_id_offset\": %"PRIu64"\n",
                            frame->build_id_offset);
 
     if (frame->function_name)
@@ -168,7 +169,7 @@ btp_core_frame_to_json(struct btp_core_frame *frame)
     if (frame->fingerprint)
     {
         btp_strbuf_append_strf(strbuf,
-                               "    \"fingerprint\": \"%s\",\n",
+                               ",   \"fingerprint\": \"%s\"\n",
                                frame->fingerprint);
     }
 
