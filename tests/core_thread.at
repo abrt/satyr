@@ -1,0 +1,60 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([Core threads])
+
+## ---------------------- ##
+## btp_core_thread_to_json ##
+## ---------------------- ##
+
+AT_TESTFUN([btp_core_thread_to_json],
+[[
+#include <lib/core_thread.h>
+#include <lib/core_frame.h>
+#include <lib/utils.h>
+#include <assert.h>
+
+int
+main(void)
+{
+  struct btp_core_frame *frame1 = btp_core_frame_new();
+  frame1->address = 0xffffffff0;
+  frame1->build_id = btp_strdup("aabbccddeeff0");
+  frame1->build_id_offset = 2560;
+  frame1->function_name = btp_strdup("test0");
+  frame1->file_name = btp_strdup("executable0");
+
+  struct btp_core_frame *frame0 = btp_core_frame_new();;
+  frame0->address = 0xffffffff1;
+  frame0->build_id = btp_strdup("aabbccddeeff1");
+  frame0->build_id_offset = 2561;
+  frame0->function_name = btp_strdup("test1");
+  frame0->file_name = btp_strdup("executable1");
+  frame0->fingerprint = btp_strdup("ab");
+  frame0->next = frame1;
+
+  struct btp_core_thread *thread = btp_core_thread_new();
+  thread->frames = frame0;
+
+  char *json = btp_core_thread_to_json(thread);
+  puts(json);
+  assert(0 == strcmp(json,
+           "{   \"frames\":\n"
+           "      [ {   \"address\": 68719476721\n"
+           "        ,   \"build_id\": \"aabbccddeeff1\"\n"
+           "        ,   \"build_id_offset\": 2561\n"
+           "        ,   \"function_name\": \"test1\"\n"
+           "        ,   \"file_name\": \"executable1\"\n"
+           "        ,   \"fingerprint\": \"ab\"\n"
+           "        }\n"
+           "      , {   \"address\": 68719476720\n"
+           "        ,   \"build_id\": \"aabbccddeeff0\"\n"
+           "        ,   \"build_id_offset\": 2560\n"
+           "        ,   \"function_name\": \"test0\"\n"
+           "        ,   \"file_name\": \"executable0\"\n"
+           "        } ]\n"
+           "}"));
+
+  btp_core_thread_free(thread);
+  return 0;
+}
+]])

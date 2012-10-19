@@ -38,6 +38,7 @@ TESTSUITE_AT =		\
   koops_frame.at	\
   koops_stacktrace.at   \
   core_frame.at         \
+  core_thread.at        \
   normalize.at  	\
   metrics.at 		\
   cluster.at

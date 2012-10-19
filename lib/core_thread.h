@@ -72,7 +72,7 @@ btp_core_thread_init(struct btp_core_thread *thread);
 
 /**
  * Releases the memory held by the thread. The thread siblings are not
- * released.
+ * released.  Thread frames are released.
  * @param thread
  * If thread is NULL, no operation is performed.
  */
