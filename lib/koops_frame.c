@@ -342,9 +342,9 @@ btp_koops_frame_to_json(struct btp_koops_frame *frame)
     }
 
     btp_strbuf_append_strf(strbuf,
-                           "%s   \"reliable\": \"%s\"\n",
+                           "%s   \"reliable\": %s\n",
                            frame->address == 0 ? "{" : ",",
-                           frame->reliable ? "yes" : "no");
+                           frame->reliable ? "true" : "false");
 
     if (frame->function_name)
     {
