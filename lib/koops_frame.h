@@ -184,6 +184,15 @@ btp_koops_parse_function(const char **input,
                          uint64_t *function_length,
                          char **module_name);
 
+/**
+ * Returns a textual representation of the frame.
+ * @param frame
+ * It must be a non-NULL pointer.  It's not modified by calling this
+ * function.
+ */
+char *
+btp_koops_frame_to_json(struct btp_koops_frame *frame);
+
 #ifdef __cplusplus
 }
 #endif

@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 
 struct btp_koops_frame *
 btp_koops_frame_new()
@@ -326,4 +327,76 @@ btp_koops_parse_function(const char **input,
 
     *input = local_input;
     return true;
+}
+
+char *
+btp_koops_frame_to_json(struct btp_koops_frame *frame)
+{
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+
+    if (frame->address != 0)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               "{   \"address\": %"PRIu64"\n",
+                               frame->address);
+    }
+
+    btp_strbuf_append_strf(strbuf,
+                           "%s   \"reliable\": \"%s\"\n",
+                           frame->address == 0 ? "{" : ",",
+                           frame->reliable ? "yes" : "no");
+
+    if (frame->function_name)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"function_name\": \"%s\"\n",
+                               frame->function_name);
+    }
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"function_offset\": %"PRIu64"\n",
+                           frame->function_offset);
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"function_length\": %"PRIu64"\n",
+                           frame->function_length);
+
+    if (frame->module_name)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"module_name\": \"%s\"\n",
+                               frame->module_name);
+    }
+
+    if (frame->from_address != 0)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"from_address\": %"PRIu64"\n",
+                               frame->from_address);
+    }
+
+    if (frame->from_function_name)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"from_function_name\": \"%s\"\n",
+                               frame->from_function_name);
+    }
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"from_function_offset\": %"PRIu64"\n",
+                           frame->from_function_offset);
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"from_function_length\": %"PRIu64"\n",
+                           frame->from_function_length);
+
+    if (frame->from_module_name)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"from_module_name\": \"%s\"\n",
+                               frame->from_module_name);
+    }
+
+    btp_strbuf_append_str(strbuf, "}");
+    return btp_strbuf_free_nobuf(strbuf);
 }
