@@ -30,6 +30,7 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 #include "json.h"
+#include "strbuf.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -356,7 +357,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
 
                   if (top->type == BTP_JSON_ARRAY)
                      flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
-                  else if (!state.settings.settings & btp_json_relaxed_commas)
+                  else if (!state.settings.settings & BTP_JSON_RELAXED_COMMAS)
                   {
                       sprintf (error, "%d:%d: Unexpected ]", cur_line, e_off);
                       goto e_failed;
@@ -481,7 +482,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                      continue;
 
                   case '"':
-                     if (flags & flag_need_comma && (!state.settings.settings & btp_json_relaxed_commas))
+                     if (flags & flag_need_comma && (!state.settings.settings & BTP_JSON_RELAXED_COMMAS))
                      {
                         sprintf (error, "%d:%d: Expected , before \"", cur_line, e_off);
                         goto e_failed;
@@ -685,4 +686,44 @@ btp_json_value_free(struct btp_json_value *value)
       value = value->parent;
       free (cur_value);
    }
+}
+
+char *
+btp_json_escape(const char *text)
+{
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+    const char *c = text;
+    while (*c != '\0')
+    {
+        switch (*c)
+        {
+        case '"':
+            btp_strbuf_append_str(strbuf, "\\\"");
+            break;
+        case '\n':
+            btp_strbuf_append_str(strbuf, "\\n");
+            break;
+        case '\\':
+            btp_strbuf_append_str(strbuf, "\\\\");
+            break;
+        case '\r':
+            btp_strbuf_append_str(strbuf, "\\r");
+            break;
+        case '\f':
+            btp_strbuf_append_str(strbuf, "\\f");
+            break;
+        case '\b':
+            btp_strbuf_append_str(strbuf, "\\b");
+            break;
+        case '\t':
+            btp_strbuf_append_str(strbuf, "\\t");
+            break;
+        default:
+            btp_strbuf_append_char(strbuf, *c);
+        }
+
+        ++c;
+    }
+
+    return btp_strbuf_free_nobuf(strbuf);
 }

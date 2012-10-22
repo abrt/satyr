@@ -42,7 +42,7 @@ struct btp_json_settings
    int settings;
 };
 
-#define btp_json_relaxed_commas 1
+#define BTP_JSON_RELAXED_COMMAS 1
 
 enum btp_json_type
 {
@@ -114,6 +114,9 @@ btp_json_parse_ex(struct btp_json_settings *settings,
 
 void
 btp_json_value_free(struct btp_json_value *value);
+
+char *
+btp_json_escape(const char *text);
 
 #ifdef __cplusplus
 } /* extern "C" */

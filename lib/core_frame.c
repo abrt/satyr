@@ -20,6 +20,7 @@
 #include "core_frame.h"
 #include "utils.h"
 #include "strbuf.h"
+#include "json.h"
 #include <string.h>
 
 struct btp_core_frame *
@@ -143,9 +144,12 @@ btp_core_frame_to_json(struct btp_core_frame *frame)
                            frame->address);
     if (frame->build_id)
     {
+        char *escaped = btp_json_escape(frame->build_id);
         btp_strbuf_append_strf(strbuf,
                                ",   \"build_id\": \"%s\"\n",
-                               frame->build_id);
+                               escaped);
+
+        free(escaped);
     }
 
     btp_strbuf_append_strf(strbuf,
@@ -154,23 +158,32 @@ btp_core_frame_to_json(struct btp_core_frame *frame)
 
     if (frame->function_name)
     {
+        char *escaped = btp_json_escape(frame->function_name);
         btp_strbuf_append_strf(strbuf,
                                ",   \"function_name\": \"%s\"\n",
-                               frame->function_name);
+                               escaped);
+
+        free(escaped);
     }
 
     if (frame->file_name)
     {
+        char *escaped = btp_json_escape(frame->file_name);
         btp_strbuf_append_strf(strbuf,
                                ",   \"file_name\": \"%s\"\n",
-                               frame->file_name);
+                               escaped);
+
+        free(escaped);
     }
 
     if (frame->fingerprint)
     {
+        char *escaped = btp_json_escape(frame->fingerprint);
         btp_strbuf_append_strf(strbuf,
                                ",   \"fingerprint\": \"%s\"\n",
-                               frame->fingerprint);
+                               escaped);
+
+        free(escaped);
     }
 
     btp_strbuf_append_str(strbuf, "}");

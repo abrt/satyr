@@ -20,6 +20,7 @@
 #include "koops_frame.h"
 #include "utils.h"
 #include "strbuf.h"
+#include "json.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -348,9 +349,12 @@ btp_koops_frame_to_json(struct btp_koops_frame *frame)
 
     if (frame->function_name)
     {
+        char *escaped = btp_json_escape(frame->function_name);
         btp_strbuf_append_strf(strbuf,
                                ",   \"function_name\": \"%s\"\n",
-                               frame->function_name);
+                               escaped);
+
+        free(escaped);
     }
 
     btp_strbuf_append_strf(strbuf,
@@ -363,9 +367,12 @@ btp_koops_frame_to_json(struct btp_koops_frame *frame)
 
     if (frame->module_name)
     {
+        char *escaped = btp_json_escape(frame->module_name);
         btp_strbuf_append_strf(strbuf,
                                ",   \"module_name\": \"%s\"\n",
-                               frame->module_name);
+                               escaped);
+
+        free(escaped);
     }
 
     if (frame->from_address != 0)
@@ -377,9 +384,12 @@ btp_koops_frame_to_json(struct btp_koops_frame *frame)
 
     if (frame->from_function_name)
     {
+        char *escaped = btp_json_escape(frame->from_function_name);
         btp_strbuf_append_strf(strbuf,
                                ",   \"from_function_name\": \"%s\"\n",
-                               frame->from_function_name);
+                               escaped);
+
+        free(escaped);
     }
 
     btp_strbuf_append_strf(strbuf,
@@ -392,9 +402,12 @@ btp_koops_frame_to_json(struct btp_koops_frame *frame)
 
     if (frame->from_module_name)
     {
+        char *escaped = btp_json_escape(frame->from_module_name);
         btp_strbuf_append_strf(strbuf,
                                ",   \"from_module_name\": \"%s\"\n",
-                               frame->from_module_name);
+                               escaped);
+
+        free(escaped);
     }
 
     btp_strbuf_append_str(strbuf, "}");
