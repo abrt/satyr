@@ -54,6 +54,7 @@ main(void)
            "        } ]\n"
            "}"));
 
+  free(json);
   btp_core_thread_free(thread);
   return 0;
 }

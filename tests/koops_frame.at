@@ -246,3 +246,49 @@ main(void)
 }
 ]])
 
+## ----------------------- ##
+## btp_koops_frame_to_json ##
+## ----------------------- ##
+
+AT_TESTFUN([btp_koops_frame_to_json],
+[[
+#include <lib/koops_frame.h>
+#include <assert.h>
+#include <stdlib.h>
+
+int
+main(void)
+{
+  struct btp_koops_frame frame;
+  btp_koops_frame_init(&frame);
+  frame.address = 0xc02f671c;
+  frame.reliable = true;
+  frame.function_name = "_raw_spin_lock_irqsave";
+  frame.function_offset = 0x48;
+  frame.function_length = 0x5c;
+  frame.from_address = 0xbf054120;
+  frame.from_function_name = "mxs_mmc_enable_sdio_irq";
+  frame.from_function_offset = 0x18;
+  frame.from_function_length = 0xdc;
+  frame.from_module_name = "mxs_mmc";
+
+  char *json = btp_koops_frame_to_json(&frame);
+  puts(json);
+  assert(0 == strcmp(json,
+            "{   \"address\": 3224332060\n"
+            ",   \"reliable\": true\n"
+            ",   \"function_name\": \"_raw_spin_lock_irqsave\"\n"
+            ",   \"function_offset\": 72\n"
+            ",   \"function_length\": 92\n"
+            ",   \"from_address\": 3204792608\n"
+            ",   \"from_function_name\": \"mxs_mmc_enable_sdio_irq\"\n"
+            ",   \"from_function_offset\": 24\n"
+            ",   \"from_function_length\": 220\n"
+            ",   \"from_module_name\": \"mxs_mmc\"\n"
+            "}"));
+
+  free(json);
+  return 0;
+}
+]])
+
