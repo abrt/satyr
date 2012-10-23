@@ -74,8 +74,9 @@ AC_DEFINE_UNQUOTED(HAVE_LIBOPCODES, $have_good_libopcodes, [Have libopcodes comp
 AC_CHECK_LIB([bfd], [main])
 
 # elfutils
-AC_CHECK_HEADERS([dwarf.h elfutils/libdw.h gelf.h libelf.h])
+AC_CHECK_HEADERS([dwarf.h elfutils/libdw.h elfutils/libdwfl.h gelf.h libelf.h])
 AC_CHECK_LIB([elf], [main])
+# dwfl is actually part of libdw, at least on fedora
 AC_CHECK_LIB([dw], [main])
 AC_CHECK_LIB([dl], [main])
 
