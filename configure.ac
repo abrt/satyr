@@ -1,4 +1,4 @@
-AC_INIT([btparser], [0.20], [kklic@redhat.com])
+AC_INIT([btparser], [0.21], [kklic@redhat.com])
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AM_MAINTAINER_MODE

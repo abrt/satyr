@@ -1,3 +1,10 @@
+== btparser 0.21
+
+- Fix stack trace normalization
+- Rebuild linked list in format_funs python binding
+- Fix typo in name of used free function
+- Add python bindings for thread normalization
+
 == btparser 0.20
 Release 2012-10-11
 
