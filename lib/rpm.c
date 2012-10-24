@@ -20,6 +20,28 @@
 #inlcude "rpm.h"
 #include <rpm/rpmlib.h>
 
+struct btp_rpm_package *
+btp_rpm_package_get_by_name(const char *name)
+{
+}
+
+struct btp_rpm_package *
+btp_rpm_package_get_by_path(const char *path)
+{
+}
+
+void
+btp_rpm_package_free(struct btp_rpm_package *package, bool recursive)
+{
+}
+
+
+/**
+ * Takes 0.06 second for bash package consisting of 92 files.
+ * Takes 0.75 second for emacs-common package consisting of 2585 files.
+ */
+struct btp_rpm_verify *rpm_verify_package_by_name(const char *name);
+
 struct btp_rpm_info *
 rpm_get_package_info(const char *name)
 {

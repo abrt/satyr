@@ -29,17 +29,7 @@
 extern "C" {
 #endif
 
-struct btp_rpm_package
-{
-    char *name;
-    int epoch;
-    char *version;
-    char *release;
-    char *architecture;
-    unsigned int install_time;
-};
-
-struct btp_rpm_verify
+struct btp_rpm_consistency
 {
     char *file_name;
 
@@ -53,18 +43,30 @@ struct btp_rpm_verify
     bool symlink_changed;
     bool modification_time_changed;
 
-    struct btp_rpm_verify *next;
-}
+    struct btp_rpm_consistency *next;
+};
 
-struct btp_rpm_info *rpm_get_package_by_name(const char *name);
+struct btp_rpm_package
+{
+    char *name;
+    uint32_t epoch;
+    char *version;
+    char *release;
+    char *architecture;
+    uint64_t install_time;
+    struct btp_rpm_consistency *consistency;
 
-struct btp_rpm_info *rpm_get_package_by_path(const char *path);
+    struct btp_rpm_package *next;
+};
 
-/**
- * Takes 0.06 second for bash package consisting of 92 files.
- * Takes 0.75 second for emacs-common package consisting of 2585 files.
- */
-struct btp_rpm_verify *rpm_verify_package_by_name(const char *name);
+struct btp_rpm_package *
+btp_rpm_package_get_by_name(const char *name);
+
+struct btp_rpm_package *
+btp_rpm_package_get_by_path(const char *path);
+
+void
+btp_rpm_package_free(struct btp_rpm_package *package, bool recursive);
 
 #ifdef __cplusplus
 }

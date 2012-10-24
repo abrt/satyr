@@ -227,7 +227,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                   continue;
 
                default:
-                  sprintf (error, "%d:%d: Trailing garbage: `%c`", cur_line, e_off, b);
+                  sprintf(error, "%d:%d: Trailing garbage: `%c`", cur_line, e_off, b);
                   goto e_failed;
             };
          }
@@ -235,7 +235,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
          if (flags & flag_string)
          {
             if (!b)
-            {  sprintf (error, "Unexpected EOF in string (at %d:%d)", cur_line, e_off);
+            {  sprintf(error, "Unexpected EOF in string (at %d:%d)", cur_line, e_off);
                goto e_failed;
             }
 
@@ -255,10 +255,10 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                   case 't':  string_add ('\t');  break;
                   case 'u':
 
-                    if ((uc_b1 = hex_value (*++ i)) == 0xFF || (uc_b2 = hex_value (*++ i)) == 0xFF
-                          || (uc_b3 = hex_value (*++ i)) == 0xFF || (uc_b4 = hex_value (*++ i)) == 0xFF)
+                    if ((uc_b1 = hex_value (*++i)) == 0xFF || (uc_b2 = hex_value (*++i)) == 0xFF
+                          || (uc_b3 = hex_value (*++i)) == 0xFF || (uc_b4 = hex_value (*++i)) == 0xFF)
                     {
-                        sprintf (error, "Invalid character value `%c` (at %d:%d)", b, cur_line, e_off);
+                        sprintf(error, "Invalid character value `%c` (at %d:%d)", b, cur_line, e_off);
                         goto e_failed;
                     }
 
@@ -269,7 +269,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
 
                     if (uc_b1 == 0 && uc_b2 <= 0x7F)
                     {
-                       string_add ((char) uchar);
+                       string_add((char) uchar);
                        break;
                     }
 
@@ -278,8 +278,9 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                         if (state.first_pass)
                            string_length += 2;
                         else
-                        {  string [string_length ++] = 0xC0 | ((uc_b2 & 0xC0) >> 6) | ((uc_b1 & 0x3) << 3);
-                           string [string_length ++] = 0x80 | (uc_b2 & 0x3F);
+                        {
+                            string[string_length ++] = 0xC0 | ((uc_b2 & 0xC0) >> 6) | ((uc_b1 & 0x3) << 3);
+                           string[string_length ++] = 0x80 | (uc_b2 & 0x3F);
                         }
 
                         break;
@@ -288,7 +289,8 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                     if (state.first_pass)
                        string_length += 3;
                     else
-                    {  string [string_length ++] = 0xE0 | ((uc_b1 & 0xF0) >> 4);
+                    {
+                        string [string_length ++] = 0xE0 | ((uc_b1 & 0xF0) >> 4);
                        string [string_length ++] = 0x80 | ((uc_b1 & 0xF) << 2) | ((uc_b2 & 0xC0) >> 6);
                        string [string_length ++] = 0x80 | (uc_b2 & 0x3F);
                     }
@@ -376,7 +378,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                      }
                      else
                      {
-                         sprintf (error, "%d:%d: Expected , before %c", cur_line, e_off, b);
+                         sprintf(error, "%d:%d: Expected , before %c", cur_line, e_off, b);
                          goto e_failed;
                      }
                   }
@@ -388,7 +390,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                         continue;
                      }
                      else
-                     {  sprintf (error, "%d:%d: Expected : before %c", cur_line, e_off, b);
+                     {  sprintf(error, "%d:%d: Expected : before %c", cur_line, e_off, b);
                         goto e_failed;
                      }
                   }

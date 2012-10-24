@@ -7,6 +7,7 @@ pkginclude_HEADERS = \
 	core_stacktrace.h \
 	core_thread.h \
 	core_unwind.h \
+	deb.h \
 	disasm.h \
 	elves.h \
 	gdb_frame.h \
@@ -21,6 +22,7 @@ pkginclude_HEADERS = \
 	normalize.h \
 	python_frame.h \
 	python_stacktrace.h \
+	report.h \
 	sha1.h \
 	strbuf.h \
 	unstrip.h \
@@ -36,6 +38,7 @@ libbtparser_la_SOURCES = \
 	core_frame.c \
 	core_thread.c \
 	core_unwind.c \
+	deb.c \
 	disasm.c \
 	elves.c \
 	gdb_stacktrace.c \
@@ -50,6 +53,7 @@ libbtparser_la_SOURCES = \
 	normalize.c \
 	python_frame.c \
 	python_stacktrace.c \
+	report.c \
 	sha1.c \
 	strbuf.c \
 	unstrip.c \

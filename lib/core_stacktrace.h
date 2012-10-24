@@ -42,6 +42,8 @@ struct btp_core_stacktrace
     /** Signal number. */
     uint8_t signal;
 
+    char *executable;
+
     /**
      * @brief Thread responsible for the crash.
      *

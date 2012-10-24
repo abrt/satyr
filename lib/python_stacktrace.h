@@ -30,9 +30,9 @@
 extern "C" {
 #endif
 
-struct btp_python_frame;
-
 #include <stdint.h>
+
+struct btp_python_frame;
 
 struct btp_python_stacktrace
 {
