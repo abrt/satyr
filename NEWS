@@ -1,4 +1,10 @@
+== btparser 0.22
+Release 2012-11-01
+
+- Fix stack trace normalization
+
 == btparser 0.21
+Release 2012-10-24
 
 - Fix stack trace normalization
 - Rebuild linked list in format_funs python binding
