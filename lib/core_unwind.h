@@ -28,7 +28,7 @@ struct btp_core_stacktrace;
 
 struct btp_core_stacktrace *
 btp_parse_coredump(const char *core_file,
-                   const char *maps_file,
+                   const char *exe_file,
                    char **error_msg);
 
 #ifdef __cplusplus

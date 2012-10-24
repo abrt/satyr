@@ -23,7 +23,7 @@
 #include "core_stacktrace.h"
 #include "config.h"
 
-#if (defined HAVE_LIBUNWIND && defined HAVE_LIBUNWIND_COREDUMP && defined HAVE_LIBUNWIND_GENERIC && defined HAVE_LIBUNWIND_COREDUMP_H && defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF)
+#if (defined HAVE_LIBUNWIND && defined HAVE_LIBUNWIND_COREDUMP && defined HAVE_LIBUNWIND_GENERIC && defined HAVE_LIBUNWIND_COREDUMP_H && defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF && defined HAVE_LIBDW && defined HAVE_ELFUTILS_LIBDWFL_H)
 #  define WITH_LIBUNWIND
 #endif
 
@@ -40,6 +40,7 @@
 #include <libelf.h>
 #include <gelf.h>
 #include <libunwind-coredump.h>
+#include <elfutils/libdwfl.h>
 #endif
 
 /* Error/warning reporting macros. Allows the error reporting code to be less
@@ -53,24 +54,8 @@
         func, elf_file, elf_errmsg(-1))
 #define warn_elf(func) warn("%s failed for '%s': %s", \
         func, elf_file, elf_errmsg(-1))
-
-struct mapping_data
-{
-    uintptr_t start;
-    char *filename;
-    struct mapping_data *next;
-};
-
-struct core_segment_data
-{
-    uintptr_t offset;
-    uintptr_t vaddr;
-    uintptr_t filesz;
-    uintptr_t memsz;
-    char *filename;
-    char *build_id;
-    struct core_segment_data *next;
-};
+#define set_error_dwfl(func) _set_error(error_msg, "%s failed: %s", \
+        func, dwfl_errmsg(-1))
 
 #define list_append(head,tail,item)          \
     do{                                      \
@@ -100,6 +85,25 @@ _set_error(char **error_msg, const char *fmt, ...)
 
 #ifdef WITH_LIBUNWIND
 
+struct exe_mapping_data
+{
+    uint64_t start;
+    char *filename;
+    struct exe_mapping_data *next;
+};
+
+struct core_handle
+{
+    int fd;
+    Elf *eh;
+    Dwfl *dwfl;
+    struct exe_mapping_data *segments;
+};
+
+/* FIXME: is there another way to pass the executable name to the find_elf
+ * callback? */
+const char *executable_file = NULL;
+
 static void
 warn(const char *fmt, ...)
 {
@@ -116,29 +120,13 @@ warn(const char *fmt, ...)
 }
 
 static void
-mapping_data_free(struct mapping_data *map)
+exe_mapping_data_free(struct exe_mapping_data *seg)
 {
-    struct mapping_data *next;
-
-    while (map)
-    {
-        free(map->filename);
-
-        next = map->next;
-        free(map);
-        map = next;
-    }
-}
-
-static void
-core_segment_data_free(struct core_segment_data *seg)
-{
-    struct core_segment_data *next;
+    struct exe_mapping_data *next;
 
     while (seg)
     {
         free(seg->filename);
-        free(seg->build_id);
 
         next = seg->next;
         free(seg);
@@ -146,204 +134,98 @@ core_segment_data_free(struct core_segment_data *seg)
     }
 }
 
-/* Returns the list of mapping_data's, one per executable file
- * mentioned in map file.
- */
-static struct mapping_data *
-load_map_file(const char *maps_file)
+static void
+core_handle_free(struct core_handle *ch)
 {
-    struct mapping_data *head = NULL, *tail = NULL;
-
-    char *file_contents = btp_file_to_string(maps_file);
-    if (!file_contents)
+    if (ch)
     {
-        warn("btp_file_to_string failed");
-        return NULL;
+        exe_mapping_data_free(ch->segments);
+        if (ch->dwfl)
+            dwfl_end(ch->dwfl);
+        if (ch->eh)
+            elf_end(ch->eh);
+        if (ch->fd > 0)
+            close(ch->fd);
+        free(ch);
     }
-
-    char *line = file_contents;
-    while (*line)
-    {
-        /* Parse lines of this form:
-         * 08048000-08050000 r-xp 00000000 fd:01 665656 /usr/bin/md5sum
-         * 08050000-08051000 r--p 00007000 fd:01 665656 /usr/bin/md5sum
-         * 08051000-08052000 rw-p 00008000 fd:01 665656 /usr/bin/md5sum
-         * 088ad000-088ce000 rw-p 00000000 00:00 0      [heap]
-         * b76fe000-b7700000 rw-p 00000000 00:00 0
-         * b7700000-b7701000 r-xp 00000000 00:00 0      [vdso]
-         * bfdc3000-bfde4000 rw-p 00000000 00:00 0      [stack]
-         */
-        unsigned long long start;//, end, fileofs;
-        char mode[20];
-        char filename[1024];
-
-        /* %c conversion doesn't store terminating NUL,
-         * need to prepare for that! */
-        memset(filename, 0, sizeof(filename));
-        int r = sscanf(line, "%llx-%*s %19s %*s %*s %*s %1023[^\n]",
-                       &start, /*&end,*/
-                       mode, /*&fileofs, &maj, &min, &inode,*/
-                       filename);
-        line += strcspn(line, "\n") + 1;
-
-        if (r < 2)
-        {
-            warn("Malformed line in maps file, ignored");
-            continue;
-        }
-        /* not a read/execute private mapping? */
-        if (strcmp(mode, "r-xp") != 0)
-            continue;
-        /* filename is missing? */
-        if (filename[0] != '/')
-            continue;
-
-        struct mapping_data *mapping = btp_mallocz(sizeof(*mapping));
-        mapping->start = start;
-        mapping->filename = btp_strdup(filename);
-        //printf("mapping: vaddr:%llx name:'%s'\n",
-        //       (unsigned long long)start, filename);
-
-        list_append(head, tail, mapping);
-    }
-
-    free(file_contents);
-    return head;
 }
 
-/* Returns hex-encoded build id of elf_file, or NULL if none is found. If the
- * mtime of core_mtime is newer than that of elf_file, error is returned. The
- * string pointed to by error_msg contains the error message, or is not written
- * to if there is no error.
- */
-static char *
-build_id_from_file(const char *elf_file,
-                   time_t core_mtime,
-                   char **error_msg)
+static int find_elf_core (Dwfl_Module *mod, void **userdata,
+                          const char *modname, Dwarf_Addr base,
+                          char **file_name, Elf **elfp)
 {
-    int i;
-    int fd;
-    char *result = NULL;
-    Elf *e = NULL;
+    int ret = -1;
 
-    /* Initialize libelf, open the file and get its Elf handle. */
-    if (elf_version(EV_CURRENT) == EV_NONE)
+    if (strcmp("[exe]", modname) == 0 || strcmp("[pie]", modname) == 0)
     {
-        set_error_elf("elf_version");
-        return NULL;
-    }
+        int fd = open(executable_file, O_RDONLY);
+        if (fd < 0)
+            return -1;
 
-    fd = open(elf_file, O_RDONLY);
-    if (fd < 0)
-    {
-        set_error("Unable to open '%s': %s", elf_file, strerror(errno));
-        return NULL;
-    }
-
-    struct stat stat;
-    if (fstat(fd, &stat) == -1)
-    {
-        set_error("Unable to stat '%s': %s", elf_file, strerror(errno));
-        goto fail_close;
-    }
-
-    if (stat.st_mtime > core_mtime)
-    {
-        set_error("File '%s' is newer than the coredump, aborting unwind", elf_file);
-        goto fail_close;
-    }
-
-    e = elf_begin(fd, ELF_C_READ, NULL);
-    if (!e)
-    {
-        warn_elf("elf_begin");
-        goto fail_close;
-    }
-
-    size_t nphdr;
-    if (elf_getphdrnum(e, &nphdr) != 0)
-    {
-        warn_elf("elf_getphdrnum");
-        goto end;
-    }
-
-    /* Go through phdrs, look for note containing build id. */
-    for (i = 0; i < nphdr; i++)
-    {
-        GElf_Phdr phdr;
-        if (gelf_getphdr(e, i, &phdr) != &phdr)
+        *file_name = realpath(executable_file, NULL);
+        *elfp = elf_begin(fd, ELF_C_READ, NULL);
+        if (*elfp == NULL)
         {
-            warn_elf("gelf_getphdr");
-            continue;
+            warn("Unable to open executable '%s': %s", executable_file,
+                 elf_errmsg(-1));
+            return -1;
         }
 
-        if (phdr.p_type != PT_NOTE)
-        {
-            continue;
-        }
-
-        Elf_Data *data, *name_data, *desc_data;
-        GElf_Nhdr nhdr;
-        size_t note_offset = 0;
-        size_t name_offset, desc_offset;
-        /* Elf_Data buffers are freed when elf_end is called. */
-        data = elf_getdata_rawchunk(e, phdr.p_offset, phdr.p_filesz,
-                                    ELF_T_NHDR);
-        if (!data)
-        {
-            warn_elf("elf_getdata_rawchunk");
-            continue;
-        }
-
-        while ((note_offset = gelf_getnote(data, note_offset, &nhdr,
-                                           &name_offset, &desc_offset)) != 0)
-        {
-            //printf("Note: type:%x name:%x+%d desc:%x+%d\n", nhdr.n_type,
-            //       name_offset, nhdr.n_namesz, desc_offset, nhdr.n_descsz);
-            if (nhdr.n_type != NT_GNU_BUILD_ID
-                || nhdr.n_namesz < sizeof(ELF_NOTE_GNU))
-                continue;
-
-            name_data = elf_getdata_rawchunk(e, phdr.p_offset + name_offset,
-                                             nhdr.n_namesz, ELF_T_BYTE);
-            desc_data = elf_getdata_rawchunk(e, phdr.p_offset + desc_offset,
-                                             nhdr.n_descsz, ELF_T_BYTE);
-            if (!(name_data && desc_data))
-                continue;
-
-            if (name_data->d_size < sizeof(ELF_NOTE_GNU))
-                continue;
-
-            if (strcmp(ELF_NOTE_GNU, name_data->d_buf))
-                continue;
-
-            result = btp_malloc(nhdr.n_descsz * 2 + 1);
-            btp_bin2hex(result, (char*)desc_data->d_buf,
-                        nhdr.n_descsz)[0] = '\0';
-            goto end;
-        }
+        ret = fd;
+    }
+    else
+    {
+        ret = dwfl_build_id_find_elf(mod, userdata, modname, base,
+                                     file_name, elfp);
     }
 
-end:
-    elf_end(e);
-fail_close:
-    close(fd);
-
-    return result;
+    return ret;
 }
 
-/* Extracts information about executable segments in the coredump. If we can
- * find an executable for the segment, we check whether the executable is older
- * than the coredump and extract a build id from it.
- */
-static struct core_segment_data *
-analyze_coredump(const char *elf_file, struct mapping_data *maps,
+/* Do not use debuginfo files at all. */
+static int find_debuginfo_none (Dwfl_Module *mod, void **userdata,
+        const char *modname, GElf_Addr base, const char *file_name,
+        const char *debuglink_file, GElf_Word debuglink_crc,
+        char **debuginfo_file_name)
+{
+    return -1;
+}
+
+static int cb_exe_maps(Dwfl_Module *mod, void **userdata, const char *name,
+                       Dwarf_Addr start_addr, void *arg)
+{
+    struct exe_mapping_data ***tailp = arg;
+    const char *filename = NULL;
+    GElf_Addr bias;
+    Dwarf_Addr base;
+
+    if (dwfl_module_getelf (mod, &bias) == NULL)
+    {
+        warn("cannot find ELF for '%s': %s", name, dwfl_errmsg(-1));
+        return DWARF_CB_OK;
+    }
+
+    dwfl_module_info(mod, NULL, &base, NULL, NULL, NULL, &filename, NULL);
+
+    if (filename)
+    {
+        **tailp = btp_mallocz(sizeof(struct exe_mapping_data));
+        (**tailp)->start = (uint64_t)base;
+        (**tailp)->filename = btp_strdup(filename);
+        *tailp = &((**tailp)->next);
+    }
+
+    return DWARF_CB_OK;
+}
+
+/* Gets dwfl handle and executable map data to be used for unwinding */
+static struct core_handle *
+analyze_coredump(const char *elf_file, const char *exe_file,
                  char **error_msg)
 {
-    struct core_segment_data *head = NULL, *tail = NULL;
+    struct exe_mapping_data *head = NULL, **tail = &head;
     int fd;
     Elf *e = NULL;
-    GElf_Ehdr ehdr;
 
     /* Initialize libelf, open the file and get its Elf handle. */
     if (elf_version(EV_CURRENT) == EV_NONE)
@@ -360,17 +242,6 @@ analyze_coredump(const char *elf_file, struct mapping_data *maps,
         return NULL;
     }
 
-    struct stat stat;
-    time_t core_mtime;
-    if (fstat(fd, &stat) == -1)
-    {
-        set_error("Unable to stat '%s': %s", elf_file, strerror(errno));
-        goto fail;
-    }
-
-    core_mtime = stat.st_mtime;
-    //printf("Core mtime: %s\n", ctime(&core_mtime));
-
     e = elf_begin(fd, ELF_C_READ, NULL);
     if (e == NULL)
     {
@@ -379,96 +250,73 @@ analyze_coredump(const char *elf_file, struct mapping_data *maps,
     }
 
     /* Check that we are working with a coredump. */
+    GElf_Ehdr ehdr;
     if (gelf_getehdr(e, &ehdr) == NULL || ehdr.e_type != ET_CORE)
     {
         set_error("File '%s' is not a coredump", elf_file);
-        goto fail;
+        goto fail_elf;
     }
 
-    /* Iterate over segments, read phdrs. */
-    int i;
-    size_t nphdr;
-    if (elf_getphdrnum(e, &nphdr) != 0)
+    Dwfl_Callbacks dwcb =
     {
-        set_error_elf("elf_getphdrnum");
-        goto fail;
-    }
+        .find_elf = find_elf_core,
+        .find_debuginfo = find_debuginfo_none,
+    /*  Use the line below to also use debuginfo files for symbols
+        .find_debuginfo = dwfl_build_id_find_debuginfo,
+    */
+        .section_address = dwfl_offline_section_address
+    };
+    executable_file = exe_file;
 
-    for (i = 0; i < nphdr; i++)
+    Dwfl *dwfl = dwfl_begin(&dwcb);
+
+    if (dwfl_core_file_report(dwfl, e) == -1)
     {
-        GElf_Phdr phdr;
-        if (gelf_getphdr(e, i, &phdr) != &phdr)
-        {
-            warn_elf("gelf_getphdr");
-            continue;
-        }
-
-        if (phdr.p_type != PT_LOAD || !(phdr.p_flags & PF_X))
-        {
-            continue;
-        }
-
-        struct core_segment_data *segment = btp_mallocz(sizeof(*segment));
-        segment->offset = phdr.p_offset;
-        segment->filesz = phdr.p_filesz;
-        segment->vaddr  = phdr.p_vaddr;
-        segment->memsz  = phdr.p_memsz;
-
-        /* Assign a filename to the segment if we know it. */
-        struct mapping_data *m;
-        for (m = maps; m != NULL; m = m->next)
-        {
-            if (m->start == phdr.p_vaddr)
-            {
-                segment->filename = btp_strdup(m->filename);
-
-                /* Even though the segment contains (in most cases) the build
-                 * id, we read it from the binary pointed to by 'm->filename',
-                 * as we can use libelf for this (which would likely be unsafe
-                 * for the incomplete segment in the coredump) and we will need
-                 * to have consistent binary file for libunwind to use anyway.
-                 *
-                 * The function also checks whether the binary is not newer
-                 * than the core. If it is, we do not proceed with the
-                 * backtrace generation as the binary likely mismatches the one
-                 * that was present during the crash. That would probably
-                 * confuse libunwind.
-                 * NOTE: It would be better to compare the build id inside the
-                 * core with the one in the file instead of mtimes. Or maybe
-                 * the whole first page (what about relocations)?
-                 */
-                segment->build_id = build_id_from_file(m->filename, core_mtime,
-                                                       error_msg);
-                if (*error_msg)
-                {
-                    goto fail_close;
-                }
-
-                //printf("%s: %s\n", segment->filename, segment->build_id);
-                break;
-            }
-        }
-
-        list_append(head, tail, segment);
+        set_error_dwfl("dwfl_core_file_report");
+        goto fail_dwfl;
     }
 
-fail_close:
-    elf_end(e);
-fail:
-    close(fd);
+    if (dwfl_report_end(dwfl, NULL, NULL) != 0)
+    {
+        set_error_dwfl("dwfl_report_end");
+        goto fail_dwfl;
+    }
+
+    ptrdiff_t ret = dwfl_getmodules(dwfl, cb_exe_maps, &tail, 0);
+    if (ret == -1)
+    {
+        set_error_dwfl("dwfl_getmodules");
+        goto fail_dwfl;
+    }
 
     if (!*error_msg && !head)
     {
         set_error("No segments found in coredump '%s'", elf_file);
+        goto fail_dwfl;
     }
 
-    return head;
+    struct core_handle *ch = btp_mallocz(sizeof(*ch));
+    ch->fd = fd;
+    ch->eh = e;
+    ch->dwfl = dwfl;
+    ch->segments = head;
+    return ch;
+
+fail_dwfl:
+    dwfl_end(dwfl);
+    exe_mapping_data_free(head);
+fail_elf:
+    elf_end(e);
+fail_close:
+    close(fd);
+
+    return NULL;
 }
 
 static struct btp_core_thread *
 unwind_thread(struct UCD_info *ui,
               unw_addr_space_t as,
-              struct core_segment_data *segments,
+              Dwfl *dwfl,
               int thread_no,
               char **error_msg)
 {
@@ -498,47 +346,37 @@ unwind_thread(struct UCD_info *ui,
         if (ip == 0)
             break;
 
-        struct core_segment_data *seg, *ip_seg = NULL;
-        for (seg = segments; seg != NULL; seg = seg->next)
-        {
-            if (seg->vaddr <= ip && seg->vaddr + seg->memsz > ip)
-            {
-                ip_seg = seg;
-                break;
-            }
-        }
-
         struct btp_core_frame *entry = btp_core_frame_new();
-        entry->address = ip;
-        entry->build_id = (ip_seg && ip_seg->build_id) ?
-            btp_strdup(ip_seg->build_id) : NULL;
-        entry->build_id_offset = ip_seg ? (ip - ip_seg->vaddr) : ip;
-        entry->file_name = (ip_seg && ip_seg->filename) ?
-            btp_strdup(ip_seg->filename) : NULL;
+        entry->address = entry->build_id_offset = ip;
+        entry->build_id = entry->file_name = NULL;
+        entry->function_name = NULL;
 
-        unw_proc_info_t pi;
-        unw_word_t off;
-        char funcname[10*1024]; /* mangled C++ names are HUGE */
-        ret = unw_get_proc_info(&c, &pi);
-        if (ret >= 0 && pi.start_ip + 1 != pi.end_ip)
+        Dwfl_Module *mod = dwfl_addrmodule(dwfl, (Dwarf_Addr)ip);
+        if (mod)
         {
-            //entry->function_initial_loc = pi.start_ip;
-            //entry->function_length = pi.end_ip - pi.start_ip - 1;
+            const unsigned char *build_id_bits;
+            const char *filename, *funcname;
+            GElf_Addr bid_addr;
+            Dwarf_Addr start;
 
-            /* NOTE: unw_get_proc_name returns the closest label when the
-             * symbols are stripped from the file, which is usually incorrect
-             * and can be confusing. We use the start and end IPs of the
-             * procedure to determine whether the label lies inside it and
-             * ignore it if it doesn't.
-             * It would be more correct to check whether ip-off==start_ip, but
-             * label inside the procedure can still be helpful (and gdb shows
-             * that one as well).
-             */
-            ret = unw_get_proc_name(&c, funcname, sizeof(funcname)-1, &off);
-            if (ret == 0 && ip-off >= pi.start_ip)
+            ret = dwfl_module_build_id(mod, &build_id_bits, &bid_addr);
+            if (ret > 0)
             {
-                entry->function_name = btp_strdup(funcname);
+                entry->build_id = btp_mallocz(2*ret + 1);
+                btp_bin2hex(entry->build_id, (const char *)build_id_bits, ret);
             }
+
+            if (dwfl_module_info(mod, NULL, &start, NULL, NULL, NULL,
+                                 &filename, NULL) != NULL)
+            {
+                entry->build_id_offset = (Dwarf_Addr)ip - start;
+                if (filename)
+                    entry->file_name = btp_strdup(filename);
+            }
+
+            funcname = dwfl_module_addrname(mod, (GElf_Addr)ip);
+            if (funcname)
+                entry->function_name = btp_strdup(funcname);
         }
 
         trace = btp_core_frame_append(trace, entry);
@@ -574,7 +412,7 @@ unwind_thread(struct UCD_info *ui,
 
 struct btp_core_stacktrace *
 btp_parse_coredump(const char *core_file,
-                   const char *maps_file,
+                   const char *exe_file,
                    char **error_msg)
 {
 #ifdef WITH_LIBUNWIND
@@ -584,19 +422,10 @@ btp_parse_coredump(const char *core_file,
     if (error_msg)
         *error_msg = NULL;
 
-    struct mapping_data *mappings = load_map_file(maps_file);
-    if (!mappings)
-    {
-        set_error("Failed to read maps file");
-        return NULL;
-    }
-
-    struct core_segment_data *segments = analyze_coredump(core_file,
-                                                          mappings,
-                                                          error_msg);
-
+    struct core_handle *ch = analyze_coredump(core_file, exe_file,
+                                              error_msg);
     if (*error_msg)
-        goto fail_free_maps;
+        return NULL;
 
     unw_addr_space_t as;
     struct UCD_info *ui;
@@ -604,7 +433,7 @@ btp_parse_coredump(const char *core_file,
     if (!as)
     {
         set_error("Failed to create address space");
-        goto fail_free_both;
+        goto fail_destroy_handle;
     }
 
     ui = _UCD_create(core_file);
@@ -614,13 +443,13 @@ btp_parse_coredump(const char *core_file,
         goto fail_destroy_as;
     }
 
-    struct mapping_data *map;
-    for (map = mappings; map; map = map->next)
+    struct exe_mapping_data *s;
+    for (s = ch->segments; s != NULL; s = s->next)
     {
-        if (_UCD_add_backing_file_at_vaddr(ui, map->start, map->filename) < 0)
+        if (_UCD_add_backing_file_at_vaddr(ui, s->start, s->filename) < 0)
         {
             set_error("Can't add backing file '%s' at addr 0x%jx",
-                      map->filename, (uintmax_t)map->start);
+                      s->filename, (uintmax_t)s->start);
             goto fail_destroy_ui;
         }
     }
@@ -631,7 +460,7 @@ btp_parse_coredump(const char *core_file,
      * int tnum, nthreads = _UCD_get_num_threads(ui);
      * for (tnum = 0; tnum < nthreads; tnum++)
      * {
-     *     trace = unwind_thread(ui, as, segments, tnum, error_msg);
+     *     trace = unwind_thread(ui, as, ch->dwfl, tnum, error_msg);
      *     if (*error_msg) {
      *         // ...
      *     }
@@ -639,16 +468,14 @@ btp_parse_coredump(const char *core_file,
      * }
      */
 
-    trace = unwind_thread(ui, as, segments, 0, error_msg);
+    trace = unwind_thread(ui, as, ch->dwfl, 0, error_msg);
 
 fail_destroy_ui:
     _UCD_destroy(ui);
 fail_destroy_as:
     unw_destroy_addr_space(as);
-fail_free_both:
-    core_segment_data_free(segments);
-fail_free_maps:
-    mapping_data_free(mappings);
+fail_destroy_handle:
+    core_handle_free(ch);
 
     if (trace)
     {
