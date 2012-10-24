@@ -155,6 +155,17 @@ btp_frame_calls_func_in_file4(struct btp_frame *frame,
          NULL != strstr(frame->source_file, source_file3));
 }
 
+bool
+btp_frame_calls_func_in_library(struct btp_frame *frame,
+                                const char *function_name,
+                                const char *library)
+{
+    return frame->function_name &&
+        0 != strcmp(frame->function_name, function_name) &&
+        frame->library_name &&
+        NULL != strstr(frame->library_name, library);
+}
+
 int
 btp_frame_cmp(struct btp_frame *f1,
               struct btp_frame *f2,

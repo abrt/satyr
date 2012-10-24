@@ -35,7 +35,8 @@ btp_normalize_dbus_thread(struct btp_thread *thread)
             btp_frame_calls_func_in_file(frame, "gerror_to_dbus_error_message", "dbus-gobject.c") ||
             btp_frame_calls_func_in_file(frame, "dbus_g_method_return_error", "dbus-gobject.c") ||
             btp_frame_calls_func_in_file(frame, "message_queue_dispatch", "dbus-gmain.c") ||
-            btp_frame_calls_func_in_file2(frame, "dbus_connection_dispatch", "dbus-connection.c", "libdbus");
+            btp_frame_calls_func_in_file(frame, "dbus_connection_dispatch", "dbus-connection.c") ||
+            btp_frame_calls_func_in_library(frame, "dbus_connection_dispatch", "libdbus");
         if (removable)
         {
             btp_thread_remove_frame(thread, frame);

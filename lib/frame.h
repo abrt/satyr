@@ -212,6 +212,18 @@ btp_frame_calls_func_in_file4(struct btp_frame *frame,
                               const char *source_file3);
 
 /**
+ * Checks whether the frame represents a call of function with certain
+ * function name, which resides in a library.
+ * @param library
+ * The frame's library_name is searched for the library as a
+ * substring.
+ */
+bool
+btp_frame_calls_func_in_library(struct btp_frame *frame,
+                                const char *function_name,
+                                const char *library);
+
+/**
  * Compares two frames.
  * @param f1
  * It must be non-NULL pointer. It's not modified by calling this
