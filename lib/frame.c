@@ -161,7 +161,7 @@ btp_frame_calls_func_in_library(struct btp_frame *frame,
                                 const char *library)
 {
     return frame->function_name &&
-        0 != strcmp(frame->function_name, function_name) &&
+        0 == strcmp(frame->function_name, function_name) &&
         frame->library_name &&
         NULL != strstr(frame->library_name, library);
 }
