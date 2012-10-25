@@ -82,12 +82,18 @@ btp_normalize_glibc_thread(struct btp_thread *thread)
 
         /* Normalize frame names. */
 #define NORMALIZE_ARCH_SPECIFIC(func)                                   \
-        if (btp_frame_calls_func_in_file3(frame, "__" func "_sse2", func, "/sysdeps/", "libc.so") || \
-            btp_frame_calls_func_in_file3(frame, "__" func "_sse2_bsf", func, "/sysdeps/", "libc.so") || \
-            btp_frame_calls_func_in_file3(frame, "__" func "_ssse3", func, "/sysdeps/", "libc.so") /* ssse3, not sse3! */ || \
-            btp_frame_calls_func_in_file3(frame, "__" func "_ssse3_rep", func, "/sysdeps/", "libc.so") || \
-            btp_frame_calls_func_in_file3(frame, "__" func "_sse42", func, "/sysdeps/", "libc.so") || \
-            btp_frame_calls_func_in_file3(frame, "__" func "_ia32", func, "/sysdeps", "libc.so")) \
+        if (btp_frame_calls_func_in_file2(frame, "__" func "_sse2", func, "/sysdeps/") || \
+            btp_frame_calls_func_in_library(frame, "__" func "_sse2", "libc.so") || \
+            btp_frame_calls_func_in_file2(frame, "__" func "_sse2_bsf", func, "/sysdeps/") || \
+            btp_frame_calls_func_in_library(frame, "__" func "_sse2_bsf", "libc.so") || \
+            btp_frame_calls_func_in_file2(frame, "__" func "_ssse3", func, "/sysdeps/") /* ssse3, not sse3! */ || \
+            btp_frame_calls_func_in_library(frame, "__" func "_ssse3", "libc.so") || \
+            btp_frame_calls_func_in_file2(frame, "__" func "_ssse3_rep", func, "/sysdeps/") || \
+            btp_frame_calls_func_in_library(frame, "__" func "_ssse3_rep", "libc.so") || \
+            btp_frame_calls_func_in_file2(frame, "__" func "_sse42", func, "/sysdeps/") || \
+            btp_frame_calls_func_in_library(frame, "__" func "_sse42", "libc.so") || \
+            btp_frame_calls_func_in_file2(frame, "__" func "_ia32", func, "/sysdeps/") || \
+            btp_frame_calls_func_in_library(frame, "__" func "_ia32", "libc.so")) \
         {                                                               \
             /* We know for sure that 'func' is shorter than		\
                'function_name', no need to use strncpy here. */		\
@@ -134,11 +140,16 @@ btp_normalize_glibc_thread(struct btp_thread *thread)
             btp_frame_calls_func(frame, "__snprintf_chk") ||
             btp_frame_calls_func(frame, "___snprintf_chk") ||
             btp_frame_calls_func(frame, "__vasprintf_chk") ||
-            btp_frame_calls_func_in_file2(frame, "malloc_consolidate", "malloc.c", "libc") ||
-            btp_frame_calls_func_in_file2(frame, "malloc_printerr", "malloc.c", "libc") ||
-            btp_frame_calls_func_in_file2(frame, "_int_malloc", "malloc.c", "libc") ||
-            btp_frame_calls_func_in_file2(frame, "_int_free", "malloc.c", "libc") ||
-            btp_frame_calls_func_in_file2(frame, "_int_realloc", "malloc.c", "libc") ||
+            btp_frame_calls_func_in_file(frame, "malloc_consolidate", "malloc.c") ||
+            btp_frame_calls_func_in_library(frame, "malloc_consolidate", "libc") ||
+            btp_frame_calls_func_in_file(frame, "malloc_printerr", "malloc.c") ||
+            btp_frame_calls_func_in_library(frame, "malloc_printerr", "libc") ||
+            btp_frame_calls_func_in_file(frame, "_int_malloc", "malloc.c") ||
+            btp_frame_calls_func_in_library(frame, "_int_malloc", "libc") ||
+            btp_frame_calls_func_in_file(frame, "_int_free", "malloc.c") ||
+            btp_frame_calls_func_in_library(frame, "_int_free", "libc") ||
+            btp_frame_calls_func_in_file(frame, "_int_realloc", "malloc.c") ||
+            btp_frame_calls_func_in_library(frame, "_int_realloc", "libc") ||
             btp_frame_calls_func_in_file(frame, "_int_memalign", "malloc.c") ||
             btp_frame_calls_func_in_file(frame, "__libc_free", "malloc.c") ||
             btp_frame_calls_func_in_file(frame, "__libc_malloc", "malloc.c") ||
@@ -146,11 +157,13 @@ btp_normalize_glibc_thread(struct btp_thread *thread)
             btp_frame_calls_func_in_file(frame, "__libc_realloc", "malloc.c") ||
             btp_frame_calls_func_in_file(frame, "__posix_memalign", "malloc.c") ||
             btp_frame_calls_func_in_file(frame, "__libc_calloc", "malloc.c");
-        bool removable = 
+        bool removable =
             btp_frame_calls_func(frame, "_start") ||
-            btp_frame_calls_func_in_file(frame, "__libc_start_main", "libc") ||
-            btp_frame_calls_func_in_file2(frame, "clone", "clone.S", "libc") ||
-            btp_frame_calls_func_in_file2(frame, "start_thread", "pthread_create.c", "libpthread");
+            btp_frame_calls_func_in_library(frame, "__libc_start_main", "libc") ||
+            btp_frame_calls_func_in_file(frame, "clone", "clone.S") ||
+            btp_frame_calls_func_in_library(frame, "clone", "libc") ||
+            btp_frame_calls_func_in_file(frame, "start_thread", "pthread_create.c") ||
+            btp_frame_calls_func_in_library(frame, "start_thread", "libpthread");
 
         if (removable_with_above)
         {
