@@ -86,6 +86,9 @@ AC_CHECK_LIB([unwind], [main])
 AC_CHECK_LIB([unwind-generic], [main])
 AC_CHECK_LIB([unwind-coredump], [main])
 
+# rpm
+AC_CHECK_LIB([rpm], [main])
+
 # pdflatex
 AC_PATH_PROG([PDFLATEX], [pdflatex], [no])
 AM_CONDITIONAL([HAVE_PDFLATEX], test "$PDFLATEX" != "no")

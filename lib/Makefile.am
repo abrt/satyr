@@ -23,6 +23,7 @@ pkginclude_HEADERS = \
 	python_frame.h \
 	python_stacktrace.h \
 	report.h \
+	rpm.h \
 	sha1.h \
 	strbuf.h \
 	unstrip.h \
@@ -54,6 +55,7 @@ libbtparser_la_SOURCES = \
 	python_frame.c \
 	python_stacktrace.c \
 	report.c \
+	rpm.c \
 	sha1.c \
 	strbuf.c \
 	unstrip.c \

@@ -36,6 +36,9 @@
 /* Have libopcodes compiled with -fPIC */
 #undef HAVE_LIBOPCODES
 
+/* Define to 1 if you have the `rpm' library (-lrpm). */
+#undef HAVE_LIBRPM
+
 /* Define to 1 if you have the `unwind' library (-lunwind). */
 #undef HAVE_LIBUNWIND
 

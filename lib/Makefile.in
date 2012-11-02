@@ -88,8 +88,9 @@ am_libbtparser_la_OBJECTS = $(am__objects_1) \
 	libbtparser_la-metrics.lo libbtparser_la-normalize.lo \
 	libbtparser_la-python_frame.lo \
 	libbtparser_la-python_stacktrace.lo libbtparser_la-report.lo \
-	libbtparser_la-sha1.lo libbtparser_la-strbuf.lo \
-	libbtparser_la-unstrip.lo libbtparser_la-utils.lo
+	libbtparser_la-rpm.lo libbtparser_la-sha1.lo \
+	libbtparser_la-strbuf.lo libbtparser_la-unstrip.lo \
+	libbtparser_la-utils.lo
 libbtparser_la_OBJECTS = $(am_libbtparser_la_OBJECTS)
 libbtparser_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libbtparser_la_CFLAGS) \
@@ -266,6 +267,7 @@ pkginclude_HEADERS = \
 	python_frame.h \
 	python_stacktrace.h \
 	report.h \
+	rpm.h \
 	sha1.h \
 	strbuf.h \
 	unstrip.h \
@@ -297,6 +299,7 @@ libbtparser_la_SOURCES = \
 	python_frame.c \
 	python_stacktrace.c \
 	report.c \
+	rpm.c \
 	sha1.c \
 	strbuf.c \
 	unstrip.c \
@@ -423,6 +426,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-python_frame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-python_stacktrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-report.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-rpm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-sha1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-strbuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-unstrip.Plo@am__quote@
@@ -609,6 +613,13 @@ libbtparser_la-report.lo: report.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='report.c' object='libbtparser_la-report.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-report.lo `test -f 'report.c' || echo '$(srcdir)/'`report.c
+
+libbtparser_la-rpm.lo: rpm.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-rpm.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-rpm.Tpo -c -o libbtparser_la-rpm.lo `test -f 'rpm.c' || echo '$(srcdir)/'`rpm.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-rpm.Tpo $(DEPDIR)/libbtparser_la-rpm.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rpm.c' object='libbtparser_la-rpm.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-rpm.lo `test -f 'rpm.c' || echo '$(srcdir)/'`rpm.c
 
 libbtparser_la-sha1.lo: sha1.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-sha1.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-sha1.Tpo -c -o libbtparser_la-sha1.lo `test -f 'sha1.c' || echo '$(srcdir)/'`sha1.c
