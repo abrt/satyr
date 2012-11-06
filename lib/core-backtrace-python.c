@@ -158,12 +158,16 @@ btp_parse_python_backtrace(char *text)
 
         /* if C callback is called, the function is named */
         /* 'calling callback function'. as quotes are not */
-        /* allowed, change it to <calling callback function> */
-        int symlen = strlen(frame->symbol);
-        if (frame->symbol[0] == '\'' && frame->symbol[symlen - 1] == '\'')
+        /* allowed, change it to <calling_callback_function> */
+        int last = strlen(frame->symbol) - 1;
+        if (frame->symbol[0] == '\'' && frame->symbol[last] == '\'')
         {
             frame->symbol[0] = '<';
-            frame->symbol[symlen - 1] = '>';
+            frame->symbol[last] = '>';
+            int i;
+            for (i = 1; i < last; ++i)
+                if (frame->symbol[i] == ' ')
+                    frame->symbol[i] = '_';
         }
 
         /* build-id */
