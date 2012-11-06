@@ -224,6 +224,13 @@ btp_load_core_backtrace(const char *text)
                 return NULL;
         }
 
+        /* C++ functions may contain const at the end */
+        /* QUrl::toEncoded(QFlags<QUrl::FormattingOption>) const */
+        /* make sure the trailing space is present */
+        int sfxlen = strlen(" const");
+        if (strncmp(" const ", end, sfxlen + 1) == 0)
+            end += sfxlen;
+
         /* btparser uses "??" to denote unknown function name */
         *end = '\0';
         frame->function_name = btp_strdup(strcmp(cur, "-") ? cur : "??");
