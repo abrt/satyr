@@ -156,6 +156,16 @@ btp_parse_python_backtrace(char *text)
         funcname += strlen(", in ");
         frame->symbol = btp_strdup(funcname);
 
+        /* if C callback is called, the function is named */
+        /* 'calling callback function'. as quotes are not */
+        /* allowed, change it to <calling callback function> */
+        int symlen = strlen(frame->symbol);
+        if (frame->symbol[0] == '\'' && frame->symbol[symlen - 1] == '\'')
+        {
+            frame->symbol[0] = '<';
+            frame->symbol[symlen - 1] = '>';
+        }
+
         /* build-id */
         frame->build_id = btp_mallocz(BTP_SHA1_RESULT_LEN);
         if (!btp_hash_file(frame->build_id, frame->filename))
