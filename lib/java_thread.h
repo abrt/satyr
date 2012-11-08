@@ -201,8 +201,7 @@ btp_java_thread_remove_frames_below_n(struct btp_java_thread *thread,
  */
 void
 btp_java_thread_append_to_str(struct btp_java_thread *thread,
-                              struct btp_strbuf *dest,
-                              bool verbose);
+                              struct btp_strbuf *dest);
 
 /**
  * If the input contains proper thread with frames, parse the thread,

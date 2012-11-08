@@ -18,6 +18,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "java_frame.h"
+#include "strbuf.h"
+#include "location.h"
 #include "utils.h"
 #include <string.h>
 
@@ -72,7 +74,123 @@ btp_java_frame_dup(struct btp_java_frame *frame, bool siblings)
         result->function_name = btp_strdup(result->function_name);
 
     if (result->class_path)
-        result->line = btp_strdup(result->line);
+        result->class_path = btp_strdup(result->class_path);
 
     return result;
 }
+
+int
+btp_java_frame_cmp(struct btp_java_frame *frame1,
+                   struct btp_java_frame *frame2,
+                   bool compare_number)
+{
+    int res = btp_strcmp0(frame1->class_path, frame2->class_path);
+    if (res != 0)
+        return res;
+
+    res = btp_strcmp0(frame1->file_name, frame2->file_name);
+    if (res != 0)
+        return res;
+
+    res = btp_strcmp0(frame1->function_name, frame2->function_name);
+    if (res != 0)
+        return res;
+
+    return frame1->file_line - frame2->file_line;
+}
+
+void
+btp_java_frame_append_to_str(struct btp_java_frame *frame,
+                             struct btp_strbuf *dest)
+{
+
+    btp_strbuf_append_strf(dest, "\tat %s(%s",
+                           frame->function_name ? frame->function_name : "",
+                           frame->file_name ? frame->file_name : "");
+    if (frame->file_line)
+        btp_strbuf_append_strf(dest, ":%d", frame->file_line);
+
+    btp_strbuf_append_str(dest, ")");
+}
+
+struct btp_java_frame *
+btp_java_frame_parse(const char **input,
+                     struct btp_location *location)
+{
+    const char *mark = *input;
+    int lines, columns;
+    /*      at SimpleTest.throwNullPointerException(SimpleTest.java:36) */
+    const char *cursor = btp_strstr_location(mark, "at", &lines, &columns);
+
+    if (!cursor)
+    {
+        location->message = "Frame expected";
+        return NULL;
+    }
+
+    /*  SimpleTest.throwNullPointerException(SimpleTest.java:36) */
+    cursor = mark = cursor + 2;
+    location->line += (lines - 1);
+    location->column = columns + 2;
+
+    /* SimpleTest.throwNullPointerException(SimpleTest.java:36) */
+    cursor = btp_skip_whitespace(cursor);
+    location->column += cursor - mark;
+    mark = cursor;
+
+    while (*cursor != '(' && *cursor != '\n' && *cursor != '\0')
+    {
+        ++cursor;
+        ++location->column;
+    }
+
+    struct btp_java_frame *frame = btp_java_frame_new();
+
+    if (cursor != mark)
+        frame->function_name = btp_strndup(mark, cursor - mark);
+
+    /* (SimpleTest.java:36) */
+    if (*cursor == '(')
+    {
+        ++cursor;
+        ++location->column;
+        mark = cursor;
+
+        while (*cursor != ':' && *cursor != ')' && *cursor != '\n' && *cursor != '\0')
+        {
+            ++cursor;
+            ++location->column;
+        }
+
+        if (mark != cursor)
+            frame->file_name = btp_strndup(mark, cursor - mark);
+
+        if (*cursor == ':')
+        {
+            ++cursor;
+            ++location->column;
+            mark = cursor;
+
+            btp_parse_uint32(&cursor, &(frame->file_line));
+
+            location->column += cursor - mark;
+        }
+    }
+
+    mark = cursor;
+    cursor = strchrnul(cursor, '\n');
+    *input = cursor;
+
+    if (*cursor == '\n')
+    {
+        ++*(input);
+        ++location->line;
+        location->column = 0;
+    }
+    else
+        /* don't take \0 Byte into account */
+        location->column += ((cursor - mark) - 1);
+
+    return frame;
+}
+

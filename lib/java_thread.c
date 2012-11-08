@@ -38,7 +38,7 @@ btp_java_thread_new()
 void
 btp_java_thread_init(struct btp_java_thread *thread)
 {
-    thread->number = -1;
+    thread->name = NULL;
     thread->frames = NULL;
     thread->next = NULL;
 }
@@ -84,10 +84,12 @@ int
 btp_java_thread_cmp(struct btp_java_thread *thread1,
                    struct btp_java_thread *thread2)
 {
-    int number = thread1->number - thread2->number;
-    if (number != 0)
-        return number;
-
+    if (thread1->name != NULL && thread2->name != NULL)
+    {
+        int res = strcmp(thread1->name, thread2->name);
+        if (res != 0)
+            return res;
+    }
 
     struct btp_java_frame *frame1 = thread1->frames;
     struct btp_java_frame *frame2 = thread2->frames;
@@ -136,6 +138,14 @@ btp_java_thread_get_frame_count(struct btp_java_thread *thread)
         ++count;
     }
     return count;
+}
+
+void
+btp_java_thread_quality_counts(struct btp_java_thread *thread,
+                               int *ok_count,
+                               int *all_count)
+{
+    *ok_count = *all_count = btp_java_thread_get_frame_count(thread);
 }
 
 float
@@ -238,23 +248,21 @@ btp_java_thread_remove_frames_below_n(struct btp_java_thread *thread,
 
 void
 btp_java_thread_append_to_str(struct btp_java_thread *thread,
-                             struct btp_strbuf *dest,
-                             bool verbose)
+                              struct btp_strbuf *dest)
 {
-    int frame_count = btp_java_thread_get_frame_count(thread);
-    if (verbose)
-    {
-        btp_strbuf_append_strf(dest, "Thread no. %d (%d frames)\n",
-                               thread->number,
-                               frame_count);
-    }
-    else
-        btp_strbuf_append_str(dest, "Thread\n");
+    btp_strbuf_append_strf(dest, "Exception in thread \"%s\"%s%s%s%s\n",
+                           thread->name ? thread->name : "",
+                           thread->exception_name ? " " : "",
+                           thread->exception_name ? thread->exception_name : "",
+                           thread->exception_message ? ":" : "",
+                           thread->exception_message ? thread->exception_message : "");
 
     struct btp_java_frame *frame = thread->frames;
     while (frame)
     {
-        btp_java_frame_append_to_str(frame, dest, verbose);
+        btp_java_frame_append_to_str(frame, dest);
+        btp_strbuf_append_char(dest, '\n');
+
         frame = frame->next;
     }
 }
@@ -263,195 +271,116 @@ struct btp_java_thread *
 btp_java_thread_parse(const char **input,
                      struct btp_location *location)
 {
-    const char *local_input = *input;
-
-    /* Read the Thread keyword, which is mandatory. */
-    int chars = btp_skip_string(&local_input, "Thread");
+    const char *mark = *input;
+    /* Exception in thread "main" java.lang.NullPointerException: foo */
+    int chars = btp_skip_string(&mark, "Exception in thread ");
     location->column += chars;
-    if (0 == chars)
+
+    if (!chars)
     {
         location->message = "\"Thread\" header expected";
         return NULL;
     }
 
-    /* Skip spaces, at least one space is mandatory. */
-    int spaces = btp_skip_char_sequence(&local_input, ' ');
-    location->column += spaces;
-    if (0 == spaces)
+    /* "main" java.lang.NullPointerException: foo */
+    if (*mark != '"')
     {
-        location->message = "Space expected after the \"Thread\" keyword.";
+        location->message = "\"Thread\" name start expected";
         return NULL;
     }
 
-    /* Read thread number. */
-    struct btp_java_thread *imthread = btp_java_thread_new();
-    int digits = btp_parse_uint32(&local_input, &imthread->number);
-    location->column += digits;
-    if (0 == digits)
+    ++mark;
+    ++location->column;
+
+    const char *cursor = mark;
+    while (*cursor != '"' && *cursor != '\n' && *cursor != '\0')
     {
-        location->message = "Thread number expected.";
-        btp_java_thread_free(imthread);
+        ++cursor;
+        ++location->column;
+    }
+
+    /* " java.lang.NullPointerException: foo */
+    if (*cursor != '"')
+    {
+        location->message = "\"Thread\" name end expected";
         return NULL;
     }
 
-    /* Skip spaces after the thread number and before parentheses. */
-    spaces = btp_skip_char_sequence(&local_input, ' ');
-    location->column += spaces;
-    if (0 == spaces)
-    {
-        location->message = "Space expected after the thread number.";
-        btp_java_thread_free(imthread);
-        return NULL;
-    }
-
-    /* Read the LWP section in parentheses, optional. */
-    location->column += btp_java_thread_skip_lwp(&local_input);
-
-    /* Read the Thread keyword in parentheses, optional. */
-    chars = btp_skip_string(&local_input, "(Thread ");
-    location->column += chars;
-    if (0 != chars)
-    {
-        /* Read the thread identification number. It can be either in
-         * decimal or hexadecimal form.
-         * Examples:
-         * "Thread 10 (Thread 2476):"
-         * "Thread 8 (Thread 0xb07fdb70 (LWP 6357)):"
-         */
-        digits = btp_skip_hexadecimal_0xuint(&local_input);
-        if (0 == digits)
-            digits = btp_skip_uint(&local_input);
-        location->column += digits;
-        if (0 == digits)
-        {
-            location->message = "The thread identification number expected.";
-            btp_java_thread_free(imthread);
-            return NULL;
-        }
-
-        /* Handle the optional " (LWP [0-9]+)" section. */
-        location->column += btp_skip_char_sequence(&local_input, ' ');
-        location->column += btp_java_thread_skip_lwp(&local_input);
-
-        /* Read the end of the parenthesis. */
-        if (!btp_skip_char(&local_input, ')'))
-        {
-            location->message = "Closing parenthesis for Thread expected.";
-            btp_java_thread_free(imthread);
-            return NULL;
-        }
-    }
-
-    /* Read the end of the header line. */
-    chars = btp_skip_string(&local_input, ":\n");
-    if (0 == chars)
-    {
-        location->message = "Expected a colon followed by a newline ':\\n'.";
-        btp_java_thread_free(imthread);
-        return NULL;
-    }
-    /* Add the newline from the last btp_skip_string. */
-    btp_location_add(location, 2, 0);
-
-    /* Read the frames. */
-    struct btp_java_frame *frame, *prevframe = NULL;
-    struct btp_location frame_location;
-    btp_location_init(&frame_location);
-    while ((frame = btp_java_frame_parse(&local_input, &frame_location)))
-    {
-        if (prevframe)
-        {
-            btp_java_frame_append(prevframe, frame);
-            prevframe = frame;
-        }
-        else
-            imthread->frames = prevframe = frame;
-
-        btp_location_add(location,
-                         frame_location.line,
-                         frame_location.column);
-    }
-    if (!imthread->frames)
-    {
-        location->message = frame_location.message;
-        btp_java_thread_free(imthread);
-        return NULL;
-    }
-
-    *input = local_input;
-    return imthread;
-}
-
-int
-btp_java_thread_skip_lwp(const char **input)
-{
-    const char *local_input = *input;
-    int count = btp_skip_string(&local_input, "(LWP ");
-    if (0 == count)
-        return 0;
-    int digits = btp_skip_uint(&local_input);
-    if (0 == digits)
-        return 0;
-    count += digits;
-    if (!btp_skip_char(&local_input, ')'))
-        return 0;
-    *input = local_input;
-    return count + 1;
-}
-
-struct btp_java_thread *
-btp_java_thread_parse_funs(const char *input)
-{
-    const char *next, *libname;
     struct btp_java_thread *thread = btp_java_thread_new();
-    struct btp_java_frame *frame, **pframe = &thread->frames;
-    int number = 0;
+    thread->name = btp_strndup(mark, cursor - mark);
 
-    while (input && *input)
+    /*  java.lang.NullPointerException: foo */
+    ++cursor;
+    ++location->column;
+    mark = cursor;
+
+    /* java.lang.NullPointerException: foo */
+    cursor = btp_skip_whitespace(mark);
+    location->column += cursor - mark;
+    mark = cursor;
+
+    while (*cursor != ':' && *cursor != '\n' && *cursor != '\0')
     {
-        next = strchr(input + 1, '\n');
-        if (!next)
-            break;
+        ++cursor;
+        ++location->column;
+    }
 
-        libname = strchr(input + 1, ' ');
-        if (!libname || libname > next)
-            libname = next;
+    if (mark != cursor)
+        thread->exception_name = btp_strndup(mark, cursor - mark);
 
-        frame = btp_java_frame_new();
-        frame->function_name = btp_strndup(input, libname - input);
-        if (libname + 1 < next)
-            frame->library_name = btp_strndup(libname + 1, next - libname - 1);
+    /* : foo */
+    if (*cursor == ':')
+    {
+        ++cursor;
+        ++location->column;
+        mark = cursor;
 
-        input = next + 1;
-        frame->number = number++;
-        *pframe = frame;
-        pframe = &frame->next;
+        /* foo */
+        cursor = btp_skip_whitespace(mark);
+        location->column += cursor - mark;
+        mark = cursor;
+
+        while (*cursor != '\n' && *cursor != '\0')
+        {
+            ++cursor;
+            ++location->column;
+        }
+
+        if (mark != cursor)
+            thread->exception_message = btp_strndup(mark, cursor - mark);
+    }
+
+    if (*cursor == '\n')
+    {
+        ++cursor;
+        ++location->line;
+        location->column = 0;
+    }
+    /* else *cursor == '\0' */
+
+    struct btp_java_frame *frame = NULL;
+    /* iterate line by line
+       best effort - continue on error */
+    while (*cursor != '\0')
+    {
+        struct btp_java_frame *parsed = btp_java_frame_parse(&cursor, location);
+
+        if (parsed == NULL)
+        {
+            btp_java_thread_free(thread);
+            return NULL;
+        }
+
+        if (thread->frames == NULL)
+            thread->frames = parsed;
+        else
+            frame->next = parsed;
+
+        frame = parsed;
+
+        ++location->line;
+        location->column = 0;
     }
 
     return thread;
-}
-
-char *
-btp_java_thread_format_funs(struct btp_java_thread *thread)
-{
-    struct btp_java_frame *frame = thread->frames;
-    struct btp_strbuf *buf = btp_strbuf_new();
-
-    while (frame)
-    {
-        if (frame->function_name)
-        {
-            btp_strbuf_append_str(buf, frame->function_name);
-            if (frame->library_name)
-            {
-                btp_strbuf_append_char(buf, ' ');
-                btp_strbuf_append_str(buf, frame->library_name);
-            }
-            btp_strbuf_append_char(buf, '\n');
-        }
-
-        frame = frame->next;
-    }
-
-    return btp_strbuf_free_nobuf(buf);
 }

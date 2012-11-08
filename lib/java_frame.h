@@ -33,6 +33,9 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
+struct btp_strbuf;
+struct btp_location;
+
 struct btp_java_frame
 {
     /**
@@ -102,6 +105,58 @@ btp_java_frame_free(struct btp_java_frame *frame);
 struct btp_java_frame *
 btp_java_frame_dup(struct btp_java_frame *frame,
                    bool siblings);
+
+/**
+ * Compares two frames.
+ * @param frame1
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @param frame2
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @param compare_number
+ * Indicates whether to include the frame numbers in the
+ * comparsion. If set to false, the frame numbers are ignored.
+ * @returns
+ * Returns 0 if the frames are same.  Returns negative number if
+ * frame1 is found to be 'less' than frame2.  Returns positive number
+ * if frame1 is found to be 'greater' than frame2.
+ */
+int
+btp_java_frame_cmp(struct btp_java_frame *frame1,
+                   struct btp_java_frame *frame2,
+                   bool compare_number);
+
+/**
+ * Appends the textual representation of the frame to the string
+ * buffer.
+ * @param frame
+ * It must be a non-NULL pointer.  It's not modified by calling this
+ * function.
+ */
+void
+btp_java_frame_append_to_str(struct btp_java_frame *frame,
+                             struct btp_strbuf *dest);
+
+/**
+ * If the input contains a complete frame, this function parses the
+ * frame text, returns it in a structure, and moves the input pointer
+ * after the frame.  If the input does not contain proper, complete
+ * frame, the function does not modify input and returns NULL.
+ * @returns
+ * Allocated pointer with a frame structure. The pointer should be
+ * released by btp_java_frame_free().
+ * @param location
+ * The caller must provide a pointer to an instance of btp_location
+ * here.  When this function returns NULL, the structure will contain
+ * the error line, column, and message.  The line and column members
+ * of the location are gradually increased as the parser handles the
+ * input, so the location should be initialized before calling this
+ * function to get reasonable values.
+ */
+struct btp_java_frame *
+btp_java_frame_parse(const char **input,
+                     struct btp_location *location);
 
 #ifdef __cplusplus
 }
