@@ -84,12 +84,22 @@ int
 btp_java_thread_cmp(struct btp_java_thread *thread1,
                    struct btp_java_thread *thread2)
 {
-    if (thread1->name != NULL && thread2->name != NULL)
-    {
-        int res = strcmp(thread1->name, thread2->name);
-        if (res != 0)
-            return res;
-    }
+    struct text_t { const char *lhs; const char *rhs; }
+        texts[] = { {.lhs = thread1->name             , .rhs = thread2->name},
+                    {.lhs = thread1->exception_name   , .rhs = thread2->exception_name},
+                    {.lhs = thread1->exception_message, .rhs = thread2->exception_message} };
+
+
+    for (unsigned i = 0; i < sizeof(texts) / sizeof(texts[0]); ++i)
+        if (texts[i].lhs != NULL && texts[i].rhs != NULL)
+        {
+            const int res = strcmp(texts[i].lhs, texts[i].rhs);
+            if (res)
+                return res;
+        }
+        else if (!(texts[i].lhs == NULL && texts[i].rhs == NULL))
+            return texts[i].lhs == NULL ? -1 : 1;
+
 
     struct btp_java_frame *frame1 = thread1->frames;
     struct btp_java_frame *frame2 = thread2->frames;
@@ -269,7 +279,7 @@ btp_java_thread_append_to_str(struct btp_java_thread *thread,
 
 struct btp_java_thread *
 btp_java_thread_parse(const char **input,
-                     struct btp_location *location)
+                      struct btp_location *location)
 {
     const char *mark = *input;
     /* Exception in thread "main" java.lang.NullPointerException: foo */
@@ -381,6 +391,8 @@ btp_java_thread_parse(const char **input,
         ++location->line;
         location->column = 0;
     }
+
+    *input = cursor;
 
     return thread;
 }

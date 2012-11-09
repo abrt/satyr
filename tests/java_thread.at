@@ -1,0 +1,84 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([Java threads])
+
+## -------------------- ##
+## btp_java_thread_parse ##
+## -------------------- ##
+AT_TESTFUN([btp_java_thread_parse],
+[[
+#include <lib/java_thread.h>
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+static void
+check(char *input,
+      struct btp_java_thread *expected_thread)
+{
+  printf("===============================================\n"
+         "Testing input: %s", input);
+
+  char *old_input = input;
+  struct btp_location location;
+  btp_location_init(&location);
+  struct btp_java_thread *thread = btp_java_thread_parse(&input, &location);
+  assert(!expected_thread || thread);
+  if (thread)
+  {
+    assert(*input == '\0');
+    assert(0 == btp_java_thread_cmp(thread, expected_thread));
+    btp_java_thread_free(thread);
+  }
+  else
+  {
+    /* Check that the pointer is not moved. */
+    assert(old_input == input);
+    assert(!expected_thread);
+  }
+}
+
+int
+main(void)
+{
+  /* Basic test. */
+  struct btp_java_frame frame0, frame1, frame2;
+  btp_java_frame_init(&frame0);
+  frame0.file_name = "SimpleTest.java";
+  frame0.file_line = 36;
+  frame0.function_name = "SimpleTest.throwNullPointerException";
+  frame0.next = &frame1;
+
+  btp_java_frame_init(&frame1);
+  frame1.file_name = "SimpleTest.java";
+  frame1.file_line = 70;
+  frame1.function_name = "SimpleTest.throwAndDontCatchException";
+  frame1.next = &frame2;
+
+  btp_java_frame_init(&frame2);
+  frame2.file_name = "SimpleTest.java";
+  frame2.file_line = 82;
+  frame2.function_name = "SimpleTest.main";
+
+  struct btp_java_thread thread;
+  btp_java_thread_init(&thread);
+  thread.name = "main";
+  thread.exception_name = "java.lang.NullPointerException";
+  thread.exception_message = "overloaded ctor";
+  thread.frames = &frame0;
+
+  struct btp_location location;
+  btp_location_init(&location);
+
+  check(
+"Exception in thread \"main\" java.lang.NullPointerException: overloaded ctor\n"
+"        at SimpleTest.throwNullPointerException(SimpleTest.java:36)\n"
+"        at SimpleTest.throwAndDontCatchException(SimpleTest.java:70)\n"
+"        at SimpleTest.main(SimpleTest.java:82)\n"
+    , &thread);
+
+  return 0;
+}
+]])
