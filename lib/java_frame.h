@@ -59,6 +59,11 @@ struct btp_java_frame
      */
     char *function_name;
 
+    /**
+     * True if method is native.
+     */
+    bool is_native;
+
     struct btp_java_frame *next;
 };
 
@@ -114,9 +119,6 @@ btp_java_frame_dup(struct btp_java_frame *frame,
  * @param frame2
  * It must be non-NULL pointer. It's not modified by calling this
  * function.
- * @param compare_number
- * Indicates whether to include the frame numbers in the
- * comparsion. If set to false, the frame numbers are ignored.
  * @returns
  * Returns 0 if the frames are same.  Returns negative number if
  * frame1 is found to be 'less' than frame2.  Returns positive number
@@ -124,8 +126,7 @@ btp_java_frame_dup(struct btp_java_frame *frame,
  */
 int
 btp_java_frame_cmp(struct btp_java_frame *frame1,
-                   struct btp_java_frame *frame2,
-                   bool compare_number);
+                   struct btp_java_frame *frame2);
 
 /**
  * Appends the textual representation of the frame to the string

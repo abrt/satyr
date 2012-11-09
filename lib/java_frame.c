@@ -81,8 +81,7 @@ btp_java_frame_dup(struct btp_java_frame *frame, bool siblings)
 
 int
 btp_java_frame_cmp(struct btp_java_frame *frame1,
-                   struct btp_java_frame *frame2,
-                   bool compare_number)
+                   struct btp_java_frame *frame2)
 {
     int res = btp_strcmp0(frame1->class_path, frame2->class_path);
     if (res != 0)

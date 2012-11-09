@@ -32,6 +32,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
+struct btp_java_exception;
 struct btp_java_frame;
 struct btp_strbuf;
 struct btp_location;
@@ -49,19 +50,9 @@ struct btp_java_thread
     char *name;
 
     /**
-     * Exception caught in this thread. Can be NULL
-     */
-    char *exception_name;
-
-    /**
-     * Message delivered by the exception. Can be NULL
-     */
-    char *exception_message;
-
-    /**
      * Thread's frames, starting from the top of the stack.
      */
-    struct btp_java_frame *frames;
+    struct btp_java_exception *exception;
 
     /**
      * A sibling thread, or NULL if this is the last thread in a
@@ -104,7 +95,7 @@ btp_java_thread_free(struct btp_java_thread *thread);
  * this function.
  * @param siblings
  * Whether to duplicate also siblings referenced by thread->next. If
- * false, thread->next is not duplicated for the new frame, but it is
+ * false, thread->next is not duplicated for the new exception, but it is
  * set to NULL.
  */
 struct btp_java_thread *
@@ -113,7 +104,7 @@ btp_java_thread_dup(struct btp_java_thread *thread,
 
 /**
  * Compares two threads. When comparing the threads, it compares also
- * their frames, including the frame numbers.
+ * their exceptions.
  * @returns
  * Returns 0 if the threads are same.  Returns negative number if t1
  * is found to be 'less' than t2.  Returns positive number if t1 is

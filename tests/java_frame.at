@@ -42,7 +42,7 @@ main(void)
   assert(frame->class_path != frame0->class_path);
   assert(0 == strcmp(frame->class_path, frame0->class_path));
 
-  assert(0 == btp_java_frame_cmp(frame, frame0, true));
+  assert(0 == btp_java_frame_cmp(frame, frame0));
   btp_java_frame_free(frame);
 
   /* Test the duplication with the siblings. */
@@ -59,7 +59,7 @@ main(void)
   assert(0 == strcmp(frame->class_path, frame0->class_path));
 
   assert(frame->next != frame1);
-  assert(0 == btp_java_frame_cmp(frame->next, frame1, true));
+  assert(0 == btp_java_frame_cmp(frame->next, frame1));
 
   btp_java_frame_free(frame->next);
   btp_java_frame_free(frame);
@@ -80,9 +80,10 @@ AT_TESTFUN([btp_java_frame_parse],
 #include <lib/location.h>
 #include <lib/strbuf.h>
 #include <lib/utils.h>
-#include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 static void
 check(char *input,
@@ -105,7 +106,9 @@ check(char *input,
     if (len > 0 && tmp_input[len-1] == '\n')
         tmp_input[len-1] = '\0';
 
+    printf("<==============================================================================>\n");
     printf("'%s' == '%s'\n", tmp_input, buf->buf);
+    printf("<==============================================================================>\n");
 
     const char *fr1 = btp_skip_whitespace(tmp_input);
     const char *fr2 = btp_skip_whitespace(buf->buf);
@@ -115,7 +118,7 @@ check(char *input,
     free(tmp_input);
     btp_strbuf_free(buf);
 
-    assert(0 == btp_java_frame_cmp(frame, expected_frame, true));
+    assert(0 == btp_java_frame_cmp(frame, expected_frame));
     puts(btp_location_to_string(&location));
     puts(btp_location_to_string(expected_location));
     assert(0 == btp_location_cmp(&location, expected_location, true));

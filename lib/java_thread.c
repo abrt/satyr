@@ -18,6 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "java_thread.h"
+#include "java_exception.h"
 #include "java_frame.h"
 #include "location.h"
 #include "utils.h"
@@ -39,7 +40,7 @@ void
 btp_java_thread_init(struct btp_java_thread *thread)
 {
     thread->name = NULL;
-    thread->frames = NULL;
+    thread->exception = NULL;
     thread->next = NULL;
 }
 
@@ -49,13 +50,9 @@ btp_java_thread_free(struct btp_java_thread *thread)
     if (!thread)
         return;
 
-    while (thread->frames)
-    {
-        struct btp_java_frame *frame = thread->frames;
-        thread->frames = frame->next;
-        btp_java_frame_free(frame);
-    }
+    btp_java_exception_free(thread->exception);
 
+    free(thread->name);
     free(thread);
 }
 
@@ -74,8 +71,8 @@ btp_java_thread_dup(struct btp_java_thread *thread, bool siblings)
     else
         result->next = NULL; /* Do not copy that. */
 
-    if (result->frames)
-        result->frames = btp_java_frame_dup(result->frames, true);
+    if (result->exception)
+        result->exception = btp_java_exception_dup(result->exception, true);
 
     return result;
 }
@@ -84,40 +81,29 @@ int
 btp_java_thread_cmp(struct btp_java_thread *thread1,
                    struct btp_java_thread *thread2)
 {
-    struct text_t { const char *lhs; const char *rhs; }
-        texts[] = { {.lhs = thread1->name             , .rhs = thread2->name},
-                    {.lhs = thread1->exception_name   , .rhs = thread2->exception_name},
-                    {.lhs = thread1->exception_message, .rhs = thread2->exception_message} };
+    if (thread1->name && thread1->name)
+    {
+        const int res = strcmp(thread1->name, thread1->name);
+        if (res)
+            return res;
+    }
+    else if (!(!thread1->name && !thread1->name))
+        return thread1->name ? 1 : -1;
 
 
-    for (unsigned i = 0; i < sizeof(texts) / sizeof(texts[0]); ++i)
-        if (texts[i].lhs != NULL && texts[i].rhs != NULL)
-        {
-            const int res = strcmp(texts[i].lhs, texts[i].rhs);
-            if (res)
-                return res;
-        }
-        else if (!(texts[i].lhs == NULL && texts[i].rhs == NULL))
-            return texts[i].lhs == NULL ? -1 : 1;
+    struct btp_java_exception *exception1 = thread1->exception;
+    struct btp_java_exception *exception2 = thread2->exception;
 
-
-    struct btp_java_frame *frame1 = thread1->frames;
-    struct btp_java_frame *frame2 = thread2->frames;
-
-    do {
-        if (frame1 && !frame2)
-            return 1;
-        else if (frame2 && !frame1)
-            return -1;
-        else if (frame1 && frame2)
-        {
-            int frames = btp_java_frame_cmp(frame1, frame2, true);
-            if (frames != 0)
-                return frames;
-            frame1 = frame1->next;
-            frame2 = frame2->next;
-        }
-    } while (frame1 || frame2);
+    if (exception1 && !exception2)
+        return 1;
+    else if (exception2 && !exception1)
+        return -1;
+    else if (exception1 && exception2)
+    {
+        int exceptions = btp_java_exception_cmp(exception1, exception2, true);
+        if (exceptions != 0)
+            return exceptions;
+    }
 
     return 0;
 }
@@ -140,14 +126,7 @@ btp_java_thread_append(struct btp_java_thread *dest,
 int
 btp_java_thread_get_frame_count(struct btp_java_thread *thread)
 {
-    struct btp_java_frame *frame = thread->frames;
-    int count = 0;
-    while (frame)
-    {
-        frame = frame->next;
-        ++count;
-    }
-    return count;
+    return 0;
 }
 
 void
@@ -155,44 +134,18 @@ btp_java_thread_quality_counts(struct btp_java_thread *thread,
                                int *ok_count,
                                int *all_count)
 {
-    *ok_count = *all_count = btp_java_thread_get_frame_count(thread);
 }
 
 float
 btp_java_thread_quality(struct btp_java_thread *thread)
 {
-    int ok_count = 0, all_count = 0;
-    btp_java_thread_quality_counts(thread, &ok_count, &all_count);
-    if (0 == all_count)
-        return 1;
-
-    return ok_count / (float)all_count;
+    return .0;
 }
 
 bool
 btp_java_thread_remove_frame(struct btp_java_thread *thread,
                             struct btp_java_frame *frame)
 {
-    struct btp_java_frame *loop_frame = thread->frames,
-        *prev_frame = NULL;
-
-    while (loop_frame)
-    {
-        if (loop_frame == frame)
-        {
-            if (prev_frame)
-                prev_frame->next = loop_frame->next;
-            else
-                thread->frames = loop_frame->next;
-
-            btp_java_frame_free(loop_frame);
-            return true;
-        }
-
-        prev_frame = loop_frame;
-        loop_frame = loop_frame->next;
-    }
-
     return false;
 }
 
@@ -200,196 +153,65 @@ bool
 btp_java_thread_remove_frames_above(struct btp_java_thread *thread,
                                    struct btp_java_frame *frame)
 {
-    /* Check that the frame is present in the thread. */
-    struct btp_java_frame *loop_frame = thread->frames;
-    while (loop_frame)
-    {
-        if (loop_frame == frame)
-            break;
-
-        loop_frame = loop_frame->next;
-    }
-
-    if (!loop_frame)
-        return false;
-
-    /* Delete all the frames up to the frame. */
-    while (thread->frames != frame)
-    {
-        loop_frame = thread->frames->next;
-        btp_java_frame_free(thread->frames);
-        thread->frames = loop_frame;
-    }
-
-    return true;
+    return false;
 }
 
 void
 btp_java_thread_remove_frames_below_n(struct btp_java_thread *thread,
                                      int n)
 {
-    assert(n >= 0);
-
-    /* Skip some frames to get the required stack depth. */
-    int i = n;
-    struct btp_java_frame *frame = thread->frames,
-        *last_frame = NULL;
-
-    while (frame && i)
-    {
-        last_frame = frame;
-        frame = frame->next;
-        --i;
-    }
-
-    /* Delete the remaining frames. */
-    if (last_frame)
-        last_frame->next = NULL;
-    else
-        thread->frames = NULL;
-
-    while (frame)
-    {
-        struct btp_java_frame *delete_frame = frame;
-        frame = frame->next;
-        btp_java_frame_free(delete_frame);
-    }
 }
 
 void
 btp_java_thread_append_to_str(struct btp_java_thread *thread,
                               struct btp_strbuf *dest)
 {
-    btp_strbuf_append_strf(dest, "Exception in thread \"%s\"%s%s%s%s\n",
-                           thread->name ? thread->name : "",
-                           thread->exception_name ? " " : "",
-                           thread->exception_name ? thread->exception_name : "",
-                           thread->exception_message ? ":" : "",
-                           thread->exception_message ? thread->exception_message : "");
+    btp_strbuf_append_strf(dest, "Exception in thread \"%s\"",
+                           thread->name ? thread->name : "");
 
-    struct btp_java_frame *frame = thread->frames;
-    while (frame)
-    {
-        btp_java_frame_append_to_str(frame, dest);
-        btp_strbuf_append_char(dest, '\n');
-
-        frame = frame->next;
-    }
+    if (thread->exception)
+        btp_java_exception_append_to_str(thread->exception, dest);
 }
 
 struct btp_java_thread *
 btp_java_thread_parse(const char **input,
                       struct btp_location *location)
 {
-    const char *mark = *input;
+    const char *cursor = *input;
     /* Exception in thread "main" java.lang.NullPointerException: foo */
-    int chars = btp_skip_string(&mark, "Exception in thread ");
+    int chars = btp_skip_string(&cursor, "Exception in thread \"");
     location->column += chars;
 
-    if (!chars)
-    {
-        location->message = "\"Thread\" header expected";
-        return NULL;
-    }
-
-    /* "main" java.lang.NullPointerException: foo */
-    if (*mark != '"')
-    {
-        location->message = "\"Thread\" name start expected";
-        return NULL;
-    }
-
-    ++mark;
-    ++location->column;
-
-    const char *cursor = mark;
-    while (*cursor != '"' && *cursor != '\n' && *cursor != '\0')
-    {
-        ++cursor;
-        ++location->column;
-    }
-
-    /* " java.lang.NullPointerException: foo */
-    if (*cursor != '"')
-    {
-        location->message = "\"Thread\" name end expected";
-        return NULL;
-    }
-
     struct btp_java_thread *thread = btp_java_thread_new();
-    thread->name = btp_strndup(mark, cursor - mark);
-
-    /*  java.lang.NullPointerException: foo */
-    ++cursor;
-    ++location->column;
-    mark = cursor;
-
-    /* java.lang.NullPointerException: foo */
-    cursor = btp_skip_whitespace(mark);
-    location->column += cursor - mark;
-    mark = cursor;
-
-    while (*cursor != ':' && *cursor != '\n' && *cursor != '\0')
+    if (chars)
     {
-        ++cursor;
-        ++location->column;
-    }
-
-    if (mark != cursor)
-        thread->exception_name = btp_strndup(mark, cursor - mark);
-
-    /* : foo */
-    if (*cursor == ':')
-    {
-        ++cursor;
-        ++location->column;
-        mark = cursor;
-
-        /* foo */
-        cursor = btp_skip_whitespace(mark);
-        location->column += cursor - mark;
-        mark = cursor;
-
-        while (*cursor != '\n' && *cursor != '\0')
+        const char *mark = cursor;
+        /* main" java.lang.NullPointerException: foo */
+        while (*cursor != '"' && *cursor != '\n' && *cursor != '\0')
         {
             ++cursor;
             ++location->column;
         }
 
-        if (mark != cursor)
-            thread->exception_message = btp_strndup(mark, cursor - mark);
-    }
-
-    if (*cursor == '\n')
-    {
-        ++cursor;
-        ++location->line;
-        location->column = 0;
-    }
-    /* else *cursor == '\0' */
-
-    struct btp_java_frame *frame = NULL;
-    /* iterate line by line
-       best effort - continue on error */
-    while (*cursor != '\0')
-    {
-        struct btp_java_frame *parsed = btp_java_frame_parse(&cursor, location);
-
-        if (parsed == NULL)
+        /* " java.lang.NullPointerException: foo */
+        if (*cursor != '"')
         {
+            location->message = "\"Thread\" name end expected";
             btp_java_thread_free(thread);
             return NULL;
         }
 
-        if (thread->frames == NULL)
-            thread->frames = parsed;
-        else
-            frame->next = parsed;
+        thread->name = btp_strndup(mark, cursor - mark);
 
-        frame = parsed;
+        ++cursor;
+        ++location->column;
+    }
 
-        ++location->line;
-        location->column = 0;
+    /* java.lang.NullPointerException: foo */
+    if (!(thread->exception = btp_java_exception_parse(&cursor, location)))
+    {
+        btp_java_thread_free(thread);
+        return NULL;
     }
 
     *input = cursor;

@@ -8,6 +8,7 @@ AT_BANNER([Java threads])
 AT_TESTFUN([btp_java_thread_parse],
 [[
 #include <lib/java_thread.h>
+#include <lib/java_exception.h>
 #include <lib/java_frame.h>
 #include <lib/location.h>
 #include <assert.h>
@@ -19,7 +20,7 @@ check(char *input,
       struct btp_java_thread *expected_thread)
 {
   printf("===============================================\n"
-         "Testing input: %s", input);
+         "Testing input:\n%s", input);
 
   char *old_input = input;
   struct btp_location location;
@@ -62,18 +63,22 @@ main(void)
   frame2.file_line = 82;
   frame2.function_name = "SimpleTest.main";
 
+  struct btp_java_exception exception;
+  btp_java_exception_init(&exception);
+  exception.name = "java.lang.NullPointerException";
+  exception.message = "null";
+  exception.frames = &frame0;
+
   struct btp_java_thread thread;
   btp_java_thread_init(&thread);
   thread.name = "main";
-  thread.exception_name = "java.lang.NullPointerException";
-  thread.exception_message = "overloaded ctor";
-  thread.frames = &frame0;
+  thread.exception = &exception;
 
   struct btp_location location;
   btp_location_init(&location);
 
   check(
-"Exception in thread \"main\" java.lang.NullPointerException: overloaded ctor\n"
+"Exception in thread \"main\" java.lang.NullPointerException: null\n"
 "        at SimpleTest.throwNullPointerException(SimpleTest.java:36)\n"
 "        at SimpleTest.throwAndDontCatchException(SimpleTest.java:70)\n"
 "        at SimpleTest.main(SimpleTest.java:82)\n"

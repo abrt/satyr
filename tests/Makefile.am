@@ -36,6 +36,7 @@ TESTSUITE_AT =		\
   gdb_stacktrace.at  	\
   gdb_sharedlib.at	\
   java_frame.at \
+  java_exception.at \
   java_thread.at \
   koops_frame.at	\
   koops_stacktrace.at   \

@@ -1,0 +1,171 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([Java exception])
+
+## ---------------------- ##
+## btp_java_exception_cmp ##
+## ---------------------- ##
+AT_TESTFUN([btp_java_exception_cmp],
+[[
+#include <lib/java_exception.h>
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+
+int
+main(void)
+{
+  /* Basic test. */
+  struct btp_java_frame frame0, frame1, frame2, frame3, frame4;
+  btp_java_frame_init(&frame0);
+  frame0.file_name = "SimpleTest.java";
+  frame0.file_line = 36;
+  frame0.function_name = "SimpleTest.throwNullPointerException";
+  frame0.next = &frame1;
+
+  btp_java_frame_init(&frame1);
+  frame1.file_name = "SimpleTest.java";
+  frame1.file_line = 70;
+  frame1.function_name = "SimpleTest.throwAndDontCatchException";
+  frame1.next = &frame2;
+
+  btp_java_frame_init(&frame2);
+  frame2.file_name = "SimpleTest.java";
+  frame2.file_line = 82;
+  frame2.function_name = "SimpleTest.main";
+
+  btp_java_frame_init(&frame3);
+  frame3.file_name = "Test.java";
+  frame3.file_line = 7;
+  frame3.function_name = "SimpleTest.execute";
+  frame3.next = &frame4;
+
+  btp_java_frame_init(&frame4);
+  frame4.file_name = "Test.java";
+  frame4.file_line = 2;
+  frame4.function_name = "SimpleTest.intercept";
+
+  struct btp_java_exception exception0, exception1;
+  btp_java_exception_init(&exception0);
+  exception0.name = "java.lang.NullPointerException";
+  exception0.message = "null";
+  exception0.frames = &frame0;
+  exception0.inner = &exception1;
+
+  btp_java_exception_init(&exception1);
+  exception1.name = "java.lang.NullPointerException";
+  exception1.message = "null";
+  exception1.frames = &frame3;
+
+  assert(0 == btp_java_exception_cmp(&exception0, &exception0, false));
+  assert(0 == btp_java_exception_cmp(&exception0, &exception0, true));
+
+  assert(0 == btp_java_exception_cmp(&exception1, &exception1, false));
+  assert(0 == btp_java_exception_cmp(&exception1, &exception1, true));
+
+  assert(0 != btp_java_exception_cmp(&exception1, &exception0, false));
+  assert(0 != btp_java_exception_cmp(&exception1, &exception0, true));
+
+  assert(0 != btp_java_exception_cmp(&exception0, &exception1, false));
+  assert(0 != btp_java_exception_cmp(&exception0, &exception1, true));
+
+  return 0;
+}
+]])
+
+## ------------------------ ##
+## btp_java_exception_parse ##
+## ------------------------ ##
+AT_TESTFUN([btp_java_exception_parse],
+[[
+#include <lib/java_exception.h>
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+
+int
+main(void)
+{
+  /* Basic test. */
+  struct btp_java_frame frame0, frame1, frame2, frame3, frame4, frame5;
+  btp_java_frame_init(&frame0);
+  frame0.function_name = "SimpleTest.throwNullPointerException";
+  frame0.file_name = "SimpleTest.java";
+  frame0.file_line = 36;
+  frame0.next = &frame1;
+
+  btp_java_frame_init(&frame1);
+  frame1.function_name = "SimpleTest.throwAndDontCatchException";
+  frame1.file_name = "SimpleTest.java";
+  frame1.file_line = 70;
+  frame1.next = &frame2;
+
+  btp_java_frame_init(&frame2);
+  frame2.function_name = "SimpleTest.main";
+  frame2.file_name = "SimpleTest.java";
+  frame2.file_line = 82;
+
+  btp_java_frame_init(&frame3);
+  frame3.function_name = "SimpleTest.execute";
+  frame3.file_name = "Test.java";
+  frame3.file_line = 7;
+  frame3.next = &frame4;
+
+  btp_java_frame_init(&frame4);
+  frame4.function_name = "SimpleTest.intercept";
+  frame4.file_name = "Test.java";
+  frame4.file_line = 2;
+
+  btp_java_frame_init(&frame5);
+  frame5.function_name = "MyVector.at";
+  frame5.file_name = "Containers.java";
+  frame5.file_line = 77;
+
+  struct btp_java_exception exception0, exception1, exception2;
+  btp_java_exception_init(&exception0);
+  exception0.name = "java.lang.RuntimeException";
+  exception0.message = "java.lang.InvalidRangeException: undefined index";
+  exception0.frames = &frame0;
+  exception0.inner = &exception1;
+
+  btp_java_exception_init(&exception1);
+  exception1.name = "java.lang.NullPointerException";
+  exception1.message = "null";
+  exception1.frames = &frame3;
+  exception1.inner = &exception2;
+
+  btp_java_exception_init(&exception2);
+  exception2.name = "java.lang.InvalidRangeException";
+  exception2.message = "null";
+  exception2.frames = &frame5;
+
+  const char *input =
+"java.lang.RuntimeException: java.lang.NullPointerException: null\n"
+"   at SimpleTest.throwNullPointerException(SimpleTest.java:36)\n"
+"   at SimpleTest.throwAndDontCatchException(SimpleTest.java:70)\n"
+"   at SimpleTest.main(SimpleTest.java:82)\n"
+"Caused by: java.lang.NullPointerException: java.lang.InvalidRangeException: undefined index\n"
+"   at SimpleTest.execute(Test.java:7)\n"
+"   at SimpleTest.intercept(Test.java:2)\n"
+"   ... 3 more\n"
+"Caused by: java.lang.InvalidRangeException: undefined index\n"
+"   at MyVector.at(Containers.java:77)\n"
+"   ... 5 more\n";
+
+  struct btp_location location;
+  btp_location_init(&location);
+
+  struct btp_java_exception *exception = btp_java_exception_parse(&input, &location);
+
+  assert(exception);
+  assert(0 == btp_java_exception_cmp(&exception0, exception, true));
+
+  btp_java_exception_free(exception);
+
+  return 0;
+}
+]])
