@@ -275,16 +275,11 @@ btp_java_exception_parse(const char **input,
                          struct btp_location *location)
 {
     /* java.lang.NullPointerException: foo */
-    const char *mark = *input;
-    const char *cursor = btp_skip_whitespace(mark);
-    location->column += cursor - mark;
-    mark = cursor;
+    const char *cursor = btp_skip_whitespace(*input);
+    btp_location_add(location, 0, cursor - *input);
+    const char *mark = cursor;
 
-    while (*cursor != ':' && *cursor != '\n' && *cursor != '\0')
-    {
-        ++cursor;
-        ++location->column;
-    }
+    btp_location_add(location, 0, btp_skip_char_cspan(&cursor, ":\n"));
 
     if (mark == cursor)
     {
@@ -299,19 +294,15 @@ btp_java_exception_parse(const char **input,
     if (*cursor == ':')
     {
         ++cursor;
-        ++location->column;
+        btp_location_add(location, 0, 1);
         mark = cursor;
 
         /* foo */
         cursor = btp_skip_whitespace(mark);
-        location->column += cursor - mark;
+        btp_location_add(location, 0, cursor - mark);
         mark = cursor;
 
-        while (*cursor != '\n' && *cursor != '\0')
-        {
-            ++cursor;
-            ++location->column;
-        }
+        btp_location_add(location, 0, btp_skip_char_cspan(&cursor, "\n"));
 
         if (mark != cursor)
             exception->message = btp_strndup(mark, cursor - mark);
@@ -320,8 +311,7 @@ btp_java_exception_parse(const char **input,
     if (*cursor == '\n')
     {
         ++cursor;
-        ++location->line;
-        location->column = 0;
+        btp_location_add(location, 2, 0);
     }
     /* else *cursor == '\0' */
 
@@ -331,8 +321,7 @@ btp_java_exception_parse(const char **input,
     while (*cursor != '\0')
     {
         cursor = btp_skip_whitespace(mark);
-        location->column += cursor - mark;
-        mark = cursor;
+        btp_location_add(location, 0, cursor - mark);
 
         if (strncmp("... ", cursor, strlen("... ")) == 0)
             goto current_exception_done;
@@ -357,35 +346,28 @@ btp_java_exception_parse(const char **input,
 
         frame = parsed;
 
-        ++location->line;
-        location->column = 0;
+        btp_location_add(location, 2, 0);
     }
     goto exception_parsing_successful;
 
 current_exception_done:
-    while (*cursor != '\n' && *cursor != '\0')
-    {
-        ++cursor;
-        ++location->column;
-    }
+    btp_location_add(location, 0, btp_skip_char_cspan(&cursor, "\n"));
 
     if (*cursor == '\n')
     {
         ++cursor;
-        ++location->line;
-        location->column = 0;
+        btp_location_add(location, 2, 0);
     }
 
     mark = cursor;
     cursor = btp_skip_whitespace(mark);
-    location->column += cursor - mark;
-    mark = cursor;
+    btp_location_add(location, 0, cursor - mark);
 
     if (strncmp("Caused by: ", cursor, strlen("Caused by: ")) == 0)
     {
 parse_inner_exception:
         cursor += strlen("Caused by: ");
-        location->column += strlen("Caused by: ");
+        btp_location_add(location, 0, strlen("Caused by: "));
 
         exception->inner = btp_java_exception_parse(&cursor, location);
         if (exception->inner == NULL)

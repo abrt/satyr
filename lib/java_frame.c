@@ -129,19 +129,14 @@ btp_java_frame_parse(const char **input,
 
     /*  SimpleTest.throwNullPointerException(SimpleTest.java:36) */
     cursor = mark = cursor + 2;
-    location->line += (lines - 1);
-    location->column = columns + 2;
+    btp_location_add(location, lines, columns + 2);
 
     /* SimpleTest.throwNullPointerException(SimpleTest.java:36) */
     cursor = btp_skip_whitespace(cursor);
-    location->column += cursor - mark;
+    btp_location_add(location, 0, cursor - mark);
     mark = cursor;
 
-    while (*cursor != '(' && *cursor != '\n' && *cursor != '\0')
-    {
-        ++cursor;
-        ++location->column;
-    }
+    btp_location_add(location, 0, btp_skip_char_cspan(&cursor, "(\n"));
 
     struct btp_java_frame *frame = btp_java_frame_new();
 
@@ -152,14 +147,10 @@ btp_java_frame_parse(const char **input,
     if (*cursor == '(')
     {
         ++cursor;
-        ++location->column;
+        btp_location_add(location, 0, 1);
         mark = cursor;
 
-        while (*cursor != ':' && *cursor != ')' && *cursor != '\n' && *cursor != '\0')
-        {
-            ++cursor;
-            ++location->column;
-        }
+        btp_location_add(location, 0, btp_skip_char_cspan(&cursor, ":)\n"));
 
         if (mark != cursor)
             frame->file_name = btp_strndup(mark, cursor - mark);
@@ -167,12 +158,12 @@ btp_java_frame_parse(const char **input,
         if (*cursor == ':')
         {
             ++cursor;
-            ++location->column;
+            btp_location_add(location, 0, 1);
             mark = cursor;
 
             btp_parse_uint32(&cursor, &(frame->file_line));
 
-            location->column += cursor - mark;
+            btp_location_add(location, 0, cursor - mark);
         }
     }
 
@@ -183,12 +174,11 @@ btp_java_frame_parse(const char **input,
     if (*cursor == '\n')
     {
         ++*(input);
-        ++location->line;
-        location->column = 0;
+        btp_location_add(location, 2, 0);
     }
     else
         /* don't take \0 Byte into account */
-        location->column += ((cursor - mark) - 1);
+        btp_location_add(location, 0, (cursor - mark) - 1);
 
     return frame;
 }

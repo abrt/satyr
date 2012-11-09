@@ -180,18 +180,15 @@ btp_java_thread_parse(const char **input,
     const char *cursor = *input;
     /* Exception in thread "main" java.lang.NullPointerException: foo */
     int chars = btp_skip_string(&cursor, "Exception in thread \"");
-    location->column += chars;
+    btp_location_add(location, 0, chars);
 
     struct btp_java_thread *thread = btp_java_thread_new();
     if (chars)
     {
         const char *mark = cursor;
         /* main" java.lang.NullPointerException: foo */
-        while (*cursor != '"' && *cursor != '\n' && *cursor != '\0')
-        {
-            ++cursor;
-            ++location->column;
-        }
+        int lines;
+        btp_location_add(location, 0, btp_skip_char_cspan(&cursor, "\"\n"));
 
         /* " java.lang.NullPointerException: foo */
         if (*cursor != '"')
@@ -203,8 +200,7 @@ btp_java_thread_parse(const char **input,
 
         thread->name = btp_strndup(mark, cursor - mark);
 
-        ++cursor;
-        ++location->column;
+        btp_location_eat_char(location, *(++cursor));
     }
 
     /* java.lang.NullPointerException: foo */
