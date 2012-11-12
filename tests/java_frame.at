@@ -79,7 +79,26 @@ AT_TESTFUN([btp_java_frame_append_to_str],
 #include <lib/java_frame.h>
 #include <lib/strbuf.h>
 #include <assert.h>
-#
+#include <stdlib.h>
+#include <stdio.h>
+
+void
+check(struct btp_java_frame *frame, const char *expected)
+{
+  struct btp_strbuf *buf = btp_strbuf_new();
+  btp_java_frame_append_to_str(frame, buf);
+
+  printf(
+"<==============================================================================>\n"
+"%s == %s\n"
+"<==============================================================================>\n",
+  expected, buf->buf);
+
+  assert(strcmp(expected, buf->buf) == 0);
+
+  btp_strbuf_free(buf);
+}
+
 int
 main(void)
 {
@@ -90,19 +109,17 @@ main(void)
   frame.file_name = btp_strdup("duke.java");
   frame.file_line = 666;
 
-  struct btp_strbuf *buf = btp_strbuf_new();
-  btp_java_frame_append_to_str(&frame, buf);
-  const char *example = "\tat com.redhat.abrt.duke.nuke(duke.java:666)";
+  check(&frame, "\tat com.redhat.abrt.duke.nuke(duke.java:666)");
 
-  printf(
-"<==============================================================================>\n"
-"%s == %s\n"
-"<==============================================================================>\n",
-  example, buf->buf);
+  frame.file_line = 0;
+  frame.is_native = true;
+  check(&frame, "\tat com.redhat.abrt.duke.nuke(Native Method)");
+  frame.is_native = false;
 
-  assert(strcmp(example, buf->buf) == 0);
+  free(frame.file_name);
+  frame.file_name = NULL;
 
-  btp_strbuf_free(buf);
+  check(&frame, "\tat com.redhat.abrt.duke.nuke(Unknown Source)");
 
   return 0;
 }
@@ -145,12 +162,12 @@ check(char *input,
     if (len > 0 && tmp_input[len-1] == '\n')
         tmp_input[len-1] = '\0';
 
-    printf("<==============================================================================>\n");
-    printf("'%s' == '%s'\n", tmp_input, buf->buf);
-    printf("<==============================================================================>\n");
-
     const char *fr1 = btp_skip_whitespace(tmp_input);
     const char *fr2 = btp_skip_whitespace(buf->buf);
+
+    printf("<==============================================================================>\n");
+    printf("'%s' == '%s'\n", fr1, fr2);
+    printf("<==============================================================================>\n");
 
     assert(strcmp(fr1, fr2) == 0);
 
@@ -194,7 +211,7 @@ main(void)
   frame.function_name = btp_strdup("com.redhat.abrt.duke.nuke");
   frame.file_line = 666;
 
-  c = "    at com.redhat.abrt.duke.nuke(:666)\n";
+  c = "    at com.redhat.abrt.duke.nuke(Unknown Source:666)\n";
   btp_location_init(&location);
   location.line = 2;
   location.column = 0;
@@ -224,8 +241,19 @@ main(void)
 
   /** next frame **/
   btp_java_frame_init(&frame);
+  frame.function_name = btp_strdup("com.redhat.abrt.duke.nuke");
+  frame.is_native = true;
 
-  c = "  at ()\n";
+  c = "    at com.redhat.abrt.duke.nuke(Native Method)\n";
+  btp_location_init(&location);
+  location.line = 2;
+  location.column = 0;
+  check(c, &frame, c + strlen(c), &location);
+
+  /** next frame **/
+  btp_java_frame_init(&frame);
+
+  c = "  at (Unknown Source)\n";
   btp_location_init(&location);
   location.line = 2;
   location.column = 0;
