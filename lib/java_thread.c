@@ -132,9 +132,7 @@ btp_java_thread_quality_counts(struct btp_java_thread *thread,
                                int *all_count)
 {
     if (thread->exception)
-        return btp_java_exception_quality_counts(thread->exception, true);
-
-    return 0;
+        btp_java_exception_quality_counts(thread->exception, ok_count, all_count, true);
 }
 
 float
@@ -171,9 +169,9 @@ btp_java_thread_remove_frames_below_n(struct btp_java_thread *thread,
                                       int n)
 {
     if (thread->exception)
-        return btp_java_exception_remove_frames_below_n(thread->exception, n, true);
+        btp_java_exception_remove_frames_below_n(thread->exception, n, true);
 
-    return false;
+    return;
 }
 
 void

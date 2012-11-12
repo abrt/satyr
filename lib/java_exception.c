@@ -44,19 +44,45 @@ btp_java_exception_init(struct btp_java_exception *exception)
     exception->inner = NULL;
 }
 
-void
-btp_java_exception_free(struct btp_java_exception *exception)
+static void btp_java_exception_free_frames(struct btp_java_exception *exception)
 {
-    if (!exception)
-        return;
-
     while (exception->frames)
     {
         struct btp_java_frame *frame = exception->frames;
         exception->frames = frame->next;
         btp_java_frame_free(frame);
     }
+}
 
+bool btp_java_exception_pop(struct btp_java_exception *exception)
+{
+    if (!exception->inner)
+        return false;
+
+    btp_java_exception_free_frames(exception);
+    free(exception->name);
+    free(exception->message);
+
+    struct btp_java_exception *inner = exception->inner->inner;
+
+    exception->frames  = inner->frames;
+    exception->inner   = inner->inner;
+    exception->name    = inner->name;
+    exception->message = inner->message;
+
+    btp_java_exception_init(inner);
+    btp_java_exception_free(inner);
+
+    return true;
+}
+
+void
+btp_java_exception_free(struct btp_java_exception *exception)
+{
+    if (!exception)
+        return;
+
+    btp_java_exception_free_frames(exception);
     btp_java_exception_free(exception->inner);
     free(exception->name);
     free(exception->message);
@@ -141,7 +167,7 @@ btp_java_exception_get_frame_count(struct btp_java_exception *exception, bool de
     }
 
     if (deep && exception->inner)
-        count += btp_java_exception_get_frame_count(exception->inner);
+        count += btp_java_exception_get_frame_count(exception->inner, deep);
 
     return count;
 }
@@ -204,6 +230,9 @@ btp_java_exception_remove_frame(struct btp_java_exception *exception,
         loop_frame = loop_frame->next;
     }
 
+    if (deep && exception->inner)
+        return btp_java_exception_remove_frame(exception->inner, frame, deep);
+
     return false;
 }
 
@@ -222,37 +251,54 @@ btp_java_exception_remove_frames_above(struct btp_java_exception *exception,
         loop_frame = loop_frame->next;
     }
 
-    if (!loop_frame)
-        return false;
-
-    /* Delete all the frames up to the frame. */
-    while (exception->frames != frame)
+    if (loop_frame)
     {
-        loop_frame = exception->frames->next;
-        btp_java_frame_free(exception->frames);
-        exception->frames = loop_frame;
-    }
+        /* Delete all the frames up to the frame. */
+        while (exception->frames != frame)
+        {
+            loop_frame = exception->frames->next;
+            btp_java_frame_free(exception->frames);
+            exception->frames = loop_frame;
+        }
 
-    return true;
+        /* Stack trace of inner exception is above */
+        btp_java_exception_free(exception->inner);
+        exception->inner = NULL;
+
+        return true;
+    }
+    else if (deep && exception->inner)
+        return btp_java_exception_remove_frames_above(exception->inner, frame, deep);
+
+    return false;
 }
 
-void
+unsigned
 btp_java_exception_remove_frames_below_n(struct btp_java_exception *exception,
-                                         int n,
+                                         unsigned n,
                                          bool deep)
 {
-    assert(n >= 0);
+    if (deep && exception->inner)
+        n = btp_java_exception_remove_frames_below_n(exception->inner, n, deep);
 
-    /* Skip some frames to get the required stack depth. */
-    int i = n;
+    if (n == 0)
+    {
+        /* if not deep then remove all frames immediately */
+        /* if deep then try pop and if it fails then remove all frames */
+        if (!deep || !btp_java_exception_pop(exception))
+            btp_java_exception_free_frames(exception);
+
+        return 0;
+    }
+
     struct btp_java_frame *frame = exception->frames,
         *last_frame = NULL;
 
-    while (frame && i)
+    while (frame && n)
     {
         last_frame = frame;
         frame = frame->next;
-        --i;
+        --n;
     }
 
     /* Delete the remaining frames. */
@@ -267,6 +313,8 @@ btp_java_exception_remove_frames_below_n(struct btp_java_exception *exception,
         frame = frame->next;
         btp_java_frame_free(delete_frame);
     }
+
+    return n;
 }
 
 void

@@ -92,6 +92,15 @@ void
 btp_java_exception_free(struct btp_java_exception *exception);
 
 /**
+ * Replaces exception by its inner exception if the exception has one.
+ * @param exception
+ * It must be non-NULL pointer. The exception is not modified by calling
+ * this function.
+ * @return TRUE if exceptions was poped, otherwise FASLE
+ */
+bool btp_java_exception_pop(struct btp_java_exception *exception);
+
+/**
  * Creates a duplicate of the exception.
  * @param exception
  * It must be non-NULL pointer. The exception is not modified by calling
@@ -181,10 +190,12 @@ btp_java_exception_remove_frames_above(struct btp_java_exception *exception,
 
 /**
  * Keeps only the top n frames in the exception.
+ * @returns
+ * if count of frames is shorter then n returns the diffrences; * otherwise 0
  */
-void
+unsigned
 btp_java_exception_remove_frames_below_n(struct btp_java_exception *exception,
-                                         int n,
+                                         unsigned n,
                                          bool deep);
 
 /**
