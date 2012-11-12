@@ -174,8 +174,13 @@ main(void)
 
   exception2 = create_real_stacktrace_objects();
 
+  struct btp_java_frame *removed = exception2->inner->frames;
+
   assert(0 == btp_java_exception_remove_frame(exception2, exception2->inner->frames, false) || !"Removed frame even if it is not in this exception");
+  assert(removed == exception2->inner->frames);
+
   assert(0 != btp_java_exception_remove_frame(exception2, exception2->inner->frames, true) || !"Not removed frame from inner exception");
+  assert(removed != exception2->inner->frames);
 
   btp_java_exception_free(exception2);
 
