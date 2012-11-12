@@ -64,13 +64,13 @@ btp_java_exception_free(struct btp_java_exception *exception)
 }
 
 struct btp_java_exception *
-btp_java_exception_dup(struct btp_java_exception *exception, bool siblings)
+btp_java_exception_dup(struct btp_java_exception *exception, bool deep)
 {
     struct btp_java_exception *result = btp_java_exception_new();
     memcpy(result, exception, sizeof(*result));
 
-    /* Handle siblings. */
-    if (siblings)
+    /* Handle deep. */
+    if (deep)
     {
         if (result->inner)
             result->inner = btp_java_exception_dup(result->inner, true);
@@ -130,7 +130,7 @@ btp_java_exception_cmp(struct btp_java_exception *exception1,
 }
 
 int
-btp_java_exception_get_frame_count(struct btp_java_exception *exception)
+btp_java_exception_get_frame_count(struct btp_java_exception *exception, bool deep)
 {
     struct btp_java_frame *frame = exception->frames;
     int count = 0;
@@ -139,23 +139,40 @@ btp_java_exception_get_frame_count(struct btp_java_exception *exception)
         frame = frame->next;
         ++count;
     }
+
+    if (deep && exception->inner)
+        count += btp_java_exception_get_frame_count(exception->inner);
+
     return count;
 }
 
 void
 btp_java_exception_quality_counts(struct btp_java_exception *exception,
-                               int *ok_count,
-                               int *all_count)
+                                  int *ok_count,
+                                  int *all_count,
+                                  bool deep)
 {
-    /* TODO !!! */
-    *ok_count = *all_count = btp_java_exception_get_frame_count(exception);
+    struct btp_java_frame *frame = exception->frames;
+    while (frame)
+    {
+        ++(*all_count);
+
+        /* Functions with unknown file names are NOT OK */
+        if (frame->is_native || frame->file_name)
+            ++(*ok_count);
+
+        frame = frame->next;
+    }
+
+    if (deep && exception->inner)
+        btp_java_exception_quality_counts(exception->inner, ok_count, all_count, deep);
 }
 
 float
-btp_java_exception_quality(struct btp_java_exception *exception)
+btp_java_exception_quality(struct btp_java_exception *exception, bool deep)
 {
     int ok_count = 0, all_count = 0;
-    btp_java_exception_quality_counts(exception, &ok_count, &all_count);
+    btp_java_exception_quality_counts(exception, &ok_count, &all_count, deep);
     if (0 == all_count)
         return 1;
 
@@ -164,7 +181,8 @@ btp_java_exception_quality(struct btp_java_exception *exception)
 
 bool
 btp_java_exception_remove_frame(struct btp_java_exception *exception,
-                            struct btp_java_frame *frame)
+                                struct btp_java_frame *frame,
+                                bool deep)
 {
     struct btp_java_frame *loop_frame = exception->frames,
         *prev_frame = NULL;
@@ -191,7 +209,8 @@ btp_java_exception_remove_frame(struct btp_java_exception *exception,
 
 bool
 btp_java_exception_remove_frames_above(struct btp_java_exception *exception,
-                                   struct btp_java_frame *frame)
+                                       struct btp_java_frame *frame,
+                                       bool deep)
 {
     /* Check that the frame is present in the exception. */
     struct btp_java_frame *loop_frame = exception->frames;
@@ -219,7 +238,8 @@ btp_java_exception_remove_frames_above(struct btp_java_exception *exception,
 
 void
 btp_java_exception_remove_frames_below_n(struct btp_java_exception *exception,
-                                     int n)
+                                         int n,
+                                         bool deep)
 {
     assert(n >= 0);
 
@@ -251,7 +271,7 @@ btp_java_exception_remove_frames_below_n(struct btp_java_exception *exception,
 
 void
 btp_java_exception_append_to_str(struct btp_java_exception *exception,
-                              struct btp_strbuf *dest)
+                                 struct btp_strbuf *dest)
 {
     btp_strbuf_append_str(dest, exception->name);
 

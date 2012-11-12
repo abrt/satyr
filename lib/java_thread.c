@@ -81,15 +81,9 @@ int
 btp_java_thread_cmp(struct btp_java_thread *thread1,
                    struct btp_java_thread *thread2)
 {
-    if (thread1->name && thread1->name)
-    {
-        const int res = strcmp(thread1->name, thread1->name);
-        if (res)
-            return res;
-    }
-    else if (!(!thread1->name && !thread1->name))
-        return thread1->name ? 1 : -1;
-
+    int res = btp_strcmp0(thread1->name, thread2->name);
+    if (res)
+        return res;
 
     struct btp_java_exception *exception1 = thread1->exception;
     struct btp_java_exception *exception2 = thread2->exception;
@@ -126,6 +120,9 @@ btp_java_thread_append(struct btp_java_thread *dest,
 int
 btp_java_thread_get_frame_count(struct btp_java_thread *thread)
 {
+    if (thread->exception)
+        return btp_java_exception_get_frame_count(thread->exception, true);
+
     return 0;
 }
 
@@ -134,32 +131,49 @@ btp_java_thread_quality_counts(struct btp_java_thread *thread,
                                int *ok_count,
                                int *all_count)
 {
+    if (thread->exception)
+        return btp_java_exception_quality_counts(thread->exception, true);
+
+    return 0;
 }
 
 float
 btp_java_thread_quality(struct btp_java_thread *thread)
 {
+    if (thread->exception)
+        return btp_java_exception_quality(thread->exception, true);
+
     return .0;
 }
 
 bool
 btp_java_thread_remove_frame(struct btp_java_thread *thread,
-                            struct btp_java_frame *frame)
+                             struct btp_java_frame *frame)
 {
+    if (thread->exception)
+        return btp_java_exception_remove_frame(thread->exception, frame, true);
+
     return false;
 }
 
 bool
 btp_java_thread_remove_frames_above(struct btp_java_thread *thread,
-                                   struct btp_java_frame *frame)
+                                    struct btp_java_frame *frame)
 {
+    if (thread->exception)
+        return btp_java_exception_remove_frames_above(thread->exception, frame, true);
+
     return false;
 }
 
 void
 btp_java_thread_remove_frames_below_n(struct btp_java_thread *thread,
-                                     int n)
+                                      int n)
 {
+    if (thread->exception)
+        return btp_java_exception_remove_frames_below_n(thread->exception, n, true);
+
+    return false;
 }
 
 void
@@ -187,7 +201,6 @@ btp_java_thread_parse(const char **input,
     {
         const char *mark = cursor;
         /* main" java.lang.NullPointerException: foo */
-        int lines;
         btp_location_add(location, 0, btp_skip_char_cspan(&cursor, "\"\n"));
 
         /* " java.lang.NullPointerException: foo */

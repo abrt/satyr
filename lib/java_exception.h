@@ -119,19 +119,11 @@ btp_java_exception_cmp(struct btp_java_exception *exception1,
                        bool deep);
 
 /**
- * Appends 'item' at the end of the list 'dest'.
- * @returns
- * This function returns the 'dest' exception.
- */
-struct btp_java_exception *
-btp_java_exception_append(struct btp_java_exception *dest,
-                          struct btp_java_exception *item);
-
-/**
  * Returns the number of frames in the exception.
  */
 int
-btp_java_exception_get_frame_count(struct btp_java_exception *exception);
+btp_java_exception_get_frame_count(struct btp_java_exception *exception,
+                                   bool deep);
 
 /**
  * Counts the number of 'good' frames and the number of all frames in
@@ -145,7 +137,8 @@ btp_java_exception_get_frame_count(struct btp_java_exception *exception);
 void
 btp_java_exception_quality_counts(struct btp_java_exception *exception,
                                   int *ok_count,
-                                  int *all_count);
+                                  int *all_count,
+                                  bool deep);
 
 /**
  * Returns the quality of the exception. The quality is the ratio of the
@@ -160,7 +153,7 @@ btp_java_exception_quality_counts(struct btp_java_exception *exception,
  * function returns 1.
  */
 float
-btp_java_exception_quality(struct btp_java_exception *exception);
+btp_java_exception_quality(struct btp_java_exception *exception, bool deep);
 
 /**
  * Removes the frame from the exception and then deletes it.
@@ -170,7 +163,8 @@ btp_java_exception_quality(struct btp_java_exception *exception);
  */
 bool
 btp_java_exception_remove_frame(struct btp_java_exception *exception,
-                                struct btp_java_frame *frame);
+                                struct btp_java_frame *frame,
+                                bool deep);
 
 /**
  * Removes all the frames from the exception that are above certain
@@ -182,21 +176,23 @@ btp_java_exception_remove_frame(struct btp_java_exception *exception,
  */
 bool
 btp_java_exception_remove_frames_above(struct btp_java_exception *exception,
-                                       struct btp_java_frame *frame);
+                                       struct btp_java_frame *frame,
+                                       bool deep);
 
 /**
  * Keeps only the top n frames in the exception.
  */
 void
 btp_java_exception_remove_frames_below_n(struct btp_java_exception *exception,
-                                      int n);
+                                         int n,
+                                         bool deep);
 
 /**
  * Appends a textual representation of 'exception' to the 'str'.
  */
 void
 btp_java_exception_append_to_str(struct btp_java_exception *exception,
-                              struct btp_strbuf *dest);
+                                 struct btp_strbuf *dest);
 
 /**
  * If the input contains proper exception with frames, parse the exception,
@@ -216,29 +212,6 @@ btp_java_exception_append_to_str(struct btp_java_exception *exception,
 struct btp_java_exception *
 btp_java_exception_parse(const char **input,
                          struct btp_location *location);
-
-/**
- * Create a exception from function and library names.
- * @param input
- * String containing function names and library names separated
- * by space, one frame per line.
- * @returns
- * Newly allocated structure, which should be released by
- * calling btp_java_exception_free().
- */
-struct btp_java_exception *
-btp_java_exception_parse_funs(const char *input);
-
-/**
- * Prepare a string representing exception which contains just the function
- * and library names. This can be used to store only data necessary for
- * comparison.
- * @returns
- * Newly allocated string, which should be released by
- * calling free(). The string can be parsed by btp_java_exception_parse_funs().
- */
-char *
-btp_java_exception_format_funs(struct btp_java_exception *exception, int inner);
 
 #ifdef __cplusplus
 }
