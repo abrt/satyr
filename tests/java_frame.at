@@ -2,9 +2,9 @@
 
 AT_BANNER([Java frames])
 
-## ----------------- ##
+## ------------------ ##
 ## btp_java_frame_dup ##
-## ----------------- ##
+## ------------------ ##
 AT_TESTFUN([btp_java_frame_dup],
 [[
 #include <lib/java_frame.h>
@@ -70,9 +70,48 @@ main(void)
 }
 ]])
 
-## ------------------- ##
+## ---------------------------- ##
+## btp_java_frame_append_to_str ##
+## ---------------------------- ##
+
+AT_TESTFUN([btp_java_frame_append_to_str],
+[[
+#include <lib/java_frame.h>
+#include <lib/strbuf.h>
+#include <assert.h>
+#
+int
+main(void)
+{
+  /* basic */
+  struct btp_java_frame frame;
+  btp_java_frame_init(&frame);
+  frame.function_name = btp_strdup("com.redhat.abrt.duke.nuke");
+  frame.file_name = btp_strdup("duke.java");
+  frame.file_line = 666;
+
+  struct btp_strbuf *buf = btp_strbuf_new();
+  btp_java_frame_append_to_str(&frame, buf);
+  const char *example = "\tat com.redhat.abrt.duke.nuke(duke.java:666)";
+
+  printf(
+"<==============================================================================>\n"
+"%s == %s\n"
+"<==============================================================================>\n",
+  example, buf->buf);
+
+  assert(strcmp(example, buf->buf) == 0);
+
+  btp_strbuf_free(buf);
+
+  return 0;
+}
+
+]])
+
+## -------------------- ##
 ## btp_java_frame_parse ##
-## ------------------- ##
+## -------------------- ##
 
 AT_TESTFUN([btp_java_frame_parse],
 [[
