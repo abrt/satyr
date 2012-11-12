@@ -63,15 +63,14 @@ bool btp_java_exception_pop(struct btp_java_exception *exception)
     free(exception->name);
     free(exception->message);
 
-    struct btp_java_exception *inner = exception->inner->inner;
+    struct btp_java_exception *inner = exception->inner;
 
     exception->frames  = inner->frames;
     exception->inner   = inner->inner;
     exception->name    = inner->name;
     exception->message = inner->message;
 
-    btp_java_exception_init(inner);
-    btp_java_exception_free(inner);
+    free(inner);
 
     return true;
 }
@@ -106,6 +105,12 @@ btp_java_exception_dup(struct btp_java_exception *exception, bool deep)
 
     if (result->frames)
         result->frames = btp_java_frame_dup(result->frames, true);
+
+    if (result->name)
+        result->name = btp_strdup(result->name);
+
+    if (result->message)
+        result->message = btp_strdup(result->message);
 
     return result;
 }
