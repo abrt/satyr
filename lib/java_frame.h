@@ -44,7 +44,7 @@ struct btp_java_frame
     char *file_name;
 
     /**
-     * Line no. in the Java file
+     * Line no. in the Java file. 0 is used when file_line is missing.
      */
     uint32_t file_line;
 

@@ -2,9 +2,86 @@
 
 AT_BANNER([Java threads])
 
-## -------------------- ##
+## ------------------- ##
+## btp_java_thread_cmp ##
+## ------------------- ##
+AT_TESTFUN([btp_java_thread_cmp],
+[[
+#include <lib/java_thread.h>
+#include <lib/java_exception.h>
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <tests/java_testcases.c>
+
+int
+main(void)
+{
+  struct btp_java_thread *thread0 = create_real_main_thread_objects();
+  struct btp_java_thread *thread1 = create_real_main_thread_objects();
+
+  assert(0 == btp_java_thread_cmp(thread0, thread1));
+
+  btp_java_exception_pop(thread1->exception);
+
+  assert(0 != btp_java_thread_cmp(thread0, thread1));
+
+  btp_java_exception_free(thread1->exception);
+  thread1->exception = NULL;
+
+  assert(0 != btp_java_thread_cmp(thread0, thread1));
+
+  btp_java_thread_free(thread1);
+
+  thread1 = create_real_main_thread_objects();
+  free(thread1->name);
+  thread1->name = btp_strdup("worker");
+
+  assert(0 != btp_java_thread_cmp(thread0, thread1));
+
+  btp_java_thread_free(thread0);
+  btp_java_thread_free(thread1);
+
+  return 0;
+}
+]])
+
+## ------------------- ##
+## btp_java_thread_dup ##
+## ------------------- ##
+AT_TESTFUN([btp_java_thread_dup],
+[[
+#include <lib/java_thread.h>
+#include <lib/java_exception.h>
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <tests/java_testcases.c>
+
+int
+main(void)
+{
+  struct btp_java_thread *thread0 = create_real_main_thread_objects();
+  struct btp_java_thread *thread1 = btp_java_thread_dup(thread0, false);
+
+  assert(0 == btp_java_thread_cmp(thread0, thread1));
+
+  btp_java_thread_free(thread0);
+  btp_java_thread_free(thread1);
+
+  return 0;
+}
+]])
+
+## --------------------- ##
 ## btp_java_thread_parse ##
-## -------------------- ##
+## --------------------- ##
 AT_TESTFUN([btp_java_thread_parse],
 [[
 #include <lib/java_thread.h>
@@ -14,6 +91,8 @@ AT_TESTFUN([btp_java_thread_parse],
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include <tests/java_testcases.c>
 
 static void
 check(char *input,
@@ -44,45 +123,12 @@ check(char *input,
 int
 main(void)
 {
-  /* Basic test. */
-  struct btp_java_frame frame0, frame1, frame2;
-  btp_java_frame_init(&frame0);
-  frame0.file_name = "SimpleTest.java";
-  frame0.file_line = 36;
-  frame0.function_name = "SimpleTest.throwNullPointerException";
-  frame0.next = &frame1;
-
-  btp_java_frame_init(&frame1);
-  frame1.file_name = "SimpleTest.java";
-  frame1.file_line = 70;
-  frame1.function_name = "SimpleTest.throwAndDontCatchException";
-  frame1.next = &frame2;
-
-  btp_java_frame_init(&frame2);
-  frame2.file_name = "SimpleTest.java";
-  frame2.file_line = 82;
-  frame2.function_name = "SimpleTest.main";
-
-  struct btp_java_exception exception;
-  btp_java_exception_init(&exception);
-  exception.name = "java.lang.NullPointerException";
-  exception.message = "null";
-  exception.frames = &frame0;
-
-  struct btp_java_thread thread;
-  btp_java_thread_init(&thread);
-  thread.name = "main";
-  thread.exception = &exception;
+  struct btp_java_thread *thread = create_real_main_thread_objects();
 
   struct btp_location location;
   btp_location_init(&location);
 
-  check(
-"Exception in thread \"main\" java.lang.NullPointerException: null\n"
-"        at SimpleTest.throwNullPointerException(SimpleTest.java:36)\n"
-"        at SimpleTest.throwAndDontCatchException(SimpleTest.java:70)\n"
-"        at SimpleTest.main(SimpleTest.java:82)\n"
-    , &thread);
+  check(get_real_thread_stacktrace() , thread);
 
   return 0;
 }

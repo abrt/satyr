@@ -1,7 +1,8 @@
 /*
     java_exception.c
 
-    Copyright (C) 2010  Red Hat, Inc.
+    Copyright (C) 2012  ABRT Team
+    Copyright (C) 2012  Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,7 +45,8 @@ btp_java_exception_init(struct btp_java_exception *exception)
     exception->inner = NULL;
 }
 
-static void btp_java_exception_free_frames(struct btp_java_exception *exception)
+static void
+btp_java_exception_free_frames(struct btp_java_exception *exception)
 {
     while (exception->frames)
     {
@@ -54,7 +56,8 @@ static void btp_java_exception_free_frames(struct btp_java_exception *exception)
     }
 }
 
-bool btp_java_exception_pop(struct btp_java_exception *exception)
+bool
+btp_java_exception_pop(struct btp_java_exception *exception)
 {
     if (!exception->inner)
         return false;
@@ -248,13 +251,8 @@ btp_java_exception_remove_frames_above(struct btp_java_exception *exception,
 {
     /* Check that the frame is present in the exception. */
     struct btp_java_frame *loop_frame = exception->frames;
-    while (loop_frame)
-    {
-        if (loop_frame == frame)
-            break;
-
+    while (loop_frame && loop_frame != frame)
         loop_frame = loop_frame->next;
-    }
 
     if (loop_frame)
     {

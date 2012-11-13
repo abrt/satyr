@@ -31,11 +31,15 @@ extern "C" {
 #endif
 
 struct btp_java_thread;
+struct btp_location;
 
 #include <stdint.h>
 
 struct btp_java_stacktrace
 {
+    /**
+     * Threads of stack trace. Always non-NULL.
+     */
     struct btp_java_thread *threads;
 };
 
@@ -75,6 +79,43 @@ btp_java_stacktrace_free(struct btp_java_stacktrace *stacktrace);
  */
 struct btp_java_stacktrace *
 btp_java_stacktrace_dup(struct btp_java_stacktrace *stacktrace);
+
+/**
+ * Compares two stacktraces.
+ * @returns
+ * Returns 0 if the stacktraces are same.  Returns negative number if t1
+ * is found to be 'less' than t2.  Returns positive number if t1 is
+ * found to be 'greater' than t2.
+ */
+int
+btp_java_stacktrace_cmp(struct btp_java_stacktrace *stacktrace1,
+                        struct btp_java_stacktrace *stacktrace2);
+
+/**
+ * Parses a textual stack trace and puts it into a structure.  If
+ * parsing fails, the input parameter is not changed and NULL is
+ * returned.
+ * @param input
+ * Pointer to the string with the stacktrace. If this function returns
+ * a non-NULL value, this pointer is modified to point after the
+ * stacktrace that was just parsed.
+ * @param location
+ * The caller must provide a pointer to an instance of btp_location
+ * here.  The line and column members of the location are gradually
+ * increased as the parser handles the input, so the location should
+ * be initialized by btp_location_init() before calling this function
+ * to get reasonable values.  When this function returns false (an
+ * error occurred), the structure will contain the error line, column,
+ * and message.
+ * @returns
+ * A newly allocated stacktrace structure or NULL. A stacktrace struct
+ * is returned when at least one thread was parsed from the input and
+ * no error occurred. The returned structure should be released by
+ * btp_java_stacktrace_free().
+ */
+struct btp_java_stacktrace *
+btp_java_stacktrace_parse(const char **input,
+                          struct btp_location *location);
 
 #ifdef __cplusplus
 }

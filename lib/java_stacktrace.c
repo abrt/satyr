@@ -1,6 +1,7 @@
 /*
     java_stacktrace.c
 
+    Copyright (C) 2012  ABRT Team
     Copyright (C) 2012  Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
@@ -69,6 +70,32 @@ btp_java_stacktrace_dup(struct btp_java_stacktrace *stacktrace)
     return result;
 }
 
+int
+btp_java_stacktrace_cmp(struct btp_java_stacktrace *stacktrace1,
+                        struct btp_java_stacktrace *stacktrace2)
+{
+    struct btp_java_thread *thread1 = stacktrace1->threads;
+    struct btp_java_thread *thread2 = stacktrace2->threads;
+
+    do
+    {
+        if ( thread1 && !thread2)
+            return 1;
+        if (!thread1 &&  thread2)
+            return -1;
+        if ( thread1 &&  thread2)
+        {
+            int threads = btp_java_thread_cmp(thread1, thread2);
+            if (threads != 0)
+                return threads;
+            thread1 = thread1->next;
+            thread2 = thread2->next;
+        }
+    }
+    while (thread1 || thread2);
+
+    return 0;
+}
 
 /*
 Example input:
@@ -84,7 +111,7 @@ relevant lines:
 */
 
 struct btp_java_stacktrace *
-btp_java_parse_stacktrace(const char **input, struct btp_location *location)
+btp_java_stacktrace_parse(const char **input, struct btp_location *location)
 {
     struct btp_java_thread *thread = btp_java_thread_parse(input, location);
     if (thread == NULL)

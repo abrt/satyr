@@ -1,7 +1,8 @@
 /*
     java_thread.c
 
-    Copyright (C) 2010  Red Hat, Inc.
+    Copyright (C) 2012  ABRT Team
+    Copyright (C) 2012  Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,6 +75,9 @@ btp_java_thread_dup(struct btp_java_thread *thread, bool siblings)
     if (result->exception)
         result->exception = btp_java_exception_dup(result->exception, true);
 
+    if (result->name)
+        result->name = btp_strdup(result->name);
+
     return result;
 }
 
@@ -93,11 +97,7 @@ btp_java_thread_cmp(struct btp_java_thread *thread1,
     else if (exception2 && !exception1)
         return -1;
     else if (exception1 && exception2)
-    {
-        int exceptions = btp_java_exception_cmp(exception1, exception2, true);
-        if (exceptions != 0)
-            return exceptions;
-    }
+        return btp_java_exception_cmp(exception1, exception2, true);
 
     return 0;
 }

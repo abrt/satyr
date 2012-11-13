@@ -3,6 +3,61 @@
 AT_BANNER([Java frames])
 
 ## ------------------ ##
+## btp_java_frame_cmp ##
+## ------------------ ##
+AT_TESTFUN([btp_java_frame_cmp],
+[[
+#include <lib/java_frame.h>
+#include <lib/utils.h>
+#include <assert.h>
+
+int
+main(void)
+{
+  struct btp_java_frame *frame1 = btp_java_frame_new();
+  frame1->function_name = btp_strdup("name.space.test1.ctor");
+  frame1->file_name = btp_strdup("test1.java");
+  frame1->file_line = 1;
+  frame1->class_path = btp_strdup("/usr/share/jar1");
+
+  struct btp_java_frame *frame0 = btp_java_frame_new();;
+  frame0->function_name = btp_strdup(frame1->function_name);
+  frame0->file_name = btp_strdup(frame1->file_name);
+  frame0->file_line = frame1->file_line;
+  frame0->class_path = btp_strdup(frame1->class_path);
+
+  assert(0 == btp_java_frame_cmp(frame0, frame1));
+
+  frame0->file_line += 1;
+
+  assert(0 != btp_java_frame_cmp(frame0, frame1));
+
+  frame0->file_line -= 1;
+  char *bck = frame0->function_name;
+  frame0->function_name = NULL;
+
+  assert(0 != btp_java_frame_cmp(frame0, frame1));
+
+  frame0->function_name = bck;
+  bck = frame0->file_name;
+  frame0->file_name = NULL;
+
+  assert(0 != btp_java_frame_cmp(frame0, frame1));
+
+  frame0->file_name = bck;
+  bck = frame0->class_path;
+  frame0->class_path = NULL;
+
+  assert(0 != btp_java_frame_cmp(frame0, frame1));
+
+  btp_java_frame_free(frame0);
+  btp_java_frame_free(frame1);
+
+  return 0;
+}
+]])
+
+## ------------------ ##
 ## btp_java_frame_dup ##
 ## ------------------ ##
 AT_TESTFUN([btp_java_frame_dup],

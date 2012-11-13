@@ -1,7 +1,8 @@
 /*
     java_exception.h
 
-    Copyright (C) 2010  Red Hat, Inc.
+    Copyright (C) 2012  ABRT Team
+    Copyright (C) 2012  Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -98,7 +99,8 @@ btp_java_exception_free(struct btp_java_exception *exception);
  * this function.
  * @return TRUE if exceptions was poped, otherwise FASLE
  */
-bool btp_java_exception_pop(struct btp_java_exception *exception);
+bool
+btp_java_exception_pop(struct btp_java_exception *exception);
 
 /**
  * Creates a duplicate of the exception.
@@ -140,6 +142,8 @@ btp_java_exception_get_frame_count(struct btp_java_exception *exception,
  * just 'Unknown Source' | 'Native method').
  * @param ok_count
  * @param all_count
+ * @param deep
+ * If logical true, work out the sum from inner exceptions too.
  * Not zeroed. This function just adds the numbers to ok_count and
  * all_count.
  */
@@ -156,6 +160,8 @@ btp_java_exception_quality_counts(struct btp_java_exception *exception,
  * frames are more important than others.
  * @param exception
  * Must be a non-NULL pointer. It's not modified in this function.
+ * @param deep
+ * If logical true, work out the quality from inner exceptions too.
  * @returns
  * A number between 0 and 1. 0 means the lowest quality, 1 means full
  * exception stacktrace is known. If the exception contains no frames, this
@@ -166,6 +172,13 @@ btp_java_exception_quality(struct btp_java_exception *exception, bool deep);
 
 /**
  * Removes the frame from the exception and then deletes it.
+ * @param exception
+ * Modified exception. Non-NULL pointer.
+ * @param frame
+ * Removed frame. Non-NULL pointer.
+ * @param deep
+ * If logical true, remove the frame from inner exception if frame is not found
+ * in the current one.
  * @returns
  * True if the frame was found in the exception and removed and deleted.
  * False if the frame was not found in the exception.
@@ -178,6 +191,13 @@ btp_java_exception_remove_frame(struct btp_java_exception *exception,
 /**
  * Removes all the frames from the exception that are above certain
  * frame.
+ * @param exception
+ * Modified exception. Non-NULL pointer.
+ * @param frame
+ * A new topmost frame. Non-NULL pointer.
+ * @param deep
+ * If logical true, remove inner exception because an inner exception
+ * is always higher in stack trace.
  * @returns
  * True if the frame was found, and all the frames that were above the
  * frame in the exception were removed from the exception and then deleted.
@@ -190,6 +210,13 @@ btp_java_exception_remove_frames_above(struct btp_java_exception *exception,
 
 /**
  * Keeps only the top n frames in the exception.
+ * @param exception
+ * Modified exception. Non-NULL pointer.
+ * @param n
+ * A number of left frames
+ * @param deep
+ * If logical true, take inner exceptions into account. It can leads to
+ * replacement of the passed exception byt its inner excpetion.
  * @returns
  * if count of frames is shorter then n returns the diffrences; * otherwise 0
  */
@@ -200,6 +227,10 @@ btp_java_exception_remove_frames_below_n(struct btp_java_exception *exception,
 
 /**
  * Appends a textual representation of 'exception' to the 'str'.
+ * @param exception
+ * Formated exception. Non-NULL pointer.
+ * @param dest
+ * An output buffer. Non-NULL pointer.
  */
 void
 btp_java_exception_append_to_str(struct btp_java_exception *exception,

@@ -146,10 +146,10 @@ main(void)
 }
 ]])
 
-## -------------------------------- ##
-## btp_java_exception_remove_frames ##
-## -------------------------------- ##
-AT_TESTFUN([btp_java_exception_remove_frames],
+## ---------------------- ##
+## btp_java_exception_pop ##
+## ---------------------- ##
+AT_TESTFUN([btp_java_exception_pop],
 [[
 #include <lib/java_exception.h>
 #include <lib/java_frame.h>
@@ -172,8 +172,28 @@ main(void)
   btp_java_exception_free(exception2);
   btp_java_exception_free(inner);
 
-  exception2 = create_real_stacktrace_objects();
+  return 0;
+}
+]])
 
+## ------------------------------- ##
+## btp_java_exception_remove_frame ##
+## ------------------------------- ##
+AT_TESTFUN([btp_java_exception_remove_frame],
+[[
+#include <lib/java_exception.h>
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+
+#include <tests/java_testcases.c>
+
+int
+main(void)
+{
+  struct btp_java_exception *exception2 = create_real_stacktrace_objects();
   struct btp_java_frame *removed = exception2->inner->frames;
 
   assert(0 == btp_java_exception_remove_frame(exception2, exception2->inner->frames, false) || !"Removed frame even if it is not in this exception");
@@ -184,7 +204,28 @@ main(void)
 
   btp_java_exception_free(exception2);
 
-  exception2 = create_real_stacktrace_objects();
+  return 0;
+}
+]])
+
+## -------------------------------------- ##
+## btp_java_exception_remove_frames_above ##
+## -------------------------------------- ##
+AT_TESTFUN([btp_java_exception_remove_frames_above],
+[[
+#include <lib/java_exception.h>
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+
+#include <tests/java_testcases.c>
+
+int
+main(void)
+{
+  struct btp_java_exception *exception2 = create_real_stacktrace_objects();
 
   assert(0 == btp_java_exception_remove_frames_above(exception2, exception2->inner->frames->next, false) || !"Removed frame even if it is not in this exception");
   assert(0 != btp_java_exception_remove_frames_above(exception2, exception2->inner->frames->next, true) || !"Not removed frame from inner exception");
@@ -194,8 +235,30 @@ main(void)
 
   btp_java_exception_free(exception2);
 
-  exception2 = create_real_stacktrace_objects();
-  inner = btp_java_exception_dup(exception2->inner->inner, true);
+  return 0;
+}
+]])
+
+## ---------------------------------------- ##
+## btp_java_exception_remove_frames_below_n ##
+## ---------------------------------------- ##
+AT_TESTFUN([btp_java_exception_remove_frames_below_n],
+[[
+#include <lib/java_exception.h>
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+
+#include <tests/java_testcases.c>
+
+int
+main(void)
+{
+  struct btp_java_exception *exception2 = create_real_stacktrace_objects();
+  struct btp_java_exception *inner = btp_java_exception_dup(exception2->inner->inner, true);
+
   btp_java_exception_remove_frames_below_n(exception2, btp_java_exception_get_frame_count(inner, false), true);
 
   assert(0 == btp_java_exception_cmp(exception2, inner, true) || !"Don't equal after cut on count of frames from the bottom most exception");
@@ -236,6 +299,49 @@ main(void)
   assert(0 == btp_java_exception_cmp(expected, exception, true));
 
   btp_java_exception_free(exception);
+
+  return 0;
+}
+]])
+
+## -------------------------------- ##
+## btp_java_exception_append_to_str ##
+## -------------------------------- ##
+AT_TESTFUN([btp_java_exception_append_to_str],
+[[
+#include <lib/java_exception.h>
+#include <lib/java_frame.h>
+#include <lib/utils.h>
+#include <lib/strbuf.h>
+#include <assert.h>
+#include <stdlib.h>
+
+#include <tests/java_testcases.c>
+
+int
+main(void)
+{
+  struct btp_java_exception exception;
+  btp_java_exception_init(&exception);
+  exception.name = "java.Exception";
+  exception.message = "whatever";
+  exception.frames = create_real_stacktrace_bottom();
+
+  struct btp_strbuf *buf = btp_strbuf_new();
+  btp_java_exception_append_to_str(&exception, buf);
+
+  struct btp_strbuf *expected = btp_strbuf_new();
+  btp_strbuf_append_str(expected, "java.Exception: whatever\n");
+  btp_java_frame_append_to_str(exception.frames, expected);
+  btp_strbuf_append_char(expected, '\n');
+
+  printf(
+"<==============================================================================>\n"
+"'%s'\n==\n'%s'\n"
+"<==============================================================================>\n",
+  expected->buf, buf->buf);
+
+  assert(0 == strcmp(buf->buf, expected->buf));
 
   return 0;
 }

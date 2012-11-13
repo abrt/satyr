@@ -217,6 +217,7 @@ TESTSUITE_AT = \
   java_frame.at \
   java_exception.at \
   java_thread.at \
+  java_stacktrace.at \
   koops_frame.at	\
   koops_stacktrace.at   \
   core_frame.at         \

@@ -1,6 +1,7 @@
 /*
     java_frame.c
 
+    Copyright (C) 2012  ABRT Team
     Copyright (C) 2012  Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
@@ -131,13 +132,15 @@ btp_java_frame_append_to_str(struct btp_java_frame *frame,
 /*
  * We can expect different formats hence these two following helper functions
  */
-static bool btp_java_frame_parse_is_native_method(const char *input_mark)
+static bool
+btp_java_frame_parse_is_native_method(const char *input_mark)
 {
     return 0 == strncmp(input_mark, BTP_JF_MARK_NATIVE_METHOD,
                                     strlen(BTP_JF_MARK_NATIVE_METHOD));
 }
 
-static bool btp_java_frame_parse_is_unknown_source(const char *input_mark)
+static bool
+btp_java_frame_parse_is_unknown_source(const char *input_mark)
 {
     return 0 == strncmp(input_mark, BTP_JF_MARK_UNKNOWN_SOURCE,
                                     strlen(BTP_JF_MARK_UNKNOWN_SOURCE));

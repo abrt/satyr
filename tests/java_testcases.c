@@ -4,6 +4,18 @@
 #include "lib/java_frame.h"
 #include "lib/utils.h"
 
+#define XYZ_JTC_UT_STACKTRACE "java.lang.RuntimeException: java.lang.NullPointerException: null\n"\
+"\tat SimpleTest.throwNullPointerException(SimpleTest.java:36)\n"\
+"\tat SimpleTest.throwAndDontCatchException(SimpleTest.java:70)\n"\
+"\tat SimpleTest.main(SimpleTest.java:82)\n"\
+"Caused by: java.lang.NullPointerException: java.lang.InvalidRangeException: undefined index\n"\
+"\tat SimpleTest.execute(Test.java:7)\n"\
+"\tat SimpleTest.intercept(Test.java:2)\n"\
+"\t... 3 more\n"\
+"Caused by: java.lang.InvalidRangeException: undefined index\n"\
+"\tat MyVector.at(Containers.java:77)\n"\
+"\t... 5 more\n";
+
 struct btp_java_frame
 *create_real_stacktrace_top()
 {
@@ -83,18 +95,23 @@ struct btp_java_exception
   return exception0;
 }
 
+struct btp_java_thread
+*create_real_main_thread_objects()
+{
+    struct btp_java_thread *thread;
+    thread = btp_java_thread_new();
+    thread->name = btp_strdup("main");
+    thread->exception = create_real_stacktrace_objects();
+
+    return thread;
+}
+
 const char *get_real_stacktrace_str()
 {
-    return
-"java.lang.RuntimeException: java.lang.NullPointerException: null\n"
-"   at SimpleTest.throwNullPointerException(SimpleTest.java:36)\n"
-"   at SimpleTest.throwAndDontCatchException(SimpleTest.java:70)\n"
-"   at SimpleTest.main(SimpleTest.java:82)\n"
-"Caused by: java.lang.NullPointerException: java.lang.InvalidRangeException: undefined index\n"
-"   at SimpleTest.execute(Test.java:7)\n"
-"   at SimpleTest.intercept(Test.java:2)\n"
-"   ... 3 more\n"
-"Caused by: java.lang.InvalidRangeException: undefined index\n"
-"   at MyVector.at(Containers.java:77)\n"
-"   ... 5 more\n";
+    return XYZ_JTC_UT_STACKTRACE;
+}
+
+const char *get_real_thread_stacktrace()
+{
+    return "Exception in thread \"main\" " XYZ_JTC_UT_STACKTRACE;
 }

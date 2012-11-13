@@ -1,7 +1,8 @@
 /*
     java_thread.h
 
-    Copyright (C) 2010  Red Hat, Inc.
+    Copyright (C) 2012  ABRT Team
+    Copyright (C) 2012  Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,7 +51,7 @@ struct btp_java_thread
     char *name;
 
     /**
-     * Thread's frames, starting from the top of the stack.
+     * Thread's exceptiopn. Can be NULL
      */
     struct btp_java_exception *exception;
 
