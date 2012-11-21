@@ -50,7 +50,7 @@ btp_java_frame_free(struct btp_java_frame *frame)
         return;
 
     free(frame->file_name);
-    free(frame->function_name);
+    free(frame->name);
     free(frame->class_path);
     free(frame);
 }
@@ -74,8 +74,8 @@ btp_java_frame_dup(struct btp_java_frame *frame, bool siblings)
     if (result->file_name)
         result->file_name = btp_strdup(result->file_name);
 
-    if (result->function_name)
-        result->function_name = btp_strdup(result->function_name);
+    if (result->name)
+        result->name = btp_strdup(result->name);
 
     if (result->class_path)
         result->class_path = btp_strdup(result->class_path);
@@ -95,7 +95,7 @@ btp_java_frame_cmp(struct btp_java_frame *frame1,
     if (res != 0)
         return res;
 
-    res = btp_strcmp0(frame1->function_name, frame2->function_name);
+    res = btp_strcmp0(frame1->name, frame2->name);
     if (res != 0)
         return res;
 
@@ -111,7 +111,7 @@ btp_java_frame_append_to_str(struct btp_java_frame *frame,
 {
 
     btp_strbuf_append_strf(dest, "\tat %s(",
-                           frame->function_name ? frame->function_name : "");
+                           frame->name ? frame->name : "");
 
     if (frame->is_native)
         btp_strbuf_append_str(dest, BTP_JF_MARK_NATIVE_METHOD);
@@ -175,7 +175,7 @@ btp_java_frame_parse(const char **input,
     struct btp_java_frame *frame = btp_java_frame_new();
 
     if (cursor != mark)
-        frame->function_name = btp_strndup(mark, cursor - mark);
+        frame->name = btp_strndup(mark, cursor - mark);
 
     /* (SimpleTest.java:36) */
     if (*cursor == '(')

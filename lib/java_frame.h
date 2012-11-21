@@ -39,6 +39,12 @@ struct btp_location;
 struct btp_java_frame
 {
     /**
+     * FQDN - Fully qualified domain name. Can be NULL
+     * <Namespace>.<Type>.<Function name>
+     */
+    char *name;
+
+    /**
      * a Java file. Can be NULL
      */
     char *file_name;
@@ -54,15 +60,14 @@ struct btp_java_frame
     char *class_path;
 
     /**
-     * FQDN - Fully qualified domain name. Can be NULL
-     * <Namespace>.<Type>.<Function name>
-     */
-    char *function_name;
-
-    /**
      * True if method is native.
      */
     bool is_native;
+
+    /**
+     * True if frame is exception
+     */
+    bool is_exception;
 
     struct btp_java_frame *next;
 };

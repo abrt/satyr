@@ -21,19 +21,19 @@ struct btp_java_frame
 {
   struct btp_java_frame frame0, frame1, frame2;
   btp_java_frame_init(&frame0);
-  frame0.function_name = "SimpleTest.throwNullPointerException";
+  frame0.name = "SimpleTest.throwNullPointerException";
   frame0.file_name = "SimpleTest.java";
   frame0.file_line = 36;
   frame0.next = &frame1;
 
   btp_java_frame_init(&frame1);
-  frame1.function_name = "SimpleTest.throwAndDontCatchException";
+  frame1.name = "SimpleTest.throwAndDontCatchException";
   frame1.file_name = "SimpleTest.java";
   frame1.file_line = 70;
   frame1.next = &frame2;
 
   btp_java_frame_init(&frame2);
-  frame2.function_name = "SimpleTest.main";
+  frame2.name = "SimpleTest.main";
   frame2.file_name = "SimpleTest.java";
   frame2.file_line = 82;
 
@@ -45,13 +45,13 @@ struct btp_java_frame
 {
   struct btp_java_frame frame3, frame4;
   btp_java_frame_init(&frame3);
-  frame3.function_name = "SimpleTest.execute";
+  frame3.name = "SimpleTest.execute";
   frame3.file_name = "Test.java";
   frame3.file_line = 7;
   frame3.next = &frame4;
 
   btp_java_frame_init(&frame4);
-  frame4.function_name = "SimpleTest.intercept";
+  frame4.name = "SimpleTest.intercept";
   frame4.file_name = "Test.java";
   frame4.file_line = 2;
 
@@ -63,7 +63,7 @@ struct btp_java_frame
 {
   struct btp_java_frame frame5;
   btp_java_frame_init(&frame5);
-  frame5.function_name = "MyVector.at";
+  frame5.name = "MyVector.at";
   frame5.file_name = "Containers.java";
   frame5.file_line = 77;
 
