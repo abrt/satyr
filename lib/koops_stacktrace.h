@@ -61,6 +61,7 @@ struct btp_koops_stacktrace
     bool taint_warning;
     bool taint_staging_driver;
     bool taint_firmware_workaround;
+    bool taint_virtual_box;
 
     char **modules;
 
