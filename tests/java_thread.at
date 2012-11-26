@@ -1,0 +1,135 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([Java threads])
+
+## ------------------- ##
+## btp_java_thread_cmp ##
+## ------------------- ##
+AT_TESTFUN([btp_java_thread_cmp],
+[[
+#include <lib/java_thread.h>
+#include <lib/java_exception.h>
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <tests/java_testcases.c>
+
+int
+main(void)
+{
+  struct btp_java_thread *thread0 = create_real_main_thread_objects();
+  struct btp_java_thread *thread1 = create_real_main_thread_objects();
+
+  assert(0 == btp_java_thread_cmp(thread0, thread1));
+
+  btp_java_exception_pop(thread1->exception);
+
+  assert(0 != btp_java_thread_cmp(thread0, thread1));
+
+  btp_java_exception_free(thread1->exception);
+  thread1->exception = NULL;
+
+  assert(0 != btp_java_thread_cmp(thread0, thread1));
+
+  btp_java_thread_free(thread1);
+
+  thread1 = create_real_main_thread_objects();
+  free(thread1->name);
+  thread1->name = btp_strdup("worker");
+
+  assert(0 != btp_java_thread_cmp(thread0, thread1));
+
+  btp_java_thread_free(thread0);
+  btp_java_thread_free(thread1);
+
+  return 0;
+}
+]])
+
+## ------------------- ##
+## btp_java_thread_dup ##
+## ------------------- ##
+AT_TESTFUN([btp_java_thread_dup],
+[[
+#include <lib/java_thread.h>
+#include <lib/java_exception.h>
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <tests/java_testcases.c>
+
+int
+main(void)
+{
+  struct btp_java_thread *thread0 = create_real_main_thread_objects();
+  struct btp_java_thread *thread1 = btp_java_thread_dup(thread0, false);
+
+  assert(0 == btp_java_thread_cmp(thread0, thread1));
+
+  btp_java_thread_free(thread0);
+  btp_java_thread_free(thread1);
+
+  return 0;
+}
+]])
+
+## --------------------- ##
+## btp_java_thread_parse ##
+## --------------------- ##
+AT_TESTFUN([btp_java_thread_parse],
+[[
+#include <lib/java_thread.h>
+#include <lib/java_exception.h>
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <tests/java_testcases.c>
+
+static void
+check(char *input,
+      struct btp_java_thread *expected_thread)
+{
+  printf("===============================================\n"
+         "Testing input:\n%s", input);
+
+  char *old_input = input;
+  struct btp_location location;
+  btp_location_init(&location);
+  struct btp_java_thread *thread = btp_java_thread_parse(&input, &location);
+  assert(!expected_thread || thread);
+  if (thread)
+  {
+    assert(*input == '\0');
+    assert(0 == btp_java_thread_cmp(thread, expected_thread));
+    btp_java_thread_free(thread);
+  }
+  else
+  {
+    /* Check that the pointer is not moved. */
+    assert(old_input == input);
+    assert(!expected_thread);
+  }
+}
+
+int
+main(void)
+{
+  struct btp_java_thread *thread = create_real_main_thread_objects();
+
+  struct btp_location location;
+  btp_location_init(&location);
+
+  check(get_real_thread_stacktrace() , thread);
+
+  return 0;
+}
+]])

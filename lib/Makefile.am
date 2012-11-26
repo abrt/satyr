@@ -14,6 +14,10 @@ pkginclude_HEADERS = \
 	gdb_sharedlib.h \
 	gdb_stacktrace.h \
 	gdb_thread.h \
+	java_frame.h \
+	java_exception.h \
+	java_thread.h \
+	java_stacktrace.h \
 	json.h \
 	koops_frame.h \
 	koops_stacktrace.h \
@@ -46,6 +50,10 @@ libbtparser_la_SOURCES = \
 	gdb_frame.c \
 	gdb_sharedlib.c \
 	gdb_thread.c \
+	java_frame.c \
+	java_exception.c \
+	java_thread.c \
+	java_stacktrace.c \
 	json.c \
 	koops_frame.c \
 	koops_stacktrace.c \

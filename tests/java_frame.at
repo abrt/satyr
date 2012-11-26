@@ -1,0 +1,325 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([Java frames])
+
+## ------------------ ##
+## btp_java_frame_cmp ##
+## ------------------ ##
+AT_TESTFUN([btp_java_frame_cmp],
+[[
+#include <lib/java_frame.h>
+#include <lib/utils.h>
+#include <assert.h>
+
+int
+main(void)
+{
+  struct btp_java_frame *frame1 = btp_java_frame_new();
+  frame1->function_name = btp_strdup("name.space.test1.ctor");
+  frame1->file_name = btp_strdup("test1.java");
+  frame1->file_line = 1;
+  frame1->class_path = btp_strdup("/usr/share/jar1");
+
+  struct btp_java_frame *frame0 = btp_java_frame_new();;
+  frame0->function_name = btp_strdup(frame1->function_name);
+  frame0->file_name = btp_strdup(frame1->file_name);
+  frame0->file_line = frame1->file_line;
+  frame0->class_path = btp_strdup(frame1->class_path);
+
+  assert(0 == btp_java_frame_cmp(frame0, frame1));
+
+  frame0->file_line += 1;
+
+  assert(0 != btp_java_frame_cmp(frame0, frame1));
+
+  frame0->file_line -= 1;
+  char *bck = frame0->function_name;
+  frame0->function_name = NULL;
+
+  assert(0 != btp_java_frame_cmp(frame0, frame1));
+
+  frame0->function_name = bck;
+  bck = frame0->file_name;
+  frame0->file_name = NULL;
+
+  assert(0 != btp_java_frame_cmp(frame0, frame1));
+
+  frame0->file_name = bck;
+  bck = frame0->class_path;
+  frame0->class_path = NULL;
+
+  assert(0 != btp_java_frame_cmp(frame0, frame1));
+
+  btp_java_frame_free(frame0);
+  btp_java_frame_free(frame1);
+
+  return 0;
+}
+]])
+
+## ------------------ ##
+## btp_java_frame_dup ##
+## ------------------ ##
+AT_TESTFUN([btp_java_frame_dup],
+[[
+#include <lib/java_frame.h>
+#include <lib/utils.h>
+#include <assert.h>
+
+int
+main(void)
+{
+  struct btp_java_frame *frame1 = btp_java_frame_new();
+  frame1->function_name = btp_strdup("name.space.test1.ctor");
+  frame1->file_name = btp_strdup("test1.java");
+  frame1->file_line = 1;
+  frame1->class_path = btp_strdup("/usr/share/jar1");
+
+  struct btp_java_frame *frame0 = btp_java_frame_new();;
+  frame0->function_name = btp_strdup("name.space.test0.ctor");
+  frame0->file_name = btp_strdup("test0.java");
+  frame0->file_line = 2;
+  frame0->class_path = btp_strdup("/usr/share/jar0");
+  frame0->next = frame1;
+
+  /* Test the duplication without siblings. */
+  struct btp_java_frame *frame = btp_java_frame_dup(frame0, false);
+  assert(NULL == frame->next);
+
+  assert(frame->function_name != frame0->function_name);
+  assert(0 == strcmp(frame->function_name, frame0->function_name));
+
+  assert(frame->file_name != frame0->file_name);
+  assert(0 == strcmp(frame->file_name, frame0->file_name));
+
+  assert(frame->file_line == frame0->file_line);
+
+  assert(frame->class_path != frame0->class_path);
+  assert(0 == strcmp(frame->class_path, frame0->class_path));
+
+  assert(0 == btp_java_frame_cmp(frame, frame0));
+  btp_java_frame_free(frame);
+
+  /* Test the duplication with the siblings. */
+  frame = btp_java_frame_dup(frame0, true);
+  assert(frame->function_name != frame0->function_name);
+  assert(0 == strcmp(frame->function_name, frame0->function_name));
+
+  assert(frame->file_name != frame0->file_name);
+  assert(0 == strcmp(frame->file_name, frame0->file_name));
+
+  assert(frame->file_line == frame0->file_line);
+
+  assert(frame->class_path != frame0->class_path);
+  assert(0 == strcmp(frame->class_path, frame0->class_path));
+
+  assert(frame->next != frame1);
+  assert(0 == btp_java_frame_cmp(frame->next, frame1));
+
+  btp_java_frame_free(frame->next);
+  btp_java_frame_free(frame);
+
+  btp_java_frame_free(frame1);
+  btp_java_frame_free(frame0);
+  return 0;
+}
+]])
+
+## ---------------------------- ##
+## btp_java_frame_append_to_str ##
+## ---------------------------- ##
+
+AT_TESTFUN([btp_java_frame_append_to_str],
+[[
+#include <lib/java_frame.h>
+#include <lib/strbuf.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+void
+check(struct btp_java_frame *frame, const char *expected)
+{
+  struct btp_strbuf *buf = btp_strbuf_new();
+  btp_java_frame_append_to_str(frame, buf);
+
+  printf(
+"<==============================================================================>\n"
+"%s == %s\n"
+"<==============================================================================>\n",
+  expected, buf->buf);
+
+  assert(strcmp(expected, buf->buf) == 0);
+
+  btp_strbuf_free(buf);
+}
+
+int
+main(void)
+{
+  /* basic */
+  struct btp_java_frame frame;
+  btp_java_frame_init(&frame);
+  frame.function_name = btp_strdup("com.redhat.abrt.duke.nuke");
+  frame.file_name = btp_strdup("duke.java");
+  frame.file_line = 666;
+
+  check(&frame, "\tat com.redhat.abrt.duke.nuke(duke.java:666)");
+
+  frame.file_line = 0;
+  frame.is_native = true;
+  check(&frame, "\tat com.redhat.abrt.duke.nuke(Native Method)");
+  frame.is_native = false;
+
+  free(frame.file_name);
+  frame.file_name = NULL;
+
+  check(&frame, "\tat com.redhat.abrt.duke.nuke(Unknown Source)");
+
+  return 0;
+}
+
+]])
+
+## -------------------- ##
+## btp_java_frame_parse ##
+## -------------------- ##
+
+AT_TESTFUN([btp_java_frame_parse],
+[[
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <lib/strbuf.h>
+#include <lib/utils.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+
+static void
+check(char *input,
+      struct btp_java_frame *expected_frame,
+      char *expected_input,
+      struct btp_location *expected_location)
+{
+  char *old_input = input;
+  struct btp_location location;
+  btp_location_init(&location);
+  struct btp_java_frame *frame = btp_java_frame_parse((const char **)&input, &location);
+  assert(input == expected_input);
+  if (frame)
+  {
+    struct btp_strbuf *buf = btp_strbuf_new();
+    btp_java_frame_append_to_str(frame, buf);
+
+    char *tmp_input = btp_strdup(old_input);
+    size_t len = strlen(tmp_input);
+    if (len > 0 && tmp_input[len-1] == '\n')
+        tmp_input[len-1] = '\0';
+
+    const char *fr1 = btp_skip_whitespace(tmp_input);
+    const char *fr2 = btp_skip_whitespace(buf->buf);
+
+    printf("<==============================================================================>\n");
+    printf("'%s' == '%s'\n", fr1, fr2);
+    printf("<==============================================================================>\n");
+
+    assert(strcmp(fr1, fr2) == 0);
+
+    free(tmp_input);
+    btp_strbuf_free(buf);
+
+    assert(0 == btp_java_frame_cmp(frame, expected_frame));
+    puts(btp_location_to_string(&location));
+    puts(btp_location_to_string(expected_location));
+    assert(0 == btp_location_cmp(&location, expected_location, true));
+    btp_java_frame_free(frame);
+  }
+  else
+  {
+    /* Check that the pointer is not moved. */
+    assert(old_input == input);
+    assert(0 == btp_location_cmp(&location, expected_location, true));
+    assert(!expected_frame);
+  }
+}
+
+int
+main(void)
+{
+  /* basic */
+  struct btp_java_frame frame;
+  btp_java_frame_init(&frame);
+  frame.function_name = btp_strdup("com.redhat.abrt.duke.nuke");
+  frame.file_name = btp_strdup("duke.java");
+  frame.file_line = 666;
+
+  char *c = "    at com.redhat.abrt.duke.nuke(duke.java:666)";
+  struct btp_location location;
+  btp_location_init(&location);
+  location.line = 1;
+  location.column = 46;
+  check(c, &frame, c + strlen(c), &location);
+
+  /** next frame **/
+  btp_java_frame_init(&frame);
+  frame.function_name = btp_strdup("com.redhat.abrt.duke.nuke");
+  frame.file_line = 666;
+
+  c = "    at com.redhat.abrt.duke.nuke(Unknown Source:666)\n";
+  btp_location_init(&location);
+  location.line = 2;
+  location.column = 0;
+  check(c, &frame, c + strlen(c), &location);
+
+  /** next frame **/
+  btp_java_frame_init(&frame);
+  frame.file_name = btp_strdup("duke.java");
+  frame.file_line = 666;
+
+  c = "    at (duke.java:666)\n";
+  btp_location_init(&location);
+  location.line = 2;
+  location.column = 0;
+  check(c, &frame, c + strlen(c), &location);
+
+  /** next frame **/
+  btp_java_frame_init(&frame);
+  frame.function_name = btp_strdup("com.redhat.abrt.duke.nuke");
+  frame.file_name = btp_strdup("duke.java");
+
+  c = "    at com.redhat.abrt.duke.nuke(duke.java)\n";
+  btp_location_init(&location);
+  location.line = 2;
+  location.column = 0;
+  check(c, &frame, c + strlen(c), &location);
+
+  /** next frame **/
+  btp_java_frame_init(&frame);
+  frame.function_name = btp_strdup("com.redhat.abrt.duke.nuke");
+  frame.is_native = true;
+
+  c = "    at com.redhat.abrt.duke.nuke(Native Method)\n";
+  btp_location_init(&location);
+  location.line = 2;
+  location.column = 0;
+  check(c, &frame, c + strlen(c), &location);
+
+  /** next frame **/
+  btp_java_frame_init(&frame);
+
+  c = "  at (Unknown Source)\n";
+  btp_location_init(&location);
+  location.line = 2;
+  location.column = 0;
+  check(c, &frame, c + strlen(c), &location);
+
+  /** next frame **/
+  c = " fasdfd";
+  btp_location_init(&location);
+  location.message = "Frame expected";
+  check(c, NULL, c, &location);
+
+  return 0;
+}
+]])

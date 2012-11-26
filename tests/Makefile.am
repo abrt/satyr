@@ -35,6 +35,10 @@ TESTSUITE_AT =		\
   gdb_thread.at 	\
   gdb_stacktrace.at  	\
   gdb_sharedlib.at	\
+  java_frame.at \
+  java_exception.at \
+  java_thread.at \
+  java_stacktrace.at \
   koops_frame.at	\
   koops_stacktrace.at   \
   core_frame.at         \
@@ -51,6 +55,7 @@ MAINTAINERCLEANFILES = Makefile.in $(TESTSUITE)
 check_DATA = atconfig atlocal $(TESTSUITE)
 DISTCLEANFILES = atconfig
 EXTRA_DIST += atlocal.in
+EXTRA_DIST += java_testcases.c
 
 atconfig: $(top_builddir)/config.status
 	(cd ${top_builddir} && ./config.status ${subdir}/atconfig)
