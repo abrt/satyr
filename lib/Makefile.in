@@ -102,7 +102,9 @@ am_libbtparser_la_OBJECTS = $(am__objects_1) \
 	libbtparser_la-core_stacktrace.lo \
 	libbtparser_la-core_fingerprint.lo \
 	libbtparser_la-core_frame.lo libbtparser_la-core_thread.lo \
-	libbtparser_la-core_unwind.lo libbtparser_la-deb.lo \
+	libbtparser_la-core_unwind.lo \
+	libbtparser_la-core_unwind_elfutils.lo \
+	libbtparser_la-core_unwind_libunwind.lo libbtparser_la-deb.lo \
 	libbtparser_la-disasm.lo libbtparser_la-elves.lo \
 	libbtparser_la-gdb_stacktrace.lo libbtparser_la-gdb_frame.lo \
 	libbtparser_la-gdb_sharedlib.lo libbtparser_la-gdb_thread.lo \
@@ -323,6 +325,8 @@ libbtparser_la_SOURCES = \
 	core_frame.c \
 	core_thread.c \
 	core_unwind.c \
+	core_unwind_elfutils.c \
+	core_unwind_libunwind.c \
 	deb.c \
 	disasm.c \
 	elves.c \
@@ -453,6 +457,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core_stacktrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core_thread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core_unwind.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core_unwind_elfutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-core_unwind_libunwind.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-deb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-disasm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-elves.Plo@am__quote@
@@ -548,6 +554,20 @@ libbtparser_la-core_unwind.lo: core_unwind.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='core_unwind.c' object='libbtparser_la-core_unwind.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-core_unwind.lo `test -f 'core_unwind.c' || echo '$(srcdir)/'`core_unwind.c
+
+libbtparser_la-core_unwind_elfutils.lo: core_unwind_elfutils.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-core_unwind_elfutils.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-core_unwind_elfutils.Tpo -c -o libbtparser_la-core_unwind_elfutils.lo `test -f 'core_unwind_elfutils.c' || echo '$(srcdir)/'`core_unwind_elfutils.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-core_unwind_elfutils.Tpo $(DEPDIR)/libbtparser_la-core_unwind_elfutils.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='core_unwind_elfutils.c' object='libbtparser_la-core_unwind_elfutils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-core_unwind_elfutils.lo `test -f 'core_unwind_elfutils.c' || echo '$(srcdir)/'`core_unwind_elfutils.c
+
+libbtparser_la-core_unwind_libunwind.lo: core_unwind_libunwind.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-core_unwind_libunwind.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-core_unwind_libunwind.Tpo -c -o libbtparser_la-core_unwind_libunwind.lo `test -f 'core_unwind_libunwind.c' || echo '$(srcdir)/'`core_unwind_libunwind.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-core_unwind_libunwind.Tpo $(DEPDIR)/libbtparser_la-core_unwind_libunwind.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='core_unwind_libunwind.c' object='libbtparser_la-core_unwind_libunwind.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-core_unwind_libunwind.lo `test -f 'core_unwind_libunwind.c' || echo '$(srcdir)/'`core_unwind_libunwind.c
 
 libbtparser_la-deb.lo: deb.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-deb.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-deb.Tpo -c -o libbtparser_la-deb.lo `test -f 'deb.c' || echo '$(srcdir)/'`deb.c

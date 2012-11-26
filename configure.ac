@@ -79,6 +79,8 @@ AC_CHECK_LIB([elf], [main])
 # dwfl is actually part of libdw, at least on fedora
 AC_CHECK_LIB([dw], [main])
 AC_CHECK_LIB([dl], [main])
+#AC_CHECK_LIB([dw], [dwfl_frame_state_core])
+
 
 # libunwind
 AC_CHECK_HEADERS([libunwind-coredump.h])

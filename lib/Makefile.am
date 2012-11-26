@@ -43,6 +43,8 @@ libbtparser_la_SOURCES = \
 	core_frame.c \
 	core_thread.c \
 	core_unwind.c \
+	core_unwind_elfutils.c \
+	core_unwind_libunwind.c \
 	deb.c \
 	disasm.c \
 	elves.c \
