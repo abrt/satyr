@@ -90,7 +90,7 @@ btp_python_frame_free(struct btp_python_frame *frame);
  */
 struct btp_python_frame *
 btp_python_frame_dup(struct btp_python_frame *frame,
-                  bool siblings);
+                     bool siblings);
 
 #ifdef __cplusplus
 }

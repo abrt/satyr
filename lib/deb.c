@@ -1,5 +1,5 @@
 /*
-    core_fingerprint.h
+    deb.c
 
     Copyright (C) 2012  Red Hat, Inc.
 
@@ -17,39 +17,9 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_CORE_FINGERPRINT_H
-#define BTPARSER_CORE_FINGERPRINT_H
+#include "deb.h"
 
-/**
- * @file
- * @brief Fingerprint algorithm for core stack traces.
- */
-
-#include "config.h"
-
-#if HAVE_LIBOPCODES
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <stdbool.h>
-
-struct btp_core_stacktrace;
-struct btp_core_thread;
-
-bool
-btp_core_fingerprint_generate(struct btp_core_stacktrace *stacktrace,
-                              char **error_message);
-
-bool
-btp_core_fingerprint_generate_for_binary(struct btp_core_thread *thread,
-                                         const char *binary_path,
-                                         char **error_message);
-
-#ifdef __cplusplus
+void
+btp_deb_package_free(struct btp_deb_package *package, bool recursive)
+{
 }
-#endif
-
-#endif // HAVE_LIBOPCODES
-#endif // BTPARSER_CORE_FINGERPRINT_H

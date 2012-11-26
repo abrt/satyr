@@ -35,6 +35,11 @@ TESTSUITE_AT =		\
   gdb_thread.at 	\
   gdb_stacktrace.at  	\
   gdb_sharedlib.at	\
+  koops_frame.at	\
+  koops_stacktrace.at   \
+  core_frame.at         \
+  core_thread.at        \
+  core_stacktrace.at    \
   normalize.at  	\
   metrics.at 		\
   cluster.at

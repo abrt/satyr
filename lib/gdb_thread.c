@@ -174,6 +174,7 @@ btp_gdb_thread_remove_frame(struct btp_gdb_thread *thread,
 {
     struct btp_gdb_frame *loop_frame = thread->frames,
         *prev_frame = NULL;
+
     while (loop_frame)
     {
         if (loop_frame == frame)
@@ -186,9 +187,11 @@ btp_gdb_thread_remove_frame(struct btp_gdb_thread *thread,
             btp_gdb_frame_free(loop_frame);
             return true;
         }
+
         prev_frame = loop_frame;
         loop_frame = loop_frame->next;
     }
+
     return false;
 }
 
@@ -301,7 +304,7 @@ btp_gdb_thread_parse(const char **input,
 
     /* Read thread number. */
     struct btp_gdb_thread *imthread = btp_gdb_thread_new();
-    int digits = btp_parse_unsigned_integer(&local_input, &imthread->number);
+    int digits = btp_parse_uint32(&local_input, &imthread->number);
     location->column += digits;
     if (0 == digits)
     {
@@ -334,9 +337,9 @@ btp_gdb_thread_parse(const char **input,
          * "Thread 10 (Thread 2476):"
          * "Thread 8 (Thread 0xb07fdb70 (LWP 6357)):"
          */
-        digits = btp_skip_hexadecimal_number(&local_input);
+        digits = btp_skip_hexadecimal_0xuint(&local_input);
         if (0 == digits)
-            digits = btp_skip_unsigned_integer(&local_input);
+            digits = btp_skip_uint(&local_input);
         location->column += digits;
         if (0 == digits)
         {
@@ -405,7 +408,7 @@ btp_gdb_thread_skip_lwp(const char **input)
     int count = btp_skip_string(&local_input, "(LWP ");
     if (0 == count)
         return 0;
-    int digits = btp_skip_unsigned_integer(&local_input);
+    int digits = btp_skip_uint(&local_input);
     if (0 == digits)
         return 0;
     count += digits;

@@ -19,6 +19,13 @@
 */
 #include "elves.h"
 #include "utils.h"
+#include "config.h"
+
+#if (defined HAVE_DWARF_H && defined HAVE_ELFUTILS_LIBDW_H && defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF)
+#  define WITH_ELFUTILS
+#endif
+
+#ifdef WITH_ELFUTILS
 #include <dwarf.h>
 #include <elfutils/libdw.h>
 #include <errno.h>
@@ -103,11 +110,13 @@ find_elf_section_by_name(Elf *elf,
     *error_message = btp_asprintf("Section %s not found", section_name);
     return 0;
 }
+#endif /* WITH_ELFUTILS */
 
 struct btp_elf_plt_entry *
 btp_elf_get_procedure_linkage_table(const char *filename,
                                     char **error_message)
 {
+#ifdef WITH_ELFUTILS
     /* Open the input file. */
     int fd = open(filename, O_RDONLY);
     if (fd < 0)
@@ -295,6 +304,10 @@ btp_elf_get_procedure_linkage_table(const char *filename,
     elf_end(elf);
     close(fd);
     return result;
+#else /* WITH_ELFUTILS */
+    *error_message = btp_asprintf("btparser compiled without elfutils");
+    return NULL;
+#endif /* WITH_ELFUTILS */
 }
 
 void
@@ -327,6 +340,7 @@ btp_elf_plt_find_for_address(struct btp_elf_plt_entry *plt,
 }
 
 
+#ifdef WITH_ELFUTILS
 /* Given DWARF pointer encoding, return the length of the pointer in
  * bytes.
  */
@@ -461,11 +475,13 @@ fde_read_address(const uint8_t *p, unsigned len)
 
     return (len == 4 ? (uintptr_t)u.n4 : (uintptr_t)u.n8);
 }
+#endif /* WITH_ELFUTILS */
 
-struct btp_elf_frame_description_entry *
+struct btp_elf_fde *
 btp_elf_get_eh_frame(const char *filename,
                      char **error_message)
 {
+#ifdef WITH_ELFUTILS
     /* Open the input file. */
     int fd = open(filename, O_RDONLY);
     if (fd < 0)
@@ -578,7 +594,7 @@ btp_elf_get_eh_frame(const char *filename,
      * on .eh_frame_hdr -- see http://www.airs.com/blog/archives/462
      */
 
-    struct btp_elf_frame_description_entry *result = NULL, *last = NULL;
+    struct btp_elf_fde *result = NULL, *last = NULL;
     struct cie *cie_list = NULL, *cie_list_last = NULL;
 
     Dwarf_Off cfi_offset_next = 0;
@@ -711,7 +727,7 @@ btp_elf_get_eh_frame(const char *filename,
                 initial_location -= exec_base;
             }
 
-            struct btp_elf_frame_description_entry *fde = btp_malloc(sizeof(struct btp_elf_frame_description_entry));
+            struct btp_elf_fde *fde = btp_malloc(sizeof(struct btp_elf_fde));
             fde->start_address = initial_location + exec_base;
             fde->length = address_range;
 
@@ -732,24 +748,28 @@ btp_elf_get_eh_frame(const char *filename,
     elf_end(elf);
     close(fd);
     return result;
+#else /* WITH_ELFUTILS */
+    *error_message = btp_asprintf("btparser compiled without elfutils");
+    return NULL;
+#endif /* WITH_ELFUTILS */
 }
 
 void
-btp_elf_eh_frame_free(struct btp_elf_frame_description_entry *entries)
+btp_elf_eh_frame_free(struct btp_elf_fde *entries)
 {
     while (entries)
     {
-        struct btp_elf_frame_description_entry *entry = entries;
+        struct btp_elf_fde *entry = entries;
         entries = entry->next;
         free(entry);
     }
 }
 
-struct btp_elf_frame_description_entry *
-btp_elf_find_fde_for_address(struct btp_elf_frame_description_entry *eh_frame,
+struct btp_elf_fde *
+btp_elf_find_fde_for_address(struct btp_elf_fde *eh_frame,
                              uint64_t build_id_offset)
 {
-    struct btp_elf_frame_description_entry *fde = eh_frame;
+    struct btp_elf_fde *fde = eh_frame;
     while (fde)
     {
         if (build_id_offset >= fde->start_address &&

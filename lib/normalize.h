@@ -23,6 +23,10 @@
 /**
  * @file
  * @brief Normalization of stack traces.
+ *
+ * Normalization changes stack traces with respect to similarity by
+ * removing unnecessary differences.  Normalized stack traces can be
+ * used to compute clusters and similarity of stack traces.
  */
 
 #ifdef __cplusplus
@@ -32,27 +36,21 @@ extern "C" {
 struct btp_gdb_frame;
 struct btp_gdb_thread;
 struct btp_gdb_stacktrace;
+struct btp_core_frame;
+struct btp_core_thread;
+struct btp_core_stacktrace;
+struct btp_koops_stacktrace;
 
 void
-btp_gdb_normalize_thread(struct btp_gdb_thread *thread);
+btp_normalize_gdb_thread(struct btp_gdb_thread *thread);
 
 void
-btp_gdb_normalize_stacktrace(struct btp_gdb_stacktrace *stacktrace);
-
-/**
- */
-void
-btp_gdb_normalize_dbus_thread(struct btp_gdb_thread *thread);
+btp_normalize_gdb_stacktrace(struct btp_gdb_stacktrace *stacktrace);
 
 void
-btp_gdb_normalize_gdk_thread(struct btp_gdb_thread *thread);
+btp_normalize_koops_stacktrace(struct btp_koops_stacktrace *stacktrace);
 
-void
-btp_gdb_normalize_gtk_thread(struct btp_gdb_thread *thread);
-
-void
-btp_gdb_normalize_glib_thread(struct btp_gdb_thread *thread);
-
+// TODO: move to gdb_stacktrace.h
 /**
  * Checks whether the thread it contains some function used to exit
  * application.  If a frame with the function is found, it is
@@ -64,28 +62,17 @@ btp_gdb_normalize_glib_thread(struct btp_gdb_thread *thread);
 struct btp_gdb_frame *
 btp_glibc_thread_find_exit_frame(struct btp_gdb_thread *thread);
 
-void
-btp_gdb_normalize_glibc_thread(struct btp_gdb_thread *thread);
-
-void
-btp_gdb_normalize_libstdcpp_thread(struct btp_gdb_thread *thread);
-
-void
-btp_gdb_normalize_linux_thread(struct btp_gdb_thread *thread);
-
-void
-btp_gdb_normalize_xorg_thread(struct btp_gdb_thread *thread);
-
+// TODO: move to metrics.h
 /**
- * Renames unknown function names ("??") that are between the same function names
- * to be treated as similar in later comparison.
- * Leaves unpair unknown functions unchanged
+ * Renames unknown function names ("??") that are between the same
+ * function names to be treated as similar in later comparison.
+ * Leaves unpair unknown functions unchanged.
  */
-
 void
-btp_gdb_normalize_paired_unknown_function_names(struct btp_gdb_thread *thread1,
-                                            struct btp_gdb_thread *thread2);
+btp_normalize_gdb_paired_unknown_function_names(struct btp_gdb_thread *thread1,
+                                                struct btp_gdb_thread *thread2);
 
+// TODO: merge into normalization or something else
 /**
  * Remove frames which are not interesting in comparison with other threads.
  */

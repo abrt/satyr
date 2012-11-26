@@ -129,16 +129,37 @@ btp_core_thread_get_frame_count(struct btp_core_thread *thread)
     return count;
 }
 
-void
-btp_core_thread_append_to_str(struct btp_core_thread *thread,
-                              struct btp_strbuf *dest)
+char *
+btp_core_thread_to_json(struct btp_core_thread *thread)
 {
-    btp_strbuf_append_str(dest, "thread\n");
-
-    struct btp_core_frame *frame = thread->frames;
-    while (frame)
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+    if (thread->frames)
     {
-        btp_core_frame_append_to_str(frame, dest);
-        frame = frame->next;
+        btp_strbuf_append_str(strbuf, "{   \"frames\":\n");
+
+        struct btp_core_frame *frame = thread->frames;
+        while (frame)
+        {
+            if (frame == thread->frames)
+                btp_strbuf_append_str(strbuf, "      [ ");
+            else
+                btp_strbuf_append_str(strbuf, "      , ");
+
+            char *frame_json = btp_core_frame_to_json(frame);
+            char *indented_frame_json = btp_indent_except_first_line(frame_json, 8);
+            btp_strbuf_append_str(strbuf, indented_frame_json);
+            free(indented_frame_json);
+            free(frame_json);
+            frame = frame->next;
+            if (frame)
+                btp_strbuf_append_str(strbuf, "\n");
+        }
+
+        btp_strbuf_append_str(strbuf, " ]\n");
+        btp_strbuf_append_str(strbuf, "}");
     }
+    else
+        btp_strbuf_append_str(strbuf, "{}");
+
+    return btp_strbuf_free_nobuf(strbuf);
 }

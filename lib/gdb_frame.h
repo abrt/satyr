@@ -59,7 +59,7 @@ struct btp_gdb_frame
      * actual position in the thread, as this number is set by the
      * parser and never updated.
      */
-    unsigned number;
+    uint32_t number;
 
     /**
      * The name of the source file containing the function definition,
@@ -72,7 +72,7 @@ struct btp_gdb_frame
      * A line number in the source file, determining the position of
      * the function definition, or -1 when unknown.
      */
-    unsigned source_line;
+    uint32_t source_line;
 
     /**
      * Signal handler was called on this frame.
@@ -145,74 +145,22 @@ btp_gdb_frame_dup(struct btp_gdb_frame *frame,
 /**
  * Checks whether the frame represents a call of function with certain
  * function name.
+ * @param frame
+ *   A stack trace frame.
+ * @param ...
+ *   Names of source files or shared libaries that should contain the
+ *   function name.  The list needs to be terminated by NULL.  Just
+ *   NULL can be provided, and source file cannot be present in order
+ *   to succeed.  An empty string will cause ANY source file to match
+ *   and succeed.  The name of source file is searched as a substring.
+ * @returns
+ *   True if the frame corresponds to a function with function_name,
+ *   residing in a source file.
  */
 bool
 btp_gdb_frame_calls_func(struct btp_gdb_frame *frame,
-                         const char *function_name);
-
-/**
- * Checks whether the frame represents a call of function with certain
- * function name, which resides in a source file.
- * @param source_file
- * The frame's source_file is searched for the source_file as a
- * substring.
- */
-bool
-btp_gdb_frame_calls_func_in_file(struct btp_gdb_frame *frame,
-                                 const char *function_name,
-                                 const char *source_file);
-
-/**
- * Checks whether the frame represents a call of function with certain
- * function name, which resides in one of the source files.
- * @param source_file0
- * The frame's source_file is searched for the source_file0 as a
- * substring.
- * @returns
- * True if the frame corresponds to a function with function_name,
- * residing in the source_file0, or source_file1.
- */
-bool
-btp_gdb_frame_calls_func_in_file2(struct btp_gdb_frame *frame,
-                                  const char *function_name,
-                                  const char *source_file0,
-                                  const char *source_file1);
-
-/**
- * Checks whether the frame represents a call of function with certain
- * function name, which resides in one of the source files.
- * @param source_file0
- * The frame's source_file is searched for the source_file0 as a
- * substring.
- * @returns
- * True if the frame corresponds to a function with function_name,
- * residing in the source_file0, source_file1, or source_file2.
- */
-bool
-btp_gdb_frame_calls_func_in_file3(struct btp_gdb_frame *frame,
-                                  const char *function_name,
-                                  const char *source_file0,
-                                  const char *source_file1,
-                                  const char *source_file2);
-
-/**
- * Checks whether the frame represents a call of function with certain
- * function name, which resides in one of the source files.
- * @param source_file0
- * The frame's source_file is searched for the source_file0 as a
- * substring.
- * @returns
- * True if the frame corresponds to a function with function_name,
- * residing in the source_file0, source_file1, source_file2, or
- * source_file3.
- */
-bool
-btp_gdb_frame_calls_func_in_file4(struct btp_gdb_frame *frame,
-                                  const char *function_name,
-                                  const char *source_file0,
-                                  const char *source_file1,
-                                  const char *source_file2,
-                                  const char *source_file3);
+                         const char *function_name,
+                         ...);
 
 /**
  * Compares two frames.
@@ -310,7 +258,7 @@ btp_gdb_frame_parse(const char **input,
  */
 int
 btp_gdb_frame_parse_frame_start(const char **input,
-                                unsigned *number);
+                                uint32_t *number);
 
 /**
  * Parses C++ operator on input.  Supports even 'operator new[]' and
@@ -477,7 +425,7 @@ btp_gdb_frame_parse_address_in_function(const char **input,
 bool
 btp_gdb_frame_parse_file_location(const char **input,
                                   char **file,
-                                  unsigned *fileline,
+                                  uint32_t *file_line,
                                   struct btp_location *location);
 
 /**

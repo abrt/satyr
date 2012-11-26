@@ -23,6 +23,8 @@ config.status
 /lib/.libs
 /lib/*.l[ao]
 /lib/Makefile
+/lib/stamp-h1
+/lib/config.h
 
 /python/*.l[ao]
 

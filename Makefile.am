@@ -1,6 +1,17 @@
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = lib python tests docs
+if BUILD_DOCUMENTATION
+  MAYBE_DOCUMENTATION = docs
+endif
+
+if HAVE_PYTHON
+endif
+
+SUBDIRS = lib python tests $(MAYBE_DOCUMENTATION)
+
+# Automatic update of libtool.
+libtool: $(LIBTOOL_DEPS)
+	$(SHELL) ./config.status libtool
 
 bin_PROGRAMS = btparser
 btparser_CFLAGS = -Wall

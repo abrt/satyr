@@ -1,7 +1,7 @@
 /*
-    normalize_gtk.c
+    core_unwind.h
 
-    Copyright (C) 2012  Red Hat, Inc.
+    Copyright (C) 2010, 2011, 2012  Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,23 +17,22 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "normalize.h"
-#include "gdb_frame.h"
-#include "gdb_thread.h"
-#include <stdbool.h>
-#include <string.h>
+#ifndef BTPARSER_CORE_UNWIND_H
+#define BTPARSER_CORE_UNWIND_H
 
-void
-btp_gdb_normalize_gtk_thread(struct btp_gdb_thread *thread)
-{
-    struct btp_gdb_frame *frame = thread->frames;
-    while (frame)
-    {
-        struct btp_gdb_frame *next_frame = frame->next;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-        /* Remove IA__ prefix. */
-        btp_gdb_frame_remove_func_prefix(frame, "IA__gtk", strlen("IA__"));
+struct btp_core_stacktrace;
 
-        frame = next_frame;
-    }
+struct btp_core_stacktrace *
+btp_parse_coredump(const char *core_file,
+                   const char *exe_file,
+                   char **error_msg);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif

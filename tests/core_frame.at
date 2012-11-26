@@ -1,0 +1,95 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([Core frames])
+
+## ------------------ ##
+## btp_core_frame_dup ##
+## ------------------ ##
+
+AT_TESTFUN([btp_core_frame_dup],
+[[
+#include <lib/core_frame.h>
+#include <lib/utils.h>
+#include <assert.h>
+
+int
+main(void)
+{
+  struct btp_core_frame *frame1 = btp_core_frame_new();;
+  frame1->address = 0xffffffff1;
+  frame1->build_id = btp_strdup("aabbccddeeff1");
+  frame1->build_id_offset = 2561;
+  frame1->function_name = btp_strdup("test1");
+  frame1->file_name = btp_strdup("executable1");
+  frame1->fingerprint = btp_strdup("ab");
+
+  struct btp_core_frame *frame0 = btp_core_frame_new();;
+  frame0->address = 0xffffffff0;
+  frame0->build_id = btp_strdup("aabbccddeeff0");
+  frame0->build_id_offset = 2560;
+  frame0->function_name = btp_strdup("test0");
+  frame0->file_name = btp_strdup("executable0");
+  frame0->fingerprint = btp_strdup("ab");
+  frame0->next = frame1;
+
+  /* Test the duplication without siblings. */
+  struct btp_core_frame *frame = btp_core_frame_dup(frame0, false);
+  assert(NULL == frame->next);
+  assert(frame->build_id != frame0->build_id);
+  assert(frame->function_name != frame0->function_name);
+  assert(frame->file_name != frame0->file_name);
+  assert(0 == btp_core_frame_cmp(frame, frame0));
+  btp_core_frame_free(frame);
+
+  /* Test the duplication with the siblings. */
+  frame = btp_core_frame_dup(frame0, true);
+  assert(frame->build_id != frame0->build_id);
+  assert(frame->function_name != frame0->function_name);
+  assert(frame->file_name != frame0->file_name);
+  assert(0 == btp_core_frame_cmp(frame, frame0));
+  assert(frame->next != frame1);
+  assert(0 == btp_core_frame_cmp(frame->next, frame1));
+  btp_core_frame_free(frame->next);
+  btp_core_frame_free(frame);
+
+  btp_core_frame_free(frame1);
+  btp_core_frame_free(frame0);
+  return 0;
+}
+]])
+
+## ---------------------- ##
+## btp_core_frame_to_json ##
+## ---------------------- ##
+
+AT_TESTFUN([btp_core_frame_to_json],
+[[
+#include <lib/core_frame.h>
+#include <lib/utils.h>
+#include <assert.h>
+
+int
+main(void)
+{
+  struct btp_core_frame *frame = btp_core_frame_new();;
+  frame->address = 0xffffffff1;
+  frame->build_id = btp_strdup("aabbccddeeff1");
+  frame->build_id_offset = 2561;
+  frame->function_name = btp_strdup("test1");
+  frame->file_name = btp_strdup("executable1");
+  frame->fingerprint = btp_strdup("ab");
+
+  char *json = btp_core_frame_to_json(frame);
+  assert(0 == strcmp(json,
+  	   "{   \"address\": 68719476721\n"
+	   ",   \"build_id\": \"aabbccddeeff1\"\n"
+	   ",   \"build_id_offset\": 2561\n"
+	   ",   \"function_name\": \"test1\"\n"
+	   ",   \"file_name\": \"executable1\"\n"
+	   ",   \"fingerprint\": \"ab\"\n"
+	   "}"));
+
+  btp_core_frame_free(frame);
+  return 0;
+}
+]])

@@ -1,0 +1,157 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([Kerneloops stacktraces])
+
+
+## ---------------------------------- ##
+## btp_koops_stacktrace_parse_modules ##
+## ---------------------------------- ##
+AT_TESTFUN([btp_koops_stacktrace_parse_modules],
+[[
+#include <lib/koops_stacktrace.h>
+#include <assert.h>
+#include <stdlib.h>
+
+static void
+check(bool success,
+      char *input,
+      char **expected_modules)
+{
+    char *old_input = input;
+    char **modules = btp_koops_stacktrace_parse_modules(&input);
+    assert(!!modules == success);
+
+    if (modules)
+    {
+        assert(*input == '\0');
+	int offset = 0;
+	while (modules[offset])
+        {
+            assert(expected_modules[offset]);
+	    assert(0 == strcmp(modules[offset], expected_modules[offset]));
+	    ++offset;
+        }
+	assert(!expected_modules[offset]);
+
+	offset = 0;
+	while (modules[offset])
+        {
+    	    free(modules[offset]);
+	    ++offset;
+	}
+
+	free(modules);
+    }
+    else
+    {
+        /* Check that the pointer is not moved. */
+        assert(old_input == input);
+    }
+}
+
+int
+main(void)
+{
+    char *modules[] = { "vfat", "fat", "usb_storage", NULL };
+    check(true,
+          "[110417.280431] Modules linked in: vfat fat usb_storage",
+	  modules);
+    return 0;
+}
+]])
+
+## -------------------------- ##
+## btp_koops_stacktrace_parse ##
+## -------------------------- ##
+
+AT_TESTFUN([btp_koops_stacktrace_parse],
+[[
+#include <lib/koops_stacktrace.h>
+#include <lib/koops_frame.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+static void
+check(const char *path,
+      const char *first_function_name,
+      const char *last_function_name,
+      int frame_count)
+{
+  char *full_input = btp_file_to_string(path);
+  assert(full_input);
+  char *input = full_input;
+
+  struct btp_location location;
+  btp_location_init(&location);
+  struct btp_koops_stacktrace *stacktrace =
+      btp_koops_stacktrace_parse(&input, &location);
+
+  assert(stacktrace);
+  assert(*input == '\0');
+
+  if (stacktrace->frames)
+  {
+      assert(0 == btp_strcmp0(stacktrace->frames->function_name, first_function_name));
+
+      struct btp_koops_frame *last = stacktrace->frames;
+      while (last->next)
+          last = last->next;
+
+      assert(0 == btp_strcmp0(last->function_name, last_function_name));
+  }
+  else
+      assert(!first_function_name && !last_function_name && 0 == frame_count);
+
+  printf("expected: %d, got: %d\n", frame_count, btp_koops_stacktrace_get_frame_count(stacktrace));
+  assert(frame_count == btp_koops_stacktrace_get_frame_count(stacktrace));
+
+  btp_koops_stacktrace_free(stacktrace);
+  free(full_input);
+}
+
+int
+main(void)
+{
+  check("../../kerneloopses/gitlog-01", "unwind_backtrace", "kthread", 15);
+  check("../../kerneloopses/gitlog-02", "unwind_backtrace", "cpu_idle", 27);
+  check("../../kerneloopses/gitlog-03", "lockdep_rcu_suspicious", "system_call_fastpath", 19);
+  check("../../kerneloopses/gitlog-04", "lockdep_rcu_suspicious", "addrconf_forward_change", 7);
+  check("../../kerneloopses/gitlog-05", "mark_held_locks", "sysenter_do_call", 26);
+  check("../../kerneloopses/gitlog-06", "lock_acquire", "kernel_thread_helper", 23);
+  check("../../kerneloopses/gitlog-07", "__slab_alloc.isra.50.constprop.56", "sysenter_do_call", 14);
+  check("../../kerneloopses/gitlog-08", "unwind_backtrace", "sys_write", 13);
+
+  check("../../kerneloopses/gitlog-09", "unwind_backtrace", "cpu_idle", 11);
+  check("../../kerneloopses/gitlog-10", NULL, NULL, 0);
+  check("../../kerneloopses/gitlog-11", "lockdep_rcu_suspicious", "out_of_memory", 12);
+  check("../../kerneloopses/gitlog-12", "unwind_backtrace", "regulator_get_voltage", 6);
+/*
+  check("../../kerneloopses/gitlog-13", "", "", 0);
+  check("../../kerneloopses/gitlog-14", "", "", 0);
+  check("../../kerneloopses/gitlog-15", "", "", 0);
+  check("../../kerneloopses/gitlog-16", "", "", 0);
+  check("../../kerneloopses/gitlog-17", "", "", 0);
+  check("../../kerneloopses/gitlog-18", "", "", 0);
+  check("../../kerneloopses/gitlog-19", "", "", 0);
+  check("../../kerneloopses/gitlog-20", "", "", 0);
+  check("../../kerneloopses/gitlog-21", "", "", 0);
+  check("../../kerneloopses/gitlog-22", "", "", 0);
+  check("../../kerneloopses/gitlog-23", "", "", 0);
+  check("../../kerneloopses/gitlog-24", "", "", 0);
+  check("../../kerneloopses/gitlog-25", "", "", 0);
+  check("../../kerneloopses/gitlog-26", "", "", 0);
+  check("../../kerneloopses/gitlog-27", "", "", 0);
+  check("../../kerneloopses/gitlog-28", "", "", 0);
+  check("../../kerneloopses/gitlog-29", "", "", 0);
+  check("../../kerneloopses/gitlog-30", "", "", 0);
+  check("../../kerneloopses/gitlog-31", "", "", 0);
+*/
+
+  check("../../kerneloopses/rhbz-827868", "warn_slowpath_common", "gs_change", 32);
+  check("../../kerneloopses/rhbz-836206", "__might_sleep", "system_call_fastpath", 23);
+  return 0;
+}
+]])

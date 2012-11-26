@@ -659,7 +659,7 @@ btp_py_gdb_stacktrace_normalize(PyObject *self, PyObject *args)
     /* destroys the linked list and frees some parts */
     /* need to rebuild python list manually */
     struct btp_gdb_stacktrace *tmp = btp_gdb_stacktrace_dup(this->stacktrace);
-    btp_gdb_normalize_stacktrace(tmp);
+    btp_normalize_gdb_stacktrace(tmp);
     if (stacktrace_free_thread_python_list(this) < 0)
     {
         btp_gdb_stacktrace_free(tmp);

@@ -26,6 +26,7 @@
 #include "lib/metrics.h"
 #include "lib/cluster.h"
 #include "lib/normalize.h"
+#include "lib/config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -40,7 +40,9 @@ struct btp_location;
 struct btp_core_stacktrace
 {
     /** Signal number. */
-    int signal;
+    uint8_t signal;
+
+    char *executable;
 
     /**
      * @brief Thread responsible for the crash.
@@ -109,7 +111,7 @@ btp_core_stacktrace_get_thread_count(
  */
 struct btp_core_stacktrace *
 btp_core_stacktrace_parse(const char **input,
-                         struct btp_location *location);
+                          struct btp_location *location);
 
 /**
  * Serializes stacktrace to string.
@@ -119,7 +121,7 @@ btp_core_stacktrace_parse(const char **input,
  * longer needed.
  */
 char *
-btp_core_stacktrace_to_text(struct btp_core_stacktrace *stacktrace);
+btp_core_stacktrace_to_json(struct btp_core_stacktrace *stacktrace);
 
 
 struct btp_core_stacktrace *

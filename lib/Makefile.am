@@ -1,16 +1,20 @@
 pkginclude_HEADERS = \
 	callgraph.h \
 	cluster.h \
+	config.h \
 	core_fingerprint.h \
 	core_frame.h \
 	core_stacktrace.h \
 	core_thread.h \
+	core_unwind.h \
+	deb.h \
 	disasm.h \
 	elves.h \
 	gdb_frame.h \
 	gdb_sharedlib.h \
 	gdb_stacktrace.h \
 	gdb_thread.h \
+	json.h \
 	koops_frame.h \
 	koops_stacktrace.h \
 	location.h \
@@ -18,6 +22,8 @@ pkginclude_HEADERS = \
 	normalize.h \
 	python_frame.h \
 	python_stacktrace.h \
+	report.h \
+	rpm.h \
 	sha1.h \
 	strbuf.h \
 	unstrip.h \
@@ -32,27 +38,24 @@ libbtparser_la_SOURCES = \
 	core_fingerprint.c \
 	core_frame.c \
 	core_thread.c \
+	core_unwind.c \
+	deb.c \
 	disasm.c \
 	elves.c \
 	gdb_stacktrace.c \
 	gdb_frame.c \
 	gdb_sharedlib.c \
 	gdb_thread.c \
+	json.c \
 	koops_frame.c \
 	koops_stacktrace.c \
 	location.c \
 	metrics.c \
 	normalize.c \
-	normalize_dbus.c \
-	normalize_gdk.c \
-	normalize_glib.c \
-	normalize_glibc.c \
-	normalize_gtk.c \
-	normalize_libstdcpp.c \
-	normalize_linux.c \
-	normalize_xorg.c \
 	python_frame.c \
 	python_stacktrace.c \
+	report.c \
+	rpm.c \
 	sha1.c \
 	strbuf.c \
 	unstrip.c \
@@ -61,9 +64,10 @@ libbtparser_la_SOURCES = \
 libbtparser_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE $(GLIB_CFLAGS)
 libbtparser_la_LDFLAGS = -version-info 4:2:2 $(GLIB_LIBS)
 
-if ENABLE_DISASSEMBLY
-libbtparser_la_CFLAGS += -DENABLE_DISASSEMBLY
-libbtparser_la_LIBADD = -lelf -ldw -ldl -lbfd -lopcodes
+if HAVE_LIBOPCODES
+# Conditional link is required to avoid linking to a library without
+# -fPIC.
+libbtparser_la_LIBADD = -lopcodes
 endif
 
 # From http://www.seul.org/docs/autotut/

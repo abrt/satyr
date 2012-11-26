@@ -25,25 +25,16 @@
  * @brief BFD-based function disassembler.
  */
 
+#include "config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <bfd.h>
-#include <dis-asm.h>
 #include <inttypes.h>
 #include <stdbool.h>
 
-/**
- * @brief Internal state of a disassembler.
- */
-struct btp_disasm_state
-{
-    bfd *bfd_file;
-    disassembler_ftype disassembler;
-    struct disassemble_info info;
-    char *error_message;
-};
+struct btp_disasm_state;
 
 struct btp_disasm_state *
 btp_disasm_init(const char *file_name,
@@ -87,4 +78,4 @@ btp_disasm_get_callee_addresses(char **instructions);
 }
 #endif
 
-#endif
+#endif // BTPARSER_DISASSEMBLER_H

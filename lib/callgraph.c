@@ -26,10 +26,10 @@
 
 struct btp_callgraph *
 btp_callgraph_compute(struct btp_disasm_state *disassembler,
-                      struct btp_elf_frame_description_entry *eh_frame,
+                      struct btp_elf_fde *eh_frame,
                       char **error_message)
 {
-    struct btp_elf_frame_description_entry *fde_entry = eh_frame;
+    struct btp_elf_fde *fde_entry = eh_frame;
     struct btp_callgraph *result = NULL, *last = NULL;
     while (fde_entry)
     {
@@ -71,13 +71,13 @@ struct btp_callgraph *
 btp_callgraph_extend(struct btp_callgraph *callgraph,
                      uint64_t start_address,
                      struct btp_disasm_state *disassembler,
-                     struct btp_elf_frame_description_entry *eh_frame,
+                     struct btp_elf_fde *eh_frame,
                      char **error_message)
 {
     if (btp_callgraph_find(callgraph, start_address))
         return callgraph;
 
-    struct btp_elf_frame_description_entry *fde =
+    struct btp_elf_fde *fde =
         btp_elf_find_fde_for_address(eh_frame,
                                      start_address);
 

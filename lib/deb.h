@@ -1,7 +1,7 @@
 /*
-    normalize_linux.c
+    deb.h
 
-    Copyright (C) 2010  Red Hat, Inc.
+    Copyright (C) 2012  Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,25 +17,30 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "normalize.h"
-#include "utils.h"
-#include "gdb_frame.h"
-#include "gdb_thread.h"
+#ifndef BTPARSER_DEB_H
+#define BTPARSER_DEB_H
+
+/**
+ * @file
+ * @brief Deb-related structures and utilities.
+ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdbool.h>
 
-void
-btp_gdb_normalize_linux_thread(struct btp_gdb_thread *thread)
+struct btp_deb_package
 {
-    struct btp_gdb_frame *frame = thread->frames;
-    while (frame)
-    {
-        struct btp_gdb_frame *next_frame = frame->next;
+    struct btp_deb_package *next;
+};
 
-        /* Remove frames which are not a cause of the crash. */
-        bool removable = btp_gdb_frame_calls_func(frame, "__kernel_vsyscall");
-        if (removable)
-            btp_gdb_thread_remove_frame(thread, frame);
+void
+btp_deb_package_free(struct btp_deb_package *package, bool recursive);
 
-        frame = next_frame;
-    }
+#ifdef __cplusplus
 }
+#endif
+
+#endif

@@ -248,7 +248,7 @@ btp_gdb_stacktrace_quality_complex(struct btp_gdb_stacktrace *stacktrace)
     struct btp_gdb_thread *crash_thread =
         btp_gdb_stacktrace_find_crash_thread(stacktrace);
 
-    btp_gdb_normalize_stacktrace(stacktrace);
+    btp_normalize_gdb_stacktrace(stacktrace);
 
     /* Get the quality q1 of the full stacktrace. */
     float q1 = btp_gdb_stacktrace_quality_simple(stacktrace);
@@ -317,7 +317,7 @@ btp_gdb_stacktrace_get_crash_frame(struct btp_gdb_stacktrace *stacktrace)
         return NULL;
     }
 
-    btp_gdb_normalize_stacktrace(stacktrace);
+    btp_normalize_gdb_stacktrace(stacktrace);
     struct btp_gdb_frame *crash_frame = crash_thread->frames;
     crash_frame = btp_gdb_frame_dup(crash_frame, false);
     btp_gdb_stacktrace_free(stacktrace);
@@ -332,7 +332,7 @@ btp_gdb_stacktrace_get_duplication_hash(struct btp_gdb_stacktrace *stacktrace)
     if (crash_thread)
         btp_gdb_stacktrace_remove_threads_except_one(stacktrace, crash_thread);
 
-    btp_gdb_normalize_stacktrace(stacktrace);
+    btp_normalize_gdb_stacktrace(stacktrace);
     btp_gdb_stacktrace_limit_frame_depth(stacktrace, 3);
     char *hash = btp_gdb_stacktrace_to_text(stacktrace, false);
     btp_gdb_stacktrace_free(stacktrace);
@@ -515,7 +515,7 @@ btp_gdb_stacktrace_get_optimized_thread(struct btp_gdb_stacktrace *stacktrace,
 
     btp_gdb_stacktrace_remove_threads_except_one(stacktrace, crash_thread);
     btp_gdb_stacktrace_set_libnames(stacktrace);
-    btp_gdb_normalize_thread(crash_thread);
+    btp_normalize_gdb_thread(crash_thread);
     btp_gdb_normalize_optimize_thread(crash_thread);
 
     /* Remove frames with no function name (i.e. signal handlers). */

@@ -1,14 +1,14 @@
 == btparser 0.18
 
 == btparser 0.17
-Released 2011-03-19.
+Released 2012-03-19.
 
 - New library function btp_backtrace_get_optimized_thread.
 - The main() function is not included in optimized threads.
 - Better exit frame detection.
 
 == btparser 0.16
-Released 2011-02-08.
+Released 2012-02-08.
 
 - The backtrace parser has been extended to handle frames representing
   inlined frames.
@@ -26,7 +26,7 @@ Released 2011-02-08.
 - The format of optimized backtraces has been changed.
 
 == btparser 0.15
-Released 2011-01-04.
+Released 2012-01-04.
 
 - Added parser for 'info sharedlib' GDB command output (Michal Toman).
 - Added thread clustering (Miroslav Lichvár).

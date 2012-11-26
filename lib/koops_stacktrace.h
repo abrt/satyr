@@ -31,6 +31,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <inttypes.h>
 
 struct btp_location;
 
@@ -63,10 +64,16 @@ struct btp_koops_stacktrace
     bool taint_firmware_workaround;
     bool taint_virtual_box;
 
+    /**
+     * @brief List of loaded modules.
+     *
+     * It might be NULL as it is sometimes not included in a
+     * kerneloops.
+     */
     char **modules;
 
     /**
-     * @brief Call trace
+     * @brief Call trace.  It might be NULL as it is not mandatory.
      */
     struct btp_koops_frame *frames;
 };
@@ -109,6 +116,22 @@ struct btp_koops_stacktrace *
 btp_koops_stacktrace_dup(struct btp_koops_stacktrace *stacktrace);
 
 /**
+ * Returns the number of frames in the Kerneloops stacktrace.
+ */
+int
+btp_koops_stacktrace_get_frame_count(struct btp_koops_stacktrace *stacktrace);
+
+/**
+ * Removes the frame from the stack trace and then deletes it.
+ * @returns
+ * True if the frame was found in the thread and removed and deleted.
+ * False if the frame was not found in the thread.
+ */
+bool
+btp_koops_stacktrace_remove_frame(struct btp_koops_stacktrace *stacktrace,
+                                  struct btp_koops_frame *frame);
+
+/**
  * Parses a textual kernel oops and puts it into a structure.  If
  * parsing fails, the input parameter is not changed and NULL is
  * returned.
@@ -120,6 +143,9 @@ btp_koops_stacktrace_dup(struct btp_koops_stacktrace *stacktrace);
 struct btp_koops_stacktrace *
 btp_koops_stacktrace_parse(const char **input,
                            struct btp_location *location);
+
+char **
+btp_koops_stacktrace_parse_modules(const char **input);
 
 #ifdef __cplusplus
 }

@@ -33,10 +33,15 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
+/**
+ * @brief Kernel oops stack frame.
+ */
 struct btp_koops_frame
 {
     /**
-     * Address of the function in memory.
+     * Address of the function in memory.  It is set to 0 when the
+     * address is not available.  In such a case, function_name is
+     * available.
      */
     uint64_t address;
 
@@ -46,13 +51,38 @@ struct btp_koops_frame
      */
     bool reliable;
 
-    char *name;
+    /**
+     * Might be NULL.  If it is null, address must be set.
+     */
+    char *function_name;
 
-    uint64_t offset;
+    uint64_t function_offset;
 
-    uint64_t len;
+    uint64_t function_length;
 
-    char *module;
+    /**
+     * Might be NULL.
+     */
+    char *module_name;
+
+    /**
+     * It is set to 0 when the address is not available.
+     */
+    uint64_t from_address;
+
+    /**
+     * Might be NULL.
+     */
+    char *from_function_name;
+
+    uint64_t from_function_offset;
+
+    uint64_t from_function_length;
+
+    /**
+     * Might be NULL.
+     */
+    char *from_module_name;
 
     struct btp_koops_frame *next;
 };
@@ -100,6 +130,68 @@ btp_koops_frame_free(struct btp_koops_frame *frame);
 struct btp_koops_frame *
 btp_koops_frame_dup(struct btp_koops_frame *frame,
                     bool siblings);
+
+/**
+ * Compares two frames.
+ * @param frame1
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @param frame2
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @returns
+ * Returns 0 if the frames are same.  Returns negative number if
+ * frame1 is found to be 'less' than frame2.  Returns positive number
+ * if frame1 is found to be 'greater' than frame2.
+ */
+int
+btp_koops_frame_cmp(struct btp_koops_frame *frame1,
+                    struct btp_koops_frame *frame2);
+
+/**
+ * Appends 'item' at the end of the list 'dest'.
+ * @returns
+ * This function returns the 'dest' frame.  If 'dest' is NULL, it
+ * returns the 'item' frame.
+ */
+struct btp_koops_frame *
+btp_koops_frame_append(struct btp_koops_frame *dest,
+                       struct btp_koops_frame *item);
+
+struct btp_koops_frame *
+btp_koops_frame_parse(const char **input);
+
+/**
+ * Timestamp may be present in the oops lines.
+ * @example
+ * [123456.654321]
+ * [   65.470000]
+ */
+bool
+btp_koops_skip_timestamp(const char **input);
+
+bool
+btp_koops_parse_address(const char **input, uint64_t *address);
+
+bool
+btp_koops_parse_module_name(const char **input,
+                            char **module_name);
+
+bool
+btp_koops_parse_function(const char **input,
+                         char **function_name,
+                         uint64_t *function_offset,
+                         uint64_t *function_length,
+                         char **module_name);
+
+/**
+ * Returns a textual representation of the frame.
+ * @param frame
+ * It must be a non-NULL pointer.  It's not modified by calling this
+ * function.
+ */
+char *
+btp_koops_frame_to_json(struct btp_koops_frame *frame);
 
 #ifdef __cplusplus
 }

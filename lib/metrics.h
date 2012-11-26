@@ -201,8 +201,8 @@ typedef float (*btp_dist_thread_type)(struct btp_gdb_thread *,
  */
 struct btp_distances *
 btp_gdb_threads_compare(struct btp_gdb_thread **threads,
-                    int m, int n,
-                    btp_dist_thread_type dist_func);
+                        int m, int n,
+                        btp_dist_thread_type dist_func);
 
 #ifdef __cplusplus
 }

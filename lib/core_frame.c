@@ -19,6 +19,8 @@
 */
 #include "core_frame.h"
 #include "utils.h"
+#include "strbuf.h"
+#include "json.h"
 #include <string.h>
 
 struct btp_core_frame *
@@ -133,9 +135,57 @@ btp_core_frame_append(struct btp_core_frame *dest,
     return dest;
 }
 
-void
-btp_core_frame_append_to_str(struct btp_core_frame *frame,
-                             struct btp_strbuf *dest)
+char *
+btp_core_frame_to_json(struct btp_core_frame *frame)
 {
-    // TODO
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+    btp_strbuf_append_strf(strbuf,
+                           "{   \"address\": %"PRIu64"\n",
+                           frame->address);
+    if (frame->build_id)
+    {
+        char *escaped = btp_json_escape(frame->build_id);
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"build_id\": \"%s\"\n",
+                               escaped);
+
+        free(escaped);
+    }
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"build_id_offset\": %"PRIu64"\n",
+                           frame->build_id_offset);
+
+    if (frame->function_name)
+    {
+        char *escaped = btp_json_escape(frame->function_name);
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"function_name\": \"%s\"\n",
+                               escaped);
+
+        free(escaped);
+    }
+
+    if (frame->file_name)
+    {
+        char *escaped = btp_json_escape(frame->file_name);
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"file_name\": \"%s\"\n",
+                               escaped);
+
+        free(escaped);
+    }
+
+    if (frame->fingerprint)
+    {
+        char *escaped = btp_json_escape(frame->fingerprint);
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"fingerprint\": \"%s\"\n",
+                               escaped);
+
+        free(escaped);
+    }
+
+    btp_strbuf_append_str(strbuf, "}");
+    return btp_strbuf_free_nobuf(strbuf);
 }

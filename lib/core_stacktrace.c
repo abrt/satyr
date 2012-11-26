@@ -33,6 +33,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 struct btp_core_stacktrace *
 btp_core_stacktrace_new()
@@ -100,17 +101,51 @@ btp_core_stacktrace_parse(const char **input,
 }
 
 char *
-btp_core_stacktrace_to_text(struct btp_core_stacktrace *stacktrace)
+btp_core_stacktrace_to_json(struct btp_core_stacktrace *stacktrace)
 {
     struct btp_strbuf *strbuf = btp_strbuf_new();
+    btp_strbuf_append_strf(strbuf,
+                           "{   \"signal\": %"PRIu8"\n",
+                           stacktrace->signal);
+
+    /* Crash thread offset. */
+    if (stacktrace->crash_thread)
+    {
+        /* Calculate the offset of the crash thread. */
+        uint32_t offset = 0;
+        struct btp_core_thread *thread = stacktrace->threads;
+        while (thread && thread != stacktrace->crash_thread)
+        {
+            thread = thread->next;
+            ++offset;
+        }
+
+        assert(thread);
+        btp_strbuf_append_strf(strbuf, ",   \"crash_thread\": %"PRIu32"\n", offset);
+    }
+
+    btp_strbuf_append_str(strbuf, ",   \"threads\":\n");
 
     struct btp_core_thread *thread = stacktrace->threads;
     while (thread)
     {
-        btp_core_thread_append_to_str(thread, strbuf);
+        if (thread == stacktrace->threads)
+            btp_strbuf_append_str(strbuf, "      [ ");
+        else
+            btp_strbuf_append_str(strbuf, "      , ");
+
+        char *thread_json = btp_core_thread_to_json(thread);
+        char *indented_thread_json = btp_indent_except_first_line(thread_json, 8);
+        btp_strbuf_append_str(strbuf, indented_thread_json);
+        free(indented_thread_json);
+        free(thread_json);
         thread = thread->next;
+        if (thread)
+            btp_strbuf_append_str(strbuf, "\n");
     }
 
+    btp_strbuf_append_str(strbuf, " ]\n");
+    btp_strbuf_append_str(strbuf, "}");
     return btp_strbuf_free_nobuf(strbuf);
 }
 

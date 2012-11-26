@@ -18,6 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "python_stacktrace.h"
+#include "python_frame.h"
 #include "core_stacktrace.h"
 #include "core_thread.h"
 #include "core_frame.h"
