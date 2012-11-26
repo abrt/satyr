@@ -8,7 +8,6 @@ AT_BANNER([Java threads])
 AT_TESTFUN([btp_java_thread_cmp],
 [[
 #include <lib/java_thread.h>
-#include <lib/java_exception.h>
 #include <lib/java_frame.h>
 #include <lib/location.h>
 #include <assert.h>
@@ -25,12 +24,8 @@ main(void)
 
   assert(0 == btp_java_thread_cmp(thread0, thread1));
 
-  btp_java_exception_pop(thread1->exception);
-
-  assert(0 != btp_java_thread_cmp(thread0, thread1));
-
-  btp_java_exception_free(thread1->exception);
-  thread1->exception = NULL;
+  btp_java_frame_free_full(thread1->frames);
+  thread1->frames = NULL;
 
   assert(0 != btp_java_thread_cmp(thread0, thread1));
 
@@ -55,7 +50,6 @@ main(void)
 AT_TESTFUN([btp_java_thread_dup],
 [[
 #include <lib/java_thread.h>
-#include <lib/java_exception.h>
 #include <lib/java_frame.h>
 #include <lib/location.h>
 #include <assert.h>
@@ -79,15 +73,154 @@ main(void)
 }
 ]])
 
+## ---------------------------- ##
+## btp_java_thread_remove_frame ##
+## ---------------------------- ##
+AT_TESTFUN([btp_java_thread_remove_frame],
+[[
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+
+#include <tests/java_testcases.c>
+
+int
+main(void)
+{
+  struct btp_java_thread thread;
+  btp_java_thread_init(&thread);
+
+  struct btp_java_frame *exception2 = create_real_stacktrace_objects();
+  thread.frames = exception2;
+
+  struct btp_java_frame *removed = exception2;
+
+  assert(btp_java_thread_remove_frame(&thread, removed) || !"Remove the top of stack");
+  assert(removed != thread.frames);
+
+  removed = btp_java_frame_get_last(thread.frames);
+
+  assert(btp_java_thread_remove_frame(&thread, removed) || !"Remove the bottom of stack");
+  assert(removed != btp_java_frame_get_last(thread.frames));
+
+  removed = thread.frames->next;
+
+  assert(btp_java_thread_remove_frame(&thread, removed) || !"Remove the middle of stack");
+  assert(removed != thread.frames->next);
+
+  assert(0 == btp_java_thread_remove_frame(&thread, removed) || !"Remove a nonexisting frame");
+
+  btp_java_frame_free_full(thread.frames);
+
+  return 0;
+}
+]])
+
+## ----------------------------------- ##
+## btp_java_thread_remove_frames_above ##
+## ----------------------------------- ##
+AT_TESTFUN([btp_java_thread_remove_frames_above],
+[[
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+
+#include <tests/java_testcases.c>
+
+int
+main(void)
+{
+  struct btp_java_thread thread;
+  btp_java_thread_init(&thread);
+
+  struct btp_java_frame *exception2 = create_real_stacktrace_objects();
+  thread.frames = exception2;
+
+  struct btp_java_frame *top = exception2;
+
+  assert(btp_java_thread_remove_frames_above(&thread, top) || !"Remove above the top of stack");
+  assert(top == thread.frames);
+
+  top = thread.frames->next;
+
+  assert(btp_java_thread_remove_frames_above(&thread, top) || !"Remove above the middle of stack");
+  assert(top == thread.frames);
+
+  struct btp_java_frame *above = thread.frames;
+  top = btp_java_frame_get_last(thread.frames);
+
+  assert(btp_java_thread_remove_frames_above(&thread, top) || !"Remove above the bottom of stack");
+  assert(top == thread.frames);
+
+  assert(0 == btp_java_thread_remove_frames_above(&thread, above) || !"Remove above a nonexisting frame");
+
+  btp_java_frame_free_full(thread.frames);
+
+  return 0;
+}
+]])
+
+## ------------------------------------- ##
+## btp_java_thread_remove_frames_below_n ##
+## ------------------------------------- ##
+AT_TESTFUN([btp_java_thread_remove_frames_below_n],
+[[
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdlib.h>
+
+#include <tests/java_testcases.c>
+
+int
+main(void)
+{
+  struct btp_java_thread thread;
+  btp_java_thread_init(&thread);
+
+  struct btp_java_frame *exception2 = create_real_stacktrace_objects();
+  thread.frames = exception2;
+
+  struct btp_java_frame *bottom = btp_java_frame_get_last(thread.frames);
+
+  /* Remove below too large */
+  btp_java_thread_remove_frames_below_n(&thread, 100);
+  assert(bottom != thread.frames);
+  assert(bottom == btp_java_frame_get_last(thread.frames));
+
+  bottom = thread.frames->next;
+
+  /* Remove below the second frame */
+  btp_java_thread_remove_frames_below_n(&thread, 2);
+  assert(thread.frames);
+  assert(bottom == thread.frames->next);
+  assert(NULL == thread.frames->next->next);
+
+  /* Remove below 'over the top' frame */
+  btp_java_thread_remove_frames_below_n(&thread, 0);
+  assert(NULL == thread.frames);
+
+  btp_java_frame_free_full(thread.frames);
+
+  return 0;
+}
+]])
+
+
 ## --------------------- ##
 ## btp_java_thread_parse ##
 ## --------------------- ##
 AT_TESTFUN([btp_java_thread_parse],
 [[
 #include <lib/java_thread.h>
-#include <lib/java_exception.h>
 #include <lib/java_frame.h>
 #include <lib/location.h>
+#include <lib/strbuf.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -95,19 +228,26 @@ AT_TESTFUN([btp_java_thread_parse],
 #include <tests/java_testcases.c>
 
 static void
-check(char *input,
+check(const char *input,
       struct btp_java_thread *expected_thread)
 {
-  printf("===============================================\n"
+  printf("================================================================================\n"
          "Testing input:\n%s", input);
 
-  char *old_input = input;
+  const char *old_input = input;
   struct btp_location location;
   btp_location_init(&location);
-  struct btp_java_thread *thread = btp_java_thread_parse(&input, &location);
+  struct btp_java_thread *thread = btp_java_thread_parse((const char **)&input, &location);
   assert(!expected_thread || thread);
   if (thread)
   {
+    struct btp_strbuf *output = btp_strbuf_new();
+    btp_java_thread_append_to_str(thread, output);
+    printf("--------------------------------------------------------------------------------\n"
+         "Parsed :\n%s", output->buf);
+
+    btp_strbuf_free(output);
+
     assert(*input == '\0');
     assert(0 == btp_java_thread_cmp(thread, expected_thread));
     btp_java_thread_free(thread);
@@ -118,6 +258,7 @@ check(char *input,
     assert(old_input == input);
     assert(!expected_thread);
   }
+  printf("================================================================================\n");
 }
 
 int

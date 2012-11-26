@@ -39,35 +39,50 @@ struct btp_location;
 struct btp_java_frame
 {
     /**
-     * FQDN - Fully qualified domain name. Can be NULL
-     * <Namespace>.<Type>.<Function name>
+     * FQDN - Fully qualified domain name. Can be NULL.
+     *
+     * Method:
+     *   <Namespace>.<Type>.<Function name>
+     *
+     * Exception:
+     *   <Namespace>.<Type>
      */
     char *name;
 
     /**
-     * a Java file. Can be NULL
+     * A Java file. Can be NULL.
+     * (Always NULL if frame is exception)
      */
     char *file_name;
 
     /**
      * Line no. in the Java file. 0 is used when file_line is missing.
+     * (Always 0 if frame is exception)
      */
     uint32_t file_line;
 
     /**
-     * A path to jar file or class file. Can be NULl
+     * A path to jar file or class file. Can be NULL.
+     * (Always NULL if frame is exception)
      */
     char *class_path;
 
     /**
      * True if method is native.
+     * (Always false if frame is exception)
      */
     bool is_native;
 
     /**
-     * True if frame is exception
+     * True if frame is exception.
      */
     bool is_exception;
+
+    /**
+     * Exception message. Can be NULL.
+     * (Alaways NULL if frame is NOT exception).
+     */
+    char *message;
 
     struct btp_java_frame *next;
 };
@@ -80,6 +95,15 @@ struct btp_java_frame
  */
 struct btp_java_frame *
 btp_java_frame_new();
+
+/**
+ * Creates and initializes a new exception in frame structure.
+ * @returns
+ * It never returns NULL. The returned pointer must be released by
+ * calling the function btp_java_frame_free().
+ */
+struct btp_java_frame *
+btp_java_frame_new_exception();
 
 /**
  * Initializes all members of the frame structure to their default
@@ -98,6 +122,24 @@ btp_java_frame_init(struct btp_java_frame *frame);
  */
 void
 btp_java_frame_free(struct btp_java_frame *frame);
+
+/**
+ * Releases the memory held by the frame all its siblings.
+ * @param frame
+ * If the frame is NULL, no operation is performed.
+ */
+void
+btp_java_frame_free_full(struct btp_java_frame *frame);
+
+/**
+ * Gets a number of frame in list.
+ * @param frame
+ * If the frame is NULL, no operation is performed.
+ * @returns
+ * A number of frames.
+ */
+struct btp_java_frame *
+btp_java_frame_get_last(struct btp_java_frame *frame);
 
 /**
  * Creates a duplicate of the frame.
@@ -143,6 +185,26 @@ btp_java_frame_cmp(struct btp_java_frame *frame1,
 void
 btp_java_frame_append_to_str(struct btp_java_frame *frame,
                              struct btp_strbuf *dest);
+
+/**
+ * If the input contains proper exception with frames, parse the exception,
+ * move the input pointer after the exception, and return a structure
+ * representing the exception. Otherwise to not modify the input pointer
+ * and return NULL.
+ * @param location
+ * The caller must provide a pointer to struct btp_location here.  The
+ * line and column members are gradually increased as the parser
+ * handles the input, keep this in mind to get reasonable values.
+ * When this function returns NULL (an error occurred), the structure
+ * will contain the error line, column, and message.
+ * @returns
+ * NULL or newly allocated structure, which should be released by
+ * calling btp_java_frame_free().
+ */
+
+struct btp_java_frame *
+btp_java_frame_parse_exception(const char **input,
+                               struct btp_location *location);
 
 /**
  * If the input contains a complete frame, this function parses the

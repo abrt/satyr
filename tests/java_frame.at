@@ -1,4 +1,5 @@
 # Checking the btparser. -*- Autotest -*-
+m4_include([java_exception.at])
 
 AT_BANNER([Java frames])
 
@@ -20,7 +21,7 @@ main(void)
   frame1->file_line = 1;
   frame1->class_path = btp_strdup("/usr/share/jar1");
 
-  struct btp_java_frame *frame0 = btp_java_frame_new();;
+  struct btp_java_frame *frame0 = btp_java_frame_new();
   frame0->name = btp_strdup(frame1->name);
   frame0->file_name = btp_strdup(frame1->file_name);
   frame0->file_line = frame1->file_line;
@@ -50,8 +51,32 @@ main(void)
 
   assert(0 != btp_java_frame_cmp(frame0, frame1));
 
+  struct btp_java_frame *exception0 = btp_java_frame_new_exception();
+  exception0->name = btp_strdup("com.sun.java.NullPointer");
+  exception0->message = btp_strdup("Null pointer exception");
+
+  struct btp_java_frame *exception1 = btp_java_frame_new_exception();
+  exception1->name = btp_strdup(exception0->name);
+  exception1->message = btp_strdup(exception0->message);
+
+  assert(0 == btp_java_frame_cmp(exception0, exception1));
+  assert(0 != btp_java_frame_cmp(frame0, exception1));
+  assert(0 != btp_java_frame_cmp(exception0, frame1));
+
+  free(exception1->message);
+  exception1->message = NULL;
+
+  assert(0 == btp_java_frame_cmp(exception0, exception1));
+
+  free(exception1->name);
+  exception1->name = btp_strdup("com.sun.java.InvalidOperation");
+
+  assert(0 != btp_java_frame_cmp(exception0, exception1));
+
   btp_java_frame_free(frame0);
   btp_java_frame_free(frame1);
+  btp_java_frame_free(exception0);
+  btp_java_frame_free(exception1);
 
   return 0;
 }
@@ -119,8 +144,38 @@ main(void)
   btp_java_frame_free(frame->next);
   btp_java_frame_free(frame);
 
-  btp_java_frame_free(frame1);
+  struct btp_java_frame *exception0 = btp_java_frame_new_exception();
+  exception0->name = btp_strdup("com.sun.java.NullPointer");
+  exception0->message = btp_strdup("Null pointer exception");
+  exception0->next = frame0;
+
+  struct btp_java_frame *exception = btp_java_frame_dup(exception0, false);
+  assert(NULL == exception->next);
+
+  assert(exception->name != exception0->name);
+  assert(0 == strcmp(exception->name, exception0->name));
+
+  assert(exception->message != exception0->message);
+  assert(0 == strcmp(exception->message, exception0->message));
+  btp_java_frame_free(exception);
+
+  exception = btp_java_frame_dup(exception0, true);
+  assert(NULL != exception->next);
+  assert(exception->next != frame0);
+
+  assert(exception->name != exception0->name);
+  assert(0 == strcmp(exception->name, exception0->name));
+
+  assert(exception->message != exception0->message);
+  assert(0 == strcmp(exception->message, exception0->message));
+
+  assert(0 == btp_java_frame_cmp(exception->next, frame0));
+  assert(0 == btp_java_frame_cmp(exception->next->next, frame1));
+
+  btp_java_frame_free(exception);
+  btp_java_frame_free(exception0);
   btp_java_frame_free(frame0);
+  btp_java_frame_free(frame1);
   return 0;
 }
 ]])
@@ -175,6 +230,26 @@ main(void)
   frame.file_name = NULL;
 
   check(&frame, "\tat com.redhat.abrt.duke.nuke(Unknown Source)");
+
+  struct btp_java_frame *exception0 = btp_java_frame_new_exception();
+  exception0->name = btp_strdup("com.sun.java.NullPointer");
+  exception0->message = btp_strdup("Null pointer exception");
+
+  check(exception0, "com.sun.java.NullPointer: Null pointer exception");
+
+  free(exception0->message);
+  exception0->message = NULL;
+
+  check(exception0, "com.sun.java.NullPointer");
+
+  free(exception0->name);
+  exception0->name = NULL;
+
+  check(exception0, "");
+
+  exception0->message = btp_strdup("Null pointer exception");
+
+  check(exception0, ": Null pointer exception");
 
   return 0;
 }
@@ -320,6 +395,224 @@ main(void)
   location.message = "Frame expected";
   check(c, NULL, c, &location);
 
+  return 0;
+}
+]])
+
+
+## ------------------------------ ##
+## btp_java_frame_parse_exception ##
+## ------------------------------ ##
+
+AT_TESTFUN([btp_java_frame_parse_exception],
+[[
+#include <lib/java_frame.h>
+#include <lib/location.h>
+#include <lib/strbuf.h>
+#include <lib/utils.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+
+#include <tests/java_testcases.c>
+
+static void
+check(char *input,
+      const char *expected,
+      struct btp_java_frame *expected_frame,
+      char *expected_input,
+      struct btp_location *expected_location)
+{
+  const char *old_input = input;
+  struct btp_location location;
+  btp_location_init(&location);
+  struct btp_java_frame *frame = btp_java_frame_parse_exception((const char **)&input, &location);
+  assert(input == expected_input);
+  puts("--------------------------------------------------------------------------------");
+  puts(btp_location_to_string(&location));
+  puts(btp_location_to_string(expected_location));
+  if (frame)
+  {
+    struct btp_strbuf *buf = btp_strbuf_new();
+    btp_java_frame_append_to_str(frame, buf);
+
+    const char *fr2 = buf->buf;
+
+    printf("<==============================================================================>\n");
+    printf("'%s' == '%s'\n", expected, fr2);
+    printf("<==============================================================================>\n");
+
+    assert(strcmp(expected, fr2) == 0);
+
+    btp_strbuf_free(buf);
+
+    struct btp_java_frame *tmp_expected = expected_frame;
+    struct btp_java_frame *parsed = frame;
+    while (parsed && tmp_expected)
+    {
+        assert(0 == btp_java_frame_cmp(parsed, tmp_expected));
+        parsed = parsed->next;
+        tmp_expected = tmp_expected->next;
+    }
+
+    assert(parsed == tmp_expected);
+    assert(0 == btp_location_cmp(&location, expected_location, true));
+    btp_java_frame_free_full(frame);
+  }
+  else
+  {
+    /* Check that the pointer is not moved. */
+    assert(old_input == input);
+    assert(0 == btp_location_cmp(&location, expected_location, true));
+    assert(!expected_frame);
+  }
+}
+
+int
+main(void)
+{
+  /* basic */
+  {
+      struct btp_java_frame* exception = btp_java_frame_new_exception();
+      exception->name = btp_strdup("com.sun.java.NullPointer");
+      exception->message = btp_strdup("Null Pointer Exception");
+
+      char *c = "com.sun.java.NullPointer: Null Pointer Exception";
+
+      struct btp_location location;
+      btp_location_init(&location);
+      location.line = 1;
+      location.column = 48;
+      check(c, c, exception, c + strlen(c), &location);
+
+      btp_java_frame_free(exception);
+  }
+
+  /* Next exception */
+  {
+      struct btp_java_frame* exception = btp_java_frame_new_exception();
+      exception->name = btp_strdup("com.sun.java.NullPointer");
+
+      char *c = "com.sun.java.NullPointer: ";
+
+      struct btp_location location;
+      btp_location_init(&location);
+      location.line = 1;
+      location.column = 26;
+      check(c, "com.sun.java.NullPointer", exception, c + strlen(c), &location);
+
+      btp_java_frame_free(exception);
+  }
+
+  /* Next exception */
+  {
+      struct btp_java_frame* exception = btp_java_frame_new_exception();
+      exception->name = btp_strdup("com.sun.java.NullPointer");
+
+      char *c = "com.sun.java.NullPointer  ";
+
+      struct btp_location location;
+      btp_location_init(&location);
+      location.line = 1;
+      location.column = 26;
+      check(c, "com.sun.java.NullPointer", exception, c + strlen(c), &location);
+
+      btp_java_frame_free(exception);
+  }
+
+  /* Next Exception */
+  {
+      char *c = ": Null Pointer Exception";
+
+      struct btp_location location;
+      btp_location_init(&location);
+      location.line = 1;
+      location.column = 0;
+      location.message = "Expected exception name";
+      check(c, NULL, NULL, c, &location);
+  }
+
+  /* Next Exception */
+  {
+      char *c = "";
+
+      struct btp_location location;
+      btp_location_init(&location);
+      location.line = 1;
+      location.column = 0;
+      location.message = "Expected exception name";
+      check(c, NULL, NULL, c, &location);
+  }
+
+  /* Next Exception */
+  {
+      struct btp_java_frame *frame = btp_java_frame_new();
+      frame->name = btp_strdup("com.redhat.abrt.duke.nuke");
+      frame->file_name = btp_strdup("duke.java");
+      frame->file_line = 666;
+
+      struct btp_java_frame* exception = btp_java_frame_new_exception();
+      exception->name = btp_strdup("com.sun.java.NullPointer");
+      exception->message = btp_strdup("Null Pointer Exception");
+      exception->next = frame;
+
+      char *c =
+"com.sun.java.NullPointer: Null Pointer Exception\n"
+"\tat com.redhat.abrt.duke.nuke(duke.java:666)";
+
+      struct btp_location location;
+      btp_location_init(&location);
+      location.line = 2;
+      location.column = 43;
+      check(c, "com.sun.java.NullPointer: Null Pointer Exception", exception, c + strlen(c), &location);
+
+      btp_java_frame_free_full(exception);
+  }
+
+  /* Next Exception */
+  {
+      struct btp_java_frame *frame = btp_java_frame_new();
+      frame->name = btp_strdup("com.redhat.abrt.duke.nuke");
+      frame->file_name = btp_strdup("duke.java");
+      frame->file_line = 666;
+
+      struct btp_java_frame *frame1 = btp_java_frame_dup(frame, false);
+      struct btp_java_frame *frame2 = btp_java_frame_dup(frame, false);
+
+      struct btp_java_frame* exception = btp_java_frame_new_exception();
+      exception->name = btp_strdup("com.sun.java.NullPointer");
+      exception->message = btp_strdup("Null Pointer Exception");
+      exception->next = frame;
+
+      struct btp_java_frame* exception1 = btp_java_frame_new_exception();
+      exception1->name = btp_strdup("com.sun.java.InvalidOperation");
+
+      struct btp_java_frame* exception2 = btp_java_frame_dup(exception1, false);
+
+      frame1->next = exception;  //   ^
+      exception1->next = frame1; //   |
+      frame2->next = exception1; //   |
+      exception2->next = frame2; //   |
+
+      char *c =
+"com.sun.java.NullPointer: Null Pointer Exception\n"
+"\tat com.redhat.abrt.duke.nuke(duke.java:666)\n"
+"\tCaused by: com.sun.java.InvalidOperation: Invalid Operation\n"
+"\tat com.redhat.abrt.duke.nuke(duke.java:666)\n"
+"\t... 1 more\n"
+"\tCaused by: com.sun.java.InvalidOperation: Invalid Operation\n"
+"\tat com.redhat.abrt.duke.nuke(duke.java:666)\n"
+"\t... 2 more";
+
+      struct btp_location location;
+      btp_location_init(&location);
+      location.line = 8;
+      location.column = 11;
+      check(c, "com.sun.java.InvalidOperation: Invalid Operation", exception2, c + strlen(c), &location);
+
+      btp_java_frame_free_full(exception2);
+  }
   return 0;
 }
 ]])
