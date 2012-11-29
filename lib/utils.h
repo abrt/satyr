@@ -151,7 +151,8 @@ btp_strspn_location(const char *s,
  * File contents. If file opening/reading fails, NULL is returned.
  */
 char *
-btp_file_to_string(const char *filename);
+btp_file_to_string(const char *filename,
+                   char **error_message);
 
 /**
  * If the input contains character c in the current positon, move the
@@ -355,6 +356,9 @@ btp_indent(const char *input, int spaces);
 
 char *
 btp_indent_except_first_line(const char *input, int spaces);
+
+char *
+btp_build_path(const char *first_element, ...);
 
 #ifdef __cplusplus
 }

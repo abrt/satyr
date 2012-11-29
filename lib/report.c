@@ -26,6 +26,8 @@
 #include "python_stacktrace.h"
 #include "rpm.h"
 #include "deb.h"
+#include "strbuf.h"
+#include <string.h>
 
 struct btp_report *
 btp_report_new()
@@ -72,5 +74,37 @@ btp_report_free(struct btp_report *report)
 char *
 btp_report_to_json(struct btp_report *report)
 {
-    return NULL;
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+    return btp_strbuf_free_nobuf(strbuf);
+}
+
+struct btp_report *
+btp_report_from_abrt_dir(const char *directory,
+                         char **error_message)
+{
+    struct btp_report *report = btp_report_new();
+
+    /* Report type. */
+    char *filename_type = btp_build_path(directory, "type");
+    char *contents_type = btp_file_to_string(filename_type, error_message);
+    if (!contents_type)
+    {
+        free(filename_type);
+        btp_report_free(report);
+        return NULL;
+    }
+
+    if (0 == strncmp(contents_type, "CCpp", 4))
+        report->report_type = BTP_REPORT_CORE;
+    else if (0 == strncmp(contents_type, "Python", 6))
+        report->report_type = BTP_REPORT_PYTHON;
+    else if (0 == strncmp(contents_type, "Kerneloops", 10))
+        report->report_type = BTP_REPORT_KERNELOOPS;
+    else if (0 == strncmp(contents_type, "Java", 4))
+        report->report_type = BTP_REPORT_JAVA;
+
+    free(contents_type);
+    free(filename_type);
+
+    return report;
 }

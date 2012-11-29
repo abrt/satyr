@@ -227,22 +227,27 @@ btp_strspn_location(const char *s,
 }
 
 char *
-btp_file_to_string(const char *filename)
+btp_file_to_string(const char *filename,
+                   char **error_message)
 {
     /* Open input file, and parse it. */
     int fd = open(filename, O_RDONLY | O_LARGEFILE);
     if (fd < 0)
     {
-        fprintf(stderr, "Unable to open '%s': %s.\n",
-                filename, strerror(errno));
+        *error_message = btp_asprintf("Unable to open '%s': %s.",
+                                      filename,
+                                      strerror(errno));
+
         return NULL;
     }
 
     off_t size = lseek(fd, 0, SEEK_END);
     if (size == (off_t)-1) /* EOVERFLOW? */
     {
-        fprintf(stderr, "Unable to seek in '%s': %s.\n",
-                filename, strerror(errno));
+        *error_message = btp_asprintf("Unable to seek in '%s': %s.",
+                                      filename,
+                                      strerror(errno));
+
 	close(fd);
 	return NULL;
     }
@@ -252,8 +257,10 @@ btp_file_to_string(const char *filename)
     static const size_t FILE_SIZE_LIMIT = 20000000; /* ~ 20 MB */
     if (size > FILE_SIZE_LIMIT)
     {
-        fprintf(stderr, "Input file too big (%lld). Maximum size is %zd.\n",
-                (long long)size, FILE_SIZE_LIMIT);
+        *error_message = btp_asprintf("Input file too big (%lld). Maximum size is %zd.",
+                                      (long long)size,
+                                      FILE_SIZE_LIMIT);
+
         close(fd);
         return NULL;
     }
@@ -261,7 +268,7 @@ btp_file_to_string(const char *filename)
     char *contents = btp_malloc(size + 1);
     if (size != read(fd, contents, size))
     {
-        fprintf(stderr, "Unable to read from '%s'.\n", filename);
+        *error_message = btp_asprintf("Unable to read from '%s'.", filename);
         close(fd);
         free(contents);
         return NULL;
@@ -617,5 +624,25 @@ btp_indent_except_first_line(const char *input, int spaces)
         ++c;
     }
 
+    return btp_strbuf_free_nobuf(strbuf);
+}
+
+char *
+btp_build_path(const char *first_element, ...)
+{
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+    btp_strbuf_append_str(strbuf, first_element);
+
+    va_list elements;
+    va_start(elements, first_element);
+
+    const char *element;
+    while ((element = va_arg(elements, const char *)))
+    {
+        btp_strbuf_append_char(strbuf, '/');
+        btp_strbuf_append_str(strbuf, element);
+    }
+
+    va_end(elements);
     return btp_strbuf_free_nobuf(strbuf);
 }
