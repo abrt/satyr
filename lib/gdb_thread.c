@@ -390,6 +390,7 @@ btp_gdb_thread_parse(const char **input,
                          frame_location.line,
                          frame_location.column);
     }
+
     if (!imthread->frames)
     {
         location->message = frame_location.message;

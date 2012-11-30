@@ -33,6 +33,8 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
+struct btp_location;
+
 struct btp_python_frame
 {
     char *file_name;
@@ -91,6 +93,36 @@ btp_python_frame_free(struct btp_python_frame *frame);
 struct btp_python_frame *
 btp_python_frame_dup(struct btp_python_frame *frame,
                      bool siblings);
+
+/**
+ * Appends 'item' at the end of the list 'dest'.
+ * @returns
+ * This function returns the 'dest' frame.  If 'dest' is NULL, it
+ * returns the 'item' frame.
+ */
+struct btp_python_frame *
+btp_python_frame_append(struct btp_python_frame *dest,
+                        struct btp_python_frame *item);
+
+/**
+ * If the input contains a complete frame, this function parses the
+ * frame text, returns it in a structure, and moves the input pointer
+ * after the frame.  If the input does not contain proper, complete
+ * frame, the function does not modify input and returns NULL.
+ * @returns
+ * Allocated pointer with a frame structure. The pointer should be
+ * released by btp_python_frame_free().
+ * @param location
+ * The caller must provide a pointer to an instance of btp_location
+ * here.  When this function returns NULL, the structure will contain
+ * the error line, column, and message.  The line and column members
+ * of the location are gradually increased as the parser handles the
+ * input, so the location should be initialized before calling this
+ * function to get reasonable values.
+ */
+struct btp_python_frame *
+btp_python_frame_parse(const char **input,
+                       struct btp_location *location);
 
 #ifdef __cplusplus
 }
