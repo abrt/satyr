@@ -19,9 +19,7 @@
 */
 #include "python_stacktrace.h"
 #include "python_frame.h"
-#include "core_stacktrace.h"
-#include "core_thread.h"
-#include "core_frame.h"
+#include "location.h"
 #include "utils.h"
 #include "sha1.h"
 #include <stdio.h>
@@ -71,150 +69,62 @@ btp_python_stacktrace_dup(struct btp_python_stacktrace *stacktrace)
 }
 
 
-/*
-Example input:
-
------ BEGIN -----
-__init__.py:49:execute:OperationalError: no such table: fedora_koji_rpm_provides
-
-Traceback (most recent call last):
-  File "/usr/bin/faf-refreshrepo", line 24, in <module>
-    repo.load(pool)
-  File "/usr/lib/python2.7/site-packages/pyfaf/libsolv.py", line 58, in load
-    return self.load_if_changed()
-  File "/usr/lib/python2.7/site-packages/pyfaf/libsolv.py", line 490, in load_if_changed
-    self.db.execute("SELECT COUNT(*) FROM {0}_provides".format(self.name))
-  File "/usr/lib/python2.7/site-packages/pyfaf/cache/__init__.py", line 181, in execute
-    self._cursor.execute(sql, parameters)
-  File "/usr/lib/python2.7/site-packages/pyfaf/cache/__init__.py", line 49, in execute
-    self.cursor.execute(sql, parameters)
-OperationalError: no such table: fedora_koji_rpm_provides
-
-Local variables in innermost frame:
-self: <pyfaf.cache.Cursor instance at 0x26f41b8>
-parameters: []
-sql: 'SELECT COUNT(*) FROM fedora_koji_rpm_provides'
------ END -----
-
-relevant lines:
-  File "/usr/bin/faf-refreshrepo", line 24, in <module>
-  File "/usr/lib/python2.7/site-packages/pyfaf/libsolv.py", line 58, in load
-  File "/usr/lib/python2.7/site-packages/pyfaf/libsolv.py", line 490, in load_if_changed
-  File "/usr/lib/python2.7/site-packages/pyfaf/cache/__init__.py", line 181, in execute
-  File "/usr/lib/python2.7/site-packages/pyfaf/cache/__init__.py", line 49, in execute
-
-regexp would be "^  File \"([^\"]+)\", line ([0-9]+), in (.*)$"
-\1 = file name; \2 = offset; \3 = function name
-*/
-
-struct btp_core_stacktrace *
-btp_core_python_parse_stacktrace(const char *text)
+struct btp_python_stacktrace *
+btp_python_stacktrace_parse(const char **input,
+                            struct btp_location *location)
 {
-    /* there may be other lines that match the regexp,
-       the actual stacktrace always has "Traceback" header */
-    char *line = strstr(text, "\nTraceback");
-    if (!line)
-        return NULL;
+    const char *local_input = *input;
 
-    /* jump to the first line of the actual stacktrace */
-    line = strchr(++line, '\n');
-    if (!line)
-        return NULL;
+    /* Parse the header. */
+    const char *HEADER = "\nTraceback (most recent call last):\n";
+    local_input = btp_strstr_location(local_input,
+                                      HEADER,
+                                      &location->line,
+                                      &location->column);
 
-    ++line;
-
-    struct btp_core_stacktrace *stacktrace = btp_core_stacktrace_new();
-    stacktrace->threads = btp_core_thread_new();
-
-    /* iterate line by line
-       best effort - continue on error */
-    char *nextline = NULL, *splitter;
-    while (0 == strncmp(line, "  ", strlen("  ")))
+    if (!local_input)
     {
-        /* '\n' was replaced by '\0' in the previous round */
-        if (nextline)
-            *(nextline - 1) = '\n';
-
-        /* split lines */
-        nextline = strchr(line, '\n');
-        if (!nextline)
-            break;
-        *nextline = '\0';
-        ++nextline;
-
-        if (strncmp(line, "  File \"", strlen("  File \"")) != 0)
-        {
-            line = nextline;
-            continue;
-        }
-
-        struct btp_core_frame *frame = btp_core_frame_new();
-
-        /* file name */
-        const char *filename = strchr(line, '"');
-        if (!filename)
-        {
-            btp_core_frame_free(frame);
-            fprintf(stderr, "Unable to find the '\"' character "
-                            "identifying the beginning of file name\n");
-            line = nextline;
-            continue;
-        }
-
-        splitter = strchr(++filename, '"');
-        if (!splitter)
-        {
-            btp_core_frame_free(frame);
-            fprintf(stderr, "Unable to find the '\"' character "
-                            "identifying the end of file name\n");
-            line = nextline;
-            continue;
-        }
-
-        char old = *splitter;
-        *splitter = '\0';
-        frame->file_name = btp_strdup(filename);
-        *splitter = old;
-
-        /* line number */
-        char *offsetstr = strstr(++splitter, "line ");
-        if (!offsetstr)
-        {
-            btp_core_frame_free(frame);
-            fprintf(stderr, "Unable to find 'line ' pattern "
-                            "identifying line number\n");
-            line = nextline;
-            continue;
-        }
-        offsetstr += strlen("line ");
-        if (sscanf(offsetstr, "%"PRIu64, &frame->build_id_offset) != 1)
-        {
-            btp_core_frame_free(frame);
-            fprintf(stderr, "Unable to parse line number\n");
-            line = nextline;
-            continue;
-        }
-
-        /* function name */
-        const char *funcname = strstr(splitter, ", in ");
-        if (!funcname)
-        {
-            btp_core_frame_free(frame);
-            fprintf(stderr, "Unable to find ', in ' pattern "
-                            "identifying function name\n");
-            line = nextline;
-            continue;
-        }
-        funcname += strlen(", in ");
-        frame->function_name = btp_strdup(funcname);
-
-        stacktrace->threads->frames = btp_core_frame_append(stacktrace->threads->frames,
-                                                           frame);
-        line = nextline;
+        location->message = "Traceback header not found.";
+        return NULL;
     }
 
-    if (nextline)
-        *(nextline - 1) = '\n';
+    local_input += strlen(HEADER);
+    location->line += 2;
+    location->column = 0;
 
+    struct btp_python_stacktrace *stacktrace = btp_python_stacktrace_new();
+
+    /* Read the frames. */
+    struct btp_python_frame *frame, *prevframe = NULL;
+    struct btp_location frame_location;
+    btp_location_init(&frame_location);
+    while ((frame = btp_python_frame_parse(&local_input, &frame_location)))
+    {
+        if (prevframe)
+        {
+            btp_python_frame_append(prevframe, frame);
+            prevframe = frame;
+        }
+        else
+            stacktrace->frames = prevframe = frame;
+
+        btp_location_add(location,
+                         frame_location.line,
+                         frame_location.column);
+    }
+
+    if (!stacktrace->frames)
+    {
+        location->message = frame_location.message;
+        btp_python_stacktrace_free(stacktrace);
+        return NULL;
+    }
+
+    /* Parse exception name. */
+    btp_parse_char_cspan(&local_input,
+                         ":\n",
+                         stacktrace->exception_name);
+
+    *input = local_input;
     return stacktrace;
 }

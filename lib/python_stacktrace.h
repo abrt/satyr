@@ -33,6 +33,7 @@ extern "C" {
 #include <stdint.h>
 
 struct btp_python_frame;
+struct btp_location;
 
 struct btp_python_stacktrace
 {
@@ -81,6 +82,19 @@ btp_python_stacktrace_free(struct btp_python_stacktrace *stacktrace);
  */
 struct btp_python_stacktrace *
 btp_python_stacktrace_dup(struct btp_python_stacktrace *stacktrace);
+
+/**
+ * Parses a textual Python stacktrace and puts it into a structure.
+ * If parsing fails, the input parameter is not changed and NULL is
+ * returned.
+ * @param input
+ * Pointer to the string with the Python stack trace. If this function
+ * returns a non-NULL value, the input pointer is modified to point
+ * after the stacktrace that was just parsed.
+ */
+struct btp_python_stacktrace *
+btp_python_stacktrace_parse(const char **input,
+                            struct btp_location *location);
 
 #ifdef __cplusplus
 }
