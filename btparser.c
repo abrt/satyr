@@ -26,6 +26,7 @@
 #include "lib/metrics.h"
 #include "lib/cluster.h"
 #include "lib/normalize.h"
+#include "lib/report.h"
 #include "lib/config.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,16 +34,13 @@
 #include <argp.h>
 #include <sysexits.h>
 #include <assert.h>
-
-const char *argp_program_version = "btparser " VERSION;
-const char *argp_program_bug_address = "<kklic@redhat.com>";
-
-static char doc[] = "btparser -- Automatic problem management with anonymous reports";
+#include <libgen.h>
 
 static void
 help(char *prog)
 {
-    printf("Usage: %s COMMAND [OPTION...]\n\n", prog);
+    printf("Usage: %s COMMAND [OPTION...]\n", prog);
+    printf("%s -- Automatic problem management with anonymous reports\n\n", prog);
     puts("Currently, a single command is available:");
     puts("   abrt-dir-to-report  Create report from an ABRT directory");
     puts("   report-abrt-dir     Create report from an ABRT directory and send it to a server");
@@ -51,9 +49,9 @@ help(char *prog)
 static void
 usage(char *prog)
 {
-    printf("Usage: %s --version\n", prog)
-    printf("Usage: %s abrt-dir-to-report DIR [FILE] [OPTION...]\n", prog)
-    printf("Usage: %s report-abrt-dir DIR URL [OPTION...]\n", prog)
+    printf("Usage: %s --version\n", prog);
+    printf("Usage: %s abrt-dir-to-report DIR [FILE] [OPTION...]\n", prog);
+    printf("Usage: %s report-abrt-dir DIR URL [OPTION...]\n", prog);
 }
 
 static void
@@ -69,7 +67,7 @@ abrt_dir_to_report(int argc, char **argv)
     struct btp_report *report = btp_report_from_abrt_dir(argv[0], &error_message);
     if (!report)
     {
-        fputs(stderr, error_message);
+        fputs(error_message, stderr);
         exit(1);
     }
 
@@ -87,7 +85,7 @@ report_abrt_dir(int argc, char **argv)
     struct btp_report *report = btp_report_from_abrt_dir(argv[0], &error_message);
     if (!report)
     {
-        fputs(stderr, error_message);
+        fputs(error_message, stderr);
         exit(1);
     }
 

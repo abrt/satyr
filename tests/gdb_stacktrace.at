@@ -74,7 +74,8 @@ check(const char *path, const char *first_thread_function_name)
   /* Load the stacktrace from a file. */
   struct btp_location location;
   btp_location_init(&location);
-  char *full_input = btp_file_to_string(path);
+  char *error_message;
+  char *full_input = btp_file_to_string(path, &error_message);
   assert(full_input);
   char *input = full_input;
   struct btp_gdb_stacktrace *stacktrace = btp_gdb_stacktrace_parse(&input, &location);
@@ -117,7 +118,8 @@ main(void)
   /* Load the stacktrace from Red Hat Bugzilla bug #621492. */
   struct btp_location location;
   btp_location_init(&location);
-  char *full_input = btp_file_to_string("../../gdb_stacktraces/rhbz-621492");
+  char *error_message;
+  char *full_input = btp_file_to_string("../../gdb_stacktraces/rhbz-621492", &error_message);
   assert(full_input);
   char *input = full_input;
   struct btp_gdb_stacktrace *stacktrace = btp_gdb_stacktrace_parse(&input, &location);
@@ -155,7 +157,8 @@ main(void)
   /* Load the stacktrace from Red Hat Bugzilla bug #621492. */
   struct btp_location location;
   btp_location_init(&location);
-  char *full_input = btp_file_to_string("../../gdb_stacktraces/rhbz-621492");
+  char *error_message;
+  char *full_input = btp_file_to_string("../../gdb_stacktraces/rhbz-621492", &error_message);
   assert(full_input);
   char *input = full_input;
   struct btp_gdb_stacktrace *stacktrace = btp_gdb_stacktrace_parse(&input, &location);
@@ -185,7 +188,8 @@ main(void)
   /* Check the crash frame of stacktrace from Red Hat Bugzilla bug #803600. */
   struct btp_location location;
   btp_location_init(&location);
-  char *full_input = btp_file_to_string("../../gdb_stacktraces/rhbz-803600");
+  char *error_message;
+  char *full_input = btp_file_to_string("../../gdb_stacktraces/rhbz-803600", &error_message);
   assert(full_input);
   char *input = full_input;
   struct btp_gdb_stacktrace *stacktrace = btp_gdb_stacktrace_parse(&input, &location);

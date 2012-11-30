@@ -80,7 +80,8 @@ check(const char *path,
       const char *last_function_name,
       int frame_count)
 {
-  char *full_input = btp_file_to_string(path);
+  char *error_message;
+  char *full_input = btp_file_to_string(path, &error_message);
   assert(full_input);
   char *input = full_input;
 

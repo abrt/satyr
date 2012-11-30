@@ -1,4 +1,4 @@
-AC_INIT([btparser], [1], [kklic@redhat.com])
+AC_INIT([satyr], [1], [kklic@redhat.com])
 AC_CONFIG_HEADERS([lib/config.h])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AM_MAINTAINER_MODE
