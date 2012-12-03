@@ -42,7 +42,7 @@ btp_report_init(struct btp_report *report)
 {
     report->report_version = 1;
     report->report_type = BTP_REPORT_INVALID;
-    report->reporter_name = "btparser";
+    report->reporter_name = PACKAGE_NAME;
     report->reporter_version = PACKAGE_VERSION;
     report->user_type = BTP_USER_INVALID;
     report->operating_system.name = NULL;
@@ -75,6 +75,55 @@ char *
 btp_report_to_json(struct btp_report *report)
 {
     struct btp_strbuf *strbuf = btp_strbuf_new();
+
+    /* Report version. */
+    btp_strbuf_append_strf(strbuf,
+                           "{   \"report_version\": %"PRIu32"\n",
+                           report->report_version);
+
+    /* Report type. */
+    const char *report_type;
+    switch (report->report_type)
+    {
+    default:
+    case BTP_REPORT_INVALID:
+        report_type = "invalid";
+        break;
+    case BTP_REPORT_CORE:
+        report_type = "core";
+        break;
+    case BTP_REPORT_PYTHON:
+        report_type = "python";
+        break;
+    case BTP_REPORT_KERNELOOPS:
+        report_type = "kerneloops";
+        break;
+    case BTP_REPORT_JAVA:
+        report_type = "java";
+        break;
+    }
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"report_type\": \"%s\"\n",
+                           report_type);
+
+    /* Reporter name. */
+    if (report->reporter_name)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"reporter_name\": \"%s\"\n",
+                               report->reporter_name);
+    }
+
+    /* Reporter version. */
+    if (report->reporter_version)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"reporter_version\": \"%s\"\n",
+                               report->reporter_version);
+    }
+
+    btp_strbuf_append_str(strbuf, "}");
     return btp_strbuf_free_nobuf(strbuf);
 }
 
@@ -85,7 +134,7 @@ btp_report_from_abrt_dir(const char *directory,
     struct btp_report *report = btp_report_new();
 
     /* Report type. */
-    char *filename_type = btp_build_path(directory, "type");
+    char *filename_type = btp_build_path(directory, "analyzer", NULL);
     char *contents_type = btp_file_to_string(filename_type, error_message);
     if (!contents_type)
     {

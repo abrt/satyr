@@ -76,16 +76,17 @@ static void
 abrt_dir_to_report(int argc, char **argv)
 {
     char *error_message;
-    struct btp_report *report = btp_report_from_abrt_dir(argv[0], &error_message);
+    struct btp_report *report = btp_report_from_abrt_dir(argv[0],
+                                                         &error_message);
+
     if (!report)
     {
-        fputs(error_message, stderr);
+        fprintf(stderr, "%s\n", error_message);
         exit(1);
     }
 
     char *json = btp_report_to_json(report);
     free(report);
-
     puts(json);
     free(json);
 }
@@ -94,7 +95,9 @@ static void
 report_abrt_dir(int argc, char **argv)
 {
     char *error_message;
-    struct btp_report *report = btp_report_from_abrt_dir(argv[0], &error_message);
+    struct btp_report *report = btp_report_from_abrt_dir(argv[0],
+                                                         &error_message);
+
     if (!report)
     {
         fputs(error_message, stderr);
@@ -103,8 +106,6 @@ report_abrt_dir(int argc, char **argv)
 
     char *json = btp_report_to_json(report);
     free(report);
-
-
     free(json);
 }
 
