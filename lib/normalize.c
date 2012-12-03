@@ -197,6 +197,7 @@ find_new_function_name_glibc(const char *function_name,
         call_match(function_name, source_file, "__" func "_sse2_bsf", func, "/sysdeps/", "libc.so", NULL) || \
         call_match(function_name, source_file, "__" func "_ssse3", func, "/sysdeps/", "libc.so", NULL) /* ssse3, not sse3! */ || \
         call_match(function_name, source_file, "__" func "_ssse3_rep", func, "/sysdeps/", "libc.so", NULL) || \
+        call_match(function_name, source_file, "__" func "_ssse3_back", func, "/sysdeps/", "libc.so", NULL) || \
         call_match(function_name, source_file, "__" func "_sse42", func, "/sysdeps/", "libc.so", NULL) || \
         call_match(function_name, source_file, "__" func "_ia32", func, "/sysdeps", "libc.so", NULL)) \
         {                                                               \
