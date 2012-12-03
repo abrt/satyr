@@ -1,17 +1,16 @@
 %{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
-Name: btparser
+Name: satyr
 Version: @PACKAGE_VERSION@
 Release: 1%{?dist}
-Summary: Parser and analyzer for backtraces produced by GDB
+Summary: Automatic problem management with anonymous reports
 Group: Development/Libraries
 License: GPLv2+
-URL: http://fedorahosted.org/btparser
+URL: https://github.com/karelklic/satyr
 Source0: https://fedorahosted.org/released/btparser/btparser-%{version}.tar.xz
 BuildRequires: python2-devel
 BuildRequires: glib2-devel >= 2.21
 BuildRequires: elfutils-devel, elfutils-libelf-devel, binutils-devel
-Requires: glib2 >= 2.21
 Requires: elfutils-libelf, elfutils-libs, binutils
 
 %description

@@ -11325,7 +11325,7 @@ if test -z "$PYTHON"; then
     echo "The python interpreter was not found in the search path. The Python language bindings"
     echo "will not be built.  If you want to build the Python language bindings, please ensure"
     echo "that python is installed and its directory is included in the search path."
-    echo "Then run configure again before attempting to build Btparser."
+    echo "Then run configure again before attempting to build Satyr."
 fi
 
 # Just PKG_CHECK_MODULES([PYTHON], [python]) works only with python2.7+
@@ -11589,7 +11589,7 @@ if test "$have_libopcodes" = "no"; then
     echo "The libopcodes library was not found in the search path. The core stacktrace support "
     echo "will not be built.  If you want to build core stacktrace support, please ensure"
     echo "that libopcodes is installed and its directory is included in the search path."
-    echo "Then run configure again before attempting to build Btparser."
+    echo "Then run configure again before attempting to build Satyr."
 fi
 
 # Check libopcodes
@@ -11618,7 +11618,7 @@ if test "$opcodes_pic" = "no"; then
     echo "The libopcodes library on your system was not compiled with PIC. The core backtrace support "
     echo "will not be built.  If you want to build core backtrace support, please ensure"
     echo "that the provided libopcodes is build with -fPIC."
-    echo "Then run configure again before attempting to build Btparser."
+    echo "Then run configure again before attempting to build Satyr."
 fi
 
 test ! \( "$opcodes_pic" = "yes" -a "$have_libopcodes" = "yes" \)
@@ -12560,7 +12560,7 @@ if test "$PDFLATEX" = "no"; then
     echo "The pdflatex program was not found in the search path. The documentation"
     echo "will not be built.  If you want to build the documentation, please ensure"
     echo "that pdflatex is installed and its directory is included in the search path."
-    echo "Then run configure again before attempting to build Btparser."
+    echo "Then run configure again before attempting to build Satyr."
 fi
 
 # doxygen
@@ -12617,7 +12617,7 @@ if test "$DOXYGEN" = "no"; then
     echo "The doxygen program was not found in the search path. The documentation"
     echo "will not be built.  If you want to build the documentation, please ensure"
     echo "that doxygen is installed and its directory is included in the search path."
-    echo "Then run configure again before attempting to build Btparser."
+    echo "Then run configure again before attempting to build Satyr."
 fi
 
 # dot (part of graphviz)
@@ -12674,7 +12674,7 @@ if test "DOT" = "no"; then
     echo "The dot program was not found in the search path. The documentation"
     echo "will not be built.  If you want to build the documentation, please ensure"
     echo "that dot is installed and its directory is included in the search path."
-    echo "Then run configure again before attempting to build Btparser."
+    echo "Then run configure again before attempting to build Satyr."
 fi
 
  if test \( "$DOXYGEN" != "no" \) \
@@ -12688,7 +12688,7 @@ else
 fi
 
 
-ac_config_files="$ac_config_files btparser.spec btparser.pc Makefile lib/Makefile python/Makefile docs/Makefile tests/Makefile tests/atlocal"
+ac_config_files="$ac_config_files satyr.spec satyr.pc Makefile lib/Makefile python/Makefile docs/Makefile tests/Makefile tests/atlocal"
 
 
 cat >confcache <<\_ACEOF
@@ -13626,8 +13626,8 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "tests/atconfig") CONFIG_COMMANDS="$CONFIG_COMMANDS tests/atconfig" ;;
-    "btparser.spec") CONFIG_FILES="$CONFIG_FILES btparser.spec" ;;
-    "btparser.pc") CONFIG_FILES="$CONFIG_FILES btparser.pc" ;;
+    "satyr.spec") CONFIG_FILES="$CONFIG_FILES satyr.spec" ;;
+    "satyr.pc") CONFIG_FILES="$CONFIG_FILES satyr.pc" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "lib/Makefile") CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
     "python/Makefile") CONFIG_FILES="$CONFIG_FILES python/Makefile" ;;

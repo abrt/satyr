@@ -35,11 +35,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = btparser$(EXEEXT)
+bin_PROGRAMS = satyr$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/btparser.pc.in \
-	$(srcdir)/btparser.spec.in $(top_srcdir)/configure COPYING \
+	$(srcdir)/Makefile.in $(srcdir)/satyr.pc.in \
+	$(srcdir)/satyr.spec.in $(top_srcdir)/configure COPYING \
 	ChangeLog NEWS TODO config.guess config.sub depcomp install-sh \
 	ltmain.sh missing py-compile
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -53,16 +53,16 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/lib/config.h
-CONFIG_CLEAN_FILES = btparser.spec btparser.pc
+CONFIG_CLEAN_FILES = satyr.spec satyr.pc
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" \
 	"$(DESTDIR)$(pkgconfigdir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_btparser_OBJECTS = btparser-btparser.$(OBJEXT)
-btparser_OBJECTS = $(am_btparser_OBJECTS)
-btparser_DEPENDENCIES = lib/libbtparser.la
-btparser_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(btparser_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+am_satyr_OBJECTS = satyr-satyr.$(OBJEXT)
+satyr_OBJECTS = $(am_satyr_OBJECTS)
+satyr_DEPENDENCIES = lib/libbtparser.la
+satyr_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(satyr_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/lib
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -77,8 +77,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(btparser_SOURCES)
-DIST_SOURCES = $(btparser_SOURCES)
+SOURCES = $(satyr_SOURCES)
+DIST_SOURCES = $(satyr_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -286,14 +286,13 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
 @BUILD_DOCUMENTATION_TRUE@MAYBE_DOCUMENTATION = docs
 SUBDIRS = lib python tests $(MAYBE_DOCUMENTATION)
-btparser_CFLAGS = -Wall
-btparser_SOURCES = btparser.c
-btparser_LDADD = lib/libbtparser.la
-man_MANS = btparser.1
-EXTRA_DIST = $(man_MANS) btparser.pc.in autogen.sh RELEASE \
-	btparser.spec.in
+satyr_CFLAGS = -Wall
+satyr_SOURCES = satyr.c
+satyr_LDADD = lib/libbtparser.la
+man_MANS = satyr.1
+EXTRA_DIST = $(man_MANS) satyr.pc.in autogen.sh RELEASE satyr.spec.in
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = btparser.pc
+pkgconfig_DATA = satyr.pc
 DISTCLEANFILES = $(pkgconfig_DATA)
 UPLOAD_URI = kklic@fedorahosted.org:btparser
 RPM_DIRS = --define "_sourcedir `pwd`" \
@@ -340,9 +339,9 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
-btparser.spec: $(top_builddir)/config.status $(srcdir)/btparser.spec.in
+satyr.spec: $(top_builddir)/config.status $(srcdir)/satyr.spec.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-btparser.pc: $(top_builddir)/config.status $(srcdir)/btparser.pc.in
+satyr.pc: $(top_builddir)/config.status $(srcdir)/satyr.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
@@ -387,9 +386,9 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-btparser$(EXEEXT): $(btparser_OBJECTS) $(btparser_DEPENDENCIES) 
-	@rm -f btparser$(EXEEXT)
-	$(btparser_LINK) $(btparser_OBJECTS) $(btparser_LDADD) $(LIBS)
+satyr$(EXEEXT): $(satyr_OBJECTS) $(satyr_DEPENDENCIES) 
+	@rm -f satyr$(EXEEXT)
+	$(satyr_LINK) $(satyr_OBJECTS) $(satyr_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -397,7 +396,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/btparser-btparser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/satyr-satyr.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -420,19 +419,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-btparser-btparser.o: btparser.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btparser_CFLAGS) $(CFLAGS) -MT btparser-btparser.o -MD -MP -MF $(DEPDIR)/btparser-btparser.Tpo -c -o btparser-btparser.o `test -f 'btparser.c' || echo '$(srcdir)/'`btparser.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/btparser-btparser.Tpo $(DEPDIR)/btparser-btparser.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='btparser.c' object='btparser-btparser.o' libtool=no @AMDEPBACKSLASH@
+satyr-satyr.o: satyr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(satyr_CFLAGS) $(CFLAGS) -MT satyr-satyr.o -MD -MP -MF $(DEPDIR)/satyr-satyr.Tpo -c -o satyr-satyr.o `test -f 'satyr.c' || echo '$(srcdir)/'`satyr.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/satyr-satyr.Tpo $(DEPDIR)/satyr-satyr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='satyr.c' object='satyr-satyr.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btparser_CFLAGS) $(CFLAGS) -c -o btparser-btparser.o `test -f 'btparser.c' || echo '$(srcdir)/'`btparser.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(satyr_CFLAGS) $(CFLAGS) -c -o satyr-satyr.o `test -f 'satyr.c' || echo '$(srcdir)/'`satyr.c
 
-btparser-btparser.obj: btparser.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btparser_CFLAGS) $(CFLAGS) -MT btparser-btparser.obj -MD -MP -MF $(DEPDIR)/btparser-btparser.Tpo -c -o btparser-btparser.obj `if test -f 'btparser.c'; then $(CYGPATH_W) 'btparser.c'; else $(CYGPATH_W) '$(srcdir)/btparser.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/btparser-btparser.Tpo $(DEPDIR)/btparser-btparser.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='btparser.c' object='btparser-btparser.obj' libtool=no @AMDEPBACKSLASH@
+satyr-satyr.obj: satyr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(satyr_CFLAGS) $(CFLAGS) -MT satyr-satyr.obj -MD -MP -MF $(DEPDIR)/satyr-satyr.Tpo -c -o satyr-satyr.obj `if test -f 'satyr.c'; then $(CYGPATH_W) 'satyr.c'; else $(CYGPATH_W) '$(srcdir)/satyr.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/satyr-satyr.Tpo $(DEPDIR)/satyr-satyr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='satyr.c' object='satyr-satyr.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btparser_CFLAGS) $(CFLAGS) -c -o btparser-btparser.obj `if test -f 'btparser.c'; then $(CYGPATH_W) 'btparser.c'; else $(CYGPATH_W) '$(srcdir)/btparser.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(satyr_CFLAGS) $(CFLAGS) -c -o satyr-satyr.obj `if test -f 'satyr.c'; then $(CYGPATH_W) 'satyr.c'; else $(CYGPATH_W) '$(srcdir)/satyr.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -969,10 +968,10 @@ upload:
 	scp $(distdir).zip $(UPLOAD_URI)
 	make dist-xz
 	scp $(distdir).tar.xz $(UPLOAD_URI)
-rpm: dist-xz btparser.spec
-	rpmbuild $(RPM_DIRS) -ba btparser.spec
-srpm: dist-xz btparser.spec
-	rpmbuild $(RPM_DIRS) -bs btparser.spec
+rpm: dist-xz satyr.spec
+	rpmbuild $(RPM_DIRS) -ba satyr.spec
+srpm: dist-xz satyr.spec
+	rpmbuild $(RPM_DIRS) -bs satyr.spec
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -3,8 +3,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: btparser
-Description: Library to parse and analyze backtraces produced by the GNU Project Debugger
+Name: satyr
+Description: Automatic problem management with anonymous reports
 Version: @PACKAGE_VERSION@
 Libs: -L${libdir} -lbtparser
 Cflags: -I${includedir}

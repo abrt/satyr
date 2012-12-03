@@ -20,7 +20,7 @@ AM_CONDITIONAL([HAVE_PYTHON], test -n "$PYTHON")
     [echo "The python interpreter was not found in the search path. The Python language bindings"]
     [echo "will not be built.  If you want to build the Python language bindings, please ensure"]
     [echo "that python is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Btparser."]
+    [echo "Then run configure again before attempting to build Satyr."]
 [fi]
 
 # Just PKG_CHECK_MODULES([PYTHON], [python]) works only with python2.7+
@@ -35,7 +35,7 @@ AC_CHECK_LIB([opcodes], [main], [have_libopcodes=yes], [have_libopcodes=no])
     [echo "The libopcodes library was not found in the search path. The core stacktrace support "]
     [echo "will not be built.  If you want to build core stacktrace support, please ensure"]
     [echo "that libopcodes is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Btparser."]
+    [echo "Then run configure again before attempting to build Satyr."]
 [fi]
 
 # Check libopcodes
@@ -62,7 +62,7 @@ AC_MSG_RESULT([$opcodes_pic])
     [echo "The libopcodes library on your system was not compiled with PIC. The core backtrace support "]
     [echo "will not be built.  If you want to build core backtrace support, please ensure"]
     [echo "that the provided libopcodes is build with -fPIC."]
-    [echo "Then run configure again before attempting to build Btparser."]
+    [echo "Then run configure again before attempting to build Satyr."]
 [fi]
 
 test ! \( "$opcodes_pic" = "yes" -a "$have_libopcodes" = "yes" \)
@@ -98,7 +98,7 @@ AM_CONDITIONAL([HAVE_PDFLATEX], test "$PDFLATEX" != "no")
     [echo "The pdflatex program was not found in the search path. The documentation"]
     [echo "will not be built.  If you want to build the documentation, please ensure"]
     [echo "that pdflatex is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Btparser."]
+    [echo "Then run configure again before attempting to build Satyr."]
 [fi]
 
 # doxygen
@@ -108,7 +108,7 @@ AM_CONDITIONAL([HAVE_DOXYGEN], test "$DOXYGEN" != "no")
     [echo "The doxygen program was not found in the search path. The documentation"]
     [echo "will not be built.  If you want to build the documentation, please ensure"]
     [echo "that doxygen is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Btparser."]
+    [echo "Then run configure again before attempting to build Satyr."]
 [fi]
 
 # dot (part of graphviz)
@@ -118,7 +118,7 @@ AM_CONDITIONAL([HAVE_DOT], test "$DOT" != "no")
     [echo "The dot program was not found in the search path. The documentation"]
     [echo "will not be built.  If you want to build the documentation, please ensure"]
     [echo "that dot is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Btparser."]
+    [echo "Then run configure again before attempting to build Satyr."]
 [fi]
 
 AM_CONDITIONAL([BUILD_DOCUMENTATION], test \( "$DOXYGEN" != "no" \) \
@@ -126,8 +126,8 @@ AM_CONDITIONAL([BUILD_DOCUMENTATION], test \( "$DOXYGEN" != "no" \) \
 					-a \( "$PDFLATEX" != "no" \))
 
 AC_CONFIG_FILES([
-	btparser.spec
-	btparser.pc
+	satyr.spec
+	satyr.pc
 	Makefile
 	lib/Makefile
 	python/Makefile

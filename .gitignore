@@ -3,9 +3,9 @@
 .libs
 Makefile
 autom4te.cache
-btparser
-btparser.pc
-btparser.spec
+satyr
+satyr.pc
+satyr.spec
 *.o
 config.log
 config.status
