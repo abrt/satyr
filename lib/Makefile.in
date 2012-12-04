@@ -85,7 +85,7 @@ am_libbtparser_la_OBJECTS = $(am__objects_1) \
 	libbtparser_la-disasm.lo libbtparser_la-elves.lo \
 	libbtparser_la-gdb_stacktrace.lo libbtparser_la-gdb_frame.lo \
 	libbtparser_la-gdb_sharedlib.lo libbtparser_la-gdb_thread.lo \
-	libbtparser_la-java_frame.lo libbtparser_la-java_exception.lo \
+	libbtparser_la-java_frame.lo \
 	libbtparser_la-java_thread.lo \
 	libbtparser_la-java_stacktrace.lo libbtparser_la-json.lo \
 	libbtparser_la-koops_frame.lo \
@@ -264,7 +264,6 @@ pkginclude_HEADERS = \
 	gdb_stacktrace.h \
 	gdb_thread.h \
 	java_frame.h \
-	java_exception.h \
 	java_thread.h \
 	java_stacktrace.h \
 	json.h \
@@ -302,7 +301,6 @@ libbtparser_la_SOURCES = \
 	gdb_sharedlib.c \
 	gdb_thread.c \
 	java_frame.c \
-	java_exception.c \
 	java_thread.c \
 	java_stacktrace.c \
 	json.c \
@@ -434,7 +432,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-gdb_sharedlib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-gdb_stacktrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-gdb_thread.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-java_exception.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-java_frame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-java_stacktrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-java_thread.Plo@am__quote@
@@ -592,13 +589,6 @@ libbtparser_la-java_frame.lo: java_frame.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='java_frame.c' object='libbtparser_la-java_frame.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-java_frame.lo `test -f 'java_frame.c' || echo '$(srcdir)/'`java_frame.c
-
-libbtparser_la-java_exception.lo: java_exception.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-java_exception.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-java_exception.Tpo -c -o libbtparser_la-java_exception.lo `test -f 'java_exception.c' || echo '$(srcdir)/'`java_exception.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-java_exception.Tpo $(DEPDIR)/libbtparser_la-java_exception.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='java_exception.c' object='libbtparser_la-java_exception.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-java_exception.lo `test -f 'java_exception.c' || echo '$(srcdir)/'`java_exception.c
 
 libbtparser_la-java_thread.lo: java_thread.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-java_thread.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-java_thread.Tpo -c -o libbtparser_la-java_thread.lo `test -f 'java_thread.c' || echo '$(srcdir)/'`java_thread.c
