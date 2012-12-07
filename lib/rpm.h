@@ -56,9 +56,8 @@ struct btp_rpm_package
     char *version;
     char *release;
     char *architecture;
-    uint32_t install_time;
+    uint64_t install_time;
     struct btp_rpm_consistency *consistency;
-
     struct btp_rpm_package *next;
 };
 
@@ -89,6 +88,22 @@ btp_rpm_package_get_by_name(const char *name,
 struct btp_rpm_package *
 btp_rpm_package_get_by_path(const char *path,
                             char **error_message);
+
+char *
+btp_rpm_package_to_json(struct btp_rpm_package *package,
+                        bool recursive);
+
+struct btp_rpm_package *
+btp_rpm_packages_from_abrt_dir(const char *directory,
+                               char **error_message);
+
+bool
+btp_rpm_package_parse(const char *text,
+                      char **name,
+                      uint32_t *epoch,
+                      char **version,
+                      char **release,
+                      char **architecture);
 
 struct btp_rpm_consistency *
 btp_rpm_consistency_new();

@@ -26,7 +26,6 @@
 #include "python_stacktrace.h"
 #include "operating_system.h"
 #include "rpm.h"
-#include "deb.h"
 #include "strbuf.h"
 #include <string.h>
 
@@ -48,11 +47,8 @@ btp_report_init(struct btp_report *report)
     report->user_root = false;
     report->user_local = true;
     report->operating_system = NULL;
-
     report->component_name = NULL;
     report->rpm_packages = NULL;
-    report->deb_packages = NULL;
-
     report->python_stacktrace = NULL;
     report->koops_stacktrace = NULL;
     report->core_stacktrace = NULL;
@@ -64,7 +60,6 @@ btp_report_free(struct btp_report *report)
     free(report->component_name);
     btp_operating_system_free(report->operating_system);
     btp_rpm_package_free(report->rpm_packages, true);
-    btp_deb_package_free(report->deb_packages, true);
     btp_python_stacktrace_free(report->python_stacktrace);
     btp_koops_stacktrace_free(report->koops_stacktrace);
     btp_core_stacktrace_free(report->core_stacktrace);
@@ -136,13 +131,34 @@ btp_report_to_json(struct btp_report *report)
     if (report->operating_system)
     {
         char *opsys_str = btp_operating_system_to_json(report->operating_system);
-        char *opsys_str_indented = btp_indent_except_first_line(opsys_str, 8);
+        char *opsys_str_indented = btp_indent_except_first_line(opsys_str, strlen(",   \"operating_system\": "));
         free(opsys_str);
         btp_strbuf_append_strf(strbuf,
                                ",   \"operating_system\": %s\n",
                                opsys_str_indented);
 
         free(opsys_str_indented);
+    }
+
+    /* Component name. */
+    if (report->component_name)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"component_name\": \"%s\"\n",
+                               report->component_name);
+    }
+
+    /* RPM packages. */
+    if (report->rpm_packages)
+    {
+        char *rpms_str = btp_rpm_package_to_json(report->rpm_packages, true);
+        char *rpms_str_indented = btp_indent_except_first_line(rpms_str, strlen(",   \"rpm_packages\": "));
+        free(rpms_str);
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"rpm_packages\": %s\n",
+                               rpms_str_indented);
+
+        free(rpms_str_indented);
     }
 
     btp_strbuf_append_str(strbuf, "}");
@@ -156,26 +172,46 @@ btp_report_from_abrt_dir(const char *directory,
     struct btp_report *report = btp_report_new();
 
     /* Report type. */
-    char *filename_type = btp_build_path(directory, "analyzer", NULL);
-    char *contents_type = btp_file_to_string(filename_type, error_message);
-    if (!contents_type)
+    char *analyzer_filename = btp_build_path(directory, "analyzer", NULL);
+    char *analyzer_contents = btp_file_to_string(analyzer_filename, error_message);
+    free(analyzer_filename);
+    if (!analyzer_contents)
     {
-        free(filename_type);
         btp_report_free(report);
         return NULL;
     }
 
-    if (0 == strncmp(contents_type, "CCpp", 4))
+    if (0 == strncmp(analyzer_contents, "CCpp", 4))
         report->report_type = BTP_REPORT_CORE;
-    else if (0 == strncmp(contents_type, "Python", 6))
+    else if (0 == strncmp(analyzer_contents, "Python", 6))
         report->report_type = BTP_REPORT_PYTHON;
-    else if (0 == strncmp(contents_type, "Kerneloops", 10))
+    else if (0 == strncmp(analyzer_contents, "Kerneloops", 10))
         report->report_type = BTP_REPORT_KERNELOOPS;
-    else if (0 == strncmp(contents_type, "Java", 4))
+    else if (0 == strncmp(analyzer_contents, "Java", 4))
         report->report_type = BTP_REPORT_JAVA;
 
-    free(contents_type);
-    free(filename_type);
+    free(analyzer_contents);
+
+    /* Operating system. */
+    report->operating_system = btp_operating_system_from_abrt_dir(directory, error_message);
+    if (!report->operating_system)
+    {
+        btp_report_free(report);
+        return NULL;
+    }
+
+    /* Component name. */
+    char *component_filename = btp_build_path(directory, "component", NULL);
+    report->component_name = btp_file_to_string(component_filename, error_message);
+    free(component_filename);
+
+    /* RPM packages. */
+    report->rpm_packages = btp_rpm_packages_from_abrt_dir(directory, error_message);
+    if (!report->rpm_packages)
+    {
+        btp_report_free(report);
+        return NULL;
+    }
 
     return report;
 }

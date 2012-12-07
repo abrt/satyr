@@ -52,7 +52,6 @@ struct btp_report
 
     char *component_name;
     struct btp_rpm_package *rpm_packages;
-    struct btp_deb_package *deb_packages;
 
     struct btp_python_stacktrace *python_stacktrace;
     struct btp_koops_stacktrace *koops_stacktrace;
