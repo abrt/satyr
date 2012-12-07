@@ -91,6 +91,7 @@ am_libbtparser_la_OBJECTS = $(am__objects_1) \
 	libbtparser_la-koops_frame.lo \
 	libbtparser_la-koops_stacktrace.lo libbtparser_la-location.lo \
 	libbtparser_la-metrics.lo libbtparser_la-normalize.lo \
+	libbtparser_la-operating_system.lo \
 	libbtparser_la-python_frame.lo \
 	libbtparser_la-python_stacktrace.lo libbtparser_la-report.lo \
 	libbtparser_la-rpm.lo libbtparser_la-sha1.lo \
@@ -273,6 +274,7 @@ pkginclude_HEADERS = \
 	location.h \
 	metrics.h \
 	normalize.h \
+	operating_system.h \
 	python_frame.h \
 	python_stacktrace.h \
 	report.h \
@@ -311,6 +313,7 @@ libbtparser_la_SOURCES = \
 	location.c \
 	metrics.c \
 	normalize.c \
+	operating_system.c \
 	python_frame.c \
 	python_stacktrace.c \
 	report.c \
@@ -444,6 +447,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-location.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-metrics.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-normalize.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-operating_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-python_frame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-python_stacktrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libbtparser_la-report.Plo@am__quote@
@@ -655,6 +659,13 @@ libbtparser_la-normalize.lo: normalize.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize.c' object='libbtparser_la-normalize.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-normalize.lo `test -f 'normalize.c' || echo '$(srcdir)/'`normalize.c
+
+libbtparser_la-operating_system.lo: operating_system.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-operating_system.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-operating_system.Tpo -c -o libbtparser_la-operating_system.lo `test -f 'operating_system.c' || echo '$(srcdir)/'`operating_system.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libbtparser_la-operating_system.Tpo $(DEPDIR)/libbtparser_la-operating_system.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='operating_system.c' object='libbtparser_la-operating_system.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -c -o libbtparser_la-operating_system.lo `test -f 'operating_system.c' || echo '$(srcdir)/'`operating_system.c
 
 libbtparser_la-python_frame.lo: python_frame.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libbtparser_la_CFLAGS) $(CFLAGS) -MT libbtparser_la-python_frame.lo -MD -MP -MF $(DEPDIR)/libbtparser_la-python_frame.Tpo -c -o libbtparser_la-python_frame.lo `test -f 'python_frame.c' || echo '$(srcdir)/'`python_frame.c

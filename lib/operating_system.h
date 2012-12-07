@@ -49,7 +49,10 @@ struct btp_operating_system *
 btp_operating_system_from_abrt_dir(const char *directory,
                                    char **error_message);
 
-
+bool
+btp_operating_system_parse_etc_system_release(const char *etc_system_release,
+                                              char **name,
+                                              char **version);
 
 #ifdef __cplusplus
 }

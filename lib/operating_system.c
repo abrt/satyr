@@ -90,3 +90,31 @@ btp_operating_system_from_abrt_dir(const char *directory,
 {
     return NULL;
 }
+
+bool
+btp_operating_system_parse_etc_system_release(const char *etc_system_release,
+                                              char **name,
+                                              char **version)
+{
+    const char *release = strstr(etc_system_release, " release ");
+    if (!release)
+        return false;
+
+    *name = btp_strndup(etc_system_release, release - etc_system_release);
+
+    if (0 == strlen(*name))
+        return false;
+
+    const char *version_begin = release + strlen(" release ");
+    const char *version_end = version_begin;
+    while (isdigit(*version_end) || *version_end == '.')
+        ++version_end;
+
+    // Fallback when parsing of version fails.
+    ptrdiff_t version_len = version_end - version_begin;
+    if (0 == version_len)
+        version_end = version_begin + strlen(version_begin);
+
+    *version = btp_strndup(version_begin, version_end - version_begin);
+    return true;
+}
