@@ -24,6 +24,7 @@
 #include "koops_stacktrace.h"
 #include "core_stacktrace.h"
 #include "python_stacktrace.h"
+#include "operating_system.h"
 #include "rpm.h"
 #include "deb.h"
 #include "strbuf.h"
@@ -44,11 +45,9 @@ btp_report_init(struct btp_report *report)
     report->report_type = BTP_REPORT_INVALID;
     report->reporter_name = PACKAGE_NAME;
     report->reporter_version = PACKAGE_VERSION;
-    report->user_type = BTP_USER_INVALID;
-    report->operating_system.name = NULL;
-    report->operating_system.version = NULL;
-    report->operating_system.architecture = NULL;
-    report->operating_system.uptime = 0;
+    report->user_root = false;
+    report->user_local = true;
+    report->operating_system = NULL;
 
     report->component_name = NULL;
     report->rpm_packages = NULL;
@@ -63,6 +62,7 @@ void
 btp_report_free(struct btp_report *report)
 {
     free(report->component_name);
+    btp_operating_system_free(report->operating_system);
     btp_rpm_package_free(report->rpm_packages, true);
     btp_deb_package_free(report->deb_packages, true);
     btp_python_stacktrace_free(report->python_stacktrace);
@@ -121,6 +121,28 @@ btp_report_to_json(struct btp_report *report)
         btp_strbuf_append_strf(strbuf,
                                ",   \"reporter_version\": \"%s\"\n",
                                report->reporter_version);
+    }
+
+    /* User type. */
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"user_root\": %s\n",
+                           report->user_root ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"user_local\": %s\n",
+                           report->user_local ? "true" : "false");
+
+    /* Operating system. */
+    if (report->operating_system)
+    {
+        char *opsys_str = btp_operating_system_to_json(report->operating_system);
+        char *opsys_str_indented = btp_indent_except_first_line(opsys_str, 8);
+        free(opsys_str);
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"operating_system\": %s\n",
+                               opsys_str_indented);
+
+        free(opsys_str_indented);
     }
 
     btp_strbuf_append_str(strbuf, "}");

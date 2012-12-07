@@ -24,6 +24,7 @@ pkginclude_HEADERS = \
 	location.h \
 	metrics.h \
 	normalize.h \
+	operating_system.h \
 	python_frame.h \
 	python_stacktrace.h \
 	report.h \
@@ -62,6 +63,7 @@ libbtparser_la_SOURCES = \
 	location.c \
 	metrics.c \
 	normalize.c \
+	operating_system.c \
 	python_frame.c \
 	python_stacktrace.c \
 	report.c \

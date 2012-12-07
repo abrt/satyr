@@ -26,23 +26,6 @@ extern "C" {
 
 #include <inttypes.h>
 
-enum btp_user_type
-{
-    BTP_USER_INVALID = 0,
-    BTP_USER_ROOT,
-    BTP_USER_NOLOGIN,
-    BTP_USER_LOCAL,
-    BTP_USER_REMOTE
-};
-
-struct btp_operating_system
-{
-    char *name;
-    char *version;
-    char *architecture;
-    uint64_t uptime;
-};
-
 enum btp_report_type
 {
     BTP_REPORT_INVALID = 0,
@@ -60,8 +43,11 @@ struct btp_report
     char *reporter_name;
     char *reporter_version;
 
-    enum btp_user_type user_type;
-    struct btp_operating_system operating_system;
+    // This is the real user id, not effective.
+    bool user_root;
+    bool user_local;
+
+    struct btp_operating_system *operating_system;
 
     char *component_name;
     struct btp_rpm_package *rpm_packages;
