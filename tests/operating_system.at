@@ -1,0 +1,39 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([Operating system])
+
+## --------------------------------------------- ##
+## btp_operating_system_parse_etc_system_release ##
+## --------------------------------------------- ##
+AT_TESTFUN([btp_operating_system_parse_etc_system_release],
+[[
+#include <lib/operating_system.h>
+#include <lib/utils.h>
+#include <assert.h>
+
+void check(const char *etc_system_release,
+           const char *expected_name,
+	   const char *expected_version)
+{
+    printf("Testing %s.\n", etc_system_release);
+    char *name, *version;
+    bool success = btp_operating_system_parse_etc_system_release(
+        etc_system_release,
+	&name,
+	&version);
+
+    assert(success);
+    assert(0 == strcmp(name, expected_name));
+    assert(0 == strcmp(version, expected_version));
+    free(name);
+    free(version);
+}
+
+int
+main(void)
+{
+    check("Fedora release 16 (Verne)", "Fedora", "16");
+    check("Red Hat Enterprise Linux release 6.2", "Red Hat Enterprise Linux", "6.2");
+    return 0;
+}
+]])

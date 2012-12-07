@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 #include <inttypes.h>
+#include <stdbool.h>
 
 enum btp_report_type
 {

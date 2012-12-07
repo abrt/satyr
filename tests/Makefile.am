@@ -35,12 +35,13 @@ TESTSUITE_AT =		\
   gdb_thread.at 	\
   gdb_stacktrace.at  	\
   gdb_sharedlib.at	\
-  java_frame.at \
-  java_exception.at \
-  java_thread.at \
-  java_stacktrace.at \
+  java_frame.at 	\
+  java_exception.at 	\
+  java_thread.at 	\
+  java_stacktrace.at 	\
   koops_frame.at	\
   koops_stacktrace.at   \
+  operating_system.at   \
   core_frame.at         \
   core_thread.at        \
   core_stacktrace.at    \

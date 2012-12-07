@@ -24,6 +24,9 @@
 extern "C" {
 #endif
 
+#include <inttypes.h>
+#include <stdbool.h>
+
 struct btp_operating_system
 {
     char *name;

@@ -19,6 +19,12 @@
     02110-1301 USA.
 */
 #include "operating_system.h"
+#include "utils.h"
+#include "strbuf.h"
+#include <string.h>
+#include <ctype.h>
+#include <stddef.h>
+
 
 struct btp_operating_system *
 btp_operating_system_new()
