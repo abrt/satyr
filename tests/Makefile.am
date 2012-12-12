@@ -47,7 +47,8 @@ TESTSUITE_AT =		\
   core_stacktrace.at    \
   normalize.at  	\
   metrics.at 		\
-  cluster.at
+  cluster.at  		\
+  rpm.at
 
 EXTRA_DIST += $(TESTSUITE_AT)
 TESTSUITE = $(srcdir)/testsuite

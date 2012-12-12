@@ -20,6 +20,7 @@
 #include "rpm.h"
 #include "utils.h"
 #include "strbuf.h"
+#include <errno.h>
 #include <rpm/rpmlib.h>
 #include <rpm/rpmdb.h>
 #include <rpm/rpmts.h>
@@ -357,12 +358,10 @@ btp_rpm_packages_from_abrt_dir(const char *directory,
         return NULL;
 
     struct btp_rpm_package *package = btp_rpm_package_new();
-    bool success = btp_rpm_package_parse(package_contents,
-                                         &package->name,
-                                         &package->epoch,
-                                         &package->version,
-                                         &package->release,
-                                         &package->architecture);
+    bool success = btp_rpm_package_parse_nvr(package_contents,
+                                             &package->name,
+                                             &package->version,
+                                             &package->release);
 
     if (!success)
     {
@@ -379,15 +378,131 @@ btp_rpm_packages_from_abrt_dir(const char *directory,
 }
 
 bool
-btp_rpm_package_parse(const char *text,
-                      char **name,
-                      uint32_t *epoch,
-                      char **version,
-                      char **release,
-                      char **architecture)
+btp_rpm_package_parse_nvr(const char *text,
+                          char **name,
+                          char **version,
+                          char **release)
 {
-    // TODO.
-    return false;
+    char *last_dash = strrchr(text, '-');
+    if (!last_dash)
+        return false;
+
+    if (0 == strlen(last_dash))
+        return false;
+
+    char *last_but_one_dash = last_dash;
+    while (last_but_one_dash > text)
+    {
+        --last_but_one_dash;
+        if (*last_but_one_dash == '-')
+            break;
+    }
+
+    if (last_but_one_dash == text ||
+        last_dash - last_but_one_dash == 1)
+    {
+        return false;
+    }
+
+    // Release is after the last dash.
+    *release = btp_strdup(last_dash + 1);
+
+    // Version is before the last dash.
+    *version = btp_strndup(last_but_one_dash + 1,
+                           last_dash - last_but_one_dash - 1);
+
+    // Name is before version.
+    *name = btp_strndup(text, last_but_one_dash - text);
+
+    return true;
+}
+
+bool
+btp_rpm_package_parse_nevra(const char *text,
+                            char **name,
+                            uint32_t *epoch,
+                            char **version,
+                            char **release,
+                            char **architecture)
+{
+    char *last_dot = strrchr(text, '.');
+    if (!last_dot || 0 == strlen(last_dot))
+        return false;
+
+    char *last_dash = strrchr(text, '-');
+    if (!last_dash || last_dot - last_dash <= 1)
+        return false;
+
+    char *last_but_one_dash = last_dash;
+    while (last_but_one_dash > text)
+    {
+        --last_but_one_dash;
+        if (*last_but_one_dash == '-')
+            break;
+    }
+
+    if (last_but_one_dash == text ||
+        last_dash - last_but_one_dash == 1)
+    {
+        return false;
+    }
+
+    char *colon = strchr(last_but_one_dash, ':');
+    if (colon && colon > last_dash)
+        colon = NULL;
+
+    if (colon && (last_dash - colon == 1 ||
+                  colon - last_but_one_dash == 1))
+    {
+        return false;
+    }
+
+    // Architecture is after the last dot.
+    *architecture = btp_strdup(last_dot + 1);
+
+    // Release is after the last dash.
+    *release = btp_strndup(last_dash + 1, last_dot - last_dash - 1);
+
+    // Epoch is optional.
+    if (colon)
+    {
+        // Version is before the last dash.
+        *version = btp_strndup(colon + 1,
+                               last_dash - colon - 1);
+
+        char *epoch_str = btp_strndup(last_but_one_dash + 1,
+                                      colon - last_but_one_dash - 1);
+
+        char *endptr;
+        errno = 0;
+        unsigned long r = strtoul(epoch_str, &endptr, 10);
+        bool failure = (errno || epoch_str == endptr || *endptr != '\0'
+                        || r > UINT32_MAX);
+
+        if (failure)
+        {
+            free(epoch_str);
+            free(*release);
+            free(*architecture);
+            return false;
+        }
+
+        *epoch = r;
+        free(epoch_str);
+    }
+    else
+    {
+        // Version is before the last dash.
+        *version = btp_strndup(last_but_one_dash + 1,
+                               last_dash - last_but_one_dash - 1);
+
+        *epoch = 0;
+    }
+
+    // Name is before version.
+    *name = btp_strndup(text, last_but_one_dash - text);
+
+    return true;
 }
 
 struct btp_rpm_consistency *

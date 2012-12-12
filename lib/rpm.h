@@ -98,12 +98,18 @@ btp_rpm_packages_from_abrt_dir(const char *directory,
                                char **error_message);
 
 bool
-btp_rpm_package_parse(const char *text,
-                      char **name,
-                      uint32_t *epoch,
-                      char **version,
-                      char **release,
-                      char **architecture);
+btp_rpm_package_parse_nvr(const char *text,
+                          char **name,
+                          char **version,
+                          char **release);
+
+bool
+btp_rpm_package_parse_nevra(const char *text,
+                            char **name,
+                            uint32_t *epoch,
+                            char **version,
+                            char **release,
+                            char **architecture);
 
 struct btp_rpm_consistency *
 btp_rpm_consistency_new();

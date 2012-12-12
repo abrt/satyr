@@ -1,0 +1,81 @@
+# Checking the btparser. -*- Autotest -*-
+
+AT_BANNER([RPM])
+
+## -------------------------- ##
+## btp_rpm_package_parse_nvr  ##
+## -------------------------- ##
+AT_TESTFUN([btp_rpm_package_parse_nvr],
+[[
+#include <lib/rpm.h>
+#include <assert.h>
+
+int
+main(void)
+{
+  char *name, *version, *release;
+  bool success = btp_rpm_package_parse_nvr("coreutils-8.4-19.el6",
+                                           &name,
+					   &version,
+					   &release);
+
+  assert(success);
+  assert(0 == strcmp(name, "coreutils"));
+  assert(0 == strcmp(version, "8.4"));
+  assert(0 == strcmp(release, "19.el6"));
+  return 0;
+}
+]])
+
+## ---------------------------- ##
+## btp_rpm_package_parse_nevra  ##
+## ---------------------------- ##
+AT_TESTFUN([btp_rpm_package_parse_nevra],
+[[
+#include <lib/rpm.h>
+#include <assert.h>
+#include <stdint.h>
+
+static void
+check(char *input,
+      bool expected_success,
+      char *expected_name,
+      uint32_t expected_epoch,
+      char *expected_version,
+      char *expected_release,
+      char *expected_architecture)
+{
+  char *name, *version, *release, *architecture;
+  uint32_t epoch;
+  bool success = btp_rpm_package_parse_nevra(input,
+                                             &name,
+					     &epoch,
+					     &version,
+					     &release,
+					     &architecture);
+
+  assert(success == expected_success);
+  if (success)
+  {
+    assert(0 == strcmp(name, expected_name));
+    assert(epoch == expected_epoch);
+    assert(0 == strcmp(version, expected_version));
+    assert(0 == strcmp(release, expected_release));
+    assert(0 == strcmp(architecture, expected_architecture));
+  }
+}
+
+int
+main(void)
+{
+  check("glibc-2.12-1.80.el6_3.5.x86_64",
+        true,
+	"glibc",
+	0,
+	"2.12",
+	"1.80.el6_3.5",
+	"x86_64");
+
+  return 0;
+}
+]])

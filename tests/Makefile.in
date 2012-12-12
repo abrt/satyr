@@ -201,7 +201,8 @@ TESTSUITE_AT = \
   core_stacktrace.at    \
   normalize.at  	\
   metrics.at 		\
-  cluster.at
+  cluster.at  		\
+  rpm.at
 
 TESTSUITE = $(srcdir)/testsuite
 MAINTAINERCLEANFILES = Makefile.in $(TESTSUITE)
