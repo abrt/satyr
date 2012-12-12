@@ -166,14 +166,14 @@ btp_python_frame_parse(const char **input,
     }
 
     btp_skip_char(&local_input, '\n');
-    btp_location_add(&location, 1, 0);
+    btp_location_add(location, 1, 0);
 
     /* Parse source code line (optional). */
     if (4 == btp_skip_string(&local_input, "    "))
     {
         btp_skip_char_cspan(&local_input, "\n");
         btp_skip_char(&local_input, '\n');
-        btp_location_add(&location, 1, 0);
+        btp_location_add(location, 1, 0);
     }
 
     *input = local_input;

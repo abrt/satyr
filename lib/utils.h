@@ -177,7 +177,9 @@ btp_skip_char_limited(const char **input, const char *allowed);
  * the input and return false.
  */
 bool
-btp_parse_char_limited(const char **input, const char *allowed, char *result);
+btp_parse_char_limited(const char **input,
+                       const char *allowed,
+                       char *result);
 
 /**
  * If the input contains the character c one or more times, update it
@@ -224,7 +226,9 @@ btp_skip_char_span_location(const char **input,
  * to free the result.
  */
 int
-btp_parse_char_span(const char **input, const char *accept, char **result);
+btp_parse_char_span(const char **input,
+                    const char *accept,
+                    char **result);
 
 /**
  * If the input contains one or more characters which are not
@@ -246,7 +250,9 @@ btp_skip_char_cspan(const char **input, const char *reject);
  * free the result.
  */
 bool
-btp_parse_char_cspan(const char **input, const char *reject, char **result);
+btp_parse_char_cspan(const char **input,
+                     const char *reject,
+                     char **result);
 
 /**
  * If the input contains the string, move the input pointer after

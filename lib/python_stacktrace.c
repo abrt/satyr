@@ -123,7 +123,7 @@ btp_python_stacktrace_parse(const char **input,
     /* Parse exception name. */
     btp_parse_char_cspan(&local_input,
                          ":\n",
-                         stacktrace->exception_name);
+                         &stacktrace->exception_name);
 
     *input = local_input;
     return stacktrace;
