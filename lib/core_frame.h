@@ -132,7 +132,6 @@ int
 btp_core_frame_cmp(struct btp_core_frame *frame1,
                    struct btp_core_frame *frame2);
 
-
 /**
  * Appends 'item' at the end of the list 'dest'.
  * @returns

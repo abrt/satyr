@@ -147,19 +147,10 @@ btp_struniq(char **strings, size_t *size)
 int
 btp_strcmp0(const char *s1, const char *s2)
 {
-    if (!s1)
-    {
-        if (s2)
-            return -1;
-        return 0;
-    }
+    if (s1)
+        return s2 ? strcmp(s1, s2) : 1;
     else
-    {
-        if (!s2)
-            return 1;
-        /* Both are non-null. */
-        return strcmp(s1, s2);
-    }
+        return s2 ? -1 : 0;
 }
 
 char *

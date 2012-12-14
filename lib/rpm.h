@@ -34,8 +34,7 @@ extern "C" {
 
 struct btp_rpm_consistency
 {
-    char *file_name;
-
+    char *path;
     bool owner_changed;
     bool group_changed;
     bool mode_changed;
@@ -45,7 +44,6 @@ struct btp_rpm_consistency
     bool minor_number_changed;
     bool symlink_changed;
     bool modification_time_changed;
-
     struct btp_rpm_consistency *next;
 };
 
@@ -70,6 +68,23 @@ btp_rpm_package_init(struct btp_rpm_package *package);
 void
 btp_rpm_package_free(struct btp_rpm_package *package,
                      bool recursive);
+
+/**
+ * Compares two packages.
+ * @param package1
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @param package2
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @returns
+ * Returns 0 if the packages are same.  Returns negative number if
+ * package1 is found to be 'less' than package2.  Returns positive
+ * number if package1 is found to be 'greater' than package2.
+ */
+int
+btp_rpm_package_cmp(struct btp_rpm_package *package1,
+                    struct btp_rpm_package *package2);
 
 /**
  * Appends 'item' at the end of the list 'dest'.
@@ -98,7 +113,7 @@ btp_rpm_packages_from_abrt_dir(const char *directory,
                                char **error_message);
 
 struct btp_rpm_package *
-btp_rpm_packages_parse_dso_list(const char *text);
+btp_rpm_package_parse_dso_list(const char *text);
 
 bool
 btp_rpm_package_parse_nvr(const char *text,
@@ -123,6 +138,14 @@ btp_rpm_consistency_init(struct btp_rpm_consistency *consistency);
 void
 btp_rpm_consistency_free(struct btp_rpm_consistency *consistency,
                          bool recursive);
+
+int
+btp_rpm_consistency_cmp(struct btp_rpm_consistency *consistency1,
+                        struct btp_rpm_consistency *consistency2);
+
+int
+btp_rpm_consistency_cmp_recursive(struct btp_rpm_consistency *consistency1,
+                                  struct btp_rpm_consistency *consistency2);
 
 #ifdef __cplusplus
 }

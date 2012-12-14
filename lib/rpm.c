@@ -63,6 +63,52 @@ btp_rpm_package_free(struct btp_rpm_package *package,
     free(package);
 }
 
+int
+btp_rpm_package_cmp(struct btp_rpm_package *package1,
+                    struct btp_rpm_package *package2)
+{
+    /* Name. */
+    int name = btp_strcmp0(package1->name, package2->name);
+    if (name != 0)
+        return name;
+
+    /* Epoch. */
+    int32_t epoch = package1->epoch - package2->epoch;
+    if (epoch != 0)
+        return epoch;
+
+    /* Version. */
+    int version = btp_strcmp0(package1->version, package2->version);
+    if (version != 0)
+        return version;
+
+    /* Release. */
+    int release = btp_strcmp0(package1->release, package2->release);
+    if (release != 0)
+        return release;
+
+    /* Architecture. */
+    int architecture = btp_strcmp0(package1->architecture,
+                                   package2->architecture);
+
+    if (architecture != 0)
+        return architecture;
+
+    /* Install time. */
+    int64_t install_time = package1->install_time - package2->install_time;
+    if (install_time != 0)
+        return install_time;
+
+    /* Consistency. */
+    int consistency = btp_rpm_consistency_cmp_recursive(package1->consistency,
+                                                        package2->consistency);
+
+    if (consistency)
+        return consistency;
+
+    return 0;
+}
+
 struct btp_rpm_package *
 btp_rpm_package_append(struct btp_rpm_package *dest,
                        struct btp_rpm_package *item)
@@ -385,7 +431,7 @@ btp_rpm_packages_from_abrt_dir(const char *directory,
     }
 
     struct btp_rpm_package *dso_packages =
-        btp_rpm_packages_parse_dso_list(dso_list_contents);
+        btp_rpm_package_parse_dso_list(dso_list_contents);
 
     if (dso_packages)
         packages = btp_rpm_package_append(packages, dso_packages);
@@ -395,7 +441,7 @@ btp_rpm_packages_from_abrt_dir(const char *directory,
 }
 
 struct btp_rpm_package *
-btp_rpm_packages_parse_dso_list(const char *text)
+btp_rpm_package_parse_dso_list(const char *text)
 {
     struct btp_rpm_package *packages = NULL;
     const char *pos = text;
@@ -626,9 +672,91 @@ btp_rpm_consistency_free(struct btp_rpm_consistency *consistency,
     if (!consistency)
         return;
 
-    free(consistency->file_name);
+    free(consistency->path);
     if (consistency->next && recursive)
         btp_rpm_consistency_free(consistency->next, true);
 
     free(consistency);
+}
+
+int
+btp_rpm_consistency_cmp(struct btp_rpm_consistency *consistency1,
+                        struct btp_rpm_consistency *consistency2)
+{
+    /* Path. */
+    int path = btp_strcmp0(consistency1->path, consistency2->path);
+    if (path != 0)
+        return path;
+
+    /* Owner changed. */
+    int owner_changed = consistency1->owner_changed - consistency2->owner_changed;
+    if (owner_changed != 0)
+        return owner_changed;
+
+    /* Group changed. */
+    int group_changed = consistency1->group_changed - consistency2->group_changed;
+    if (group_changed != 0)
+        return group_changed;
+
+    /* Mode changed. */
+    int mode_changed = consistency1->mode_changed - consistency2->mode_changed;
+    if (mode_changed != 0)
+        return mode_changed;
+
+    /* MD5 mismatch. */
+    int md5_mismatch = consistency1->md5_mismatch - consistency2->md5_mismatch;
+    if (md5_mismatch != 0)
+        return md5_mismatch;
+
+    /* Size changed. */
+    int size_changed = consistency1->size_changed - consistency2->size_changed;
+    if (size_changed != 0)
+        return size_changed;
+
+    /* Major number changed. */
+    int major_number_changed = consistency1->major_number_changed - consistency2->major_number_changed;
+    if (major_number_changed != 0)
+        return major_number_changed;
+
+    /* Minor number changed. */
+    int minor_number_changed = consistency1->minor_number_changed - consistency2->minor_number_changed;
+    if (minor_number_changed != 0)
+        return minor_number_changed;
+
+    /* Symlink changed. */
+    int symlink_changed = consistency1->symlink_changed - consistency2->symlink_changed;
+    if (symlink_changed != 0)
+        return symlink_changed;
+
+    /* Modification time changed. */
+    int modification_time_changed = consistency1->modification_time_changed - consistency2->modification_time_changed;
+    if (modification_time_changed != 0)
+        return modification_time_changed;
+
+    return 0;
+}
+
+int
+btp_rpm_consistency_cmp_recursive(struct btp_rpm_consistency *consistency1,
+                                  struct btp_rpm_consistency *consistency2)
+{
+    if (consistency1)
+    {
+        if (consistency2)
+        {
+            int cmp = btp_rpm_consistency_cmp(consistency1, consistency2);
+            if (cmp != 0)
+                return cmp;
+            else
+            {
+                return btp_rpm_consistency_cmp_recursive(
+                    consistency1->next,
+                    consistency2->next);
+            }
+        }
+        else
+            return 1;
+    }
+    else
+        return consistency2 ? -1 : 0;
 }
