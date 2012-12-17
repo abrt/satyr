@@ -48,7 +48,8 @@ TESTSUITE_AT =		\
   normalize.at  	\
   metrics.at 		\
   cluster.at  		\
-  rpm.at
+  rpm.at		\
+  abrt.at
 
 EXTRA_DIST += $(TESTSUITE_AT)
 TESTSUITE = $(srcdir)/testsuite
