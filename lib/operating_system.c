@@ -93,41 +93,6 @@ btp_operating_system_to_json(struct btp_operating_system *operating_system)
     return btp_strbuf_free_nobuf(strbuf);
 }
 
-struct btp_operating_system *
-btp_operating_system_from_abrt_dir(const char *directory,
-                                   char **error_message)
-{
-    char *release_filename = btp_build_path(directory, "os_release", NULL);
-    char *release_contents = btp_file_to_string(release_filename, error_message);
-    free(release_filename);
-    if (!release_contents)
-        return NULL;
-
-    struct btp_operating_system *os = btp_operating_system_new();
-    bool success = btp_operating_system_parse_etc_system_release(release_contents,
-                                                                 &os->name,
-                                                                 &os->version);
-
-    free(release_contents);
-    if (!success)
-    {
-        btp_operating_system_free(os);
-        *error_message = btp_strdup("Failed to parse operating system release string");
-        return NULL;
-    }
-
-    char *arch_filename = btp_build_path(directory, "architecture", NULL);
-    os->architecture = btp_file_to_string(arch_filename, error_message);
-    free(arch_filename);
-    if (!os->architecture)
-    {
-        btp_operating_system_free(os);
-        return NULL;
-    }
-
-    return os;
-}
-
 bool
 btp_operating_system_parse_etc_system_release(const char *etc_system_release,
                                               char **name,

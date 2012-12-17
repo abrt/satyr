@@ -318,7 +318,7 @@ btp_rpm_package_to_json(struct btp_rpm_package *package,
             else
                 btp_strbuf_append_str(strbuf, ", ");
 
-            char *package_json = btp_rpm_package_to_json(package, false);
+            char *package_json = btp_rpm_package_to_json(p, false);
             char *indented_package_json = btp_indent_except_first_line(package_json, 2);
             btp_strbuf_append_str(strbuf, indented_package_json);
             free(indented_package_json);
@@ -391,134 +391,6 @@ btp_rpm_package_to_json(struct btp_rpm_package *package,
     }
 
     return btp_strbuf_free_nobuf(strbuf);
-}
-
-struct btp_rpm_package *
-btp_rpm_packages_from_abrt_dir(const char *directory,
-                               char **error_message)
-{
-    char *package_filename = btp_build_path(directory, "package", NULL);
-    char *package_contents = btp_file_to_string(package_filename, error_message);
-    free(package_filename);
-    if (!package_contents)
-        return NULL;
-
-    struct btp_rpm_package *packages = btp_rpm_package_new();
-    bool success = btp_rpm_package_parse_nvr(package_contents,
-                                             &packages->name,
-                                             &packages->version,
-                                             &packages->release);
-
-    if (!success)
-    {
-        btp_rpm_package_free(packages, true);
-        *error_message = btp_asprintf("Failed to parse \"%s\".",
-                                      package_contents);
-
-        free(package_contents);
-        return NULL;
-    }
-
-    free(package_contents);
-
-    char *dso_list_filename = btp_build_path(directory, "dso_list", NULL);
-    char *dso_list_contents = btp_file_to_string(dso_list_filename, error_message);
-    free(dso_list_filename);
-    if (!dso_list_contents)
-    {
-        btp_rpm_package_free(packages, true);
-        return NULL;
-    }
-
-    struct btp_rpm_package *dso_packages =
-        btp_rpm_package_parse_dso_list(dso_list_contents);
-
-    if (dso_packages)
-        packages = btp_rpm_package_append(packages, dso_packages);
-
-    free(dso_list_contents);
-    return packages;
-}
-
-struct btp_rpm_package *
-btp_rpm_package_parse_dso_list(const char *text)
-{
-    struct btp_rpm_package *packages = NULL;
-    const char *pos = text;
-    while (pos && *pos)
-    {
-        // Skip dynamic library name.
-        pos = strchr(pos, ' ');
-
-        if (!pos)
-            continue;
-
-        // Skip the space.
-        ++pos;
-
-        // Find the package NEVRA.
-        char *end = strchr(pos, ' ');
-        if (!end || end - pos <= 1)
-        {
-            pos = strchr(pos, '\n');
-            continue;
-        }
-
-        // Parse the package NEVRA.
-        char *nevra = btp_strndup(pos, end - pos);
-        struct btp_rpm_package *dso_package = btp_rpm_package_new();
-        bool success = btp_rpm_package_parse_nevra(nevra,
-                                                   &dso_package->name,
-                                                   &dso_package->epoch,
-                                                   &dso_package->version,
-                                                   &dso_package->release,
-                                                   &dso_package->architecture);
-
-        free(nevra);
-
-        // If parsing failed, move to the next line.
-        if (!success)
-        {
-            btp_rpm_package_free(dso_package, true);
-            pos = strchr(pos, '\n');
-            continue;
-        }
-
-        // Find the package install time.
-        char *eol = strchr(pos, '\n');
-        if (!eol)
-        {
-            btp_rpm_package_free(dso_package, true);
-            break;
-        }
-
-        pos = strrchr(pos, ' ');
-        if (!pos)
-        {
-            pos = eol;
-            btp_rpm_package_free(dso_package, true);
-            continue;
-        }
-
-        ++pos;
-
-        // Parse the package install time.
-        int len = btp_parse_uint64((const char**)&pos,
-                                   &dso_package->install_time);
-
-        if (len <= 0)
-        {
-            pos = eol;
-            btp_rpm_package_free(dso_package, true);
-            continue;
-        }
-
-        // Append the package to the list.
-        packages = btp_rpm_package_append(packages, dso_package);
-        pos = eol;
-    }
-
-    return packages;
 }
 
 bool

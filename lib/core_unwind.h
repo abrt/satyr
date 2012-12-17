@@ -27,9 +27,9 @@ extern "C" {
 struct btp_core_stacktrace;
 
 struct btp_core_stacktrace *
-btp_parse_coredump(const char *core_file,
-                   const char *exe_file,
-                   char **error_msg);
+btp_parse_coredump(const char *coredump_filename,
+                   const char *executable_filename,
+                   char **error_message);
 
 #ifdef __cplusplus
 }

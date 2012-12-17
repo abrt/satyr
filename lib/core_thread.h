@@ -34,6 +34,7 @@ extern "C" {
 struct btp_core_frame;
 struct btp_strbuf;
 struct btp_location;
+struct btp_json_value;
 
 /**
  * @brief A thread of execution on call stack of a core dump.
@@ -120,6 +121,10 @@ btp_core_thread_append(struct btp_core_thread *dest,
  */
 int
 btp_core_thread_get_frame_count(struct btp_core_thread *thread);
+
+struct btp_core_thread *
+btp_core_thread_from_json(struct btp_json_value *root,
+                          char **error_message);
 
 char *
 btp_core_thread_to_json(struct btp_core_thread *thread);

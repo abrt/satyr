@@ -161,57 +161,19 @@ btp_report_to_json(struct btp_report *report)
         free(rpms_str_indented);
     }
 
+    /* Core stacktrace. */
+    if (report->core_stacktrace)
+    {
+        char *core_stacktrace_str = btp_core_stacktrace_to_json(report->core_stacktrace);
+        char *core_stacktrace_str_indented = btp_indent_except_first_line(core_stacktrace_str, strlen(",   \"core_stacktrace\": "));
+        free(core_stacktrace_str);
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"core_stacktrace\": %s\n",
+                               core_stacktrace_str_indented);
+
+        free(core_stacktrace_str_indented);
+    }
+
     btp_strbuf_append_str(strbuf, "}");
     return btp_strbuf_free_nobuf(strbuf);
-}
-
-struct btp_report *
-btp_report_from_abrt_dir(const char *directory,
-                         char **error_message)
-{
-    struct btp_report *report = btp_report_new();
-
-    /* Report type. */
-    char *analyzer_filename = btp_build_path(directory, "analyzer", NULL);
-    char *analyzer_contents = btp_file_to_string(analyzer_filename, error_message);
-    free(analyzer_filename);
-    if (!analyzer_contents)
-    {
-        btp_report_free(report);
-        return NULL;
-    }
-
-    if (0 == strncmp(analyzer_contents, "CCpp", 4))
-        report->report_type = BTP_REPORT_CORE;
-    else if (0 == strncmp(analyzer_contents, "Python", 6))
-        report->report_type = BTP_REPORT_PYTHON;
-    else if (0 == strncmp(analyzer_contents, "Kerneloops", 10))
-        report->report_type = BTP_REPORT_KERNELOOPS;
-    else if (0 == strncmp(analyzer_contents, "Java", 4))
-        report->report_type = BTP_REPORT_JAVA;
-
-    free(analyzer_contents);
-
-    /* Operating system. */
-    report->operating_system = btp_operating_system_from_abrt_dir(directory, error_message);
-    if (!report->operating_system)
-    {
-        btp_report_free(report);
-        return NULL;
-    }
-
-    /* Component name. */
-    char *component_filename = btp_build_path(directory, "component", NULL);
-    report->component_name = btp_file_to_string(component_filename, error_message);
-    free(component_filename);
-
-    /* RPM packages. */
-    report->rpm_packages = btp_rpm_packages_from_abrt_dir(directory, error_message);
-    if (!report->rpm_packages)
-    {
-        btp_report_free(report);
-        return NULL;
-    }
-
-    return report;
 }

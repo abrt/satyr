@@ -34,6 +34,7 @@ extern "C" {
 
 struct btp_strbuf;
 struct btp_location;
+struct btp_json_value;
 
 /**
  * @brief A function call on call stack of a core dump.
@@ -52,7 +53,8 @@ struct btp_core_frame
     uint64_t address;
 
     /** Build id of the ELF binary.  It might be NULL if the frame
-     * does not point to memory with code. */
+     * does not point to memory with code.
+     */
     char *build_id;
     // in ELF section
     uint64_t build_id_offset;
@@ -141,6 +143,10 @@ btp_core_frame_cmp(struct btp_core_frame *frame1,
 struct btp_core_frame *
 btp_core_frame_append(struct btp_core_frame *dest,
                       struct btp_core_frame *item);
+
+struct btp_core_frame *
+btp_core_frame_from_json(struct btp_json_value *root,
+                         char **error_message);
 
 /**
  * Returns a textual representation of the frame.

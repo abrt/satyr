@@ -31,7 +31,8 @@
 */
 #include "json.h"
 #include "strbuf.h"
-
+#include "location.h"
+#include "utils.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -45,16 +46,16 @@ btp_json_value_none = { 0 };
 static unsigned char
 hex_value(char c)
 {
-   if (c >= 'A' && c <= 'F')
-      return (c - 'A') + 10;
+    if (c >= 'A' && c <= 'F')
+        return (c - 'A') + 10;
 
-   if (c >= 'a' && c <= 'f')
-      return (c - 'a') + 10;
+    if (c >= 'a' && c <= 'f')
+        return (c - 'a') + 10;
 
-   if (c >= '0' && c <= '9')
-      return c - '0';
+    if (c >= '0' && c <= '9')
+        return c - '0';
 
-   return 0xFF;
+    return 0xFF;
 }
 
 struct json_state
@@ -94,78 +95,78 @@ new_value(struct json_state *state,
           struct btp_json_value **alloc,
           enum btp_json_type type)
 {
-   struct btp_json_value *value;
-   int values_size;
+    struct btp_json_value *value;
+    int values_size;
 
-   if (!state->first_pass)
-   {
-      value = *top = *alloc;
-      *alloc = (*alloc)->_reserved.next_alloc;
+    if (!state->first_pass)
+    {
+        value = *top = *alloc;
+        *alloc = (*alloc)->_reserved.next_alloc;
 
-      if (!*root)
-         *root = value;
+        if (!*root)
+            *root = value;
 
-      switch (value->type)
-      {
-         case BTP_JSON_ARRAY:
-             value->u.array.values = (struct btp_json_value **)json_alloc(
-                 state, value->u.array.length * sizeof(struct btp_json_value *), 0);
+        switch (value->type)
+        {
+        case BTP_JSON_ARRAY:
+            value->u.array.values = (struct btp_json_value **)json_alloc(
+                state, value->u.array.length * sizeof(struct btp_json_value *), 0);
 
             if (!value->u.array.values)
-               return 0;
+                return 0;
 
             break;
-         case BTP_JSON_OBJECT:
+        case BTP_JSON_OBJECT:
             values_size = sizeof(*value->u.object.values) * value->u.object.length;
             (*(void**)&value->u.object.values) =
                 json_alloc(state, values_size + ((unsigned long)value->u.object.values), 0);
 
             if (!value->u.object.values)
-               return 0;
+                return 0;
 
             value->_reserved.object_mem = (*(char**)&value->u.object.values) + values_size;
             break;
-         case BTP_JSON_STRING:
-             value->u.string.ptr = (char*)
-                 json_alloc(state, (value->u.string.length + 1), 0);
+        case BTP_JSON_STRING:
+            value->u.string.ptr = (char*)
+                json_alloc(state, (value->u.string.length + 1), 0);
 
             if (!value->u.string.ptr)
-               return 0;
+                return 0;
 
             break;
 
-         default:
+        default:
             break;
-      };
+        };
 
-      value->u.array.length = 0;
+        value->u.array.length = 0;
 
-      return 1;
-   }
+        return 1;
+    }
 
-   value = (struct btp_json_value *)json_alloc(state, sizeof(struct btp_json_value), 1);
+    value = (struct btp_json_value *)json_alloc(state, sizeof(struct btp_json_value), 1);
 
-   if (!value)
-      return 0;
+    if (!value)
+        return 0;
 
-   if (!*root)
-      *root = value;
+    if (!*root)
+        *root = value;
 
-   value->type = type;
-   value->parent = *top;
+    value->type = type;
+    value->parent = *top;
 
-   if (*alloc)
-      (*alloc)->_reserved.next_alloc = value;
+    if (*alloc)
+        (*alloc)->_reserved.next_alloc = value;
 
-   *alloc = *top = value;
-   return 1;
+    *alloc = *top = value;
+    return 1;
 }
 
 #define e_off \
    ((int) (i - cur_line_begin))
 
 #define whitespace \
-   case '\n': ++ cur_line;  cur_line_begin = i; \
+   case '\n': ++location->line;  cur_line_begin = i; \
    case ' ': case '\t': case '\r'
 
 #define string_add(b)  \
@@ -179,515 +180,513 @@ const static int
 struct btp_json_value *
 btp_json_parse_ex(struct btp_json_settings *settings,
                   const char *json,
-                  char *error_buf)
+                  struct btp_location *location)
 {
-   char error [128];
-   unsigned int cur_line;
-   const char *cur_line_begin, * i;
-   struct btp_json_value *top, *root, *alloc = 0;
-   struct json_state state;
-   int flags;
+    const char *cur_line_begin, *i;
+    struct btp_json_value *top, *root, *alloc = 0;
+    struct json_state state;
+    int flags;
 
-   error[0] = '\0';
+    memset(&state, 0, sizeof(struct json_state));
+    memcpy(&state.settings, settings, sizeof(struct btp_json_settings));
+    memset(&state.uint_max, 0xFF, sizeof(state.uint_max));
+    memset(&state.ulong_max, 0xFF, sizeof(state.ulong_max));
+    state.uint_max -= 8; /* limit of how much can be added before next check */
+    state.ulong_max -= 8;
 
-   memset(&state, 0, sizeof(struct json_state));
-   memcpy(&state.settings, settings, sizeof(struct btp_json_settings));
+    for (state.first_pass = 1; state.first_pass >= 0; --state.first_pass)
+    {
+        json_uchar uchar;
+        unsigned char uc_b1, uc_b2, uc_b3, uc_b4;
+        char *string;
+        unsigned string_length;
 
-   memset(&state.uint_max, 0xFF, sizeof(state.uint_max));
-   memset(&state.ulong_max, 0xFF, sizeof(state.ulong_max));
+        top = root = 0;
+        flags = flag_seek_value;
 
-   state.uint_max -= 8; /* limit of how much can be added before next check */
-   state.ulong_max -= 8;
+        location->line = 1;
+        cur_line_begin = json;
 
-   for (state.first_pass = 1; state.first_pass >= 0; -- state.first_pass)
-   {
-      json_uchar uchar;
-      unsigned char uc_b1, uc_b2, uc_b3, uc_b4;
-      char *string;
-      unsigned string_length;
+        for (i = json ;; ++ i)
+        {
+            char b = *i;
 
-      top = root = 0;
-      flags = flag_seek_value;
-
-      cur_line = 1;
-      cur_line_begin = json;
-
-      for (i = json ;; ++ i)
-      {
-         char b = *i;
-
-         if (flags & flag_done)
-         {
-            if (!b)
-               break;
-
-            switch (b)
+            if (flags & flag_done)
             {
-               whitespace:
-                  continue;
+                if (!b)
+                    break;
 
-               default:
-                  sprintf(error, "%d:%d: Trailing garbage: `%c`", cur_line, e_off, b);
-                  goto e_failed;
-            };
-         }
+                switch (b)
+                {
+                whitespace:
+                    continue;
 
-         if (flags & flag_string)
-         {
-            if (!b)
-            {  sprintf(error, "Unexpected EOF in string (at %d:%d)", cur_line, e_off);
-               goto e_failed;
+                default:
+                    location->column = e_off;
+                    location->message = btp_asprintf("Trailing garbage: `%c`", b);
+                    goto e_failed;
+                };
             }
 
-            if (string_length > state.uint_max)
-               goto e_overflow;
-
-            if (flags & flag_escaped)
+            if (flags & flag_string)
             {
-               flags &= ~ flag_escaped;
+                if (!b)
+                {
+                    location->column = e_off;
+                    location->message = btp_strdup("Unexpected EOF in string");
+                    goto e_failed;
+                }
 
-               switch (b)
-               {
-                  case 'b':  string_add ('\b');  break;
-                  case 'f':  string_add ('\f');  break;
-                  case 'n':  string_add ('\n');  break;
-                  case 'r':  string_add ('\r');  break;
-                  case 't':  string_add ('\t');  break;
-                  case 'u':
+                if (string_length > state.uint_max)
+                    goto e_overflow;
 
-                    if ((uc_b1 = hex_value (*++i)) == 0xFF || (uc_b2 = hex_value (*++i)) == 0xFF
-                          || (uc_b3 = hex_value (*++i)) == 0xFF || (uc_b4 = hex_value (*++i)) == 0xFF)
+                if (flags & flag_escaped)
+                {
+                    flags &= ~ flag_escaped;
+
+                    switch (b)
                     {
-                        sprintf(error, "Invalid character value `%c` (at %d:%d)", b, cur_line, e_off);
-                        goto e_failed;
-                    }
+                    case 'b':  string_add ('\b');  break;
+                    case 'f':  string_add ('\f');  break;
+                    case 'n':  string_add ('\n');  break;
+                    case 'r':  string_add ('\r');  break;
+                    case 't':  string_add ('\t');  break;
+                    case 'u':
 
-                    uc_b1 = uc_b1 * 16 + uc_b2;
-                    uc_b2 = uc_b3 * 16 + uc_b4;
+                        if ((uc_b1 = hex_value(*++i)) == 0xFF || (uc_b2 = hex_value(*++i)) == 0xFF
+                            || (uc_b3 = hex_value(*++i)) == 0xFF || (uc_b4 = hex_value(*++i)) == 0xFF)
+                        {
+                            location->column = e_off;
+                            location->message = btp_asprintf("Invalid character value `%c`", b);
+                            goto e_failed;
+                        }
 
-                    uchar = ((char) uc_b1) * 256 + uc_b2;
+                        uc_b1 = uc_b1 * 16 + uc_b2;
+                        uc_b2 = uc_b3 * 16 + uc_b4;
 
-                    if (uc_b1 == 0 && uc_b2 <= 0x7F)
-                    {
-                       string_add((char) uchar);
-                       break;
-                    }
+                        uchar = ((char) uc_b1) * 256 + uc_b2;
 
-                    if (uchar <= 0x7FF)
-                    {
+                        if (uc_b1 == 0 && uc_b2 <= 0x7F)
+                        {
+                            string_add((char) uchar);
+                            break;
+                        }
+
+                        if (uchar <= 0x7FF)
+                        {
+                            if (state.first_pass)
+                                string_length += 2;
+                            else
+                            {
+                                string[string_length ++] = 0xC0 | ((uc_b2 & 0xC0) >> 6) | ((uc_b1 & 0x3) << 3);
+                                string[string_length ++] = 0x80 | (uc_b2 & 0x3F);
+                            }
+
+                            break;
+                        }
+
                         if (state.first_pass)
-                           string_length += 2;
+                            string_length += 3;
                         else
                         {
-                            string[string_length ++] = 0xC0 | ((uc_b2 & 0xC0) >> 6) | ((uc_b1 & 0x3) << 3);
-                           string[string_length ++] = 0x80 | (uc_b2 & 0x3F);
+                            string[string_length ++] = 0xE0 | ((uc_b1 & 0xF0) >> 4);
+                            string[string_length ++] = 0x80 | ((uc_b1 & 0xF) << 2) | ((uc_b2 & 0xC0) >> 6);
+                            string[string_length ++] = 0x80 | (uc_b2 & 0x3F);
                         }
 
                         break;
-                    }
 
-                    if (state.first_pass)
-                       string_length += 3;
-                    else
+                    default:
+                        string_add (b);
+                    };
+
+                    continue;
+                }
+
+                if (b == '\\')
+                {
+                    flags |= flag_escaped;
+                    continue;
+                }
+
+                if (b == '"')
+                {
+                    if (!state.first_pass)
+                        string[string_length] = 0;
+
+                    flags &= ~ flag_string;
+                    string = 0;
+
+                    switch (top->type)
                     {
-                        string [string_length ++] = 0xE0 | ((uc_b1 & 0xF0) >> 4);
-                       string [string_length ++] = 0x80 | ((uc_b1 & 0xF) << 2) | ((uc_b2 & 0xC0) >> 6);
-                       string [string_length ++] = 0x80 | (uc_b2 & 0x3F);
+                    case BTP_JSON_STRING:
+                        top->u.string.length = string_length;
+                        flags |= flag_next;
+                        break;
+                    case BTP_JSON_OBJECT:
+                        if (state.first_pass)
+                            (*(char**) &top->u.object.values) += string_length + 1;
+                        else
+                        {
+                            top->u.object.values [top->u.object.length].name =
+                                (char*)top->_reserved.object_mem;
+
+                            (*(char**)&top->_reserved.object_mem) += string_length + 1;
+                        }
+
+                        flags |= flag_seek_value | flag_need_colon;
+                        continue;
+                    default:
+                        break;
+                    }
+                }
+                else
+                {
+                    string_add(b);
+                    continue;
+                }
+            }
+
+            if (flags & flag_seek_value)
+            {
+                switch (b)
+                {
+                whitespace:
+                    continue;
+
+                case ']':
+                    if (top->type == BTP_JSON_ARRAY)
+                        flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
+                    else if (!state.settings.settings & BTP_JSON_RELAXED_COMMAS)
+                    {
+                        location->column = e_off;
+                        location->message = btp_strdup("Unexpected ]");
+                        goto e_failed;
                     }
 
                     break;
 
-                  default:
-                     string_add (b);
-               };
+                default:
+                    if (flags & flag_need_comma)
+                    {
+                        if (b == ',')
+                        {
+                            flags &= ~ flag_need_comma;
+                            continue;
+                        }
+                        else
+                        {
+                            location->column = e_off;
+                            location->message = btp_asprintf("Expected , before %c", b);
+                            goto e_failed;
+                        }
+                    }
 
-               continue;
-            }
+                    if (flags & flag_need_colon)
+                    {
+                        if (b == ':')
+                        {  flags &= ~ flag_need_colon;
+                            continue;
+                        }
+                        else
+                        {
+                            location->column = e_off;
+                            location->message = btp_asprintf("Expected : before %c", b);
+                            goto e_failed;
+                        }
+                    }
 
-            if (b == '\\')
-            {
-               flags |= flag_escaped;
-               continue;
-            }
+                    flags &= ~ flag_seek_value;
 
-            if (b == '"')
-            {
-               if (!state.first_pass)
-                  string[string_length] = 0;
-
-               flags &= ~ flag_string;
-               string = 0;
-
-               switch (top->type)
-               {
-                  case BTP_JSON_STRING:
-                     top->u.string.length = string_length;
-                     flags |= flag_next;
-                     break;
-                  case BTP_JSON_OBJECT:
-                     if (state.first_pass)
-                        (*(char**) &top->u.object.values) += string_length + 1;
-                     else
-                     {
-                        top->u.object.values [top->u.object.length].name =
-                            (char*)top->_reserved.object_mem;
-
-                        (*(char**)&top->_reserved.object_mem) += string_length + 1;
-                     }
-
-                     flags |= flag_seek_value | flag_need_colon;
-                     continue;
-                  default:
-                     break;
-               };
-            }
-            else
-            {
-               string_add (b);
-               continue;
-            }
-         }
-
-         if (flags & flag_seek_value)
-         {
-            switch (b)
-            {
-               whitespace:
-                  continue;
-
-               case ']':
-
-                  if (top->type == BTP_JSON_ARRAY)
-                     flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
-                  else if (!state.settings.settings & BTP_JSON_RELAXED_COMMAS)
-                  {
-                      sprintf (error, "%d:%d: Unexpected ]", cur_line, e_off);
-                      goto e_failed;
-                  }
-
-                  break;
-
-               default:
-
-                  if (flags & flag_need_comma)
-                  {
-                     if (b == ',')
-                     {
-                         flags &= ~ flag_need_comma;
-                         continue;
-                     }
-                     else
-                     {
-                         sprintf(error, "%d:%d: Expected , before %c", cur_line, e_off, b);
-                         goto e_failed;
-                     }
-                  }
-
-                  if (flags & flag_need_colon)
-                  {
-                     if (b == ':')
-                     {  flags &= ~ flag_need_colon;
-                        continue;
-                     }
-                     else
-                     {  sprintf(error, "%d:%d: Expected : before %c", cur_line, e_off, b);
-                        goto e_failed;
-                     }
-                  }
-
-                  flags &= ~ flag_seek_value;
-
-                  switch (b)
-                  {
-                     case '{':
+                    switch (b)
+                    {
+                    case '{':
                         if (!new_value(&state, &top, &root, &alloc, BTP_JSON_OBJECT))
-                           goto e_alloc_failure;
+                            goto e_alloc_failure;
 
                         continue;
-                     case '[':
+                    case '[':
                         if (!new_value(&state, &top, &root, &alloc, BTP_JSON_ARRAY))
-                           goto e_alloc_failure;
+                            goto e_alloc_failure;
 
                         flags |= flag_seek_value;
                         continue;
-                     case '"':
+                    case '"':
                         if (!new_value(&state, &top, &root, &alloc, BTP_JSON_STRING))
-                           goto e_alloc_failure;
+                            goto e_alloc_failure;
 
                         flags |= flag_string;
                         string = top->u.string.ptr;
                         string_length = 0;
                         continue;
-                     case 't':
+                    case 't':
                         if (*(++ i) != 'r' || *(++ i) != 'u' || *(++ i) != 'e')
-                           goto e_unknown_value;
+                            goto e_unknown_value;
 
                         if (!new_value(&state, &top, &root, &alloc, BTP_JSON_BOOLEAN))
-                           goto e_alloc_failure;
+                            goto e_alloc_failure;
 
                         top->u.boolean = 1;
                         flags |= flag_next;
                         break;
-                     case 'f':
+                    case 'f':
                         if (*(++ i) != 'a' || *(++ i) != 'l' || *(++ i) != 's' || *(++ i) != 'e')
-                           goto e_unknown_value;
+                            goto e_unknown_value;
 
                         if (!new_value(&state, &top, &root, &alloc, BTP_JSON_BOOLEAN))
-                           goto e_alloc_failure;
+                            goto e_alloc_failure;
 
                         flags |= flag_next;
                         break;
-                     case 'n':
+                    case 'n':
                         if (*(++ i) != 'u' || *(++ i) != 'l' || *(++ i) != 'l')
-                           goto e_unknown_value;
+                            goto e_unknown_value;
 
                         if (!new_value(&state, &top, &root, &alloc, BTP_JSON_NULL))
-                           goto e_alloc_failure;
+                            goto e_alloc_failure;
 
                         flags |= flag_next;
                         break;
-                     default:
+                    default:
                         if (isdigit (b) || b == '-')
                         {
-                           if (!new_value(&state, &top, &root, &alloc, BTP_JSON_INTEGER))
-                              goto e_alloc_failure;
+                            if (!new_value(&state, &top, &root, &alloc, BTP_JSON_INTEGER))
+                                goto e_alloc_failure;
 
-                           flags &= ~ (flag_exponent | flag_got_exponent_sign);
-                           if (state.first_pass)
-                              continue;
+                            flags &= ~ (flag_exponent | flag_got_exponent_sign);
+                            if (state.first_pass)
+                                continue;
 
-                           if (top->type == BTP_JSON_DOUBLE)
-                              top->u.dbl = strtod(i, (char**)&i);
-                           else
-                              top->u.integer = strtol(i, (char**)&i, 10);
+                            if (top->type == BTP_JSON_DOUBLE)
+                                top->u.dbl = strtod(i, (char**)&i);
+                            else
+                                top->u.integer = strtol(i, (char**)&i, 10);
 
-                           flags |= flag_next | flag_reproc;
+                            flags |= flag_next | flag_reproc;
                         }
                         else
                         {
-                            sprintf (error, "%d:%d: Unexpected %c when seeking value",
-                                     cur_line, e_off, b);
-
+                            location->column = e_off;
+                            location->message = btp_asprintf("Unexpected %c when seeking value", b);
                             goto e_failed;
                         }
-                  };
-            };
-         }
-         else
-         {
-            switch (top->type)
+                    }
+                }
+            }
+            else
             {
-            case BTP_JSON_OBJECT:
-               switch (b)
-               {
-                  whitespace:
-                     continue;
+                switch (top->type)
+                {
+                case BTP_JSON_OBJECT:
+                    switch (b)
+                    {
+                    whitespace:
+                        continue;
 
-                  case '"':
-                     if (flags & flag_need_comma && (!state.settings.settings & BTP_JSON_RELAXED_COMMAS))
-                     {
-                        sprintf (error, "%d:%d: Expected , before \"", cur_line, e_off);
-                        goto e_failed;
-                     }
+                    case '"':
+                        if (flags & flag_need_comma && (!state.settings.settings & BTP_JSON_RELAXED_COMMAS))
+                        {
+                            location->column = e_off;
+                            location->message = btp_strdup("Expected , before \"");
+                            goto e_failed;
+                        }
 
-                     flags |= flag_string;
-                     string = (char*)top->_reserved.object_mem;
-                     string_length = 0;
-                     break;
-                  case '}':
-                     flags = (flags & ~ flag_need_comma) | flag_next;
-                     break;
-                  case ',':
-                     if (flags & flag_need_comma)
-                     {
-                        flags &= ~ flag_need_comma;
+                        flags |= flag_string;
+                        string = (char*)top->_reserved.object_mem;
+                        string_length = 0;
                         break;
-                     }
-                  default:
-                     sprintf (error, "%d:%d: Unexpected `%c` in object", cur_line, e_off, b);
-                     goto e_failed;
-               }
+                    case '}':
+                        flags = (flags & ~ flag_need_comma) | flag_next;
+                        break;
+                    case ',':
+                        if (flags & flag_need_comma)
+                        {
+                            flags &= ~ flag_need_comma;
+                            break;
+                        }
+                    default:
+                        location->column = e_off;
+                        location->message = btp_asprintf("Unexpected `%c` in object", b);
+                        goto e_failed;
+                    }
 
-               break;
-            case BTP_JSON_INTEGER:
-            case BTP_JSON_DOUBLE:
-               if (isdigit (b))
-                  continue;
+                    break;
+                case BTP_JSON_INTEGER:
+                case BTP_JSON_DOUBLE:
+                    if (isdigit (b))
+                        continue;
 
-               if (b == 'e' || b == 'E')
-               {
-                  if (!(flags & flag_exponent))
-                  {
-                     flags |= flag_exponent;
-                     top->type = BTP_JSON_DOUBLE;
+                    if (b == 'e' || b == 'E')
+                    {
+                        if (!(flags & flag_exponent))
+                        {
+                            flags |= flag_exponent;
+                            top->type = BTP_JSON_DOUBLE;
 
-                     continue;
-                  }
-               }
-               else if (b == '+' || b == '-')
-               {
-                  if (flags & flag_exponent && !(flags & flag_got_exponent_sign))
-                  {
-                     flags |= flag_got_exponent_sign;
-                     continue;
-                  }
-               }
-               else if (b == '.' && top->type == BTP_JSON_INTEGER)
-               {
-                  top->type = BTP_JSON_DOUBLE;
-                  continue;
-               }
+                            continue;
+                        }
+                    }
+                    else if (b == '+' || b == '-')
+                    {
+                        if (flags & flag_exponent && !(flags & flag_got_exponent_sign))
+                        {
+                            flags |= flag_got_exponent_sign;
+                            continue;
+                        }
+                    }
+                    else if (b == '.' && top->type == BTP_JSON_INTEGER)
+                    {
+                        top->type = BTP_JSON_DOUBLE;
+                        continue;
+                    }
 
-               flags |= flag_next | flag_reproc;
-               break;
-            default:
-               break;
-            };
-         }
-
-         if (flags & flag_reproc)
-         {
-            flags &= ~ flag_reproc;
-            -- i;
-         }
-
-         if (flags & flag_next)
-         {
-            flags = (flags & ~ flag_next) | flag_need_comma;
-
-            if (!top->parent)
-            {
-               /* root value done */
-
-               flags |= flag_done;
-               continue;
+                    flags |= flag_next | flag_reproc;
+                    break;
+                default:
+                    break;
+                }
             }
 
-            if (top->parent->type == BTP_JSON_ARRAY)
-               flags |= flag_seek_value;
-
-            if (!state.first_pass)
+            if (flags & flag_reproc)
             {
-               struct btp_json_value *parent = top->parent;
-
-               switch (parent->type)
-               {
-                  case BTP_JSON_OBJECT:
-                     parent->u.object.values
-                        [parent->u.object.length].value = top;
-
-                     break;
-                  case BTP_JSON_ARRAY:
-                     parent->u.array.values
-                           [parent->u.array.length] = top;
-
-                     break;
-                  default:
-                     break;
-               };
+                flags &= ~ flag_reproc;
+                -- i;
             }
 
-            if ( (++ top->parent->u.array.length) > state.uint_max)
-               goto e_overflow;
+            if (flags & flag_next)
+            {
+                flags = (flags & ~ flag_next) | flag_need_comma;
 
-            top = top->parent;
-            continue;
-         }
-      }
+                if (!top->parent)
+                {
+                    /* root value done */
 
-      alloc = root;
-   }
+                    flags |= flag_done;
+                    continue;
+                }
 
-   return root;
+                if (top->parent->type == BTP_JSON_ARRAY)
+                    flags |= flag_seek_value;
 
-e_unknown_value:
-   sprintf (error, "%d:%d: Unknown value", cur_line, e_off);
-   goto e_failed;
+                if (!state.first_pass)
+                {
+                    struct btp_json_value *parent = top->parent;
 
-e_alloc_failure:
-   strcpy (error, "Memory allocation failure");
-   goto e_failed;
+                    switch (parent->type)
+                    {
+                    case BTP_JSON_OBJECT:
+                        parent->u.object.values
+                            [parent->u.object.length].value = top;
 
-e_overflow:
-   sprintf (error, "%d:%d: Too long (caught overflow)", cur_line, e_off);
-   goto e_failed;
+                        break;
+                    case BTP_JSON_ARRAY:
+                        parent->u.array.values
+                            [parent->u.array.length] = top;
 
-e_failed:
-   if (error_buf)
-   {
-      if (*error)
-         strcpy (error_buf, error);
-      else
-         strcpy (error_buf, "Unknown error");
-   }
+                        break;
+                    default:
+                        break;
+                    };
+                }
 
-   if (state.first_pass)
-      alloc = root;
+                if ( (++ top->parent->u.array.length) > state.uint_max)
+                    goto e_overflow;
 
-   while (alloc)
-   {
-      top = alloc->_reserved.next_alloc;
-      free (alloc);
-      alloc = top;
-   }
+                top = top->parent;
+                continue;
+            }
+        }
 
-   if (!state.first_pass)
-      btp_json_value_free(root);
+        alloc = root;
+    }
 
-   return 0;
+    return root;
+
+ e_unknown_value:
+    location->column = e_off;
+    location->message = btp_strdup("Unknown value");
+    goto e_failed;
+
+ e_alloc_failure:
+    location->column = e_off;
+    location->message = btp_strdup("Memory allocation failure");
+    goto e_failed;
+
+ e_overflow:
+    location->column = e_off;
+    location->message = btp_strdup("Too long (caught overflow)");
+    goto e_failed;
+
+ e_failed:
+    if (state.first_pass)
+        alloc = root;
+
+    while (alloc)
+    {
+        top = alloc->_reserved.next_alloc;
+        free(alloc);
+        alloc = top;
+    }
+
+    if (!state.first_pass)
+        btp_json_value_free(root);
+
+    return NULL;
 }
 
 struct btp_json_value *
 btp_json_parse(const char *json)
 {
-   struct btp_json_settings settings;
-   memset (&settings, 0, sizeof(struct btp_json_settings));
-   return btp_json_parse_ex(&settings, json, 0);
+    struct btp_json_settings settings;
+    memset(&settings, 0, sizeof(struct btp_json_settings));
+    struct btp_location location;
+    btp_location_init(&location);
+    return btp_json_parse_ex(&settings, json, &location);
 }
 
 void
 btp_json_value_free(struct btp_json_value *value)
 {
-   struct btp_json_value *cur_value;
+    struct btp_json_value *cur_value;
 
-   if (!value)
-      return;
+    if (!value)
+        return;
 
-   value->parent = 0;
+    value->parent = 0;
 
-   while (value)
-   {
-      switch (value->type)
-      {
-         case BTP_JSON_ARRAY:
+    while (value)
+    {
+        switch (value->type)
+        {
+        case BTP_JSON_ARRAY:
             if (!value->u.array.length)
             {
-               free (value->u.array.values);
-               break;
+                free(value->u.array.values);
+                break;
             }
 
             value = value->u.array.values[--value->u.array.length];
             continue;
-         case BTP_JSON_OBJECT:
+        case BTP_JSON_OBJECT:
             if (!value->u.object.length)
             {
-               free (value->u.object.values);
-               break;
+                free(value->u.object.values);
+                break;
             }
 
             value = value->u.object.values[--value->u.object.length].value;
             continue;
-         case BTP_JSON_STRING:
-            free (value->u.string.ptr);
+        case BTP_JSON_STRING:
+            free(value->u.string.ptr);
             break;
-         default:
+        default:
             break;
-      };
+        };
 
-      cur_value = value;
-      value = value->parent;
-      free (cur_value);
-   }
+        cur_value = value;
+        value = value->parent;
+        free(cur_value);
+    }
 }
 
 char *

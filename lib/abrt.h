@@ -1,5 +1,5 @@
 /*
-    operating_system.h
+    abrt.h
 
     Copyright (C) 2012  Red Hat, Inc.
 
@@ -17,41 +17,37 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_OPERATING_SYSTEM_H
-#define BTPARSER_OPERATING_SYSTEM_H
+#ifndef BTPARSER_ABRT_H
+#define BTPARSER_ABRT_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <inttypes.h>
 #include <stdbool.h>
 
-struct btp_operating_system
-{
-    char *name;
-    char *version;
-    char *architecture;
-    /* Uptime in seconds. */
-    uint64_t uptime;
-};
-
-struct btp_operating_system *
-btp_operating_system_new();
-
-void
-btp_operating_system_init(struct btp_operating_system *operating_system);
-
-void
-btp_operating_system_free(struct btp_operating_system *operating_system);
-
-char *
-btp_operating_system_to_json(struct btp_operating_system *operating_system);
+bool
+btp_abrt_print_report_from_dir(const char *directory,
+                               char **error_message);
 
 bool
-btp_operating_system_parse_etc_system_release(const char *etc_system_release,
-                                              char **name,
-                                              char **version);
+btp_abrt_create_core_stacktrace(const char *directory,
+                                char **error_message);
+
+struct btp_rpm_package *
+btp_abrt_parse_dso_list(const char *text);
+
+struct btp_rpm_package *
+btp_abrt_rpm_packages_from_dir(const char *directory,
+                               char **error_message);
+
+struct btp_operating_system *
+btp_abrt_operating_system_from_dir(const char *directory,
+                                   char **error_message);
+
+struct btp_report *
+btp_abrt_report_from_dir(const char *directory,
+                         char **error_message);
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,5 @@
 pkginclude_HEADERS = \
+	abrt.h \
 	callgraph.h \
 	cluster.h \
 	config.h \
@@ -37,6 +38,7 @@ pkginclude_HEADERS = \
 lib_LTLIBRARIES = libbtparser.la
 libbtparser_la_SOURCES = \
 	$(pkginclude_HEADERS) \
+	abrt.c \
 	callgraph.c \
 	cluster.c \
 	core_stacktrace.c \

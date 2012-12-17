@@ -1,5 +1,5 @@
 /*
-    btparser.c - stacktrace parsing tool
+    satyr.c
 
     Copyright (C) 2010  Red Hat, Inc.
 
@@ -27,6 +27,7 @@
 #include "lib/cluster.h"
 #include "lib/normalize.h"
 #include "lib/report.h"
+#include "lib/abrt.h"
 #include "lib/config.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,7 +46,7 @@ help()
     printf("%s -- Automatic problem management with anonymous reports\n\n", g_program_name);
     puts("The following commands are available:");
     puts("   abrt-dir-to-report  Create report from an ABRT directory");
-    puts("   report-abrt-dir     Create report from an ABRT directory and send it to a server");
+    puts("   abrt-report-dir     Create report from an ABRT directory and send it to a server");
     puts("   debug               Commands for debugging and development support.");
 }
 
@@ -62,7 +63,7 @@ usage()
 {
     printf("Usage: %s --version\n", g_program_name);
     printf("Usage: %s abrt-dir-to-report DIR [FILE] [OPTION...]\n", g_program_name);
-    printf("Usage: %s report-abrt-dir DIR URL [OPTION...]\n", g_program_name);
+    printf("Usage: %s abrt-report-dir DIR URL [OPTION...]\n", g_program_name);
     printf("Usage: %s debug COMMAND [OPTION...]\n", g_program_name);
 }
 
@@ -73,40 +74,53 @@ version()
 }
 
 static void
-abrt_dir_to_report(int argc, char **argv)
+abrt_print_report_from_dir(int argc, char **argv)
 {
-    char *error_message;
-    struct btp_report *report = btp_report_from_abrt_dir(argv[0],
-                                                         &error_message);
-
-    if (!report)
+    /* Require ABRT problem directory path. */
+    if (argc == 0)
     {
-        fprintf(stderr, "%s\n", error_message);
-        exit(1);
+        fprintf(stderr, "Missing ABRT problem directory path.\n");
+        short_usage_and_exit();
     }
 
-    char *json = btp_report_to_json(report);
-    free(report);
-    puts(json);
-    free(json);
+    char *error_message;
+    bool success = btp_abrt_print_report_from_dir(argv[0],
+                                                  &error_message);
+
+    if (!success)
+    {
+        fprintf(stderr, "%s\n", error_message);
+        free(error_message);
+        exit(1);
+    }
 }
 
 static void
-report_abrt_dir(int argc, char **argv)
+abrt_report_dir(int argc, char **argv)
 {
-    char *error_message;
-    struct btp_report *report = btp_report_from_abrt_dir(argv[0],
-                                                         &error_message);
+    fprintf(stderr, "Not implemented.\n");
+}
 
-    if (!report)
+static void
+abrt_create_core_stacktrace(int argc, char **argv)
+{
+    /* Require ABRT problem directory path. */
+    if (argc == 0)
     {
-        fputs(error_message, stderr);
-        exit(1);
+        fprintf(stderr, "Missing ABRT problem directory path.\n");
+        short_usage_and_exit();
     }
 
-    char *json = btp_report_to_json(report);
-    free(report);
-    free(json);
+    char *error_message;
+    bool success = btp_abrt_create_core_stacktrace(argv[0],
+                                                   &error_message);
+
+    if (!success)
+    {
+        fprintf(stderr, "%s\n", error_message);
+        free(error_message);
+        exit(1);
+    }
 }
 
 static void
@@ -214,10 +228,12 @@ main(int argc, char **argv)
         usage();
     else if (0 == strcmp(argv[1], "--version"))
         version();
-    else if (0 == strcmp(argv[1], "abrt-dir-to-report"))
-        abrt_dir_to_report(argc - 2, argv + 2);
-    else if (0 == strcmp(argv[1], "report-abrt-dir"))
-        report_abrt_dir(argc - 2, argv + 2);
+    else if (0 == strcmp(argv[1], "abrt-print-report-from-dir"))
+        abrt_print_report_from_dir(argc - 2, argv + 2);
+    else if (0 == strcmp(argv[1], "abrt-report-dir"))
+        abrt_report_dir(argc - 2, argv + 2);
+    else if (0 == strcmp(argv[1], "abrt-create-core-stacktrace"))
+        abrt_create_core_stacktrace(argc - 2, argv + 2);
     else if (0 == strcmp(argv[1], "debug"))
         debug(argc - 2, argv + 2);
     else

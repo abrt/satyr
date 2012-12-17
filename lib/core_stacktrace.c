@@ -28,6 +28,7 @@
 #include "utils.h"
 #include "strbuf.h"
 #include "unstrip.h"
+#include "json.h"
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdint.h>
@@ -48,6 +49,9 @@ btp_core_stacktrace_new()
 void
 btp_core_stacktrace_init(struct btp_core_stacktrace *stacktrace)
 {
+    stacktrace->signal = 0;
+    stacktrace->executable = NULL;
+    stacktrace->crash_thread = NULL;
     stacktrace->threads = NULL;
 }
 
@@ -93,11 +97,127 @@ btp_core_stacktrace_get_thread_count(struct btp_core_stacktrace *stacktrace)
 }
 
 struct btp_core_stacktrace *
-btp_core_stacktrace_parse(const char **input,
-                         struct btp_location *location)
+btp_core_stacktrace_from_json(struct btp_json_value *root,
+                              char **error_message)
 {
-    // TODO
-    return NULL;
+    if (root->type != BTP_JSON_OBJECT)
+    {
+        *error_message = btp_strdup("Invalid type of root value; object expected.");
+        return NULL;
+    }
+
+    struct btp_core_stacktrace *result = btp_core_stacktrace_new();
+
+    /* Read signal. */
+    for (unsigned i = 0; i < root->u.object.length; ++i)
+    {
+        if (0 != strcmp("signal", root->u.object.values[i].name))
+            continue;
+
+        if (root->u.object.values[i].value->type != BTP_JSON_INTEGER)
+        {
+            *error_message = btp_strdup("Invalid type of \"signal\"; integer expected.");
+            btp_core_stacktrace_free(result);
+            return NULL;
+        }
+
+        result->signal = root->u.object.values[i].value->u.integer;
+        break;
+    }
+
+    /* Read executable. */
+    for (unsigned i = 0; i < root->u.object.length; ++i)
+    {
+        if (0 != strcmp("executable", root->u.object.values[i].name))
+            continue;
+
+        if (root->u.object.values[i].value->type != BTP_JSON_STRING)
+        {
+            *error_message = btp_strdup("Invalid type of \"executable\"; string expected.");
+            btp_core_stacktrace_free(result);
+            return NULL;
+        }
+
+        result->executable = btp_strdup(root->u.object.values[i].value->u.string.ptr);
+        break;
+    }
+
+    /* Read threads. */
+    for (unsigned i = 0; i < root->u.object.length; ++i)
+    {
+        if (0 != strcmp("threads", root->u.object.values[i].name))
+            continue;
+
+        if (root->u.object.values[i].value->type != BTP_JSON_ARRAY)
+        {
+            *error_message = btp_strdup("Invalid type of \"threads\"; array expected.");
+            btp_core_stacktrace_free(result);
+            return NULL;
+        }
+
+        for (unsigned j = 0; j < root->u.object.values[i].value->u.array.length; ++j)
+        {
+            struct btp_core_thread *thread = btp_core_thread_from_json(
+                root->u.object.values[i].value->u.array.values[j],
+                error_message);
+
+            if (!thread)
+            {
+                btp_core_stacktrace_free(result);
+                return NULL;
+            }
+
+            result->threads = btp_core_thread_append(result->threads, thread);
+        }
+
+        break;
+    }
+
+    /* Read crash thread. */
+    for (unsigned i = 0; i < root->u.object.length; ++i)
+    {
+        if (0 != strcmp("crash_thread", root->u.object.values[i].name))
+            continue;
+
+        if (root->u.object.values[i].value->type != BTP_JSON_INTEGER)
+        {
+            *error_message = btp_strdup("Invalid type of \"crash_thread\"; integer expected.");
+            btp_core_stacktrace_free(result);
+            return NULL;
+        }
+
+        long crash_thread = root->u.object.values[i].value->u.integer;
+        if (crash_thread < 0)
+        {
+            *error_message = btp_strdup("Invalid index in \"crash_thread\".");
+            btp_core_stacktrace_free(result);
+            return NULL;
+        }
+
+        result->crash_thread = result->threads;
+        for (long j = 0; j <= crash_thread; ++j)
+        {
+            if (!result->crash_thread)
+            {
+                *error_message = btp_strdup("Invalid index in \"crash_thread\".");
+                btp_core_stacktrace_free(result);
+                return NULL;
+            }
+
+            result->crash_thread = result->crash_thread->next;
+        }
+
+        if (!result->crash_thread)
+        {
+            *error_message = btp_strdup("Invalid index in \"crash_thread\".");
+            btp_core_stacktrace_free(result);
+            return NULL;
+        }
+
+        break;
+    }
+
+    return result;
 }
 
 char *
@@ -151,8 +271,8 @@ btp_core_stacktrace_to_json(struct btp_core_stacktrace *stacktrace)
 
 struct btp_core_stacktrace *
 btp_core_stacktrace_create(const char *gdb_stacktrace_text,
-                          const char *unstrip_text,
-                          const char *executable_path)
+                           const char *unstrip_text,
+                           const char *executable_path)
 {
     // Parse the GDB stacktrace.
     struct btp_location location;

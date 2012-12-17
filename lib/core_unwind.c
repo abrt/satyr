@@ -19,6 +19,7 @@
 */
 #include "core_unwind.h"
 #include "utils.h"
+#include "config.h"
 
 #if (defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF && defined HAVE_LIBDW && defined HAVE_ELFUTILS_LIBDWFL_H)
 #  define WITH_LIBDWFL
@@ -31,11 +32,11 @@
 #if !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND
 
 struct btp_core_stacktrace *
-btp_parse_coredump(const char *core_file,
-                   const char *exe_file,
-                   char **error_msg)
+btp_parse_coredump(const char *coredump_filename,
+                   const char *executable_filename,
+                   char **error_message)
 {
-    *error_msg = btp_asprintf("Btparser is built without unwind support");
+    *error_message = btp_asprintf("Btparser is built without unwind support");
     return NULL;
 }
 

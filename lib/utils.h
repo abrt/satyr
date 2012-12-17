@@ -154,6 +154,11 @@ char *
 btp_file_to_string(const char *filename,
                    char **error_message);
 
+bool
+btp_string_to_file(const char *filename,
+                   char *contents,
+                   char **error_message);
+
 /**
  * If the input contains character c in the current positon, move the
  * input pointer after the character, and return true. Otherwise do

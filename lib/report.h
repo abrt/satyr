@@ -70,10 +70,6 @@ btp_report_free(struct btp_report *report);
 char *
 btp_report_to_json(struct btp_report *report);
 
-struct btp_report *
-btp_report_from_abrt_dir(const char *directory,
-                         char **error_message);
-
 #ifdef __cplusplus
 }
 #endif

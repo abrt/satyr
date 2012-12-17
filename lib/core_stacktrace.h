@@ -33,6 +33,7 @@ extern "C" {
 
 struct btp_core_thread;
 struct btp_location;
+struct btp_json_value;
 
 /**
  * @brief A stack trace of a core dump.
@@ -101,17 +102,13 @@ btp_core_stacktrace_get_thread_count(
     struct btp_core_stacktrace *stacktrace);
 
 /**
- * Parses a textual stacktrace and puts it into a structure.  If
- * parsing fails, the input parameter is not changed and NULL is
- * returned.
- *
  * @note
- * Stacktrace can be serialized to string via
- * btp_core_stacktrace_to_text().
+ * Stacktrace can be serialized to JSON string via
+ * btp_core_stacktrace_to_json().
  */
 struct btp_core_stacktrace *
-btp_core_stacktrace_parse(const char **input,
-                          struct btp_location *location);
+btp_core_stacktrace_from_json(struct btp_json_value *root,
+                              char **error_message);
 
 /**
  * Serializes stacktrace to string.
@@ -122,7 +119,6 @@ btp_core_stacktrace_parse(const char **input,
  */
 char *
 btp_core_stacktrace_to_json(struct btp_core_stacktrace *stacktrace);
-
 
 struct btp_core_stacktrace *
 btp_core_stacktrace_create(const char *gdb_stacktrace_text,

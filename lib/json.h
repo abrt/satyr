@@ -36,6 +36,8 @@
 extern "C" {
 #endif
 
+struct btp_location;
+
 struct btp_json_settings
 {
    unsigned long max_memory;
@@ -110,7 +112,7 @@ btp_json_parse(const char *json);
 struct btp_json_value *
 btp_json_parse_ex(struct btp_json_settings *settings,
                   const char *json,
-                  char *error);
+                  struct btp_location *location);
 
 void
 btp_json_value_free(struct btp_json_value *value);

@@ -135,6 +135,123 @@ btp_core_frame_append(struct btp_core_frame *dest,
     return dest;
 }
 
+struct btp_core_frame *
+btp_core_frame_from_json(struct btp_json_value *root,
+                         char **error_message)
+{
+    if (root->type != BTP_JSON_OBJECT)
+    {
+        *error_message = btp_strdup("Invalid type of root value; object expected.");
+        return NULL;
+    }
+
+    struct btp_core_frame *result = btp_core_frame_new();
+
+    /* Read address. */
+    for (unsigned i = 0; i < root->u.object.length; ++i)
+    {
+        if (0 != strcmp("address", root->u.object.values[i].name))
+            continue;
+
+        if (root->u.object.values[i].value->type != BTP_JSON_INTEGER)
+        {
+            *error_message = btp_strdup("Invalid type of \"address\"; integer expected.");
+            btp_core_frame_free(result);
+            return NULL;
+        }
+
+        result->address = root->u.object.values[i].value->u.integer;
+        break;
+    }
+
+    /* Read build id. */
+    for (unsigned i = 0; i < root->u.object.length; ++i)
+    {
+        if (0 != strcmp("build_id", root->u.object.values[i].name))
+            continue;
+
+        if (root->u.object.values[i].value->type != BTP_JSON_STRING)
+        {
+            *error_message = btp_strdup("Invalid type of \"build_id\"; string expected.");
+            btp_core_frame_free(result);
+            return NULL;
+        }
+
+        result->build_id = btp_strdup(root->u.object.values[i].value->u.string.ptr);
+        break;
+    }
+
+    /* Read build id offset. */
+    for (unsigned i = 0; i < root->u.object.length; ++i)
+    {
+        if (0 != strcmp("build_id_offset", root->u.object.values[i].name))
+            continue;
+
+        if (root->u.object.values[i].value->type != BTP_JSON_INTEGER)
+        {
+            *error_message = btp_strdup("Invalid type of \"build_id_offset\"; integer expected.");
+            btp_core_frame_free(result);
+            return NULL;
+        }
+
+        result->build_id_offset = root->u.object.values[i].value->u.integer;
+        break;
+    }
+
+    /* Read function name. */
+    for (unsigned i = 0; i < root->u.object.length; ++i)
+    {
+        if (0 != strcmp("function_name", root->u.object.values[i].name))
+            continue;
+
+        if (root->u.object.values[i].value->type != BTP_JSON_STRING)
+        {
+            *error_message = btp_strdup("Invalid type of \"function_name\"; string expected.");
+            btp_core_frame_free(result);
+            return NULL;
+        }
+
+        result->function_name = btp_strdup(root->u.object.values[i].value->u.string.ptr);
+        break;
+    }
+
+    /* Read file name. */
+    for (unsigned i = 0; i < root->u.object.length; ++i)
+    {
+        if (0 != strcmp("file_name", root->u.object.values[i].name))
+            continue;
+
+        if (root->u.object.values[i].value->type != BTP_JSON_STRING)
+        {
+            *error_message = btp_strdup("Invalid type of \"file_name\"; string expected.");
+            btp_core_frame_free(result);
+            return NULL;
+        }
+
+        result->file_name = btp_strdup(root->u.object.values[i].value->u.string.ptr);
+        break;
+    }
+
+    /* Read fingerprint. */
+    for (unsigned i = 0; i < root->u.object.length; ++i)
+    {
+        if (0 != strcmp("fingerprint", root->u.object.values[i].name))
+            continue;
+
+        if (root->u.object.values[i].value->type != BTP_JSON_STRING)
+        {
+            *error_message = btp_strdup("Invalid type of \"fingerprint\"; string expected.");
+            btp_core_frame_free(result);
+            return NULL;
+        }
+
+        result->fingerprint = btp_strdup(root->u.object.values[i].value->u.string.ptr);
+        break;
+    }
+
+    return result;
+}
+
 char *
 btp_core_frame_to_json(struct btp_core_frame *frame)
 {

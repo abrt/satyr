@@ -21,6 +21,7 @@
 #include "core_frame.h"
 #include "utils.h"
 #include "strbuf.h"
+#include "json.h"
 #include <string.h>
 
 struct btp_core_thread *
@@ -127,6 +128,52 @@ btp_core_thread_get_frame_count(struct btp_core_thread *thread)
     }
 
     return count;
+}
+
+struct btp_core_thread *
+btp_core_thread_from_json(struct btp_json_value *root,
+                          char **error_message)
+{
+    if (root->type != BTP_JSON_OBJECT)
+    {
+        *error_message = btp_strdup("Invalid type of root value; object expected.");
+        return NULL;
+    }
+
+    struct btp_core_thread *result = btp_core_thread_new();
+
+    /* Read frames. */
+    for (unsigned i = 0; i < root->u.object.length; ++i)
+    {
+        if (0 != strcmp("frames", root->u.object.values[i].name))
+            continue;
+
+        if (root->u.object.values[i].value->type != BTP_JSON_ARRAY)
+        {
+            *error_message = btp_strdup("Invalid type of \"frames\"; array expected.");
+            btp_core_thread_free(result);
+            return NULL;
+        }
+
+        for (unsigned j = 0; j < root->u.object.values[i].value->u.array.length; ++j)
+        {
+            struct btp_core_frame *frame = btp_core_frame_from_json(
+                root->u.object.values[i].value->u.array.values[j],
+                error_message);
+
+            if (!frame)
+            {
+                btp_core_thread_free(result);
+                return NULL;
+            }
+
+            result->frames = btp_core_frame_append(result->frames, frame);
+        }
+
+        break;
+    }
+
+    return result;
 }
 
 char *

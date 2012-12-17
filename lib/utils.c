@@ -273,6 +273,50 @@ btp_file_to_string(const char *filename,
 }
 
 bool
+btp_string_to_file(const char *filename,
+                   char *contents,
+                   char **error_message)
+{
+    /* Open the file. */
+    int fd = open(filename, O_WRONLY | O_LARGEFILE | O_TRUNC | O_CREAT);
+    if (fd < 0)
+    {
+        *error_message = btp_asprintf("Unable to open '%s': %s.",
+                                      filename,
+                                      strerror(errno));
+
+        return false;
+    }
+
+    size_t count = strlen(contents);
+    ssize_t write_result = write(fd, contents, count);
+    if (count != write_result)
+    {
+        char *error = "Failed to write the contents to a file at once.";
+        if (-1 == write_result)
+            error = strerror(errno);
+
+        *error_message = btp_asprintf("Unable to write to '%s': %s.",
+                                      filename,
+                                      error);
+
+        return false;
+    }
+
+    int close_result = close(fd);
+    if (-1 == close_result)
+    {
+        *error_message = btp_asprintf("Unable to close '%s': %s.",
+                                      filename,
+                                      strerror(errno));
+
+        return false;
+    }
+
+    return true;
+}
+
+bool
 btp_skip_char(const char **input, char c)
 {
     if (**input != c)
