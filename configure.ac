@@ -33,7 +33,7 @@ PKG_CHECK_MODULES([PYTHON], [python2],,[
 AC_CHECK_LIB([opcodes], [main], [have_libopcodes=yes], [have_libopcodes=no])
 [if test "$have_libopcodes" = "no"; then]
     [echo "The libopcodes library was not found in the search path. The core stacktrace support "]
-    [echo "will not be built.  If you want to build core stacktrace support, please ensure"]
+    [echo "will not be built.  If you want to build core fingerprinting support, please ensure"]
     [echo "that libopcodes is installed and its directory is included in the search path."]
     [echo "Then run configure again before attempting to build Satyr."]
 [fi]
@@ -59,7 +59,7 @@ done
 AC_MSG_RESULT([$opcodes_pic])
 
 [if test "$opcodes_pic" = "no"; then]
-    [echo "The libopcodes library on your system was not compiled with PIC. The core backtrace support "]
+    [echo "The libopcodes library on your system was not compiled with PIC. The core backtrace fingerprinting support "]
     [echo "will not be built.  If you want to build core backtrace support, please ensure"]
     [echo "that the provided libopcodes is build with -fPIC."]
     [echo "Then run configure again before attempting to build Satyr."]
