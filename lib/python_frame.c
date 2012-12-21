@@ -20,7 +20,9 @@
 #include "python_frame.h"
 #include "utils.h"
 #include "location.h"
+#include "strbuf.h"
 #include <string.h>
+#include <inttypes.h>
 
 struct btp_python_frame *
 btp_python_frame_new()
@@ -46,7 +48,7 @@ btp_python_frame_free(struct btp_python_frame *frame)
 
     free(frame->file_name);
     free(frame->function_name);
-    free(frame->line);
+    free(frame->line_contents);
     free(frame);
 }
 
@@ -72,8 +74,8 @@ btp_python_frame_dup(struct btp_python_frame *frame, bool siblings)
     if (result->function_name)
         result->function_name = btp_strdup(result->function_name);
 
-    if (result->line)
-        result->line = btp_strdup(result->line);
+    if (result->line_contents)
+        result->line_contents = btp_strdup(result->line_contents);
 
     return result;
 }
@@ -178,4 +180,51 @@ btp_python_frame_parse(const char **input,
 
     *input = local_input;
     return frame;
+}
+
+char *
+btp_python_frame_to_json(struct btp_python_frame *frame)
+{
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+
+    /* Source file name. */
+    if (frame->file_name)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"file_name\": \"%s\"\n",
+                               frame->file_name);
+    }
+
+    /* Source file line. */
+    if (frame->file_line)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"file_line\": %"PRIu32"\n",
+                               frame->file_line);
+    }
+
+    /* Is module. */
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"is_module\": %s\n",
+                           frame->is_module ? "true" : "false");
+
+    /* Function name. */
+    if (frame->function_name)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"function_name\": \"%s\"\n",
+                               frame->function_name);
+    }
+
+    /* Line contents. */
+    if (frame->line_contents)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"line_contents\": \"%s\"\n",
+                               frame->line_contents);
+    }
+
+    strbuf->buf[0] = '{';
+    btp_strbuf_append_char(strbuf, '}');
+    return btp_strbuf_free_nobuf(strbuf);
 }

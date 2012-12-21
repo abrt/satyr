@@ -140,6 +140,16 @@ int
 btp_rpm_consistency_cmp_recursive(struct btp_rpm_consistency *consistency1,
                                   struct btp_rpm_consistency *consistency2);
 
+/**
+ * Appends 'item' at the end of the list 'dest'.
+ * @returns
+ * This function returns the 'dest' consistency info.  If 'dest' is
+ * NULL, it returns the 'item' consistency info.
+ */
+struct btp_rpm_consistency *
+btp_rpm_consistency_append(struct btp_rpm_consistency *dest,
+                           struct btp_rpm_consistency *item);
+
 #ifdef __cplusplus
 }
 #endif

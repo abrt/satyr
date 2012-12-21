@@ -37,10 +37,15 @@ struct btp_location;
 
 struct btp_python_stacktrace
 {
+    /* Name of the source file where an exception has been raised. */
     char *file_name;
 
+    /* Line of the source file where the exception has been
+     * raised. First line has number 1. 0 means the file line is
+     * unknown. */
     uint32_t file_line;
 
+    /* Exception class name. */
     char *exception_name;
 
     struct btp_python_frame *frames;
@@ -95,6 +100,16 @@ btp_python_stacktrace_dup(struct btp_python_stacktrace *stacktrace);
 struct btp_python_stacktrace *
 btp_python_stacktrace_parse(const char **input,
                             struct btp_location *location);
+
+/**
+ * Serializes stacktrace to string.
+ * @returnes
+ * Newly allocated memory containing the textual representation of the
+ * provided stacktrace.  Caller should free the memory when it's no
+ * longer needed.
+ */
+char *
+btp_python_stacktrace_to_json(struct btp_python_stacktrace *stacktrace);
 
 #ifdef __cplusplus
 }

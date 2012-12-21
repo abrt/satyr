@@ -632,3 +632,18 @@ btp_rpm_consistency_cmp_recursive(struct btp_rpm_consistency *consistency1,
     else
         return consistency2 ? -1 : 0;
 }
+
+struct btp_rpm_consistency *
+btp_rpm_consistency_append(struct btp_rpm_consistency *dest,
+                           struct btp_rpm_consistency *item)
+{
+    if (!dest)
+        return item;
+
+    struct btp_rpm_consistency *dest_loop = dest;
+    while (dest_loop->next)
+        dest_loop = dest_loop->next;
+
+    dest_loop->next = item;
+    return dest;
+}

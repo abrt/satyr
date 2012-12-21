@@ -45,7 +45,7 @@ struct btp_python_frame
 
     char *function_name;
 
-    char *line;
+    char *line_contents;
 
     struct btp_python_frame *next;
 };
@@ -123,6 +123,15 @@ btp_python_frame_append(struct btp_python_frame *dest,
 struct btp_python_frame *
 btp_python_frame_parse(const char **input,
                        struct btp_location *location);
+
+/**
+ * Returns a textual representation of the frame.
+ * @param frame
+ * It must be a non-NULL pointer.  It's not modified by calling this
+ * function.
+ */
+char *
+btp_python_frame_to_json(struct btp_python_frame *frame);
 
 #ifdef __cplusplus
 }

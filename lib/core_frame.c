@@ -259,6 +259,7 @@ btp_core_frame_to_json(struct btp_core_frame *frame)
     btp_strbuf_append_strf(strbuf,
                            "{   \"address\": %"PRIu64"\n",
                            frame->address);
+
     if (frame->build_id)
     {
         char *escaped = btp_json_escape(frame->build_id);
@@ -303,6 +304,6 @@ btp_core_frame_to_json(struct btp_core_frame *frame)
         free(escaped);
     }
 
-    btp_strbuf_append_str(strbuf, "}");
+    btp_strbuf_append_char(strbuf, '}');
     return btp_strbuf_free_nobuf(strbuf);
 }

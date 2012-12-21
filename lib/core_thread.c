@@ -183,7 +183,6 @@ btp_core_thread_to_json(struct btp_core_thread *thread)
     if (thread->frames)
     {
         btp_strbuf_append_str(strbuf, "{   \"frames\":\n");
-
         struct btp_core_frame *frame = thread->frames;
         while (frame)
         {
