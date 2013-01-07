@@ -27,8 +27,6 @@
 
 #include "config.h"
 
-#if HAVE_LIBOPCODES
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,5 +49,4 @@ btp_core_fingerprint_generate_for_binary(struct btp_core_thread *thread,
 }
 #endif
 
-#endif // HAVE_LIBOPCODES
 #endif // BTPARSER_CORE_FINGERPRINT_H

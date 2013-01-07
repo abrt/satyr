@@ -18,8 +18,6 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "core_fingerprint.h"
-
-#if HAVE_LIBOPCODES
 #include "core_stacktrace.h"
 #include "core_frame.h"
 #include "core_thread.h"
@@ -30,6 +28,7 @@
 #include "callgraph.h"
 #include <ctype.h>
 #include <string.h>
+#include <stdio.h>
 
 static void
 fingerprint_add_bool(struct btp_strbuf *buffer,
@@ -50,7 +49,11 @@ fingerprint_add_list(struct btp_strbuf *buffer,
     bool first = true;
     for (size_t loop = 0; loop < count; ++loop)
     {
-        btp_strbuf_append_strf(buffer, "%s%s", (first ? "" : ","), list[loop]);
+        btp_strbuf_append_strf(buffer,
+                               "%s%s",
+                               (first ? "" : ","),
+                               list[loop]);
+
         first = false;
     }
 
@@ -390,7 +393,8 @@ compute_fingerprint(struct btp_core_frame *frame,
     if (!fde)
     {
         *error_message = btp_asprintf("No frame description entry found"
-                                      " for an offset.");
+                                      " for an offset %"PRIu64".",
+                                      frame->build_id_offset);
         return false;
     }
 
@@ -402,6 +406,14 @@ compute_fingerprint(struct btp_core_frame *frame,
 
     if (!instructions)
         return false;
+
+    //puts("BEGIN");
+    //printf("Function\n%s\n%s\n\n\n\n",
+    //       btp_disasm_instructions_to_text(instructions),
+    //       btp_disasm_binary_to_text(disassembler,
+    //                                 fde->start_address,
+    //                                 fde->length,
+    //                                 error_message));
 
     struct btp_strbuf *fingerprint = btp_strbuf_new();
 
@@ -512,4 +524,3 @@ btp_core_fingerprint_generate_for_binary(struct btp_core_thread *thread,
     return true;
 }
 
-#endif // HAVE_LIBOPCODES
