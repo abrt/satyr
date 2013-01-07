@@ -5,7 +5,6 @@ CLEANFILES = *.aux btparser.log btparser.out btparser.toc btparser.idx btparser.
 if HAVE_PDFLATEX
 if HAVE_DOXYGEN
 if HAVE_DOT
-doc_DATA += btparser.pdf
 
 btparser.pdf: btparser.tex doxygen/refman.tex
 	echo Calling pdflatex twice to handle all references.
