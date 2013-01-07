@@ -20,6 +20,7 @@
 #include "elves.h"
 #include "utils.h"
 #include "config.h"
+#include "strbuf.h"
 
 #if (defined HAVE_DWARF_H && defined HAVE_ELFUTILS_LIBDW_H && defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF)
 #  define WITH_ELFUTILS
@@ -434,10 +435,12 @@ read_cie(Dwarf_CFI_Entry *cfi,
             {
                 *error_message = btp_asprintf("Unknown size for personality encoding (CIE %jx)",
                                               (uintmax_t)cfi_offset);
+
                 free(cie);
                 return NULL;
             }
-            augmentation_data += (size + 1);
+
+            augmentation_data += size + 1;
             break;
         }
         default:
@@ -527,6 +530,7 @@ btp_elf_get_eh_frame(const char *filename,
         *error_message = btp_asprintf("Failed to find .eh_frame section for %s: %s",
                                       filename,
                                       find_section_error_message);
+
         free(find_section_error_message);
         elf_end(elf);
         close(fd);
@@ -550,7 +554,7 @@ btp_elf_get_eh_frame(const char *filename,
         return NULL;
     }
 
-    uintptr_t exec_base = 0;
+    uint64_t exec_base = 0;
     int i;
     for (i = 0; i < phnum; i++)
     {
@@ -567,7 +571,7 @@ btp_elf_get_eh_frame(const char *filename,
 
         if (phdr.p_type == PT_LOAD && phdr.p_flags & PF_X)
         {
-            exec_base = (uintptr_t)phdr.p_vaddr;
+            exec_base = phdr.p_vaddr;
             break;
         }
     }
@@ -576,6 +580,7 @@ btp_elf_get_eh_frame(const char *filename,
     {
         *error_message = btp_asprintf("Can't determine executable base for %s",
                                       filename);
+
         elf_end(elf);
         close(fd);
         return NULL;
@@ -625,6 +630,7 @@ btp_elf_get_eh_frame(const char *filename,
             *error_message = btp_asprintf("dwarf_next_cfi failed for %s: %s",
                                           filename,
                                           dwarf_errmsg(-1));
+
             cie_free(cie_list);
             btp_elf_eh_frame_free(result);
             elf_end(elf);
@@ -651,6 +657,7 @@ btp_elf_get_eh_frame(const char *filename,
                 *error_message = btp_asprintf("CIE reading failed for %s: %s",
                                               filename,
                                               cie_error_message);
+
                 free(cie_error_message);
                 cie_free(cie_list);
                 btp_elf_eh_frame_free(result);
@@ -690,6 +697,7 @@ btp_elf_get_eh_frame(const char *filename,
                 *error_message = btp_asprintf("CIE not found for FDE %jx in %s",
                                               (uintmax_t)cfi_offset,
                                               filename);
+
                 cie_free(cie_list);
                 btp_elf_eh_frame_free(result);
                 elf_end(elf);
@@ -715,7 +723,7 @@ btp_elf_get_eh_frame(const char *filename,
                 uint64_t length = fde_read_address(section_data->d_buf + cfi_offset, 4);
                 uint64_t skip = (length == 0xffffffffUL ? 12 : 4);
                 uint64_t mask = (cie->ptr_len == 4 ? 0xffffffffUL : 0xffffffffffffffffUL);
-                initial_location += (uintptr_t)shdr.sh_offset + (uintptr_t)cfi_offset + 2 * skip;
+                initial_location += shdr.sh_offset + cfi_offset + 2 * skip;
                 initial_location &= mask;
             }
             else
@@ -730,6 +738,7 @@ btp_elf_get_eh_frame(const char *filename,
             struct btp_elf_fde *fde = btp_malloc(sizeof(struct btp_elf_fde));
             fde->start_address = initial_location + exec_base;
             fde->length = address_range;
+            fde->next = NULL;
 
             /* Append the newly parsed Frame Description Entry to our
              * list of FDEs.
@@ -782,4 +791,50 @@ btp_elf_find_fde_for_address(struct btp_elf_fde *eh_frame,
     }
 
     return NULL;
+}
+
+char *
+btp_elf_fde_to_json(struct btp_elf_fde *fde,
+                    bool recursive)
+{
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+
+    if (recursive)
+    {
+        struct btp_elf_fde *loop = fde;
+        while (loop)
+        {
+            if (loop == fde)
+                btp_strbuf_append_str(strbuf, "[ ");
+            else
+                btp_strbuf_append_str(strbuf, ", ");
+
+            char *fde_json = btp_elf_fde_to_json(loop, false);
+            char *indented_fde_json = btp_indent_except_first_line(fde_json, 2);
+            btp_strbuf_append_str(strbuf, indented_fde_json);
+            free(indented_fde_json);
+            free(fde_json);
+            loop = loop->next;
+            if (loop)
+                btp_strbuf_append_str(strbuf, "\n");
+        }
+
+        btp_strbuf_append_str(strbuf, " ]");
+    }
+    else
+    {
+        /* Start address. */
+        btp_strbuf_append_strf(strbuf,
+                               "{   \"start_address\": %"PRIu64"\n",
+                               fde->start_address);
+
+        /* Length. */
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"length\": %"PRIu64"\n",
+                               fde->length);
+
+        btp_strbuf_append_str(strbuf, "}");
+    }
+
+    return btp_strbuf_free_nobuf(strbuf);
 }
