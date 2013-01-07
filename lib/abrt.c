@@ -24,6 +24,7 @@
 #include "operating_system.h"
 #include "core_unwind.h"
 #include "core_stacktrace.h"
+#include "core_fingerprint.h"
 #include "json.h"
 #include "location.h"
 #include <stdio.h>
@@ -68,11 +69,17 @@ btp_abrt_create_core_stacktrace(const char *directory,
     if (!core_stacktrace)
         return false;
 
+    bool success = btp_core_fingerprint_generate(core_stacktrace,
+                                                 error_message);
+
+    if (!success)
+        return false;
+
     char *json = btp_core_stacktrace_to_json(core_stacktrace);
     char *core_backtrace_filename = btp_build_path(directory, "core_backtrace", NULL);
-    bool success = btp_string_to_file(core_backtrace_filename,
-                                      json,
-                                      error_message);
+    success = btp_string_to_file(core_backtrace_filename,
+                                 json,
+                                 error_message);
 
     free(core_backtrace_filename);
     free(json);
