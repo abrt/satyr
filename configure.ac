@@ -76,11 +76,11 @@ AC_CHECK_LIB([bfd], [main])
 # elfutils
 AC_CHECK_HEADERS([dwarf.h elfutils/libdw.h elfutils/libdwfl.h gelf.h libelf.h])
 AC_CHECK_LIB([elf], [main])
-# dwfl is actually part of libdw, at least on fedora
+# dwfl is actually part of libdw, at least on Fedora
 AC_CHECK_LIB([dw], [main])
+AC_CHECK_LIB([dwfl], [main])
 AC_CHECK_LIB([dl], [main])
-#AC_CHECK_LIB([dw], [dwfl_frame_state_core])
-
+AC_CHECK_FUNC(dwfl_frame_state_core, AC_DEFINE(HAVE_DWFL_FRAME_STATE_CORE, [], [Have function dwfl_frame_state_core for coredump unwinding]))
 
 # libunwind
 AC_CHECK_HEADERS([libunwind-coredump.h])

@@ -23,7 +23,11 @@
 #include "core_stacktrace.h"
 #include "config.h"
 
-#if (defined HAVE_LIBUNWIND && defined HAVE_LIBUNWIND_COREDUMP && defined HAVE_LIBUNWIND_GENERIC && defined HAVE_LIBUNWIND_COREDUMP_H && defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF && defined HAVE_LIBDW && defined HAVE_ELFUTILS_LIBDWFL_H)
+#if (defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF && defined HAVE_LIBDW && defined HAVE_ELFUTILS_LIBDWFL_H && defined HAVE_DWFL_FRAME_STATE_CORE)
+#  define WITH_LIBDWFL
+#endif
+
+#if !defined WITH_LIBDWFL && (defined HAVE_LIBUNWIND && defined HAVE_LIBUNWIND_COREDUMP && defined HAVE_LIBUNWIND_GENERIC && defined HAVE_LIBUNWIND_COREDUMP_H && defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF && defined HAVE_LIBDW && defined HAVE_ELFUTILS_LIBDWFL_H)
 #  define WITH_LIBUNWIND
 #endif
 
@@ -148,9 +152,13 @@ core_handle_free(struct core_handle *ch)
     }
 }
 
-static int find_elf_core (Dwfl_Module *mod, void **userdata,
-                          const char *modname, Dwarf_Addr base,
-                          char **file_name, Elf **elfp)
+static int
+find_elf_core(Dwfl_Module *mod,
+              void **userdata,
+              const char *modname,
+              Dwarf_Addr base,
+              char **file_name,
+              Elf **elfp)
 {
     int ret = -1;
 
@@ -181,16 +189,25 @@ static int find_elf_core (Dwfl_Module *mod, void **userdata,
 }
 
 /* Do not use debuginfo files at all. */
-static int find_debuginfo_none (Dwfl_Module *mod, void **userdata,
-        const char *modname, GElf_Addr base, const char *file_name,
-        const char *debuglink_file, GElf_Word debuglink_crc,
-        char **debuginfo_file_name)
+static int
+find_debuginfo_none(Dwfl_Module *mod,
+                    void **userdata,
+                    const char *modname,
+                    GElf_Addr base,
+                    const char *file_name,
+                    const char *debuglink_file,
+                    GElf_Word debuglink_crc,
+                    char **debuginfo_file_name)
 {
     return -1;
 }
 
-static int cb_exe_maps(Dwfl_Module *mod, void **userdata, const char *name,
-                       Dwarf_Addr start_addr, void *arg)
+static int
+cb_exe_maps(Dwfl_Module *mod,
+            void **userdata,
+            const char *name,
+            Dwarf_Addr start_addr,
+            void *arg)
 {
     struct exe_mapping_data ***tailp = arg;
     const char *filename = NULL;
@@ -218,7 +235,8 @@ static int cb_exe_maps(Dwfl_Module *mod, void **userdata, const char *name,
 
 /* Gets dwfl handle and executable map data to be used for unwinding */
 static struct core_handle *
-analyze_coredump(const char *elf_file, const char *exe_file,
+analyze_coredump(const char *elf_file,
+                 const char *exe_file,
                  char **error_msg)
 {
     struct exe_mapping_data *head = NULL, **tail = &head;
