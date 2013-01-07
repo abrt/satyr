@@ -18,6 +18,7 @@ Makefile.in
 /depcomp
 /install-sh
 /ltmain.sh
+/libtool
 /missing
 /py-compile
 
