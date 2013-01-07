@@ -38,7 +38,7 @@ struct btp_disasm_state;
 
 struct btp_disasm_state *
 btp_disasm_init(const char *file_name,
-                      char **error_message);
+                char **error_message);
 
 void
 btp_disasm_free(struct btp_disasm_state *state);
@@ -73,6 +73,15 @@ btp_disasm_instruction_parse_single_address_operand(char *instruction,
  */
 uint64_t *
 btp_disasm_get_callee_addresses(char **instructions);
+
+char *
+btp_disasm_instructions_to_text(char **instructions);
+
+char *
+btp_disasm_binary_to_text(struct btp_disasm_state *state,
+                          uint64_t start_offset,
+                          uint64_t size,
+                          char **error_message);
 
 #ifdef __cplusplus
 }

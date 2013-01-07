@@ -158,9 +158,12 @@ btp_disasm_get_function_instructions(struct btp_disasm_state *state,
         || (start_offset + size) > section->vma + section->size)
     {
         *error_message = btp_asprintf(
-            "Invalid function range: 0x%"PRIx64" - 0x%"PRIx64,
+            "Invalid function range 0x%"PRIx64" - 0x%"PRIx64
+            " for section.  Section range is 0x%"PRIx64" - 0x%"PRIx64".",
             start_offset,
-            start_offset + size);
+            start_offset + size,
+            section->vma,
+            section->vma + section->size);
 
         return NULL;
     }
@@ -337,3 +340,64 @@ btp_disasm_get_callee_addresses(char **instructions)
     return result;
 }
 
+char *
+btp_disasm_instructions_to_text(char **instructions)
+{
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+    while (instructions)
+    {
+        btp_strbuf_append_str(strbuf, *instructions);
+        btp_strbuf_append_char(strbuf, '\n');
+        ++instructions;
+    }
+
+    return btp_strbuf_free_nobuf(strbuf);
+}
+
+char *
+btp_disasm_binary_to_text(struct btp_disasm_state *state,
+                          uint64_t start_offset,
+                          uint64_t size,
+                          char **error_message)
+{
+#if HAVE_LIBOPCODES
+    asection *section = state->info.section;
+    if (start_offset < section->vma
+        || (start_offset + size) > section->vma + section->size)
+    {
+        *error_message = btp_asprintf(
+            "Invalid function range: 0x%"PRIx64" - 0x%"PRIx64,
+            start_offset,
+            start_offset + size);
+
+        return NULL;
+    }
+
+    char *code = btp_malloc(size);
+    bool success = bfd_get_section_contents(state->bfd_file,
+                                            state->info.section,
+                                            code,
+                                            start_offset,
+                                            size);
+
+    if (!success)
+    {
+        *error_message = btp_strdup("Failed to get section contents.");
+        return NULL;
+    }
+
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+    for (int i = 0; i < size; ++i)
+    {
+        btp_strbuf_append_strf(strbuf, "%"PRIu8);
+        if (i % 32 == 0)
+            btp_strbuf_append_char(strbuf, '\n');
+    }
+
+    free(code);
+    return btp_strbuf_free_nobuf(strbuf);
+#else // HAVE_LIBOPCODES
+    *error_message = btp_asprintf("btparser compiled without libopcodes");
+    return NULL;
+#endif // HAVE_LIBOPCODES
+}
