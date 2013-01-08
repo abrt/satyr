@@ -136,7 +136,7 @@ btp_py_gdb_frame_type =
 {
     PyObject_HEAD_INIT(NULL)
     0,
-    "btparser.Frame",           /* tp_name */
+    "btparser.GdbFrame",           /* tp_name */
     sizeof(struct btp_py_gdb_frame),        /* tp_basicsize */
     0,                          /* tp_itemsize */
     btp_py_gdb_frame_free,       /* tp_dealloc */

@@ -71,7 +71,7 @@ PyTypeObject btp_py_gdb_thread_type =
 {
     PyObject_HEAD_INIT(NULL)
     0,
-    "btparser.Thread",          /* tp_name */
+    "btparser.GdbThread",          /* tp_name */
     sizeof(struct btp_py_gdb_thread),       /* tp_basicsize */
     0,                          /* tp_itemsize */
     btp_py_gdb_thread_free,      /* tp_dealloc */

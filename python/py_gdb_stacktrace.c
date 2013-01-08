@@ -105,7 +105,7 @@ gdb_stacktrace_members[] =
 PyTypeObject btp_py_gdb_stacktrace_type = {
     PyObject_HEAD_INIT(NULL)
     0,
-    "btparser.Stacktrace",           /* tp_name */
+    "btparser.GdbStacktrace",           /* tp_name */
     sizeof(struct btp_py_gdb_stacktrace),        /* tp_basicsize */
     0,                              /* tp_itemsize */
     btp_py_gdb_stacktrace_free,       /* tp_dealloc */

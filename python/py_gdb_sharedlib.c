@@ -64,7 +64,7 @@ btp_py_gdb_sharedlib_type =
 {
     PyObject_HEAD_INIT(NULL)
     0,
-    "btparser.Sharedlib",       /* tp_name */
+    "btparser.GdbSharedlib",       /* tp_name */
     sizeof(struct btp_py_gdb_sharedlib),    /* tp_basicsize */
     0,                          /* tp_itemsize */
     btp_py_gdb_sharedlib_free,   /* tp_dealloc */
