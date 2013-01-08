@@ -132,7 +132,7 @@ frame_methods[] =
 };
 
 PyTypeObject
-btp_py_frame_type =
+btp_py_gdb_frame_type =
 {
     PyObject_HEAD_INIT(NULL)
     0,
