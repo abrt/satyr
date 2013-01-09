@@ -403,6 +403,11 @@ unwind_thread(struct UCD_info *ui,
                 (entry->symbol ? entry->symbol : "-"),
                 (ip_seg && ip_seg->filename) ? ip_seg->filename : "-");
         */
+
+        /* Do not unwind below __libc_start_main. */
+        if (0 == btp_strcmp0(entry->function_name, "__libc_start_main"))
+            break;
+
         ret = unw_step(&c);
         if (ret == 0)
             break;

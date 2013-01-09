@@ -310,6 +310,10 @@ unwind_thread(Dwfl *dwfl, Dwfl_Frame_State *state, char **error_msg)
                 frame->function_name = btp_strdup(funcname);
         }
 
+        /* Do not unwind below __libc_start_main. */
+        if (0 == btp_strcmp0(frame->function_name, "__libc_start_main"))
+            break;
+
         if (!dwfl_frame_unwind(&state))
         {
             warn("Cannot unwind frame: %s", dwfl_errmsg(-1));
