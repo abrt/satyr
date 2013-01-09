@@ -428,7 +428,7 @@ compute_fingerprint(struct btp_core_frame *frame,
                  instructions,
                  fde->start_address,
                  fde->start_address + fde->length);
-
+/*
     if (!fp_libcalls(fingerprint,
                      fde->start_address,
                      plt,
@@ -450,7 +450,7 @@ compute_fingerprint(struct btp_core_frame *frame,
     {
         return false;
     }
-
+*/
     frame->fingerprint = btp_strbuf_free_nobuf(fingerprint);
     btp_disasm_instructions_free(instructions);
     return true;

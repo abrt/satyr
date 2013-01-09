@@ -30,6 +30,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <inttypes.h>
 
 struct btp_core_frame;
 struct btp_strbuf;
@@ -41,6 +42,9 @@ struct btp_json_value;
  */
 struct btp_core_thread
 {
+    /** Thread id. */
+    int64_t id;
+
     /**
      * Thread's frames, starting from the top of the stack.
      */

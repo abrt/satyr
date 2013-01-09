@@ -86,6 +86,7 @@ find_elf_section_by_name(Elf *elf,
         const char *current_section_name = elf_strptr(elf,
                                                       shdr_string_index,
                                                       shdr.sh_name);
+
         if (!current_section_name)
         {
             *error_message = btp_asprintf("elf_strptr failed");
@@ -125,6 +126,7 @@ btp_elf_get_procedure_linkage_table(const char *filename,
         *error_message = btp_asprintf("Failed to open file %s: %s",
                                       filename,
                                       strerror(errno));
+
         return NULL;
     }
 
@@ -135,6 +137,7 @@ btp_elf_get_procedure_linkage_table(const char *filename,
         *error_message = btp_asprintf("Failed to run elf_begin on file %s: %s",
                                       filename,
                                       elf_errmsg(-1));
+
         close(fd);
         return NULL;
     }
@@ -153,6 +156,7 @@ btp_elf_get_procedure_linkage_table(const char *filename,
         *error_message = btp_asprintf("Failed to find .plt section for %s: %s",
                                       filename,
                                       find_section_error_message);
+
         free(find_section_error_message);
         elf_end(elf);
         close(fd);
@@ -174,6 +178,7 @@ btp_elf_get_procedure_linkage_table(const char *filename,
             *error_message = btp_asprintf("gelf_getshdr failed for %s: %s",
                                           filename,
                                           elf_errmsg(-1));
+
             elf_end(elf);
             close(fd);
             return NULL;
@@ -188,6 +193,7 @@ btp_elf_get_procedure_linkage_table(const char *filename,
                 *error_message = btp_asprintf("elf_getdata failed for %s: %s",
                                               filename,
                                               elf_errmsg(-1));
+
                 elf_end(elf);
                 close(fd);
                 return NULL;
@@ -200,6 +206,7 @@ btp_elf_get_procedure_linkage_table(const char *filename,
                 *error_message = btp_asprintf("elf_getscn failed for %s: %s",
                                               filename,
                                               elf_errmsg(-1));
+
                 elf_end(elf);
                 close(fd);
                 return NULL;
@@ -211,6 +218,7 @@ btp_elf_get_procedure_linkage_table(const char *filename,
                 *error_message = btp_asprintf("elf_getdata failed for %s: %s",
                                               filename,
                                               elf_errmsg(-1));
+
                 elf_end(elf);
                 close(fd);
                 return NULL;
@@ -222,6 +230,7 @@ btp_elf_get_procedure_linkage_table(const char *filename,
                 *error_message = btp_asprintf("gelf_getshdr failed for %s: %s",
                                               filename,
                                               elf_errmsg(-1));
+
                 elf_end(elf);
                 close(fd);
                 return NULL;
@@ -236,6 +245,7 @@ btp_elf_get_procedure_linkage_table(const char *filename,
     {
         *error_message = btp_asprintf("Unable to read symbol table for .plt for file %s",
                                       filename);
+
         elf_end(elf);
         close(fd);
         return NULL;
@@ -271,6 +281,7 @@ btp_elf_get_procedure_linkage_table(const char *filename,
             *error_message = btp_asprintf("gelf_getrela failed for %s: %s",
                                           filename,
                                           elf_errmsg(-1));
+
             btp_elf_procedure_linkage_table_free(result);
             elf_end(elf);
             close(fd);
@@ -283,6 +294,7 @@ btp_elf_get_procedure_linkage_table(const char *filename,
             *error_message = btp_asprintf("gelf_getsym failed for %s: %s",
                                           filename,
                                           elf_errmsg(-1));
+
             btp_elf_procedure_linkage_table_free(result);
             elf_end(elf);
             close(fd);
@@ -292,7 +304,10 @@ btp_elf_get_procedure_linkage_table(const char *filename,
         struct btp_elf_plt_entry *entry = btp_malloc(sizeof(struct btp_elf_plt_entry));
         entry->symbol_name = btp_strdup(elf_strptr(elf, stringtable,
                                                    symb.st_name));
+
         entry->address = (uint64_t)(plt_base + plt_offset);
+        entry->next = NULL;
+
         if (result)
         {
             last->next = entry;

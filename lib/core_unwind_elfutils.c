@@ -323,7 +323,7 @@ unwind_thread(Dwfl *dwfl, Dwfl_Frame_State *state, char **error_msg)
     }
 
     struct btp_core_thread *thread = btp_core_thread_new();
-    thread->tid = (int64_t)tid;
+    thread->id = (int64_t)tid;
     thread->frames = head;
     return thread;
 }
