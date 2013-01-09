@@ -377,7 +377,7 @@ btp_disasm_binary_to_text(struct btp_disasm_state *state,
     bool success = bfd_get_section_contents(state->bfd_file,
                                             state->info.section,
                                             code,
-                                            start_offset,
+                                            start_offset - section->vma,
                                             size);
 
     if (!success)
@@ -389,8 +389,8 @@ btp_disasm_binary_to_text(struct btp_disasm_state *state,
     struct btp_strbuf *strbuf = btp_strbuf_new();
     for (int i = 0; i < size; ++i)
     {
-        btp_strbuf_append_strf(strbuf, "%"PRIu8);
-        if (i % 32 == 0)
+        btp_strbuf_append_strf(strbuf, "0x%02x ", (unsigned char)code[i]);
+        if ((i + 1) % 12 == 0)
             btp_strbuf_append_char(strbuf, '\n');
     }
 

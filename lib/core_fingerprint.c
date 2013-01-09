@@ -410,12 +410,17 @@ compute_fingerprint(struct btp_core_frame *frame,
         return false;
 
 /*    puts("BEGIN");
+    char *binary = btp_disasm_binary_to_text(disassembler,
+                                             fde->exec_base + fde->start_address,
+                                             fde->length,
+                                             error_message);
+
+    if (!binary)
+        puts(*error_message);
+
     printf("Function\n%s\n%s\n\n\n\n",
            btp_disasm_instructions_to_text(instructions),
-           btp_disasm_binary_to_text(disassembler,
-                                     fde->exec_base + fde->start_address,
-                                     fde->length,
-                                     error_message));
+           binary);
 */
     struct btp_strbuf *fingerprint = btp_strbuf_new();
 
@@ -426,8 +431,8 @@ compute_fingerprint(struct btp_core_frame *frame,
     fp_shift(fingerprint, instructions);
     fp_has_cycle(fingerprint,
                  instructions,
-                 fde->start_address,
-                 fde->start_address + fde->length);
+                 fde->exec_base + fde->start_address,
+                 fde->exec_base + fde->start_address + fde->length);
 /*
     if (!fp_libcalls(fingerprint,
                      fde->start_address,
