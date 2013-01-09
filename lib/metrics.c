@@ -17,7 +17,6 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
 #include "gdb_thread.h"
 #include "gdb_frame.h"
 #include "utils.h"
@@ -69,13 +68,16 @@ btp_gdb_thread_jarowinkler_distance_custom(struct btp_gdb_thread *thread1,
             }
             curr_frame2 = curr_frame2->next;
         }
+
         if (still_prefix)
             prefix_len++;
+
         if (match)
             match_count++;
 
         curr_frame = curr_frame->next;
     }
+
     trans_count = trans_count / 2;
 
     if (prefix_len > 4)
@@ -87,29 +89,35 @@ btp_gdb_thread_jarowinkler_distance_custom(struct btp_gdb_thread *thread1,
                  match_count / (float)frame2_count +
                 (match_count - trans_count) / match_count) / 3;
 
-    k = 0.2;  /*how much weight we give to having common prefixes (always k<0.25)*/
+    k = 0.2;  /* how much weight we give to having common prefixes
+               * (always k < 0.25) */
+
     dist = dist_jaro + (float)prefix_len * k * (1 - dist_jaro);
 
     return dist;
 }
 
 static bool
-frames_contain(struct btp_gdb_frame *frames, struct btp_gdb_frame *frame,
-        btp_gdb_frame_cmp_type compare_func)
+frames_contain(struct btp_gdb_frame *frames,
+               struct btp_gdb_frame *frame,
+               btp_gdb_frame_cmp_type compare_func)
 {
     while (frames)
     {
         // checking if functions are the same but not both "??"
         if (!compare_func(frames, frame))
             return true;
+
         frames = frames->next;
     }
+
     return false;
 }
 
 float
-btp_gdb_thread_jaccard_distance_custom(struct btp_gdb_thread *thread1, struct btp_gdb_thread *thread2,
-        btp_gdb_frame_cmp_type compare_func)
+btp_gdb_thread_jaccard_distance_custom(struct btp_gdb_thread *thread1,
+                                       struct btp_gdb_thread *thread2,
+                                       btp_gdb_frame_cmp_type compare_func)
 {
     int union_size, intersection_size = 0, set1_size = 0, set2_size = 0;
     float j_distance;
@@ -119,6 +127,7 @@ btp_gdb_thread_jaccard_distance_custom(struct btp_gdb_thread *thread1, struct bt
     {
         if (frames_contain(curr_frame->next, curr_frame, compare_func))
             continue; // not last, skip
+
         set1_size++;
 
         if (frames_contain(thread2->frames, curr_frame, compare_func))
@@ -129,12 +138,14 @@ btp_gdb_thread_jaccard_distance_custom(struct btp_gdb_thread *thread1, struct bt
     {
         if (frames_contain(curr_frame->next, curr_frame, compare_func))
             continue; // not last, skip
+
         set2_size++;
     }
 
     union_size = set1_size + set2_size - intersection_size;
     if (!union_size)
         return 0.0;
+
     j_distance = 1.0 - intersection_size / (float)union_size;
     if (j_distance < 0.0)
         j_distance = 0.0;
@@ -144,8 +155,10 @@ btp_gdb_thread_jaccard_distance_custom(struct btp_gdb_thread *thread1, struct bt
 
 
 int
-btp_gdb_thread_levenshtein_distance_custom(struct btp_gdb_thread *thread1, struct btp_gdb_thread *thread2,
-        bool transposition, btp_gdb_frame_cmp_type compare_func)
+btp_gdb_thread_levenshtein_distance_custom(struct btp_gdb_thread *thread1,
+                                           struct btp_gdb_thread *thread2,
+                                           bool transposition,
+                                           btp_gdb_frame_cmp_type compare_func)
 {
     int m = btp_gdb_thread_get_frame_count(thread1) + 1;
     int n = btp_gdb_thread_get_frame_count(thread2) + 1;
@@ -158,6 +171,7 @@ btp_gdb_thread_levenshtein_distance_custom(struct btp_gdb_thread *thread1, struc
     // first row and column having distance equal to their position
     for (i = m; i > 0; i--)
         dist[m - i] = i;
+
     for (; i <= n; i++)
         dist[m + i] = i;
 
@@ -167,7 +181,6 @@ btp_gdb_thread_levenshtein_distance_custom(struct btp_gdb_thread *thread1, struc
 
     for (j = 1; curr_frame2; j++)
     {
-
         struct btp_gdb_frame *curr_frame = thread1->frames;
         for (i = 1; curr_frame; i++)
         {
@@ -179,9 +192,7 @@ btp_gdb_thread_levenshtein_distance_custom(struct btp_gdb_thread *thread1, struc
             /*similar characters have distance equal to the previous one diagonally,
               "??" functions aren't taken as similar */
             if (0 == compare_func(curr_frame, curr_frame2))
-            {
                 cost = 0;
-            }
             // different ones takes the lowest value of all previous distances
             else
             {
@@ -199,7 +210,9 @@ btp_gdb_thread_levenshtein_distance_custom(struct btp_gdb_thread *thread1, struc
                 (i >= 2 && j >= 2 && dist[l] > dist2 + cost &&
                  0 == compare_func(curr_frame, prev_frame2) &&
                  0 == compare_func(prev_frame, curr_frame2)))
+            {
                 dist[l] = dist2 + cost;
+            }
 
             prev_frame = curr_frame;
             curr_frame = curr_frame->next;
@@ -213,25 +226,37 @@ btp_gdb_thread_levenshtein_distance_custom(struct btp_gdb_thread *thread1, struc
 }
 
 float
-btp_gdb_thread_jarowinkler_distance(struct btp_gdb_thread *thread1, struct btp_gdb_thread *thread2)
+btp_gdb_thread_jarowinkler_distance(struct btp_gdb_thread *thread1,
+                                    struct btp_gdb_thread *thread2)
 {
-    return btp_gdb_thread_jarowinkler_distance_custom(thread1, thread2, btp_gdb_frame_cmp_simple);
+    return btp_gdb_thread_jarowinkler_distance_custom(thread1,
+                                                      thread2,
+                                                      btp_gdb_frame_cmp_simple);
 }
 
 float
-btp_gdb_thread_jaccard_distance(struct btp_gdb_thread *thread1, struct btp_gdb_thread *thread2)
+btp_gdb_thread_jaccard_distance(struct btp_gdb_thread *thread1,
+                                struct btp_gdb_thread *thread2)
 {
-    return btp_gdb_thread_jaccard_distance_custom(thread1, thread2, btp_gdb_frame_cmp_simple);
+    return btp_gdb_thread_jaccard_distance_custom(thread1,
+                                                  thread2,
+                                                  btp_gdb_frame_cmp_simple);
 }
 
 int
-btp_gdb_thread_levenshtein_distance(struct btp_gdb_thread *thread1, struct btp_gdb_thread *thread2, bool transposition)
+btp_gdb_thread_levenshtein_distance(struct btp_gdb_thread *thread1,
+                                    struct btp_gdb_thread *thread2,
+                                    bool transposition)
 {
-    return btp_gdb_thread_levenshtein_distance_custom(thread1, thread2, transposition, btp_gdb_frame_cmp_simple);
+    return btp_gdb_thread_levenshtein_distance_custom(thread1,
+                                                      thread2,
+                                                      transposition,
+                                                      btp_gdb_frame_cmp_simple);
 }
 
 float
-btp_gdb_thread_levenshtein_distance_f(struct btp_gdb_thread *thread1, struct btp_gdb_thread *thread2)
+btp_gdb_thread_levenshtein_distance_f(struct btp_gdb_thread *thread1,
+                                      struct btp_gdb_thread *thread2)
 {
     int frame_count1, frame_count2, max_frame_count;
 
@@ -242,7 +267,10 @@ btp_gdb_thread_levenshtein_distance_f(struct btp_gdb_thread *thread1, struct btp
     if (!max_frame_count)
         return 1.0;
 
-    return (float)btp_gdb_thread_levenshtein_distance_custom(thread1, thread2, true, btp_gdb_frame_cmp_simple) / max_frame_count;
+    return (float)btp_gdb_thread_levenshtein_distance_custom(thread1,
+                                                             thread2,
+                                                             true,
+                                                             btp_gdb_frame_cmp_simple) / max_frame_count;
 }
 
 static int
@@ -271,7 +299,8 @@ btp_distances_new(int m, int n)
     distances->m = m;
     distances->n = n;
     distances->distances = btp_malloc(sizeof(*distances->distances) *
-            (get_distance_position(distances, m - 1, n - 1) + 1));
+                                      (get_distance_position(distances, m - 1, n - 1) + 1));
+
     return distances;
 }
 
@@ -293,6 +322,7 @@ btp_distances_free(struct btp_distances *distances)
 {
     if (!distances)
         return;
+
     free(distances->distances);
     free(distances);
 }
@@ -313,8 +343,10 @@ btp_distances_get_distance(struct btp_distances *distances, int i, int j)
 }
 
 void
-btp_distances_set_distance(struct btp_distances *distances, int i, int j,
-        float d)
+btp_distances_set_distance(struct btp_distances *distances,
+                           int i,
+                           int j,
+                           float d)
 {
     if (i == j)
         return;
@@ -329,7 +361,10 @@ btp_distances_set_distance(struct btp_distances *distances, int i, int j,
 }
 
 struct btp_distances *
-btp_gdb_threads_compare(struct btp_gdb_thread **threads, int m, int n, btp_dist_thread_type dist_func)
+btp_gdb_threads_compare(struct btp_gdb_thread **threads,
+                        int m,
+                        int n,
+                        btp_dist_thread_type dist_func)
 {
     struct btp_distances *distances;
     struct btp_gdb_thread *thread1, *thread2;
@@ -338,6 +373,7 @@ btp_gdb_threads_compare(struct btp_gdb_thread **threads, int m, int n, btp_dist_
     distances = btp_distances_new(m, n);
 
     for (i = 0; i < m; i++)
+    {
         for (j = i + 1; j < n; j++)
         {
             ok = all = 0;
@@ -366,6 +402,7 @@ btp_gdb_threads_compare(struct btp_gdb_thread **threads, int m, int n, btp_dist_
                 btp_gdb_thread_free(thread2);
             }
         }
+    }
 
     return distances;
 }

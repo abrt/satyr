@@ -35,14 +35,15 @@ struct btp_gdb_frame;
 struct btp_gdb_thread;
 
 /* Jaro-Winkler distance:
- * Gets number of matching function names(match_count) from both threads and
- * number of transpositions in place(trans_count)
- * if the transpositioned function names are not farther away than frame_count/2 - 1.
- * Then computes the Jaro-Winkler distance according to the formula.
- * NOTE: The Jaro-Winkler distance is not a metric distance as it does not
- * satisfy the triangle inequality.
- * Returns a number between 0 and 1:
- * 0 = no similarity, 1 = similar threads
+ *
+ * Gets number of matching function names(match_count) from both
+ * threads and number of transpositions in place(trans_count) if the
+ * transpositioned function names are not farther away than
+ * frame_count/2 - 1.  Then computes the Jaro-Winkler distance
+ * according to the formula.  NOTE: The Jaro-Winkler distance is not a
+ * metric distance as it does not satisfy the triangle inequality.
+ * Returns a number between 0 and 1: 0 = no similarity, 1 = similar
+ * threads
  */
 float
 btp_gdb_thread_jarowinkler_distance(struct btp_gdb_thread *thread1,
@@ -50,11 +51,12 @@ btp_gdb_thread_jarowinkler_distance(struct btp_gdb_thread *thread1,
 
 
 /* Jaccard distance:
- * Gives a number representing the difference of the size of the intersection
- * and union divided by the size of the union of two threads.
- * Function names positions in the thread are not taken into account.
- * Returns a number between 0 and 1:
- * 0 = similar threads, 1 = no similarity
+ *
+ * Gives a number representing the difference of the size of the
+ * intersection and union divided by the size of the union of two
+ * threads.  Function names positions in the thread are not taken into
+ * account.  Returns a number between 0 and 1: 0 = similar threads, 1
+ * = no similarity
  */
 float
 btp_gdb_thread_jaccard_distance(struct btp_gdb_thread *thread1,
@@ -62,15 +64,17 @@ btp_gdb_thread_jaccard_distance(struct btp_gdb_thread *thread1,
 
 
 /* Levenshtein distance:
+ *
  * Computes the distance of two threads creating a matrix of distances
- * between all the frames in each thread.
- * Returns a number representing how many function names need to be different
- * in one thread to match all the function names in second thread at each respective
- * positions or how many function names need to be different/transpositioned
- * to have a match if the transposition argument is enabled.
- * NOTE: With transpositions enabled the triangle inequality does not hold.
- * The distance is always between 0 and n, where n is the frame count of longer thread
- * 0 = similar threads, n = no similar function names
+ * between all the frames in each thread.  Returns a number
+ * representing how many function names need to be different in one
+ * thread to match all the function names in second thread at each
+ * respective positions or how many function names need to be
+ * different/transpositioned to have a match if the transposition
+ * argument is enabled.  NOTE: With transpositions enabled the
+ * triangle inequality does not hold.  The distance is always between
+ * 0 and n, where n is the frame count of longer thread 0 = similar
+ * threads, n = no similar function names
  */
 int
 btp_gdb_thread_levenshtein_distance(struct btp_gdb_thread *thread1,
@@ -78,7 +82,8 @@ btp_gdb_thread_levenshtein_distance(struct btp_gdb_thread *thread1,
                                     bool transposition);
 
 /* Levenshtein distance returned with transpositions enabled and
- * returned in interval [0, 1] */
+ * returned in interval [0, 1].
+ */
 float
 btp_gdb_thread_levenshtein_distance_f(struct btp_gdb_thread *thread1,
                                       struct btp_gdb_thread *thread2);
@@ -177,7 +182,10 @@ btp_distances_get_distance(struct btp_distances *distances, int i, int j);
  * Distance.
  */
 void
-btp_distances_set_distance(struct btp_distances *distances, int i, int j, float d);
+btp_distances_set_distance(struct btp_distances *distances,
+                           int i,
+                           int j,
+                           float d);
 
 /**
  * A function which compares two threads.

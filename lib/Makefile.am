@@ -10,6 +10,7 @@ pkginclude_HEADERS = \
 	core_unwind.h \
 	deb.h \
 	disasm.h \
+	distance.h \
 	elves.h \
 	gdb_frame.h \
 	gdb_sharedlib.h \
@@ -50,6 +51,7 @@ libbtparser_la_SOURCES = \
 	core_unwind_libunwind.c \
 	deb.c \
 	disasm.c \
+	distance.c \
 	elves.c \
 	gdb_stacktrace.c \
 	gdb_frame.c \
