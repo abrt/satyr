@@ -751,7 +751,8 @@ btp_elf_get_eh_frame(const char *filename,
             }
 
             struct btp_elf_fde *fde = btp_malloc(sizeof(struct btp_elf_fde));
-            fde->start_address = initial_location + exec_base;
+            fde->exec_base = exec_base;
+            fde->start_address = initial_location;
             fde->length = address_range;
             fde->next = NULL;
 

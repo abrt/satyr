@@ -402,21 +402,21 @@ compute_fingerprint(struct btp_core_frame *frame,
 
     char **instructions =
         btp_disasm_get_function_instructions(disassembler,
-                                             fde->start_address,
+                                             fde->exec_base + fde->start_address,
                                              fde->length,
                                              error_message);
 
     if (!instructions)
         return false;
 
-    //puts("BEGIN");
-    //printf("Function\n%s\n%s\n\n\n\n",
-    //       btp_disasm_instructions_to_text(instructions),
-    //       btp_disasm_binary_to_text(disassembler,
-    //                                 fde->start_address,
-    //                                 fde->length,
-    //                                 error_message));
-
+/*    puts("BEGIN");
+    printf("Function\n%s\n%s\n\n\n\n",
+           btp_disasm_instructions_to_text(instructions),
+           btp_disasm_binary_to_text(disassembler,
+                                     fde->exec_base + fde->start_address,
+                                     fde->length,
+                                     error_message));
+*/
     struct btp_strbuf *fingerprint = btp_strbuf_new();
 
     fp_jump_equality(fingerprint, instructions);

@@ -344,7 +344,7 @@ char *
 btp_disasm_instructions_to_text(char **instructions)
 {
     struct btp_strbuf *strbuf = btp_strbuf_new();
-    while (instructions)
+    while (*instructions)
     {
         btp_strbuf_append_str(strbuf, *instructions);
         btp_strbuf_append_char(strbuf, '\n');

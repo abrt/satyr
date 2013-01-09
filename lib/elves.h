@@ -55,12 +55,18 @@ struct btp_elf_plt_entry
  */
 struct btp_elf_fde
 {
+    /** Offset where all functions starts.  start_address is relative
+     * to this exec base.
+     */
+    uint64_t exec_base;
+
     /**
      * Offset where a function starts.  If the function is present in
      * the Procedure Linkage Table, this address matches some address
      * in btp_elf_plt_entry.
      */
     uint64_t start_address;
+
     /** Length of the function in bytes. */
     uint64_t length;
 

@@ -378,7 +378,7 @@ unwind_thread(struct UCD_info *ui,
             ret = dwfl_module_build_id(mod, &build_id_bits, &bid_addr);
             if (ret > 0)
             {
-                entry->build_id = btp_mallocz(2*ret + 1);
+                entry->build_id = btp_mallocz(2 * ret + 1);
                 btp_bin2hex(entry->build_id, (const char *)build_id_bits, ret);
             }
 
