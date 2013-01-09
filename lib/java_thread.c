@@ -19,7 +19,6 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "java_thread.h"
-#include "java_exception.h"
 #include "java_frame.h"
 #include "location.h"
 #include "utils.h"
@@ -41,7 +40,7 @@ void
 btp_java_thread_init(struct btp_java_thread *thread)
 {
     thread->name = NULL;
-    thread->exception = NULL;
+    thread->frames = NULL;
     thread->next = NULL;
 }
 
@@ -51,7 +50,7 @@ btp_java_thread_free(struct btp_java_thread *thread)
     if (!thread)
         return;
 
-    btp_java_exception_free(thread->exception);
+    btp_java_frame_free_full(thread->frames);
 
     free(thread->name);
     free(thread);
@@ -72,8 +71,8 @@ btp_java_thread_dup(struct btp_java_thread *thread, bool siblings)
     else
         result->next = NULL; /* Do not copy that. */
 
-    if (result->exception)
-        result->exception = btp_java_exception_dup(result->exception, true);
+    if (result->frames)
+        result->frames = btp_java_frame_dup(result->frames, true);
 
     if (result->name)
         result->name = btp_strdup(result->name);
@@ -89,15 +88,15 @@ btp_java_thread_cmp(struct btp_java_thread *thread1,
     if (res)
         return res;
 
-    struct btp_java_exception *exception1 = thread1->exception;
-    struct btp_java_exception *exception2 = thread2->exception;
+    struct btp_java_frame *frame1 = thread1->frames;
+    struct btp_java_frame *frame2 = thread2->frames;
 
-    if (exception1 && !exception2)
+    if (frame1 && !frame2)
         return 1;
-    else if (exception2 && !exception1)
+    else if (frame2 && !frame1)
         return -1;
-    else if (exception1 && exception2)
-        return btp_java_exception_cmp(exception1, exception2, true);
+    else if (frame1 && frame2)
+        return btp_java_frame_cmp(frame1, frame2);
 
     return 0;
 }
@@ -120,10 +119,15 @@ btp_java_thread_append(struct btp_java_thread *dest,
 int
 btp_java_thread_get_frame_count(struct btp_java_thread *thread)
 {
-    if (thread->exception)
-        return btp_java_exception_get_frame_count(thread->exception, true);
+    struct btp_java_frame *frame = thread->frames;
+    int count = 0;
+    while (frame)
+    {
+        frame = frame->next;
+        ++count;
+    }
 
-    return 0;
+    return count;
 }
 
 void
@@ -131,25 +135,53 @@ btp_java_thread_quality_counts(struct btp_java_thread *thread,
                                int *ok_count,
                                int *all_count)
 {
-    if (thread->exception)
-        btp_java_exception_quality_counts(thread->exception, ok_count, all_count, true);
+    struct btp_java_frame *frame = thread->frames;
+    while (frame)
+    {
+        ++(*all_count);
+
+        /* Functions with unknown file names are NOT OK */
+        if (frame->is_native || frame->file_name)
+            ++(*ok_count);
+
+        frame = frame->next;
+    }
 }
 
 float
 btp_java_thread_quality(struct btp_java_thread *thread)
 {
-    if (thread->exception)
-        return btp_java_exception_quality(thread->exception, true);
+    int ok_count = 0, all_count = 0;
+    btp_java_thread_quality_counts(thread, &ok_count, &all_count);
+    if (0 == all_count)
+        return 1;
 
-    return .0;
+    return ok_count / (float)all_count;
 }
 
 bool
 btp_java_thread_remove_frame(struct btp_java_thread *thread,
                              struct btp_java_frame *frame)
 {
-    if (thread->exception)
-        return btp_java_exception_remove_frame(thread->exception, frame, true);
+    struct btp_java_frame *loop_frame = thread->frames,
+        *prev_frame = NULL;
+
+    while (loop_frame)
+    {
+        if (loop_frame == frame)
+        {
+            if (prev_frame)
+                prev_frame->next = loop_frame->next;
+            else
+                thread->frames = loop_frame->next;
+
+            btp_java_frame_free(loop_frame);
+            return true;
+        }
+
+        prev_frame = loop_frame;
+        loop_frame = loop_frame->next;
+    }
 
     return false;
 }
@@ -158,31 +190,90 @@ bool
 btp_java_thread_remove_frames_above(struct btp_java_thread *thread,
                                     struct btp_java_frame *frame)
 {
-    if (thread->exception)
-        return btp_java_exception_remove_frames_above(thread->exception, frame, true);
+    /* Check that the frame is present in the thread. */
+    struct btp_java_frame *loop_frame = thread->frames;
+    while (loop_frame)
+    {
+        if (loop_frame == frame)
+            break;
 
-    return false;
+        loop_frame = loop_frame->next;
+    }
+
+    if (!loop_frame)
+        return false;
+
+    /* Delete all the frames up to the frame. */
+    while (thread->frames != frame)
+    {
+        loop_frame = thread->frames->next;
+        btp_java_frame_free(thread->frames);
+        thread->frames = loop_frame;
+    }
+
+    return true;
 }
 
 void
 btp_java_thread_remove_frames_below_n(struct btp_java_thread *thread,
                                       int n)
 {
-    if (thread->exception)
-        btp_java_exception_remove_frames_below_n(thread->exception, n, true);
+    assert(n >= 0);
 
-    return;
+    /* Skip some frames to get the required stack depth. */
+    int i = n;
+    struct btp_java_frame *frame = thread->frames,
+        *last_frame = NULL;
+
+    while (frame && i)
+    {
+        last_frame = frame;
+        frame = frame->next;
+        --i;
+    }
+
+    /* Delete the remaining frames. */
+    if (last_frame)
+        last_frame->next = NULL;
+    else
+        thread->frames = NULL;
+
+    while (frame)
+    {
+        struct btp_java_frame *delete_frame = frame;
+        frame = frame->next;
+        btp_java_frame_free(delete_frame);
+    }
 }
 
 void
 btp_java_thread_append_to_str(struct btp_java_thread *thread,
                               struct btp_strbuf *dest)
 {
-    btp_strbuf_append_strf(dest, "Exception in thread \"%s\"",
-                           thread->name ? thread->name : "");
+    struct btp_strbuf *exception = btp_strbuf_new();
+    struct btp_java_frame *frame = thread->frames;
+    while (frame)
+    {
+        if (frame->is_exception && exception->len > 0)
+        {
+            btp_strbuf_prepend_strf(dest, "Caused by: %s\t...\n",
+                                    exception->buf);
+            btp_strbuf_clear(exception);
+        }
 
-    if (thread->exception)
-        btp_java_exception_append_to_str(thread->exception, dest);
+        btp_java_frame_append_to_str(frame, exception);
+        btp_strbuf_append_char(exception, '\n');
+
+        frame = frame->next;
+    }
+
+    if (exception->len > 0)
+        btp_strbuf_prepend_str(dest, exception->buf);
+
+    btp_strbuf_prepend_strf(dest, "Exception in thread \"%s\" ",
+                            thread->name ? thread->name : "");
+
+    btp_strbuf_free(exception);
 }
 
 struct btp_java_thread *
@@ -215,7 +306,7 @@ btp_java_thread_parse(const char **input,
     }
 
     /* java.lang.NullPointerException: foo */
-    if (!(thread->exception = btp_java_exception_parse(&cursor, location)))
+    if (!(thread->frames = btp_java_frame_parse_exception(&cursor, location)))
     {
         btp_java_thread_free(thread);
         return NULL;

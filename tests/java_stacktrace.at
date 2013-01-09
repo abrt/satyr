@@ -9,7 +9,6 @@ AT_TESTFUN([btp_java_stacktrace_cmp],
 [[
 #include <lib/java_stacktrace.h>
 #include <lib/java_thread.h>
-#include <lib/java_exception.h>
 #include <lib/java_frame.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -47,7 +46,6 @@ AT_TESTFUN([btp_java_stacktrace_dup],
 [[
 #include <lib/java_stacktrace.h>
 #include <lib/java_thread.h>
-#include <lib/java_exception.h>
 #include <lib/java_frame.h>
 #include <lib/location.h>
 #include <assert.h>
@@ -80,7 +78,6 @@ AT_TESTFUN([btp_java_stacktrace_parse],
 [[
 #include <lib/java_stacktrace.h>
 #include <lib/java_thread.h>
-#include <lib/java_exception.h>
 #include <lib/java_frame.h>
 #include <lib/location.h>
 #include <assert.h>
