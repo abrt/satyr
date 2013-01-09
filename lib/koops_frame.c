@@ -137,8 +137,8 @@ btp_koops_frame_parse(const char **input)
 
     btp_skip_char_span(&local_input, " \t");
 
-    /* Question mark? */
-    frame->reliable = (0 != btp_skip_char(&local_input, '?'));
+    /* Question mark means unreliable */
+    frame->reliable = btp_skip_char(&local_input, '?') != true;
 
     btp_skip_char_span(&local_input, " \t");
 
