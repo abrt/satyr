@@ -223,7 +223,7 @@ bool
 btp_disasm_instruction_is_one_of(char *instruction,
                                  const char **mnemonics)
 {
-    while (mnemonics)
+    while (*mnemonics)
     {
         size_t len = strlen(*mnemonics);
         if (0 == strncmp(instruction, *mnemonics, len) &&
@@ -242,7 +242,7 @@ bool
 btp_disasm_instruction_present(char **instructions,
                                const char **mnemonics)
 {
-    while (instructions)
+    while (*instructions)
     {
         if (btp_disasm_instruction_is_one_of(*instructions,
                                              mnemonics))

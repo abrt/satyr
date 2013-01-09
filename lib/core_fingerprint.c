@@ -122,11 +122,12 @@ fp_has_cycle(struct btp_strbuf *fingerprint,
       {"jmp", "jmpb", "jmpw", "jmpl", "jmpq", NULL};
 
     bool found = false;
-    while (instructions)
+    while (*instructions)
     {
         if (!btp_disasm_instruction_is_one_of(*instructions,
                                               jmp_mnemonics))
         {
+            ++instructions;
             continue;
         }
 
@@ -134,6 +135,7 @@ fp_has_cycle(struct btp_strbuf *fingerprint,
         if (!btp_disasm_instruction_parse_single_address_operand(
                 *instructions, &target_address))
         {
+            ++instructions;
             continue;
         }
 
