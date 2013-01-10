@@ -101,7 +101,6 @@ btp_py_koops_stacktrace_get_modules(PyObject *self, PyObject *args)
     if (!result)
         return PyErr_NoMemory();
 
-    printf("%d\n", sizeof(st->modules));
     while(iter && *iter)
     {
       PyList_Append(result, Py_BuildValue("s", *iter++));
