@@ -1,4 +1,5 @@
 doc_DATA = btparser.tex
+EXTRA_DIST = btparser.tex doxygen.conf
 
 CLEANFILES = *.aux btparser.log btparser.out btparser.toc btparser.idx btparser.ilg btparser.ind
 

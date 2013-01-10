@@ -1,4 +1,4 @@
-EXTRA_DIST = backtraces
+EXTRA_DIST = gdb_stacktraces kerneloopses programs
 
 ## ------------ ##
 ## package.m4.  ##
