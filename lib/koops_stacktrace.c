@@ -122,6 +122,9 @@ btp_koops_stacktrace_parse(const char **input,
     while (*local_input)
     {
         struct btp_koops_frame *frame = btp_koops_frame_parse(&local_input);
+        if (!stacktrace->modules) {
+            stacktrace->modules = btp_koops_stacktrace_parse_modules(&local_input);
+        }
 
         if (frame)
         {
