@@ -11,6 +11,8 @@ _btparser_la_SOURCES = \
     py_gdb_sharedlib.c \
     py_gdb_stacktrace.c \
     py_gdb_thread.c \
+    py_koops_frame.c \
+    py_koops_stacktrace.c \
     py_metrics.c \
     py_module.c
 
