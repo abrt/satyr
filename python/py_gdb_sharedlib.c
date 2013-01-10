@@ -2,7 +2,7 @@
 #include "lib/gdb_sharedlib.h"
 #include "lib/utils.h"
 
-#define sharedlib_doc "btparser.Sharedlib - class representing a shared library loaded at the moment of crash"
+#define sharedlib_doc "btparser.GdbSharedlib - class representing a shared library loaded at the moment of crash"
 
 #define s_get_from_doc "Usage: sharedlib.get_from()\n" \
                        "Returns: long - address where lib's memory begins"

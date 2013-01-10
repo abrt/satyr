@@ -23,10 +23,10 @@
 #include "lib/utils.h"
 #include "lib/gdb_frame.h"
 
-#define frame_doc "btparser.Frame - class representing a frame in a thread\n" \
+#define frame_doc "btparser.GdbFrame - class representing a frame in a thread\n" \
                   "Usage:\n" \
-                  "btparser.Frame() - creates an empty frame\n" \
-                  "btparser.Frame(str) - parses str and fills the frame object"
+                  "btparser.GdbFrame() - creates an empty frame\n" \
+                  "btparser.GdbFrame(str) - parses str and fills the frame object"
 
 #define f_get_function_name_doc "Usage: frame.get_function_name()\n" \
                                 "Returns: string - function name"
@@ -77,7 +77,7 @@
                               "newname: string - new library name"
 
 #define f_dup_doc "Usage: frame.dup()\n" \
-                  "Returns: btparser.Frame - a new clone of frame\n" \
+                  "Returns: btparser.GdbFrame - a new clone of frame\n" \
                   "Clones the frame object. All new structures are independent " \
                   "on the original object."
 

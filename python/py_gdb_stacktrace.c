@@ -9,13 +9,13 @@
 #include "lib/location.h"
 #include "lib/normalize.h"
 
-#define stacktrace_doc "btparser.Stacktrace - class representing a stacktrace\n" \
+#define stacktrace_doc "btparser.GdbStacktrace - class representing a stacktrace\n" \
                       "Usage:\n" \
-                      "btparser.Stacktrace() - creates an empty stacktrace\n" \
-                      "btparser.Stacktrace(str) - parses str and fills the stacktrace object"
+                      "btparser.GdbStacktrace() - creates an empty stacktrace\n" \
+                      "btparser.GdbStacktrace(str) - parses str and fills the stacktrace object"
 
 #define b_dup_doc "Usage: stacktrace.dup()\n" \
-                  "Returns: btparser.Stacktrace - a new clone of stacktrace\n" \
+                  "Returns: btparser.GdbStacktrace - a new clone of stacktrace\n" \
                   "Clones the stacktrace object. All new structures are independent " \
                   "on the original object."
 

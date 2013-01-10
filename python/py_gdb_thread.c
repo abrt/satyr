@@ -5,11 +5,11 @@
 #include "lib/gdb_frame.h"
 #include "lib/location.h"
 
-#define thread_doc "btparser.Thread - class representing a thread in a stacktrace\n" \
+#define thread_doc "btparser.GdbThread - class representing a thread in a stacktrace\n" \
                    "Usage:\n" \
-                   "btparser.Thread() - creates an empty thread\n" \
-                   "btparser.Thread(str) - parses str and fills the thread object\n" \
-                   "btparser.Thread(str, only_funs=True) - parses list of function names"
+                   "btparser.GdbThread() - creates an empty thread\n" \
+                   "btparser.GdbThread(str) - parses str and fills the thread object\n" \
+                   "btparser.GdbThread(str, only_funs=True) - parses list of function names"
 
 #define t_get_number_doc "Usage: thread.get_number()\n" \
                          "Returns: positive integer - thread number"
@@ -18,7 +18,7 @@
                          "N: positive integer - new thread number"
 
 #define t_dup_doc "Usage: thread.dup()\n" \
-                  "Returns: btparser.Thread - a new clone of thread\n" \
+                  "Returns: btparser.GdbThread - a new clone of thread\n" \
                   "Clones the thread object. All new structures are independent " \
                   "on the original object."
 
