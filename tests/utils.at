@@ -460,3 +460,44 @@ int main(void)
   return 0;
 }
 ]])
+
+## ----------- ##
+## btp_struniq ##
+## ----------- ##
+
+AT_TESTFUN([btp_struniq],
+[[
+#include <lib/utils.h>
+#include <assert.h>
+void do_check(char **in, size_t inlen, char **out, size_t outlen)
+{
+  printf("%d %d\n", inlen, outlen);
+  btp_struniq(in, &inlen);
+  assert(inlen == outlen);
+
+  int i;
+  for (i = 0; i < outlen; i++)
+  {
+    assert(0 == strcmp(in[i], out[i]));
+  }
+}
+#define check(x,y) do_check(x, sizeof(x)/sizeof(x[0]), y, sizeof(y)/sizeof(y[0]))
+
+int main(void)
+{
+  size_t size = 0;
+  btp_struniq(NULL, &size);
+  assert(size == 0);
+
+  char *a1[] = {"a"}, *b1[] = {"a"};
+  check(a1, b1);
+
+  char *a2[] = {"a", "a"}, *b2[] = {"a"};
+  check(a2, b2);
+
+  char *a3[] = {"a", "b"}, *b3[] = {"a", "b"};
+  check(a3, b3);
+
+  return 0;
+}
+]])

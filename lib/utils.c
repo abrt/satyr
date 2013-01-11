@@ -132,7 +132,10 @@ btp_strndup(const char *s, size_t n)
 void
 btp_struniq(char **strings, size_t *size)
 {
-    for (size_t loop = *size - 1; loop >= 0; --loop)
+    if (*size < 1)
+        return;
+
+    for (size_t loop = *size - 1; loop > 0; --loop)
     {
         if (0 == strcmp(strings[loop], strings[loop - 1]))
         {
