@@ -61,7 +61,8 @@ void *
 btp_realloc(void *ptr, size_t size)
 {
     void *result = realloc(ptr, size);
-    if (!result)
+    /* When size is 0, realloc may return NULL on success. */
+    if (!result && size > 0)
     {
         fprintf(stderr, "btp_realloc: out of memory");
         exit(1);
