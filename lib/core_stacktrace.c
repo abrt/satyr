@@ -265,7 +265,7 @@ btp_core_stacktrace_to_json(struct btp_core_stacktrace *stacktrace)
     }
 
     btp_strbuf_append_str(strbuf, " ]\n");
-    btp_strbuf_append_str(strbuf, "}");
+    btp_strbuf_append_str(strbuf, "}\n");
     return btp_strbuf_free_nobuf(strbuf);
 }
 
