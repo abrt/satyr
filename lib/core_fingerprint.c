@@ -269,11 +269,11 @@ get_libcalls(char ***symbol_list,
         ++callees;
     }
 
-    memcpy(symbol_list + *symbol_list_size,
+    memcpy(*symbol_list + *symbol_list_size,
            sub_symbol_list,
            sub_symbol_list_size * sizeof(char*));
 
-    symbol_list_size += sub_symbol_list_size;
+    *symbol_list_size += sub_symbol_list_size;
     return true;
 }
 
@@ -446,7 +446,6 @@ compute_fingerprint(struct btp_core_frame *frame,
         return false;
     }
 
-    /*
     if (!fp_calltree_leaves(fingerprint,
                             fde->exec_base + fde->start_address,
                             plt,
@@ -457,7 +456,7 @@ compute_fingerprint(struct btp_core_frame *frame,
     {
         return false;
     }
-*/
+
     frame->fingerprint = btp_strbuf_free_nobuf(fingerprint);
     btp_disasm_instructions_free(instructions);
     return true;
