@@ -152,8 +152,8 @@ btp_python_frame_parse(const char **input,
     if (!btp_parse_char_cspan(&local_input, "\n", &frame->function_name))
     {
         btp_python_frame_free(frame);
-        location->message = btp_asprintf("Unable to find the '\"' character "
-                "identifying the beginning of file name.");
+        location->message = btp_asprintf("Unable to find the newline character "
+                "identifying the end of function name.");
 
         return NULL;
     }
