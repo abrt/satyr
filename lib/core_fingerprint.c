@@ -291,7 +291,7 @@ fp_libcalls(struct btp_strbuf *fingerprint,
     bool success = get_libcalls(&symbol_list,
                                 &symbol_list_size,
                                 function_start_address,
-                                1,
+                                0,
                                 plt,
                                 eh_frame,
                                 disassembler,
@@ -435,7 +435,6 @@ compute_fingerprint(struct btp_core_frame *frame,
                  instructions,
                  fde->exec_base + fde->start_address,
                  fde->exec_base + fde->start_address + fde->length);
-/*
     if (!fp_libcalls(fingerprint,
                      fde->exec_base + fde->start_address,
                      plt,
@@ -447,6 +446,7 @@ compute_fingerprint(struct btp_core_frame *frame,
         return false;
     }
 
+    /*
     if (!fp_calltree_leaves(fingerprint,
                             fde->exec_base + fde->start_address,
                             plt,
