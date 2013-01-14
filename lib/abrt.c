@@ -76,6 +76,12 @@ btp_abrt_create_core_stacktrace(const char *directory,
         return false;
 
     char *json = btp_core_stacktrace_to_json(core_stacktrace);
+
+    // Add newline to the end of core stacktrace file to make text
+    // editors happy.
+    json = btp_realloc(json, strlen(json) + 2);
+    strcat(json, "\n");
+
     char *core_backtrace_filename = btp_build_path(directory, "core_backtrace", NULL);
     success = btp_string_to_file(core_backtrace_filename,
                                  json,

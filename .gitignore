@@ -37,6 +37,7 @@ Makefile.in
 /lib/Makefile
 /lib/stamp-h1
 /lib/config.h
+/lib/config.h.in
 
 /python/*.l[ao]
 
