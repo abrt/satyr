@@ -173,7 +173,7 @@ btp_python_frame_parse(const char **input,
     /* Parse source code line (optional). */
     if (4 == btp_skip_string(&local_input, "    "))
     {
-        btp_skip_char_cspan(&local_input, "\n");
+        btp_parse_char_cspan(&local_input, "\n", &frame->line_contents);
         btp_skip_char(&local_input, '\n');
         btp_location_add(location, 1, 0);
     }
