@@ -282,7 +282,7 @@ btp_string_to_file(const char *filename,
                    char **error_message)
 {
     /* Open the file. */
-    int fd = open(filename, O_WRONLY | O_LARGEFILE | O_TRUNC | O_CREAT);
+    int fd = open(filename, O_WRONLY | O_LARGEFILE | O_TRUNC | O_CREAT, 0640);
     if (fd < 0)
     {
         *error_message = btp_asprintf("Unable to open '%s': %s.",
