@@ -791,14 +791,33 @@ btp_elf_eh_frame_free(struct btp_elf_fde *entries)
 }
 
 struct btp_elf_fde *
-btp_elf_find_fde_for_address(struct btp_elf_fde *eh_frame,
-                             uint64_t build_id_offset)
+btp_elf_find_fde_for_offset(struct btp_elf_fde *eh_frame,
+                            uint64_t build_id_offset)
 {
     struct btp_elf_fde *fde = eh_frame;
     while (fde)
     {
         if (build_id_offset >= fde->start_address &&
             build_id_offset < fde->start_address + fde->length)
+        {
+            return fde;
+        }
+
+        fde = fde->next;
+    }
+
+    return NULL;
+}
+
+struct btp_elf_fde *
+btp_elf_find_fde_for_address(struct btp_elf_fde *eh_frame,
+                             uint64_t address)
+{
+    struct btp_elf_fde *fde = eh_frame;
+    while (fde)
+    {
+        if (address >= fde->start_address + fde->exec_base &&
+            address < fde->start_address + fde->exec_base + fde->length)
         {
             return fde;
         }

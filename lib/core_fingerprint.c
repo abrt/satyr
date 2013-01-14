@@ -265,6 +265,8 @@ get_libcalls(char ***symbol_list,
             *item = plt_entry->symbol_name;
             ++item;
         }
+
+        ++callees;
     }
 
     memcpy(symbol_list + *symbol_list_size,
@@ -390,7 +392,7 @@ compute_fingerprint(struct btp_core_frame *frame,
                     char **error_message)
 {
     struct btp_elf_fde *fde =
-        btp_elf_find_fde_for_address(eh_frame, frame->build_id_offset);
+        btp_elf_find_fde_for_offset(eh_frame, frame->build_id_offset);
 
     if (!fde)
     {
@@ -435,7 +437,7 @@ compute_fingerprint(struct btp_core_frame *frame,
                  fde->exec_base + fde->start_address + fde->length);
 /*
     if (!fp_libcalls(fingerprint,
-                     fde->start_address,
+                     fde->exec_base + fde->start_address,
                      plt,
                      eh_frame,
                      disassembler,
@@ -446,7 +448,7 @@ compute_fingerprint(struct btp_core_frame *frame,
     }
 
     if (!fp_calltree_leaves(fingerprint,
-                            fde->start_address,
+                            fde->exec_base + fde->start_address,
                             plt,
                             eh_frame,
                             disassembler,

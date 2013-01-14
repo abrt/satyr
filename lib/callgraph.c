@@ -90,17 +90,16 @@ btp_callgraph_extend(struct btp_callgraph *callgraph,
         return NULL;
     }
 
-    struct btp_callgraph *result = callgraph,
-        *last = btp_callgraph_last(callgraph);
+    struct btp_callgraph *last = btp_callgraph_last(callgraph);
 
     struct btp_callgraph *entry = malloc(sizeof(struct btp_callgraph));
-    entry->address = fde->start_address;
+    entry->address = fde->exec_base + fde->start_address;
     entry->callees = NULL;
     entry->next = NULL;
 
     char **instructions = btp_disasm_get_function_instructions(
         disassembler,
-        fde->start_address,
+        fde->exec_base + fde->start_address,
         fde->length,
         error_message);
 
@@ -112,28 +111,36 @@ btp_callgraph_extend(struct btp_callgraph *callgraph,
 
     entry->callees = btp_disasm_get_callee_addresses(instructions);
 
-    if (result)
+    if (callgraph)
     {
         last->next = entry;
         last = entry;
     }
     else
-        result = last = entry;
+        callgraph = last = entry;
 
     uint64_t *callees = entry->callees;
     while (*callees != 0)
     {
-        result = btp_callgraph_extend(result,
-                                      *callees,
-                                      disassembler,
-                                      eh_frame,
-                                      error_message);
+        struct btp_callgraph *result = btp_callgraph_extend(callgraph,
+                                                            *callees,
+                                                            disassembler,
+                                                            eh_frame,
+                                                            error_message);
 
-        if (!result)
-            return NULL;
+        /* Failure here may mean that the address points to PLT. */
+        if (result)
+            callgraph = result;
+        else if (*error_message)
+        {
+            free(*error_message);
+            *error_message = NULL;
+        }
+
+        ++callees;
     }
 
-    return result;
+    return callgraph;
 }
 
 

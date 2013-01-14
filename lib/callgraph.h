@@ -54,14 +54,14 @@ struct btp_elf_fde;
 struct btp_callgraph
 {
     /**
-     * @brief An offset to the start of a function executable code.
+     * @brief Memory address of the start of a function executable code.
      */
     uint64_t address;
 
     /**
-     * @brief A list of offsets to called functions.
+     * @brief A list of addresses of called functions.
      *
-     * It is terminated by a zero offset.
+     * It is terminated by a zero address.
      */
     uint64_t *callees;
 

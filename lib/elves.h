@@ -114,7 +114,10 @@ btp_elf_eh_frame_free(struct btp_elf_fde *entries);
 
 struct btp_elf_fde *
 btp_elf_find_fde_for_address(struct btp_elf_fde *eh_frame,
-                             uint64_t build_id_offset);
+                             uint64_t address);
+struct btp_elf_fde *
+btp_elf_find_fde_for_offset(struct btp_elf_fde *eh_frame,
+                            uint64_t build_id_offset);
 
 char *
 btp_elf_fde_to_json(struct btp_elf_fde *fde,
