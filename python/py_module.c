@@ -7,6 +7,8 @@
 #include "py_gdb_thread.h"
 #include "py_koops_frame.h"
 #include "py_koops_stacktrace.h"
+#include "py_python_frame.h"
+#include "py_python_stacktrace.h"
 #include "py_metrics.h"
 
 static PyMethodDef
@@ -70,6 +72,18 @@ init_btparser()
         return;
     }
 
+    if (PyType_Ready(&btp_py_python_frame_type) < 0)
+    {
+        puts("PyType_Ready(&btp_py_python_frame_type) < 0");
+        return;
+    }
+
+    if (PyType_Ready(&btp_py_python_stacktrace_type) < 0)
+    {
+        puts("PyType_Ready(&btp_py_python_stacktrace_type) < 0");
+        return;
+    }
+
 
     PyObject *module = Py_InitModule("_btparser", module_methods);
     if (!module)
@@ -109,4 +123,13 @@ init_btparser()
     Py_INCREF(&btp_py_koops_stacktrace_type);
     PyModule_AddObject(module, "Kerneloops",
                        (PyObject *)&btp_py_koops_stacktrace_type);
+
+    Py_INCREF(&btp_py_python_frame_type);
+    PyModule_AddObject(module, "PythonFrame",
+                       (PyObject *)&btp_py_python_frame_type);
+
+    Py_INCREF(&btp_py_python_stacktrace_type);
+    PyModule_AddObject(module, "PythonStacktrace",
+                       (PyObject *)&btp_py_python_stacktrace_type);
+
 }
