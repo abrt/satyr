@@ -1,0 +1,7 @@
+Exception in thread "main" java.lang.IllegalStateException: A book has a null property
+        at com.example.myproject.Author.getBookIds(Author.java:38)
+        at com.example.myproject.Bootstrap.main(Bootstrap.java:14)
+Caused by: java.lang.NullPointerException
+        at com.example.myproject.Book.getId(Book.java:22)
+        at com.example.myproject.Author.getBookIds(Author.java:35)
+        ... 1 more

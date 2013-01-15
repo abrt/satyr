@@ -1,0 +1,11 @@
+java.lang.RuntimeException: java.lang.NullPointerException: null
+	at SimpleTest.throwNullPointerException(SimpleTest.java:36)
+	at SimpleTest.throwAndDontCatchException(SimpleTest.java:70)
+	at SimpleTest.main(SimpleTest.java:82)
+Caused by: java.lang.NullPointerException: java.lang.InvalidRangeException: undefined index
+	at SimpleTest.execute(Test.java:7)
+	at SimpleTest.intercept(Test.java:2)
+	... 3 more
+Caused by: java.lang.InvalidRangeException: undefined index
+	at MyVector.at(Containers.java:77)
+	... 5 more
