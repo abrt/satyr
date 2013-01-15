@@ -115,7 +115,7 @@ PyTypeObject btp_py_python_stacktrace_type = {
 };
 
 PyObject *
-new_python_frame_list(struct btp_python_stacktrace *stacktrace)
+python_frame_linked_list_to_python_list(struct btp_python_stacktrace *stacktrace)
 {
     PyObject *result = PyList_New(0);
     if (!result)
@@ -143,7 +143,7 @@ new_python_frame_list(struct btp_python_stacktrace *stacktrace)
 }
 
 int
-free_python_frame_list(struct btp_py_python_stacktrace *stacktrace)
+python_free_frame_python_list(struct btp_py_python_stacktrace *stacktrace)
 {
     int i;
     PyObject *item;
@@ -188,7 +188,7 @@ btp_py_python_stacktrace_new(PyTypeObject *object,
             return NULL;
         }
 
-        bo->frames = new_python_frame_list(bo->stacktrace);
+        bo->frames = python_frame_linked_list_to_python_list(bo->stacktrace);
     }
     else
     {
@@ -204,7 +204,7 @@ void
 btp_py_python_stacktrace_free(PyObject *object)
 {
     struct btp_py_python_stacktrace *this = (struct btp_py_python_stacktrace*)object;
-    free_python_frame_list(this);
+    python_free_frame_python_list(this);
     this->stacktrace->frames = NULL;
     btp_python_stacktrace_free(this->stacktrace);
     PyObject_Del(object);
@@ -308,7 +308,7 @@ btp_py_python_stacktrace_dup(PyObject *self, PyObject *args)
     if (!bo->stacktrace)
         return NULL;
 
-    bo->frames =  new_python_frame_list(bo->stacktrace);
+    bo->frames =  python_frame_linked_list_to_python_list(bo->stacktrace);
     if (!bo->frames)
         return NULL;
 
@@ -326,7 +326,7 @@ btp_py_python_stacktrace_normalize(PyObject *self, PyObject *args)
 
     struct btp_python_stacktrace *tmp = btp_python_stacktrace_dup(this->stacktrace);
     btp_normalize_python_stacktrace(tmp);
-    if (free_python_frame_list(this) < 0)
+    if (python_free_frame_python_list(this) < 0)
     {
         btp_python_stacktrace_free(tmp);
         return NULL;
@@ -336,7 +336,7 @@ btp_py_python_stacktrace_normalize(PyObject *self, PyObject *args)
     tmp->frames = NULL;
     btp_python_stacktrace_free(tmp);
 
-    this->frames = new_python_frame_list(this->stacktrace);
+    this->frames = python_frame_linked_list_to_python_list(this->stacktrace);
     if (!this->frames)
         return NULL;
 
