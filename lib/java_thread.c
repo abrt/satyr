@@ -316,3 +316,23 @@ btp_java_thread_parse(const char **input,
 
     return thread;
 }
+
+char *
+btp_java_thread_format_funs(struct btp_java_thread *thread)
+{
+    struct btp_java_frame *frame = thread->frames;
+    struct btp_strbuf *buf = btp_strbuf_new();
+
+    while (frame)
+    {
+        if (frame->name)
+        {
+            btp_strbuf_append_str(buf, frame->name);
+            btp_strbuf_append_char(buf, '\n');
+        }
+
+        frame = frame->next;
+    }
+
+    return btp_strbuf_free_nobuf(buf);
+}
