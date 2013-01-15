@@ -24,6 +24,12 @@ _btparser_la_SOURCES = \
     py_python_frame.c \
     py_python_stacktrace.h \
     py_python_stacktrace.c \
+    py_java_frame.h \
+    py_java_frame.c \
+    py_java_thread.h \
+    py_java_thread.c \
+    py_java_stacktrace.h \
+    py_java_stacktrace.c \
     py_metrics.h \
     py_metrics.c \
     py_module.c

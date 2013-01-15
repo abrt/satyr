@@ -9,6 +9,9 @@
 #include "py_koops_stacktrace.h"
 #include "py_python_frame.h"
 #include "py_python_stacktrace.h"
+#include "py_java_frame.h"
+#include "py_java_thread.h"
+#include "py_java_stacktrace.h"
 #include "py_metrics.h"
 
 static PyMethodDef
@@ -84,6 +87,24 @@ init_btparser()
         return;
     }
 
+    if (PyType_Ready(&btp_py_java_frame_type) < 0)
+    {
+        puts("PyType_Ready(&btp_py_java_frame_type) < 0");
+        return;
+    }
+
+    if (PyType_Ready(&btp_py_java_thread_type) < 0)
+    {
+        puts("PyType_Ready(&btp_py_java_thread_type) < 0");
+        return;
+    }
+
+    if (PyType_Ready(&btp_py_java_stacktrace_type) < 0)
+    {
+        puts("PyType_Ready(&btp_py_java_stacktrace_type) < 0");
+        return;
+    }
+
 
     PyObject *module = Py_InitModule("_btparser", module_methods);
     if (!module)
@@ -131,5 +152,17 @@ init_btparser()
     Py_INCREF(&btp_py_python_stacktrace_type);
     PyModule_AddObject(module, "PythonStacktrace",
                        (PyObject *)&btp_py_python_stacktrace_type);
+
+    Py_INCREF(&btp_py_java_frame_type);
+    PyModule_AddObject(module, "JavaFrame",
+                       (PyObject *)&btp_py_java_frame_type);
+
+    Py_INCREF(&btp_py_java_thread_type);
+    PyModule_AddObject(module, "JavaThread",
+                       (PyObject *)&btp_py_java_thread_type);
+
+    Py_INCREF(&btp_py_java_stacktrace_type);
+    PyModule_AddObject(module, "JavaStacktrace",
+                       (PyObject *)&btp_py_java_stacktrace_type);
 
 }
