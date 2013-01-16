@@ -78,8 +78,8 @@ btp_callgraph_extend(struct btp_callgraph *callgraph,
         return callgraph;
 
     struct btp_elf_fde *fde =
-        btp_elf_find_fde_for_address(eh_frame,
-                                     start_address);
+        btp_elf_find_fde_for_start_address(eh_frame,
+                                           start_address);
 
     if (!fde)
     {
@@ -91,7 +91,6 @@ btp_callgraph_extend(struct btp_callgraph *callgraph,
     }
 
     struct btp_callgraph *last = btp_callgraph_last(callgraph);
-
     struct btp_callgraph *entry = malloc(sizeof(struct btp_callgraph));
     entry->address = fde->exec_base + fde->start_address;
     entry->callees = NULL;
