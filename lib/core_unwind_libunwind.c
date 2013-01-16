@@ -472,21 +472,23 @@ btp_parse_coredump(const char *core_file,
         }
     }
 
-    /* NOTE: the stack unwinding should be run for each thread in the
-     * new version, like this:
-     *
-     * int tnum, nthreads = _UCD_get_num_threads(ui);
-     * for (tnum = 0; tnum < nthreads; tnum++)
-     * {
-     *     trace = unwind_thread(ui, as, ch->dwfl, tnum, error_msg);
-     *     if (*error_msg) {
-     *         // ...
-     *     }
-     *     // ...
-     * }
-     */
+    struct btp_core_stacktrace *stacktrace = btp_core_stacktrace_new();
 
-    trace = unwind_thread(ui, as, ch->dwfl, 0, error_msg);
+    int tnum, nthreads = _UCD_get_num_threads(ui);
+    for (tnum = 0; tnum < nthreads; ++tnum)
+    {
+        trace = unwind_thread(ui, as, ch->dwfl, tnum, error_msg);
+        if (trace)
+        {
+            stacktrace->threads = btp_core_thread_append(stacktrace->threads, trace);
+        }
+        else
+        {
+            btp_core_stacktrace_free(stacktrace);
+            stacktrace = NULL;
+            break;
+        }
+    }
 
 fail_destroy_ui:
     _UCD_destroy(ui);
@@ -495,14 +497,7 @@ fail_destroy_as:
 fail_destroy_handle:
     core_handle_free(ch);
 
-    if (trace)
-    {
-        struct btp_core_stacktrace *stacktrace = btp_core_stacktrace_new();
-        stacktrace->threads = trace;
-        return stacktrace;
-    }
-
-    return NULL;
+    return stacktrace;
 }
 
 #endif /* WITH_LIBUNWIND */
