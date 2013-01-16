@@ -20,14 +20,18 @@
 #include "rpm.h"
 #include "utils.h"
 #include "strbuf.h"
+#include "config.h"
 #include <errno.h>
+#ifdef HAVE_LIBRPM
 #include <rpm/rpmlib.h>
 #include <rpm/rpmdb.h>
 #include <rpm/rpmts.h>
 #include <rpm/rpmtd.h>
 #include <rpm/header.h>
+#endif
 #include <fcntl.h>
 #include <assert.h>
+#include <string.h>
 
 struct btp_rpm_package *
 btp_rpm_package_new()
@@ -124,6 +128,7 @@ btp_rpm_package_append(struct btp_rpm_package *dest,
     return dest;
 }
 
+#ifdef HAVE_LIBRPM
 static bool
 header_get_string(Header header,
                   rpmTag tag,
@@ -224,6 +229,7 @@ header_to_rpm_info(Header header,
 
     return rpm;
 }
+#endif
 
 /**
  * Takes 0.06 second for bash package consisting of 92 files.
@@ -232,6 +238,7 @@ header_to_rpm_info(Header header,
 struct btp_rpm_package *
 btp_rpm_package_get_by_name(const char *name, char **error_message)
 {
+#ifdef HAVE_LIBRPM
     if (rpmReadConfigFiles(NULL, NULL))
     {
         *error_message = btp_asprintf("Failed to read RPM configuration files.");
@@ -263,12 +270,17 @@ btp_rpm_package_get_by_name(const char *name, char **error_message)
     rpmdbFreeIterator(iter);
     rpmtsFree(ts);
     return result;
+#else
+    *error_message = btp_asprintf("btparser compiled without rpm");
+    return NULL;
+#endif
 }
 
 struct btp_rpm_package *
 btp_rpm_package_get_by_path(const char *path,
                             char **error_message)
 {
+#ifdef HAVE_LIBRPM
     if (rpmReadConfigFiles(NULL, NULL))
     {
         *error_message = btp_asprintf("Failed to read RPM configuration files.");
@@ -300,6 +312,10 @@ btp_rpm_package_get_by_path(const char *path,
     rpmdbFreeIterator(iter);
     rpmtsFree(ts);
     return result;
+#else
+    *error_message = btp_asprintf("btparser compiled without rpm");
+    return NULL;
+#endif
 }
 
 char *
