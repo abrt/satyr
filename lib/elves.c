@@ -828,6 +828,22 @@ btp_elf_find_fde_for_address(struct btp_elf_fde *eh_frame,
     return NULL;
 }
 
+struct btp_elf_fde *
+btp_elf_find_fde_for_start_address(struct btp_elf_fde *eh_frame,
+                                   uint64_t start_address)
+{
+    struct btp_elf_fde *fde = eh_frame;
+    while (fde)
+    {
+        if (start_address == fde->start_address + fde->exec_base)
+            return fde;
+
+        fde = fde->next;
+    }
+
+    return NULL;
+}
+
 char *
 btp_elf_fde_to_json(struct btp_elf_fde *fde,
                     bool recursive)
