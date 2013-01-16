@@ -148,6 +148,17 @@ btp_java_frame_cmp(struct btp_java_frame *frame1,
     return frame1->file_line - frame2->file_line;
 }
 
+int
+btp_java_frame_cmp_distance(struct btp_java_frame *frame1,
+                            struct btp_java_frame *frame2)
+{
+    int res = btp_strcmp0(frame1->name, frame2->name);
+    if (res != 0)
+        return res;
+
+    return 0;
+}
+
 void
 btp_java_frame_append_to_str(struct btp_java_frame *frame,
                              struct btp_strbuf *dest)

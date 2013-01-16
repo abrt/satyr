@@ -90,6 +90,39 @@ int
 btp_koops_frame_cmp(struct btp_koops_frame *frame1,
                     struct btp_koops_frame *frame2)
 {
+    /* Address. */
+    int address = frame2->address - frame1->address;
+    if (address != 0)
+        return address;
+
+    /* Reliable. */
+    int reliable = (int)frame2->reliable - (int)frame1->reliable;
+    if (reliable != 0)
+        return reliable;
+
+    /* Function name. */
+    int function_name = btp_strcmp0(frame1->function_name,
+                                    frame2->function_name);
+    if (function_name != 0)
+        return function_name;
+
+    /* Function offset. */
+    int64_t function_offset = frame2->function_offset - frame1->function_offset;
+    if (function_offset != 0)
+        return function_offset;
+
+    /* Function length. */
+    int64_t function_length = frame2->function_length - frame1->function_length;
+    if (function_length != 0)
+        return function_length;
+
+    return 0;
+}
+
+int
+btp_koops_frame_cmp_distance(struct btp_koops_frame *frame1,
+                             struct btp_koops_frame *frame2)
+{
     /* Function. */
     int function_name = btp_strcmp0(frame1->function_name,
                                     frame2->function_name);

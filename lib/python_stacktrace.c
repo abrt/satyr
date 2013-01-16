@@ -70,6 +70,19 @@ btp_python_stacktrace_dup(struct btp_python_stacktrace *stacktrace)
     return result;
 }
 
+int
+btp_python_stacktrace_get_frame_count(struct btp_python_stacktrace *stacktrace)
+{
+    struct btp_python_frame *frame = stacktrace->frames;
+    int count = 0;
+    while (frame)
+    {
+        frame = frame->next;
+        ++count;
+    }
+
+    return count;
+}
 
 struct btp_python_stacktrace *
 btp_python_stacktrace_parse(const char **input,

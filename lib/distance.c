@@ -291,8 +291,8 @@ distance(enum btp_distance_type distance_type,
 static int
 frame_cmp_gdb(void *frame1, void *frame2)
 {
-    return btp_gdb_frame_cmp_simple((struct btp_gdb_frame*)frame1,
-                                    (struct btp_gdb_frame*)frame2);
+    return btp_gdb_frame_cmp_distance((struct btp_gdb_frame*)frame1,
+                                      (struct btp_gdb_frame*)frame2);
 }
 
 static void *
@@ -334,12 +334,8 @@ btp_distance_gdb(enum btp_distance_type distance_type,
 static int
 frame_cmp_core(void *frame1, void *frame2)
 {
-    // TODO
-    return 0;
-/*
-    return btp_core_frame_cmp_simple((struct btp_core_frame*)frame1,
-                                     (struct btp_core_frame*)frame2);
-*/
+    return btp_core_frame_cmp_distance((struct btp_core_frame*)frame1,
+                                       (struct btp_core_frame*)frame2);
 }
 
 static void *
@@ -381,12 +377,8 @@ btp_distance_core(enum btp_distance_type distance_type,
 static int
 frame_cmp_java(void *frame1, void *frame2)
 {
-    // TODO
-    return 0;
-/*
-    return btp_java_frame_cmp_simple((struct btp_java_frame*)frame1,
-                                     (struct btp_java_frame*)frame2);
-*/
+    return btp_java_frame_cmp_distance((struct btp_java_frame*)frame1,
+                                       (struct btp_java_frame*)frame2);
 }
 
 static void *
@@ -428,12 +420,8 @@ btp_distance_java(enum btp_distance_type distance_type,
 static int
 frame_cmp_koops(void *frame1, void *frame2)
 {
-    // TODO
-    return 0;
-/*
-    return btp_koops_frame_cmp_simple((struct btp_koops_frame*)frame1,
-                                      (struct btp_koops_frame*)frame2);
-*/
+    return btp_koops_frame_cmp_distance((struct btp_koops_frame*)frame1,
+                                        (struct btp_koops_frame*)frame2);
 }
 
 static void *
@@ -476,12 +464,8 @@ btp_distance_koops(enum btp_distance_type distance_type,
 static int
 frame_cmp_python(void *frame1, void *frame2)
 {
-    // TODO
-    return 0;
-/*
-    return btp_python_frame_cmp_simple((struct btp_python_frame*)frame1,
-                                       (struct btp_python_frame*)frame2);
-*/
+    return btp_python_frame_cmp_distance((struct btp_python_frame*)frame1,
+                                         (struct btp_python_frame*)frame2);
 }
 
 static void *
@@ -499,11 +483,7 @@ thread_first_frame_python(void *stacktrace)
 static int
 thread_get_frame_count_python(void *stacktrace)
 {
-    // TODO
-    return 0;
-/*
     return btp_python_stacktrace_get_frame_count((struct btp_python_stacktrace*)stacktrace);
-*/
 }
 
 struct type_specific_functions python_specific_functions = {

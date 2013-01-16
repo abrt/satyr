@@ -109,7 +109,24 @@ btp_python_frame_dup(struct btp_python_frame *frame,
  */
 int
 btp_python_frame_cmp(struct btp_python_frame *frame1,
-                      struct btp_python_frame *frame2);
+                     struct btp_python_frame *frame2);
+
+/**
+ * Compares two python frames.
+ * @param frame1
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @param frame2
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @returns
+ * Returns 0 if the frames are same.  Returns negative number if
+ * frame1 is found to be 'less' than frame2.  Returns positive number
+ * if frame1 is found to be 'greater' than frame2.
+ */
+int
+btp_python_frame_cmp_distance(struct btp_python_frame *frame1,
+                              struct btp_python_frame *frame2);
 
 
 /**

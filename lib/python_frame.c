@@ -80,6 +80,55 @@ btp_python_frame_dup(struct btp_python_frame *frame, bool siblings)
     return result;
 }
 
+int
+btp_python_frame_cmp(struct btp_python_frame *frame1,
+                     struct btp_python_frame *frame2)
+{
+    /* function_name */
+    int function_name = btp_strcmp0(frame1->function_name,
+                                    frame2->function_name);
+    if (function_name != 0)
+        return function_name;
+
+    /* file_name */
+    int file_name = btp_strcmp0(frame1->file_name,
+                                frame2->file_name);
+    if (file_name != 0)
+        return file_name;
+
+    /* file_line */
+    int file_line = frame1->file_line - frame2->file_line;
+    if (file_line != 0)
+        return file_line;
+
+    /* is_module */
+    int is_module = frame1->is_module - frame2->is_module;
+
+    if (is_module != 0)
+        return is_module;
+
+    /* line_contents */
+    int line_contents = btp_strcmp0(frame1->line_contents,
+                                    frame2->line_contents);
+    if (line_contents != 0)
+        return line_contents;
+
+    return 0;
+}
+
+int
+btp_python_frame_cmp_distance(struct btp_python_frame *frame1,
+                              struct btp_python_frame *frame2)
+{
+    /* function_name */
+    int function_name = btp_strcmp0(frame1->function_name,
+                                    frame2->function_name);
+    if (function_name != 0)
+        return function_name;
+
+    return 0;
+}
+
 struct btp_python_frame *
 btp_python_frame_append(struct btp_python_frame *dest,
                         struct btp_python_frame *item)
@@ -227,40 +276,4 @@ btp_python_frame_to_json(struct btp_python_frame *frame)
     strbuf->buf[0] = '{';
     btp_strbuf_append_char(strbuf, '}');
     return btp_strbuf_free_nobuf(strbuf);
-}
-
-int
-btp_python_frame_cmp(struct btp_python_frame *frame1,
-                     struct btp_python_frame *frame2)
-{
-    /* function_name */
-    int function_name = btp_strcmp0(frame1->function_name,
-                                    frame2->function_name);
-    if (function_name != 0)
-        return function_name;
-
-    /* file_name */
-    int file_name = btp_strcmp0(frame1->file_name,
-                                frame2->file_name);
-    if (file_name != 0)
-        return file_name;
-
-    /* file_line */
-    int file_line = frame1->file_line - frame2->file_line;
-    if (file_line != 0)
-        return file_line;
-
-    /* is_module */
-    int is_module = frame1->is_module - frame2->is_module;
-
-    if (is_module != 0)
-        return is_module;
-
-    /* line_contents */
-    int line_contents = btp_strcmp0(frame1->line_contents,
-                                    frame2->line_contents);
-    if (line_contents != 0)
-        return line_contents;
-
-    return 0;
 }

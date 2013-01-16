@@ -199,8 +199,8 @@ btp_gdb_frame_cmp(struct btp_gdb_frame *frame1,
  * if frame1 is found to be 'greater' than frame2.
  */
 int
-btp_gdb_frame_cmp_simple(struct btp_gdb_frame *frame1,
-                         struct btp_gdb_frame *frame2);
+btp_gdb_frame_cmp_distance(struct btp_gdb_frame *frame1,
+                           struct btp_gdb_frame *frame2);
 
 /**
  * Appends 'item' at the end of the list 'dest'.

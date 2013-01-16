@@ -120,6 +120,25 @@ btp_core_frame_cmp(struct btp_core_frame *frame1,
     return 0;
 }
 
+int
+btp_core_frame_cmp_distance(struct btp_core_frame *frame1,
+                            struct btp_core_frame *frame2)
+{
+    /* Function name. */
+    int function_name = btp_strcmp0(frame1->function_name,
+                                    frame2->function_name);
+    if (function_name != 0)
+        return function_name;
+
+    /* Fingerprint. */
+    int fingerprint = btp_strcmp0(frame1->fingerprint,
+                                  frame2->fingerprint);
+    if (fingerprint != 0)
+        return fingerprint;
+
+    return 0;
+}
+
 struct btp_core_frame *
 btp_core_frame_append(struct btp_core_frame *dest,
                       struct btp_core_frame *item)

@@ -231,7 +231,7 @@ btp_gdb_thread_jarowinkler_distance(struct btp_gdb_thread *thread1,
 {
     return btp_gdb_thread_jarowinkler_distance_custom(thread1,
                                                       thread2,
-                                                      btp_gdb_frame_cmp_simple);
+                                                      btp_gdb_frame_cmp_distance);
 }
 
 float
@@ -240,7 +240,7 @@ btp_gdb_thread_jaccard_distance(struct btp_gdb_thread *thread1,
 {
     return btp_gdb_thread_jaccard_distance_custom(thread1,
                                                   thread2,
-                                                  btp_gdb_frame_cmp_simple);
+                                                  btp_gdb_frame_cmp_distance);
 }
 
 int
@@ -251,7 +251,7 @@ btp_gdb_thread_levenshtein_distance(struct btp_gdb_thread *thread1,
     return btp_gdb_thread_levenshtein_distance_custom(thread1,
                                                       thread2,
                                                       transposition,
-                                                      btp_gdb_frame_cmp_simple);
+                                                      btp_gdb_frame_cmp_distance);
 }
 
 float
@@ -270,7 +270,7 @@ btp_gdb_thread_levenshtein_distance_f(struct btp_gdb_thread *thread1,
     return (float)btp_gdb_thread_levenshtein_distance_custom(thread1,
                                                              thread2,
                                                              true,
-                                                             btp_gdb_frame_cmp_simple) / max_frame_count;
+                                                             btp_gdb_frame_cmp_distance) / max_frame_count;
 }
 
 static int

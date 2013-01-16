@@ -183,8 +183,8 @@ btp_gdb_frame_cmp(struct btp_gdb_frame *frame1,
 }
 
 int
-btp_gdb_frame_cmp_simple(struct btp_gdb_frame *frame1,
-                         struct btp_gdb_frame *frame2)
+btp_gdb_frame_cmp_distance(struct btp_gdb_frame *frame1,
+                           struct btp_gdb_frame *frame2)
 {
     if (btp_strcmp0(frame1->function_name, "??") == 0 &&
         btp_strcmp0(frame2->function_name, "??") == 0)
