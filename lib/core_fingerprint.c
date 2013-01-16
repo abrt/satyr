@@ -365,7 +365,7 @@ btp_core_fingerprint_generate(struct btp_core_stacktrace *stacktrace,
         struct btp_core_frame *frame = thread->frames;
         while (frame)
         {
-            if (!frame->fingerprint)
+            if (!frame->fingerprint && frame->file_name)
             {
                 bool success = btp_core_fingerprint_generate_for_binary(
                     thread, frame->file_name, error_message);
@@ -435,6 +435,7 @@ compute_fingerprint(struct btp_core_frame *frame,
                  instructions,
                  fde->exec_base + fde->start_address,
                  fde->exec_base + fde->start_address + fde->length);
+
     if (!fp_libcalls(fingerprint,
                      fde->exec_base + fde->start_address,
                      plt,
@@ -502,7 +503,7 @@ btp_core_fingerprint_generate_for_binary(struct btp_core_thread *thread,
         while (frame)
         {
             if (!frame->fingerprint &&
-                0 == strcmp(frame->file_name, binary_path))
+                0 == btp_strcmp0(frame->file_name, binary_path))
             {
                 bool success = compute_fingerprint(frame,
                                                    plt,
@@ -510,12 +511,11 @@ btp_core_fingerprint_generate_for_binary(struct btp_core_thread *thread,
                                                    disassembler,
                                                    &callgraph,
                                                    error_message);
+
                 if (!success)
                 {
-                    btp_disasm_free(disassembler);
-                    btp_elf_procedure_linkage_table_free(plt);
-                    btp_elf_eh_frame_free(eh_frame);
-                    return false;
+                    free(*error_message);
+                    *error_message = NULL;
                 }
             }
 
