@@ -1,0 +1,5 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+script: autoreconf -if && ./configure && make && make check
