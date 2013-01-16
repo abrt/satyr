@@ -114,6 +114,46 @@ PyTypeObject btp_py_python_stacktrace_type = {
     NULL,                           /* tp_weaklist */
 };
 
+/* helpers */
+int
+python_stacktrace_prepare_linked_list(struct btp_py_python_stacktrace *stacktrace)
+{
+    int i;
+    PyObject *item;
+
+    struct btp_py_python_frame *current = NULL, *prev = NULL;
+    for (i = 0; i < PyList_Size(stacktrace->frames); ++i)
+    {
+        item = PyList_GetItem(stacktrace->frames, i);
+        if (!item)
+            return -1;
+
+        Py_INCREF(item);
+        if (!PyObject_TypeCheck(item, &btp_py_python_frame_type))
+        {
+            Py_XDECREF(current);
+            Py_XDECREF(prev);
+            PyErr_SetString(PyExc_TypeError,
+                            "frames must be a list of btparser.PythonFrame objects");
+            return -1;
+        }
+
+        current = (struct btp_py_python_frame*)item;
+        if (i == 0)
+            stacktrace->stacktrace->frames = current->frame;
+        else
+            prev->frame->next = current->frame;
+
+        Py_XDECREF(prev);
+        prev = current;
+    }
+
+    current->frame->next = NULL;
+    Py_XDECREF(current);
+
+    return 0;
+}
+
 PyObject *
 python_frame_linked_list_to_python_list(struct btp_python_stacktrace *stacktrace)
 {
@@ -296,6 +336,8 @@ PyObject *
 btp_py_python_stacktrace_dup(PyObject *self, PyObject *args)
 {
     struct btp_py_python_stacktrace *this = (struct btp_py_python_stacktrace*)self;
+    if (python_stacktrace_prepare_linked_list(this) < 0)
+        return NULL;
 
     struct btp_py_python_stacktrace *bo = (struct btp_py_python_stacktrace*)
         PyObject_New(struct btp_py_python_stacktrace,

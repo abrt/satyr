@@ -91,6 +91,46 @@ PyTypeObject btp_py_koops_stacktrace_type = {
     NULL,                           /* tp_weaklist */
 };
 
+/* helpers */
+int
+koops_stacktrace_prepare_linked_list(struct btp_py_koops_stacktrace *stacktrace)
+{
+    int i;
+    PyObject *item;
+
+    struct btp_py_koops_frame *current = NULL, *prev = NULL;
+    for (i = 0; i < PyList_Size(stacktrace->frames); ++i)
+    {
+        item = PyList_GetItem(stacktrace->frames, i);
+        if (!item)
+            return -1;
+
+        Py_INCREF(item);
+        if (!PyObject_TypeCheck(item, &btp_py_koops_frame_type))
+        {
+            Py_XDECREF(current);
+            Py_XDECREF(prev);
+            PyErr_SetString(PyExc_TypeError,
+                            "frames must be a list of btparser.KerneloopsFrame objects");
+            return -1;
+        }
+
+        current = (struct btp_py_koops_frame*)item;
+        if (i == 0)
+            stacktrace->stacktrace->frames = current->frame;
+        else
+            prev->frame->next = current->frame;
+
+        Py_XDECREF(prev);
+        prev = current;
+    }
+
+    current->frame->next = NULL;
+    Py_XDECREF(current);
+
+    return 0;
+}
+
 PyObject *
 btp_py_koops_stacktrace_get_modules(PyObject *self, PyObject *args) 
 {
@@ -224,6 +264,8 @@ PyObject *
 btp_py_koops_stacktrace_dup(PyObject *self, PyObject *args)
 {
     struct btp_py_koops_stacktrace *this = (struct btp_py_koops_stacktrace*)self;
+    if (koops_stacktrace_prepare_linked_list(this) < 0)
+        return NULL;
 
     struct btp_py_koops_stacktrace *bo = (struct btp_py_koops_stacktrace*)
         PyObject_New(struct btp_py_koops_stacktrace,
