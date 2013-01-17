@@ -1,4 +1,4 @@
-clientexecdir = $(pyexecdir)/btparser
+clientexecdir = $(pyexecdir)/satyr
 
 clientexec_PYTHON = \
     __init__.py
