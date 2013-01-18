@@ -80,7 +80,7 @@ struct btp_java_frame
 
     /**
      * Exception message. Can be NULL.
-     * (Alaways NULL if frame is NOT exception).
+     * (Always NULL if frame is NOT exception).
      */
     char *message;
 
@@ -243,6 +243,15 @@ btp_java_frame_parse_exception(const char **input,
 struct btp_java_frame *
 btp_java_frame_parse(const char **input,
                      struct btp_location *location);
+
+/**
+ * Returns a textual representation of the frame.
+ * @param frame
+ * It must be a non-NULL pointer.  It's not modified by calling this
+ * function.
+ */
+char *
+btp_java_frame_to_json(struct btp_java_frame *frame);
 
 #ifdef __cplusplus
 }

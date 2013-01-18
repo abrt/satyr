@@ -23,6 +23,7 @@
 #include "location.h"
 #include "utils.h"
 #include <string.h>
+#include <inttypes.h>
 
 #define BTP_JF_MARK_NATIVE_METHOD "Native Method"
 #define BTP_JF_MARK_UNKNOWN_SOURCE "Unknown Source"
@@ -417,3 +418,59 @@ btp_java_frame_parse(const char **input,
     return frame;
 }
 
+char *
+btp_java_frame_to_json(struct btp_java_frame *frame)
+{
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+
+    /* Name. */
+    if (frame->name)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"name\": \"%s\"\n",
+                               frame->name);
+    }
+
+    /* File name. */
+    if (frame->file_name)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"file_name\": \"%s\"\n",
+                               frame->file_name);
+
+        /* File line. */
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"file_line\": %"PRIu32"\n",
+                               frame->file_line);
+    }
+
+    /* Class path. */
+    if (frame->class_path)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"class_path\": \"%s\"\n",
+                               frame->class_path);
+    }
+
+    /* Is native? */
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"is_native\": %s\n",
+                           frame->is_native ? "true" : "false");
+
+    /* Is exception? */
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"is_exception\": %s\n",
+                           frame->is_exception ? "true" : "false");
+
+    /* Message. */
+    if (frame->message)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"message\": \"%s\"\n",
+                               frame->message);
+    }
+
+    strbuf->buf[0] = '{';
+    btp_strbuf_append_str(strbuf, "}");
+    return btp_strbuf_free_nobuf(strbuf);
+}
