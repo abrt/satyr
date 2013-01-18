@@ -103,6 +103,7 @@ btp_koops_frame_cmp(struct btp_koops_frame *frame1,
     /* Function name. */
     int function_name = btp_strcmp0(frame1->function_name,
                                     frame2->function_name);
+
     if (function_name != 0)
         return function_name;
 
@@ -115,6 +116,42 @@ btp_koops_frame_cmp(struct btp_koops_frame *frame1,
     int64_t function_length = frame2->function_length - frame1->function_length;
     if (function_length != 0)
         return function_length;
+
+    /* Module name. */
+    int module_name = btp_strcmp0(frame1->module_name,
+                                  frame2->module_name);
+
+    if (module_name != 0)
+        return module_name;
+
+    /* From address. */
+    int from_address = frame2->from_address - frame1->from_address;
+    if (from_address != 0)
+        return from_address;
+
+    /* From function name. */
+    int from_function_name = btp_strcmp0(frame1->from_function_name,
+                                         frame2->from_function_name);
+
+    if (from_function_name != 0)
+        return from_function_name;
+
+    /* From function offset. */
+    int64_t from_function_offset = frame2->from_function_offset - frame1->from_function_offset;
+    if (from_function_offset != 0)
+        return from_function_offset;
+
+    /* From function length. */
+    int64_t from_function_length = frame2->from_function_length - frame1->from_function_length;
+    if (from_function_length != 0)
+        return from_function_length;
+
+    /* From module name. */
+    int from_module_name = btp_strcmp0(frame1->from_module_name,
+                                       frame2->from_module_name);
+
+    if (from_module_name != 0)
+        return from_module_name;
 
     return 0;
 }
