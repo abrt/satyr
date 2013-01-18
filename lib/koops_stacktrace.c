@@ -20,6 +20,7 @@
 #include "koops_stacktrace.h"
 #include "koops_frame.h"
 #include "utils.h"
+#include "strbuf.h"
 #include <string.h>
 
 struct btp_koops_stacktrace *
@@ -180,4 +181,133 @@ btp_koops_stacktrace_parse_modules(const char **input)
     result[result_offset] = NULL;
     *input = local_input;
     return result;
+}
+
+char *
+btp_koops_stacktrace_to_json(struct btp_koops_stacktrace *stacktrace)
+{
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+
+    /* Kernel version. */
+    if (stacktrace->version)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"version\": \"%s\"\n",
+                               stacktrace->version);
+    }
+
+    /* Kernel taint flags. */
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_module_proprietary\": %s\n",
+                           stacktrace->taint_module_proprietary ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_module_gpl\": %s\n",
+                           stacktrace->taint_module_gpl ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_module_out_of_tree\": %s\n",
+                           stacktrace->taint_module_out_of_tree ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_forced_module\": %s\n",
+                           stacktrace->taint_forced_module ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_forced_removal\": %s\n",
+                           stacktrace->taint_forced_removal ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_smp_unsafe\": %s\n",
+                           stacktrace->taint_smp_unsafe ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_mce\": %s\n",
+                           stacktrace->taint_mce ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_page_release\": %s\n",
+                           stacktrace->taint_page_release ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_userspace\": %s\n",
+                           stacktrace->taint_userspace ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_died_recently\": %s\n",
+                           stacktrace->taint_died_recently ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_acpi_overridden\": %s\n",
+                           stacktrace->taint_acpi_overridden ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_warning\": %s\n",
+                           stacktrace->taint_warning ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_staging_driver\": %s\n",
+                           stacktrace->taint_staging_driver ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_firmware_workaround\": %s\n",
+                           stacktrace->taint_firmware_workaround ? "true" : "false");
+
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"taint_virtual_box\": %s\n",
+                           stacktrace->taint_virtual_box ? "true" : "false");
+
+    /* Modules. */
+    if (stacktrace->modules)
+    {
+        btp_strbuf_append_strf(strbuf, ",   \"modules\":\n");
+        char **module = stacktrace->modules;
+        while (*module)
+        {
+            if (module == stacktrace->modules)
+                btp_strbuf_append_str(strbuf, "      [ ");
+            else
+                btp_strbuf_append_str(strbuf, "      , ");
+
+            btp_strbuf_append_strf(strbuf, "\"%s\"", *module);
+            ++module;
+            if (*module)
+                btp_strbuf_append_str(strbuf, "\n");
+        }
+
+        btp_strbuf_append_str(strbuf, " ]\n");
+    }
+
+    /* Frames. */
+    if (stacktrace->frames)
+    {
+        struct btp_koops_frame *frame = stacktrace->frames;
+        btp_strbuf_append_str(strbuf, ",   \"frames\":\n");
+        while (frame)
+        {
+            if (frame == stacktrace->frames)
+                btp_strbuf_append_str(strbuf, "      [ ");
+            else
+                btp_strbuf_append_str(strbuf, "      , ");
+
+            char *frame_json = btp_koops_frame_to_json(frame);
+            char *indented_frame_json = btp_indent_except_first_line(frame_json, 8);
+            btp_strbuf_append_str(strbuf, indented_frame_json);
+            free(indented_frame_json);
+            free(frame_json);
+            frame = frame->next;
+            if (frame)
+                btp_strbuf_append_str(strbuf, "\n");
+        }
+
+        btp_strbuf_append_str(strbuf, " ]\n");
+    }
+
+    if (strbuf->len > 0)
+        strbuf->buf[0] = '{';
+    else
+        btp_strbuf_append_char(strbuf, '{');
+
+    btp_strbuf_append_char(strbuf, '}');
+    return btp_strbuf_free_nobuf(strbuf);
 }

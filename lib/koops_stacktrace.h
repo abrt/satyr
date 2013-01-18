@@ -147,6 +147,16 @@ btp_koops_stacktrace_parse(const char **input,
 char **
 btp_koops_stacktrace_parse_modules(const char **input);
 
+/**
+ * Serializes stacktrace to string.
+ * @returnes
+ * Newly allocated memory containing the textual representation of the
+ * provided stacktrace.  Caller should free the memory when it's no
+ * longer needed.
+ */
+char *
+btp_koops_stacktrace_to_json(struct btp_koops_stacktrace *stacktrace);
+
 #ifdef __cplusplus
 }
 #endif
