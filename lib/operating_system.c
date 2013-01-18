@@ -88,8 +88,12 @@ btp_operating_system_to_json(struct btp_operating_system *operating_system)
                                operating_system->uptime);
     }
 
-    strbuf->buf[0] = '{';
-    btp_strbuf_append_str(strbuf, "}");
+    if (strbuf->len > 0)
+        strbuf->buf[0] = '{';
+    else
+        btp_strbuf_append_char(strbuf, '{');
+
+    btp_strbuf_append_char(strbuf, '}');
     return btp_strbuf_free_nobuf(strbuf);
 }
 

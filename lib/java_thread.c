@@ -336,3 +336,52 @@ btp_java_thread_format_funs(struct btp_java_thread *thread)
 
     return btp_strbuf_free_nobuf(buf);
 }
+
+char *
+btp_java_thread_to_json(struct btp_java_thread *thread)
+{
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+
+    if (thread->name)
+    {
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"name\": \"%s\"\n",
+                               thread->name);
+    }
+
+    if (thread->frames)
+    {
+        btp_strbuf_append_str(strbuf, ",   \"frames\":\n");
+        struct btp_java_frame *frame = thread->frames;
+        while (frame)
+        {
+            if (frame == thread->frames)
+                btp_strbuf_append_str(strbuf, "      [ ");
+            else
+                btp_strbuf_append_str(strbuf, "      , ");
+
+            char *frame_json = btp_java_frame_to_json(frame);
+            char *indented_frame_json = btp_indent_except_first_line(frame_json, 8);
+            btp_strbuf_append_str(strbuf, indented_frame_json);
+            free(indented_frame_json);
+            free(frame_json);
+            frame = frame->next;
+            if (frame)
+                btp_strbuf_append_str(strbuf, "\n");
+        }
+
+        btp_strbuf_append_str(strbuf, " ]\n");
+        btp_strbuf_append_str(strbuf, "}");
+    }
+    else
+        btp_strbuf_append_str(strbuf, "{}");
+
+    if (strbuf->len > 0)
+        strbuf->buf[0] = '{';
+    else
+        btp_strbuf_append_char(strbuf, '{');
+
+    btp_strbuf_append_char(strbuf, '}');
+    return btp_strbuf_free_nobuf(strbuf);
+}
+

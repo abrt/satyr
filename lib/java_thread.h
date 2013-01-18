@@ -224,6 +224,9 @@ btp_java_thread_parse(const char **input,
 char *
 btp_java_thread_format_funs(struct btp_java_thread *thread);
 
+char *
+btp_java_thread_to_json(struct btp_java_thread *thread);
+
 #ifdef __cplusplus
 }
 #endif
