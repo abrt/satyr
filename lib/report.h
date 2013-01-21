@@ -56,6 +56,7 @@ struct btp_report
     struct btp_python_stacktrace *python_stacktrace;
     struct btp_koops_stacktrace *koops_stacktrace;
     struct btp_core_stacktrace *core_stacktrace;
+    struct btp_java_stacktrace *java_stacktrace;
 };
 
 struct btp_report *

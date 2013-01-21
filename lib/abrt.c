@@ -25,6 +25,9 @@
 #include "core_unwind.h"
 #include "core_stacktrace.h"
 #include "core_fingerprint.h"
+#include "python_stacktrace.h"
+#include "koops_stacktrace.h"
+#include "java_stacktrace.h"
 #include "json.h"
 #include "location.h"
 #include <stdio.h>
@@ -332,6 +335,7 @@ btp_abrt_report_from_dir(const char *directory,
                                                              core_backtrace_contents,
                                                              &location);
 
+        free(core_backtrace_contents);
         if (!json_root)
         {
             *error_message = btp_location_to_string(&location);
@@ -345,6 +349,108 @@ btp_abrt_report_from_dir(const char *directory,
         btp_json_value_free(json_root);
         if (!report->core_stacktrace)
         {
+            btp_report_free(report);
+            return NULL;
+        }
+    }
+
+    /* Python stacktrace. */
+    if (report->report_type == BTP_REPORT_PYTHON)
+    {
+        char *backtrace_filename = btp_build_path(directory,
+                                                  "backtrace",
+                                                  NULL);
+
+        char *backtrace_contents = btp_file_to_string(backtrace_filename,
+                                                      error_message);
+
+        free(backtrace_filename);
+        if (!backtrace_contents)
+        {
+            btp_report_free(report);
+            return NULL;
+        }
+
+        /* Parse the Python stacktrace. */
+        struct btp_location location;
+        btp_location_init(&location);
+        const char *contents_pointer = backtrace_contents;
+        report->python_stacktrace = btp_python_stacktrace_parse(
+            &contents_pointer,
+            &location);
+
+        free(backtrace_contents);
+        if (!report->python_stacktrace)
+        {
+            *error_message = btp_location_to_string(&location);
+            btp_report_free(report);
+            return NULL;
+        }
+    }
+
+    /* Kerneloops stacktrace. */
+    if (report->report_type == BTP_REPORT_KERNELOOPS)
+    {
+        char *backtrace_filename = btp_build_path(directory,
+                                                  "backtrace",
+                                                  NULL);
+
+        char *backtrace_contents = btp_file_to_string(backtrace_filename,
+                                                      error_message);
+
+        free(backtrace_filename);
+        if (!backtrace_contents)
+        {
+            btp_report_free(report);
+            return NULL;
+        }
+
+        /* Parse the Kerneloops stacktrace. */
+        struct btp_location location;
+        btp_location_init(&location);
+        const char *contents_pointer = backtrace_contents;
+        report->koops_stacktrace = btp_koops_stacktrace_parse(
+            &contents_pointer,
+            &location);
+
+        free(backtrace_contents);
+        if (!report->koops_stacktrace)
+        {
+            *error_message = btp_location_to_string(&location);
+            btp_report_free(report);
+            return NULL;
+        }
+    }
+
+    /* Java stacktrace. */
+    if (report->report_type == BTP_REPORT_JAVA)
+    {
+        char *backtrace_filename = btp_build_path(directory,
+                                                  "backtrace",
+                                                  NULL);
+
+        char *backtrace_contents = btp_file_to_string(backtrace_filename,
+                                                      error_message);
+
+        free(backtrace_filename);
+        if (!backtrace_contents)
+        {
+            btp_report_free(report);
+            return NULL;
+        }
+
+        /* Parse the Java stacktrace. */
+        struct btp_location location;
+        btp_location_init(&location);
+        const char *contents_pointer = backtrace_contents;
+        report->java_stacktrace = btp_java_stacktrace_parse(
+            &contents_pointer,
+            &location);
+
+        free(backtrace_contents);
+        if (!report->java_stacktrace)
+        {
+            *error_message = btp_location_to_string(&location);
             btp_report_free(report);
             return NULL;
         }

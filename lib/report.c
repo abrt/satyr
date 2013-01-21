@@ -24,6 +24,7 @@
 #include "koops_stacktrace.h"
 #include "core_stacktrace.h"
 #include "python_stacktrace.h"
+#include "java_stacktrace.h"
 #include "operating_system.h"
 #include "rpm.h"
 #include "strbuf.h"
@@ -52,6 +53,7 @@ btp_report_init(struct btp_report *report)
     report->python_stacktrace = NULL;
     report->koops_stacktrace = NULL;
     report->core_stacktrace = NULL;
+    report->java_stacktrace = NULL;
 }
 
 void
@@ -63,6 +65,7 @@ btp_report_free(struct btp_report *report)
     btp_python_stacktrace_free(report->python_stacktrace);
     btp_koops_stacktrace_free(report->koops_stacktrace);
     btp_core_stacktrace_free(report->core_stacktrace);
+    btp_java_stacktrace_free(report->java_stacktrace);
     free(report);
 }
 
@@ -172,6 +175,45 @@ btp_report_to_json(struct btp_report *report)
                                core_stacktrace_str_indented);
 
         free(core_stacktrace_str_indented);
+    }
+
+    /* Python stacktrace. */
+    if (report->python_stacktrace)
+    {
+        char *stacktrace = btp_python_stacktrace_to_json(report->python_stacktrace);
+        char *stacktrace_indented = btp_indent_except_first_line(stacktrace, strlen(",   \"python_stacktrace\": "));
+        free(stacktrace);
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"python_stacktrace\": %s\n",
+                               stacktrace_indented);
+
+        free(stacktrace_indented);
+    }
+
+    /* Koops stacktrace. */
+    if (report->koops_stacktrace)
+    {
+        char *stacktrace = btp_koops_stacktrace_to_json(report->koops_stacktrace);
+        char *stacktrace_indented = btp_indent_except_first_line(stacktrace, strlen(",   \"koops_stacktrace\": "));
+        free(stacktrace);
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"koops_stacktrace\": %s\n",
+                               stacktrace_indented);
+
+        free(stacktrace_indented);
+    }
+
+    /* Java stacktrace. */
+    if (report->java_stacktrace)
+    {
+        char *stacktrace = btp_java_stacktrace_to_json(report->java_stacktrace);
+        char *stacktrace_indented = btp_indent_except_first_line(stacktrace, strlen(",   \"java_stacktrace\": "));
+        free(stacktrace);
+        btp_strbuf_append_strf(strbuf,
+                               ",   \"java_stacktrace\": %s\n",
+                               stacktrace_indented);
+
+        free(stacktrace_indented);
     }
 
     btp_strbuf_append_str(strbuf, "}");
