@@ -117,6 +117,16 @@ struct btp_java_stacktrace *
 btp_java_stacktrace_parse(const char **input,
                           struct btp_location *location);
 
+/**
+ * Serializes stacktrace to string.
+ * @returnes
+ * Newly allocated memory containing the textual representation of the
+ * provided stacktrace.  Caller should free the memory when it's no
+ * longer needed.
+ */
+char *
+btp_java_stacktrace_to_json(struct btp_java_stacktrace *stacktrace);
+
 #ifdef __cplusplus
 }
 #endif

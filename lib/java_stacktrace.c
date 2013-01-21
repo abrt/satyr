@@ -22,7 +22,7 @@
 #include "java_thread.h"
 #include "java_frame.h"
 #include "utils.h"
-#include "sha1.h"
+#include "strbuf.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -91,8 +91,7 @@ btp_java_stacktrace_cmp(struct btp_java_stacktrace *stacktrace1,
             thread1 = thread1->next;
             thread2 = thread2->next;
         }
-    }
-    while (thread1 || thread2);
+    } while (thread1 || thread2);
 
     return 0;
 }
@@ -121,4 +120,38 @@ btp_java_stacktrace_parse(const char **input, struct btp_location *location)
     stacktrace->threads = thread;
 
     return stacktrace;
+}
+
+char *
+btp_java_stacktrace_to_json(struct btp_java_stacktrace *stacktrace)
+{
+    struct btp_strbuf *strbuf = btp_strbuf_new();
+
+    btp_strbuf_append_str(strbuf, "{   \"threads\":");
+    if (stacktrace->threads)
+        btp_strbuf_append_str(strbuf, "\n");
+    else
+        btp_strbuf_append_str(strbuf, " [");
+
+    struct btp_java_thread *thread = stacktrace->threads;
+    while (thread)
+    {
+        if (thread == stacktrace->threads)
+            btp_strbuf_append_str(strbuf, "      [ ");
+        else
+            btp_strbuf_append_str(strbuf, "      , ");
+
+        char *thread_json = btp_java_thread_to_json(thread);
+        char *indented_thread_json = btp_indent_except_first_line(thread_json, 8);
+        btp_strbuf_append_str(strbuf, indented_thread_json);
+        free(indented_thread_json);
+        free(thread_json);
+        thread = thread->next;
+        if (thread)
+            btp_strbuf_append_str(strbuf, "\n");
+    }
+
+    btp_strbuf_append_str(strbuf, " ]\n");
+    btp_strbuf_append_char(strbuf, '}');
+    return btp_strbuf_free_nobuf(strbuf);
 }
