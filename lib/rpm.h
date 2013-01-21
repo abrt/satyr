@@ -87,6 +87,23 @@ btp_rpm_package_cmp(struct btp_rpm_package *package1,
                     struct btp_rpm_package *package2);
 
 /**
+ * Compares two packages.
+ * @param package1
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @param package2
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @returns
+ * Returns 0 if the packages are same.  Returns negative number if
+ * package1 is found to be 'less' than package2.  Returns positive
+ * number if package1 is found to be 'greater' than package2.
+ */
+int
+btp_rpm_package_cmp_nevra(struct btp_rpm_package *package1,
+                          struct btp_rpm_package *package2);
+
+/**
  * Appends 'item' at the end of the list 'dest'.
  * @returns
  * This function returns the 'dest' package.  If 'dest' is NULL, it
@@ -95,6 +112,18 @@ btp_rpm_package_cmp(struct btp_rpm_package *package1,
 struct btp_rpm_package *
 btp_rpm_package_append(struct btp_rpm_package *dest,
                        struct btp_rpm_package *item);
+
+/**
+ * Returns the number of packages in the list.
+ */
+int
+btp_rpm_package_count(struct btp_rpm_package *packages);
+
+struct btp_rpm_package *
+btp_rpm_package_sort(struct btp_rpm_package *packages);
+
+struct btp_rpm_package *
+btp_rpm_package_uniq(struct btp_rpm_package *packages);
 
 struct btp_rpm_package *
 btp_rpm_package_get_by_name(const char *name,

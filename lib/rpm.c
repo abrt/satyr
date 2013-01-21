@@ -71,6 +71,29 @@ int
 btp_rpm_package_cmp(struct btp_rpm_package *package1,
                     struct btp_rpm_package *package2)
 {
+    int nevra = btp_rpm_package_cmp_nevra(package1, package2);
+    if (nevra != 0)
+        return nevra;
+
+    /* Install time. */
+    int64_t install_time = package1->install_time - package2->install_time;
+    if (install_time != 0)
+        return install_time;
+
+    /* Consistency. */
+    int consistency = btp_rpm_consistency_cmp_recursive(package1->consistency,
+                                                        package2->consistency);
+
+    if (consistency)
+        return consistency;
+
+    return 0;
+}
+
+int
+btp_rpm_package_cmp_nevra(struct btp_rpm_package *package1,
+                          struct btp_rpm_package *package2)
+{
     /* Name. */
     int name = btp_strcmp0(package1->name, package2->name);
     if (name != 0)
@@ -98,18 +121,6 @@ btp_rpm_package_cmp(struct btp_rpm_package *package1,
     if (architecture != 0)
         return architecture;
 
-    /* Install time. */
-    int64_t install_time = package1->install_time - package2->install_time;
-    if (install_time != 0)
-        return install_time;
-
-    /* Consistency. */
-    int consistency = btp_rpm_consistency_cmp_recursive(package1->consistency,
-                                                        package2->consistency);
-
-    if (consistency)
-        return consistency;
-
     return 0;
 }
 
@@ -126,6 +137,85 @@ btp_rpm_package_append(struct btp_rpm_package *dest,
 
     dest_loop->next = item;
     return dest;
+}
+
+int
+btp_rpm_package_count(struct btp_rpm_package *packages)
+{
+    int count = 0;
+    struct btp_rpm_package *loop = packages;
+    while (loop)
+    {
+        ++count;
+        loop = loop->next;
+    }
+
+    return count;
+}
+
+struct btp_rpm_package *
+btp_rpm_package_sort(struct btp_rpm_package *packages)
+{
+    size_t count = btp_rpm_package_count(packages);
+    struct btp_rpm_package **array = btp_malloc(count * sizeof(struct btp_rpm_package*));
+
+    /* Copy the linked list to an array. */
+    struct btp_rpm_package *list_loop = packages, **array_loop = array;
+    while (list_loop)
+    {
+        *array_loop = list_loop;
+        list_loop = list_loop->next;
+        ++array_loop;
+    }
+
+    /* Sort the array. */
+    qsort(array, count, sizeof(struct btp_rpm_package*), (comparison_fn_t)btp_rpm_package_cmp_nevra);
+
+    /* Create a linked list from the sorted array. */
+    for (size_t loop = 0; loop < count; ++loop)
+    {
+        if (loop + 1 < count)
+            array[loop]->next = array[loop + 1];
+        else
+            array[loop]->next = NULL;
+    }
+
+    return array[0];
+}
+
+struct btp_rpm_package *
+btp_rpm_package_uniq(struct btp_rpm_package *packages)
+{
+    struct btp_rpm_package *loop = packages, *prev = NULL;
+    while (loop && loop->next)
+    {
+        if (0 == btp_rpm_package_cmp_nevra(loop, loop->next))
+        {
+            if (loop->install_time)
+            {
+                struct btp_rpm_package *next = loop->next->next;
+                btp_rpm_package_free(loop->next, false);
+                loop->next = next;
+            }
+            else
+            {
+                if (prev)
+                    prev->next = loop->next;
+                else
+                    packages = loop->next;
+
+                btp_rpm_package_free(loop, false);
+                loop = prev->next;
+            }
+
+            continue;
+        }
+
+        prev = loop;
+        loop = loop->next;
+    }
+
+    return packages;
 }
 
 #ifdef HAVE_LIBRPM
