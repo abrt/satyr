@@ -11,7 +11,7 @@ libtool: $(LIBTOOL_DEPS)
 bin_PROGRAMS = satyr
 satyr_CFLAGS = -Wall
 satyr_SOURCES = satyr.c
-satyr_LDADD = lib/libbtparser.la
+satyr_LDADD = lib/libsatyr.la
 
 man_MANS = satyr.1
 EXTRA_DIST = $(man_MANS)

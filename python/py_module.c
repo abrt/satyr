@@ -1,5 +1,4 @@
 #include <Python.h>
-
 #include "py_cluster.h"
 #include "py_gdb_frame.h"
 #include "py_gdb_sharedlib.h"
@@ -106,7 +105,7 @@ init_btparser()
     }
 
 
-    PyObject *module = Py_InitModule("_btparser", module_methods);
+    PyObject *module = Py_InitModule("_satyr", module_methods);
     if (!module)
     {
         puts("module == NULL");

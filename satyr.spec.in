@@ -14,12 +14,12 @@ BuildRequires: elfutils-devel, elfutils-libelf-devel, binutils-devel
 Requires: elfutils-libelf, elfutils-libs, binutils
 
 %description
-Btparser is a backtrace parser and analyzer, which works with
+Satyr is a backtrace parser and analyzer, which works with
 backtraces produced by the GNU Project Debugger. It can parse a text
 file with a backtrace to a tree of C structures, allowing to analyze
 the threads and frames of the backtrace and work with them.
 
-Btparser also contains some backtrace manipulation and extraction
+Satyr also contains some backtrace manipulation and extraction
 routines:
 - it can find a frame in the crash-time backtrace where the program
   most likely crashed (a chance is that the function described in that

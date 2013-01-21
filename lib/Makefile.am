@@ -35,8 +35,8 @@ pkginclude_HEADERS = \
 	unstrip.h \
 	utils.h
 
-lib_LTLIBRARIES = libbtparser.la
-libbtparser_la_SOURCES = \
+lib_LTLIBRARIES = libsatyr.la
+libsatyr_la_SOURCES = \
 	$(pkginclude_HEADERS) \
 	abrt.c \
 	callgraph.c \
@@ -75,13 +75,13 @@ libbtparser_la_SOURCES = \
 	unstrip.c \
 	utils.c
 
-libbtparser_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE $(GLIB_CFLAGS)
-libbtparser_la_LDFLAGS = -version-info 4:2:2 $(GLIB_LIBS)
+libsatyr_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE $(GLIB_CFLAGS)
+libsatyr_la_LDFLAGS = -version-info 1:0:0 $(GLIB_LIBS)
 
 if HAVE_LIBOPCODES
 # Conditional link is required to avoid linking to a library without
 # -fPIC.
-libbtparser_la_LIBADD = -lopcodes
+libsatyr_la_LIBADD = -lopcodes
 endif
 
 # From http://www.seul.org/docs/autotut/
