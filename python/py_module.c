@@ -24,7 +24,7 @@ module_methods[]=
 #endif
 
 PyMODINIT_FUNC
-init_btparser()
+init_satyr()
 {
     if (PyType_Ready(&btp_py_gdb_frame_type) < 0)
     {

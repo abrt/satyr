@@ -45,5 +45,5 @@ _satyr_la_CPPFLAGS = \
 _satyr_la_LDFLAGS = \
     -module \
     -avoid-version \
-    -export-symbols-regex init_btparser \
+    -export-symbols-regex init_satyr \
     ../lib/libsatyr.la
