@@ -102,7 +102,7 @@
                   "Clones the frame object. All new structures are independent " \
                   "on the original object."
 
-#define f_cmp_doc "Usage: frame.cmp(frame2, compare_number)\n" \
+#define f_cmp_doc "Usage: frame.cmp(frame2)\n" \
                   "frame2: btparser.KerneloopsFrame - another frame to compare\n" \
                   "Returns: integer - distance\n" \
                   "Compares frame to frame2. Returns 0 if frame = frame2, " \
