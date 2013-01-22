@@ -289,6 +289,8 @@ PyObject *
 btp_py_koops_stacktrace_normalize(PyObject *self, PyObject *args)
 {
     struct btp_py_koops_stacktrace *this = (struct btp_py_koops_stacktrace*)self;
+    if (koops_stacktrace_prepare_linked_list(this) < 0)
+        return NULL;
 
     /* destroys the linked list and frees some parts */
     /* need to rebuild python list manually */
