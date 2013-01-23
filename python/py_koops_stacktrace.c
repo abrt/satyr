@@ -125,8 +125,11 @@ koops_stacktrace_prepare_linked_list(struct btp_py_koops_stacktrace *stacktrace)
         prev = current;
     }
 
-    current->frame->next = NULL;
-    Py_XDECREF(current);
+    if (current)
+    {
+        current->frame->next = NULL;
+        Py_XDECREF(current);
+    }
 
     return 0;
 }
