@@ -1,5 +1,6 @@
 #include "py_python_frame.h"
 #include "py_python_stacktrace.h"
+#include "lib/utils.h"
 #include "lib/strbuf.h"
 #include "lib/python_frame.h"
 #include "lib/python_stacktrace.h"
