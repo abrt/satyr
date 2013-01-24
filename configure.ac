@@ -3,9 +3,11 @@ AC_CONFIG_HEADERS([lib/config.h])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AM_MAINTAINER_MODE
 
+AM_PROG_AR
 AC_PROG_CC
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
+AM_PROG_CC_C_O
 
 # Initialize the test suite.
 AC_CONFIG_TESTDIR(tests)
