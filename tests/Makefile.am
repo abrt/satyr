@@ -1,4 +1,4 @@
-EXTRA_DIST = gdb_stacktraces kerneloopses programs
+EXTRA_DIST = gdb_stacktraces java_stacktraces python_stacktraces kerneloopses programs python
 
 ## ------------ ##
 ## package.m4.  ##
@@ -48,7 +48,8 @@ TESTSUITE_AT =		\
   metrics.at 		\
   cluster.at  		\
   rpm.at		\
-  abrt.at
+  abrt.at               \
+  python_bindings.at
 
 EXTRA_DIST += $(TESTSUITE_AT)
 TESTSUITE = $(srcdir)/testsuite
