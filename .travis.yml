@@ -2,4 +2,4 @@ language: cpp
 compiler:
   - gcc
   - clang
-script: autoreconf -if && ./configure && make && make check
+script: autoreconf -if && ./configure && make && make check || cat tests/testsuite.log
