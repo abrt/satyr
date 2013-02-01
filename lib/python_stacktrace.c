@@ -91,7 +91,10 @@ btp_python_stacktrace_parse(const char **input,
     const char *local_input = *input;
 
     /* Parse the header. */
-    const char *HEADER = "\nTraceback (most recent call last):\n";
+    if (btp_skip_char(&local_input, '\n'))
+        location->column += 1;
+
+    const char *HEADER = "Traceback (most recent call last):\n";
     local_input = btp_strstr_location(local_input,
                                       HEADER,
                                       &location->line,

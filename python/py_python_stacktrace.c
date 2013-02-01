@@ -1,5 +1,6 @@
 #include "py_python_frame.h"
 #include "py_python_stacktrace.h"
+#include "lib/utils.h"
 #include "lib/strbuf.h"
 #include "lib/python_frame.h"
 #include "lib/python_stacktrace.h"
@@ -148,8 +149,11 @@ python_stacktrace_prepare_linked_list(struct btp_py_python_stacktrace *stacktrac
         prev = current;
     }
 
-    current->frame->next = NULL;
-    Py_XDECREF(current);
+    if (current)
+    {
+        current->frame->next = NULL;
+        Py_XDECREF(current);
+    }
 
     return 0;
 }

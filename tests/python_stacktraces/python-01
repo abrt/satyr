@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/usr/share/PackageKit/helpers/yum/yumBackend.py", line 1830, in _runYumTransaction
+    rpmDisplay=rpmDisplay)
+  File "/usr/lib/python2.6/site-packages/yum/__init__.py", line 3494, in processTransaction
+    pkgs = self._downloadPackages(callback)
+  File "/usr/lib/python2.6/site-packages/yum/__init__.py", line 3518, in _downloadPackages
+    probs = self.downloadPkgs(dlpkgs)
+  File "/usr/lib/python2.6/site-packages/yum/__init__.py", line 1275, in downloadPkgs
+    self.plugins.run('predownload', pkglist=pkglist)
+  File "/usr/lib/python2.6/site-packages/yum/plugins.py", line 179, in run
+    func(conduitcls(self, self.base, conf, **kwargs))
+  File "/usr/lib/yum-plugins/presto.py", line 577, in predownload_hook
+    (problems, more) = downloadPkgs(conduit, pinfo, download_pkgs)
+  File "/usr/lib/yum-plugins/presto.py", line 419, in downloadPkgs
+    cb.start(text="<delta rebuild>", size=rebuild_size)
+  File "/usr/lib/python2.6/site-packages/urlgrabber/progress.py", line 129, in start
+    self._do_start(now)
+  File "/usr/share/PackageKit/helpers/yum/yumBackend.py", line 2551, in _do_start
+    self.updateProgress(name, 0.0, "", "")
+  File "/usr/share/PackageKit/helpers/yum/yumBackend.py", line 2593, in updateProgress
+    pkg = self._getPackage(name)
+  File "/usr/share/PackageKit/helpers/yum/yumBackend.py", line 2534, in _getPackage
+    sections = name.rsplit('-', 2)
+AttributeError: 'NoneType' object has no attribute 'rsplit'

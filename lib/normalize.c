@@ -426,15 +426,14 @@ btp_normalize_koops_stacktrace(struct btp_koops_stacktrace *stacktrace)
     {
         struct btp_koops_frame *next_frame = frame->next;
 
-        /* do not drop frames belonging to a module */
-        bool in_module = (btp_strcmp0(frame->module_name, "vmlinux") != 0);
         bool in_blacklist = bsearch(&frame->function_name,
                                     blacklist,
                                     sizeof(blacklist) / sizeof(blacklist[0]),
                                     sizeof(blacklist[0]),
                                     ptrstrcmp);
 
-        if (!in_module && in_blacklist)
+        /* do not drop frames belonging to a module */
+        if (!frame->module_name && in_blacklist)
         {
             bool success = btp_koops_stacktrace_remove_frame(stacktrace, frame);
             assert(success || !"failed to remove frame");

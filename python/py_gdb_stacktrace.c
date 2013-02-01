@@ -189,8 +189,11 @@ stacktrace_prepare_linked_list(struct btp_py_gdb_stacktrace *stacktrace)
         prev = current;
     }
 
-    current->thread->next = NULL;
-    Py_XDECREF(current);
+    if (current)
+    {
+        current->thread->next = NULL;
+        Py_XDECREF(current);
+    }
 
     /* sharedlib */
     struct btp_py_gdb_sharedlib *currentlib = NULL, *prevlib = NULL;

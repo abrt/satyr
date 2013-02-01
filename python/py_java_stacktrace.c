@@ -126,8 +126,11 @@ java_stacktrace_prepare_linked_list(struct btp_py_java_stacktrace *stacktrace)
         prev = current;
     }
 
-    current->thread->next = NULL;
-    Py_XDECREF(current);
+    if (current)
+    {
+        current->thread->next = NULL;
+        Py_XDECREF(current);
+    }
 
     return 0;
 }

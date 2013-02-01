@@ -4,6 +4,8 @@
 Makefile
 *.o
 Makefile.in
+ar-lib
+compile
 
 /autom4te.cache
 /satyr

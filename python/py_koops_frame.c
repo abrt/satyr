@@ -515,7 +515,7 @@ btp_py_koops_frame_cmp(PyObject *self, PyObject *args)
 {
     PyObject *compare_to;
     if (!PyArg_ParseTuple(args,
-                          "O!i",
+                          "O!",
                           &btp_py_koops_frame_type,
                           &compare_to))
     {
