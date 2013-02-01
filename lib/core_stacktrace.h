@@ -101,6 +101,9 @@ int
 btp_core_stacktrace_get_thread_count(
     struct btp_core_stacktrace *stacktrace);
 
+struct btp_core_thread *
+btp_core_stacktrace_find_crash_thread(struct btp_core_stacktrace *stacktrace);
+
 /**
  * @note
  * Stacktrace can be serialized to JSON string via
@@ -109,6 +112,10 @@ btp_core_stacktrace_get_thread_count(
 struct btp_core_stacktrace *
 btp_core_stacktrace_from_json(struct btp_json_value *root,
                               char **error_message);
+
+struct btp_core_stacktrace *
+btp_core_stacktrace_from_json_text(const char *text,
+                                   char **error_message);
 
 /**
  * Serializes stacktrace to string.

@@ -93,7 +93,31 @@ btp_core_stacktrace_get_thread_count(struct btp_core_stacktrace *stacktrace)
         thread = thread->next;
         ++count;
     }
+
     return count;
+}
+
+struct btp_core_thread *
+btp_core_stacktrace_find_crash_thread(struct btp_core_stacktrace *stacktrace)
+{
+    /* If there is no thread, be silent and report NULL. */
+    if (!stacktrace->threads)
+        return NULL;
+
+    /* If there is just one thread, it is simple. */
+    if (!stacktrace->threads->next)
+        return stacktrace->threads;
+
+    struct btp_core_thread *thread = stacktrace->threads;
+    while (thread)
+    {
+        if (btp_core_thread_find_exit_frame(thread))
+            return thread;
+
+        thread = thread->next;
+    }
+
+    return thread;
 }
 
 struct btp_core_stacktrace *
@@ -218,6 +242,28 @@ btp_core_stacktrace_from_json(struct btp_json_value *root,
     }
 
     return result;
+}
+
+struct btp_core_stacktrace *
+btp_core_stacktrace_from_json_text(const char *text,
+                                   char **error_message)
+{
+    struct btp_json_settings settings;
+    memset(&settings, 0, sizeof(struct btp_json_settings));
+    struct btp_location location;
+    btp_location_init(&location);
+    struct btp_json_value *json_root = btp_json_parse_ex(&settings,
+                                                         text,
+                                                         &location);
+
+    if (!json_root)
+    {
+        *error_message = btp_location_to_string(&location);
+        return NULL;
+    }
+
+    return btp_core_stacktrace_from_json(json_root,
+                                         error_message);
 }
 
 char *
