@@ -84,6 +84,42 @@ btp_core_frame_dup(struct btp_core_frame *frame, bool siblings)
     return result;
 }
 
+bool
+btp_core_frame_calls_func(struct btp_core_frame *frame,
+                          const char *function_name,
+                          ...)
+{
+    if (!frame->function_name ||
+        0 != strcmp(frame->function_name, function_name))
+    {
+        return false;
+    }
+
+    va_list file_names;
+    va_start(file_names, function_name);
+    bool success = false;
+    bool empty = true;
+
+    while (true)
+    {
+        char *file_name = va_arg(file_names, char*);
+        if (!file_name)
+            break;
+
+        empty = false;
+
+        if (frame->file_name &&
+            NULL != strstr(frame->file_name, file_name))
+        {
+            success = true;
+            break;
+        }
+    }
+
+   va_end(file_names);
+   return success || empty;
+}
+
 int
 btp_core_frame_cmp(struct btp_core_frame *frame1,
                    struct btp_core_frame *frame2)

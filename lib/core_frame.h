@@ -118,6 +118,25 @@ btp_core_frame_dup(struct btp_core_frame *frame,
                    bool siblings);
 
 /**
+ * Checks whether the frame represents a call of function with certain
+ * function name.
+ * @param frame
+ *   A stack trace frame.
+ * @param ...
+ *   Names of executables or shared libaries that should contain the
+ *   function name.  The list needs to be terminated by NULL.  Just
+ *   NULL will cause ANY file name to match and succeed.  The name
+ *   of file is searched as a substring.
+ * @returns
+ *   True if the frame corresponds to a function with function_name,
+ *   residing in a specified executable or shared binary.
+ */
+bool
+btp_core_frame_calls_func(struct btp_core_frame *frame,
+                          const char *function_name,
+                          ...);
+
+/**
  * Compares two frames.
  * @param frame1
  * It must be non-NULL pointer. It's not modified by calling this
