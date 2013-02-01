@@ -130,6 +130,34 @@ btp_core_thread_get_frame_count(struct btp_core_thread *thread)
     return count;
 }
 
+struct btp_core_frame *
+btp_core_thread_find_exit_frame(struct btp_core_thread *thread)
+{
+    struct btp_core_frame *frame = thread->frames;
+    struct btp_core_frame *result = NULL;
+    while (frame)
+    {
+        bool is_exit_frame =
+            btp_core_frame_calls_func(frame, "__run_exit_handlers", NULL) ||
+            btp_core_frame_calls_func(frame, "raise", "libc.so", "libc-", "libpthread.so", NULL) ||
+            btp_core_frame_calls_func(frame, "__GI_raise", NULL) ||
+            btp_core_frame_calls_func(frame, "exit", NULL) ||
+            btp_core_frame_calls_func(frame, "abort", "libc.so", "libc-", NULL) ||
+            btp_core_frame_calls_func(frame, "__GI_abort", NULL) ||
+            /* Terminates a function in case of buffer overflow. */
+            btp_core_frame_calls_func(frame, "__chk_fail", "libc.so", NULL) ||
+            btp_core_frame_calls_func(frame, "__stack_chk_fail", "libc.so", NULL) ||
+            btp_core_frame_calls_func(frame, "kill", NULL);
+
+        if (is_exit_frame)
+            result = frame;
+
+        frame = frame->next;
+    }
+
+    return result;
+}
+
 struct btp_core_thread *
 btp_core_thread_from_json(struct btp_json_value *root,
                           char **error_message)

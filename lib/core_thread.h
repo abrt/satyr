@@ -126,6 +126,9 @@ btp_core_thread_append(struct btp_core_thread *dest,
 int
 btp_core_thread_get_frame_count(struct btp_core_thread *thread);
 
+struct btp_core_frame *
+btp_core_thread_find_exit_frame(struct btp_core_thread *thread);
+
 struct btp_core_thread *
 btp_core_thread_from_json(struct btp_json_value *root,
                           char **error_message);
