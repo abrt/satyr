@@ -45,9 +45,11 @@ help()
     printf("Usage: %s COMMAND [OPTION...]\n", g_program_name);
     printf("%s -- Automatic problem management with anonymous reports\n\n", g_program_name);
     puts("The following commands are available:");
-    puts("   abrt-dir-to-report  Create report from an ABRT directory");
-    puts("   abrt-report-dir     Create report from an ABRT directory and send it to a server");
-    puts("   debug               Commands for debugging and development support.");
+    puts("   abrt-print-report-from-dir   Create report from an ABRT directory");
+    puts("   abrt-report-dir              Create report from an ABRT directory and");
+    puts("                                send it to a server");
+    puts("   abrt-create-core-stacktrace  Create core stacktrace from an ABRT directory");
+    puts("   debug                        Commands for debugging and development support");
 }
 
 static void
@@ -62,8 +64,9 @@ static void
 usage()
 {
     printf("Usage: %s --version\n", g_program_name);
-    printf("Usage: %s abrt-dir-to-report DIR [FILE] [OPTION...]\n", g_program_name);
+    printf("Usage: %s abrt-print-report-from-dir DIR [OPTION...]\n", g_program_name);
     printf("Usage: %s abrt-report-dir DIR URL [OPTION...]\n", g_program_name);
+    printf("Usage: %s abrt-create-core-stacktrace DIR [OPTION...]\n", g_program_name);
     printf("Usage: %s debug COMMAND [OPTION...]\n", g_program_name);
 }
 
