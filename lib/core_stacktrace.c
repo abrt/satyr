@@ -219,7 +219,7 @@ btp_core_stacktrace_from_json(struct btp_json_value *root,
         }
 
         result->crash_thread = result->threads;
-        for (long j = 0; j <= crash_thread; ++j)
+        for (long j = 0; j < crash_thread; ++j)
         {
             if (!result->crash_thread)
             {
