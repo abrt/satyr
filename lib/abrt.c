@@ -220,7 +220,11 @@ btp_abrt_rpm_packages_from_dir(const char *directory,
         btp_abrt_parse_dso_list(dso_list_contents);
 
     if (dso_packages)
+    {
         packages = btp_rpm_package_append(packages, dso_packages);
+        packages = btp_rpm_package_sort(packages);
+        packages = btp_rpm_package_uniq(packages);
+    }
 
     free(dso_list_contents);
     return packages;

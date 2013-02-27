@@ -87,7 +87,25 @@ btp_rpm_package_cmp(struct btp_rpm_package *package1,
                     struct btp_rpm_package *package2);
 
 /**
- * Compares two packages.
+ * Compares two packages by their name, version and release.
+ * @param package1
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @param package2
+ * It must be non-NULL pointer. It's not modified by calling this
+ * function.
+ * @returns
+ * Returns 0 if the packages are same.  Returns negative number if
+ * package1 is found to be 'less' than package2.  Returns positive
+ * number if package1 is found to be 'greater' than package2.
+ */
+int
+btp_rpm_package_cmp_nvr(struct btp_rpm_package *package1,
+                        struct btp_rpm_package *package2);
+
+/**
+ * Compares two packages by their name, epoch, version, release and
+ * architecture.
  * @param package1
  * It must be non-NULL pointer. It's not modified by calling this
  * function.

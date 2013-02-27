@@ -94,15 +94,32 @@ int
 btp_rpm_package_cmp_nevra(struct btp_rpm_package *package1,
                           struct btp_rpm_package *package2)
 {
-    /* Name. */
-    int name = btp_strcmp0(package1->name, package2->name);
-    if (name != 0)
-        return name;
+    int nvr = btp_rpm_package_cmp_nvr(package1, package2);
+    if (nvr != 0)
+        return nvr;
 
     /* Epoch. */
     int32_t epoch = package1->epoch - package2->epoch;
     if (epoch != 0)
         return epoch;
+
+    /* Architecture. */
+    int architecture = btp_strcmp0(package1->architecture,
+                                   package2->architecture);
+    if (architecture != 0)
+        return architecture;
+
+    return 0;
+}
+
+int
+btp_rpm_package_cmp_nvr(struct btp_rpm_package *package1,
+                         struct btp_rpm_package *package2)
+{
+    /* Name. */
+    int name = btp_strcmp0(package1->name, package2->name);
+    if (name != 0)
+        return name;
 
     /* Version. */
     int version = btp_strcmp0(package1->version, package2->version);
@@ -114,14 +131,14 @@ btp_rpm_package_cmp_nevra(struct btp_rpm_package *package1,
     if (release != 0)
         return release;
 
-    /* Architecture. */
-    int architecture = btp_strcmp0(package1->architecture,
-                                   package2->architecture);
-
-    if (architecture != 0)
-        return architecture;
-
     return 0;
+}
+
+static int
+cmp_nevra_qsort_wrapper(struct btp_rpm_package **package1,
+                        struct btp_rpm_package **package2)
+{
+    return btp_rpm_package_cmp_nevra(*package1, *package2);
 }
 
 struct btp_rpm_package *
@@ -169,7 +186,7 @@ btp_rpm_package_sort(struct btp_rpm_package *packages)
     }
 
     /* Sort the array. */
-    qsort(array, count, sizeof(struct btp_rpm_package*), (comparison_fn_t)btp_rpm_package_cmp_nevra);
+    qsort(array, count, sizeof(struct btp_rpm_package*), (comparison_fn_t)cmp_nevra_qsort_wrapper);
 
     /* Create a linked list from the sorted array. */
     for (size_t loop = 0; loop < count; ++loop)
@@ -189,8 +206,15 @@ btp_rpm_package_uniq(struct btp_rpm_package *packages)
     struct btp_rpm_package *loop = packages, *prev = NULL;
     while (loop && loop->next)
     {
-        if (0 == btp_rpm_package_cmp_nevra(loop, loop->next))
+        /* architecture is sometimes missing */
+        if (0 == btp_rpm_package_cmp_nvr(loop, loop->next))
         {
+            /* the architectures were not compared */
+            if (loop->architecture && loop->next->architecture &&
+                0 != btp_strcmp0(loop->architecture, loop->next->architecture))
+                continue;
+
+            /* keep the record with install_time */
             if (loop->install_time)
             {
                 struct btp_rpm_package *next = loop->next->next;
