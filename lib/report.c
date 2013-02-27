@@ -29,6 +29,7 @@
 #include "rpm.h"
 #include "strbuf.h"
 #include <string.h>
+#include <assert.h>
 
 struct btp_report *
 btp_report_new()
@@ -41,7 +42,7 @@ btp_report_new()
 void
 btp_report_init(struct btp_report *report)
 {
-    report->report_version = 1;
+    report->report_version = 2;
     report->report_type = BTP_REPORT_INVALID;
     report->reporter_name = PACKAGE_NAME;
     report->reporter_version = PACKAGE_VERSION;
@@ -76,7 +77,7 @@ btp_report_to_json(struct btp_report *report)
 
     /* Report version. */
     btp_strbuf_append_strf(strbuf,
-                           "{   \"report_version\": %"PRIu32"\n",
+                           "{   \"ureport_version\": %"PRIu32"\n",
                            report->report_version);
 
     /* Report type. */
@@ -105,21 +106,17 @@ btp_report_to_json(struct btp_report *report)
                            ",   \"report_type\": \"%s\"\n",
                            report_type);
 
-    /* Reporter name. */
-    if (report->reporter_name)
-    {
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"reporter_name\": \"%s\"\n",
-                               report->reporter_name);
-    }
+    /* Reporter name and version. */
+    assert(report->reporter_name);
+    assert(report->reporter_version);
 
-    /* Reporter version. */
-    if (report->reporter_version)
-    {
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"reporter_version\": \"%s\"\n",
-                               report->reporter_version);
-    }
+    char *reporter = btp_asprintf("{   \"name\": \"%s\"\n,   \"version\": \"%s\"\n}",
+                                  report->reporter_name,
+                                  report->reporter_version);
+    char *reporter_indented = btp_indent_except_first_line(reporter, strlen(",   \"reporter\": "));
+    btp_strbuf_append_strf(strbuf,
+                           ",   \"reporter\": %s\n",
+                           reporter_indented);
 
     /* User type. */
     btp_strbuf_append_strf(strbuf,
@@ -134,10 +131,10 @@ btp_report_to_json(struct btp_report *report)
     if (report->operating_system)
     {
         char *opsys_str = btp_operating_system_to_json(report->operating_system);
-        char *opsys_str_indented = btp_indent_except_first_line(opsys_str, strlen(",   \"operating_system\": "));
+        char *opsys_str_indented = btp_indent_except_first_line(opsys_str, strlen(",   \"os\": "));
         free(opsys_str);
         btp_strbuf_append_strf(strbuf,
-                               ",   \"operating_system\": %s\n",
+                               ",   \"os\": %s\n",
                                opsys_str_indented);
 
         free(opsys_str_indented);
@@ -147,7 +144,7 @@ btp_report_to_json(struct btp_report *report)
     if (report->component_name)
     {
         btp_strbuf_append_strf(strbuf,
-                               ",   \"component_name\": \"%s\"\n",
+                               ",   \"component\": \"%s\"\n",
                                report->component_name);
     }
 
