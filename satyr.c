@@ -87,8 +87,8 @@ abrt_print_report_from_dir(int argc, char **argv)
     }
 
     char *error_message;
-    bool success = btp_abrt_print_report_from_dir(argv[0],
-                                                  &error_message);
+    bool success = sr_abrt_print_report_from_dir(argv[0],
+                                                 &error_message);
 
     if (!success)
     {
@@ -115,8 +115,8 @@ abrt_create_core_stacktrace(int argc, char **argv)
     }
 
     char *error_message;
-    bool success = btp_abrt_create_core_stacktrace(argv[0],
-                                                   &error_message);
+    bool success = sr_abrt_create_core_stacktrace(argv[0],
+                                                  &error_message);
 
     if (!success)
     {
@@ -137,63 +137,63 @@ debug_normalize(int argc, char **argv)
     }
 
     char *error_message;
-    char *text = btp_file_to_string(argv[0], &error_message);
+    char *text = sr_file_to_string(argv[0], &error_message);
     if (!text)
     {
         fprintf(stderr, "%s\n", error_message);
         exit(1);
     }
 
-    struct btp_gdb_thread *thread = btp_gdb_thread_new();
+    struct sr_gdb_thread *thread = sr_gdb_thread_new();
 
     char *cur = text;
 
     /* Parse the text. */
     while (*cur)
     {
-        struct btp_gdb_frame *frame = btp_gdb_frame_new();
+        struct sr_gdb_frame *frame = sr_gdb_frame_new();
 
         /* SYMBOL */
         /* may contain spaces! RHBZ #857475 */
         /* if ( character is found, we do not stop on white space, but on ) */
         /* parentheses may be nested, we need to consider the depth */
-        btp_skip_whitespace(cur);
+        sr_skip_whitespace(cur);
         char *end;
         for (end = cur; *end && *end != ' '; ++end)
         {
         }
 
-        frame->function_name = btp_strndup(cur, end - cur);
+        frame->function_name = sr_strndup(cur, end - cur);
         cur = end;
-        btp_skip_whitespace(cur);
+        sr_skip_whitespace(cur);
 
         for (end = cur; *end && *end != '\n'; ++end)
         {
         }
 
-        frame->library_name = btp_strndup(cur, end - cur);
+        frame->library_name = sr_strndup(cur, end - cur);
         cur = end;
-        btp_skip_whitespace(cur);
+        sr_skip_whitespace(cur);
 
         for (end = cur; *end && *end != '\n'; ++end)
         {
         }
 
-        frame->source_file = btp_strndup(cur, end - cur);
+        frame->source_file = sr_strndup(cur, end - cur);
 
         /* Skip the rest of the line. */
         while (*cur && *cur++ != '\n')
         {
         }
 
-        thread->frames = btp_gdb_frame_append(thread->frames,
+        thread->frames = sr_gdb_frame_append(thread->frames,
                                               frame);
     }
 
-    btp_normalize_gdb_thread(thread);
+    sr_normalize_gdb_thread(thread);
 
-    struct btp_strbuf *strbuf = btp_strbuf_new();
-    btp_gdb_thread_append_to_str(thread, strbuf, false);
+    struct sr_strbuf *strbuf = sr_strbuf_new();
+    sr_gdb_thread_append_to_str(thread, strbuf, false);
     puts(strbuf->buf);
 }
 

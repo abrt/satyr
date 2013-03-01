@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_GDB_SHAREDLIB_H
-#define BTPARSER_GDB_SHAREDLIB_H
+#ifndef SATYR_GDB_SHAREDLIB_H
+#define SATYR_GDB_SHAREDLIB_H
 
 /**
  * @file
@@ -42,23 +42,23 @@ enum
 /**
  * @brief A shared library memory location as reported by GDB.
  */
-struct btp_gdb_sharedlib
+struct sr_gdb_sharedlib
 {
     uint64_t from;
     uint64_t to;
     int symbols;
     char *soname;
-    struct btp_gdb_sharedlib *next;
+    struct sr_gdb_sharedlib *next;
 };
 
 /**
  * Creates and initializes a new sharedlib structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_gdb_sharedlib_free().
+ * calling the function sr_gdb_sharedlib_free().
  */
-struct btp_gdb_sharedlib *
-btp_gdb_sharedlib_new();
+struct sr_gdb_sharedlib *
+sr_gdb_sharedlib_new();
 
 /**
  * Initializes all members of the sharedlib to default values.  No
@@ -66,7 +66,7 @@ btp_gdb_sharedlib_new();
  * for initializing a sharedlib structure placed on the stack.
  */
 void
-btp_gdb_sharedlib_init(struct btp_gdb_sharedlib *sharedlib);
+sr_gdb_sharedlib_init(struct sr_gdb_sharedlib *sharedlib);
 
 /**
  * Releases the memory held by the sharedlib.  Sharedlibs referenced
@@ -75,7 +75,7 @@ btp_gdb_sharedlib_init(struct btp_gdb_sharedlib *sharedlib);
  * If sharedlib is NULL, no operation is performed.
  */
 void
-btp_gdb_sharedlib_free(struct btp_gdb_sharedlib *sharedlib);
+sr_gdb_sharedlib_free(struct sr_gdb_sharedlib *sharedlib);
 
 /**
  * Appends 'item' at the end of the list 'dest'.
@@ -83,9 +83,9 @@ btp_gdb_sharedlib_free(struct btp_gdb_sharedlib *sharedlib);
  * This function returns the 'dest' sharedlib.  If 'dest' is NULL, it
  * returns the 'item' sharedlib.
  */
-struct btp_gdb_sharedlib *
-btp_gdb_sharedlib_append(struct btp_gdb_sharedlib *dest,
-                         struct btp_gdb_sharedlib *item);
+struct sr_gdb_sharedlib *
+sr_gdb_sharedlib_append(struct sr_gdb_sharedlib *dest,
+                        struct sr_gdb_sharedlib *item);
 
 /**
  * Creates a duplicate of the sharedlib structure.
@@ -97,15 +97,15 @@ btp_gdb_sharedlib_append(struct btp_gdb_sharedlib *dest,
  * Never returns NULL. Returns the duplicated structure
  * or the first structure in the duplicated list.
  */
-struct btp_gdb_sharedlib *
-btp_gdb_sharedlib_dup(struct btp_gdb_sharedlib *sharedlib,
-                      bool siblings);
+struct sr_gdb_sharedlib *
+sr_gdb_sharedlib_dup(struct sr_gdb_sharedlib *sharedlib,
+                     bool siblings);
 
 /**
  * Returns the number of sharedlibs in the list.
  */
 int
-btp_gdb_sharedlib_count(struct btp_gdb_sharedlib *sharedlib);
+sr_gdb_sharedlib_count(struct sr_gdb_sharedlib *sharedlib);
 
 /**
  * Finds whether the address belongs to some sharedlib
@@ -113,9 +113,9 @@ btp_gdb_sharedlib_count(struct btp_gdb_sharedlib *sharedlib);
  * @returns
  * Pointer to an existing structure or NULL if not found.
  */
-struct btp_gdb_sharedlib *
-btp_gdb_sharedlib_find_address(struct btp_gdb_sharedlib *first,
-                               uint64_t address);
+struct sr_gdb_sharedlib *
+sr_gdb_sharedlib_find_address(struct sr_gdb_sharedlib *first,
+                              uint64_t address);
 
 /**
  * Parses the output of GDB's 'info sharedlib' command.
@@ -124,8 +124,8 @@ btp_gdb_sharedlib_find_address(struct btp_gdb_sharedlib *first,
  * @returns
  * First element of the list of loaded libraries.
  */
-struct btp_gdb_sharedlib *
-btp_gdb_sharedlib_parse(const char *input);
+struct sr_gdb_sharedlib *
+sr_gdb_sharedlib_parse(const char *input);
 
 #ifdef __cplusplus
 }

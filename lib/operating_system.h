@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_OPERATING_SYSTEM_H
-#define BTPARSER_OPERATING_SYSTEM_H
+#ifndef SATYR_OPERATING_SYSTEM_H
+#define SATYR_OPERATING_SYSTEM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,7 +27,7 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
-struct btp_operating_system
+struct sr_operating_system
 {
     char *name;
     char *version;
@@ -36,22 +36,22 @@ struct btp_operating_system
     uint64_t uptime;
 };
 
-struct btp_operating_system *
-btp_operating_system_new();
+struct sr_operating_system *
+sr_operating_system_new();
 
 void
-btp_operating_system_init(struct btp_operating_system *operating_system);
+sr_operating_system_init(struct sr_operating_system *operating_system);
 
 void
-btp_operating_system_free(struct btp_operating_system *operating_system);
+sr_operating_system_free(struct sr_operating_system *operating_system);
 
 char *
-btp_operating_system_to_json(struct btp_operating_system *operating_system);
+sr_operating_system_to_json(struct sr_operating_system *operating_system);
 
 bool
-btp_operating_system_parse_etc_system_release(const char *etc_system_release,
-                                              char **name,
-                                              char **version);
+sr_operating_system_parse_etc_system_release(const char *etc_system_release,
+                                             char **name,
+                                             char **version);
 
 #ifdef __cplusplus
 }

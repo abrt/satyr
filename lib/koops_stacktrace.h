@@ -18,8 +18,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_KOOPS_STACKTRACE_H
-#define BTPARSER_KOOPS_STACKTRACE_H
+#ifndef SATYR_KOOPS_STACKTRACE_H
+#define SATYR_KOOPS_STACKTRACE_H
 
 /**
  * @file
@@ -33,9 +33,9 @@ extern "C" {
 #include <stdbool.h>
 #include <inttypes.h>
 
-struct btp_location;
+struct sr_location;
 
-struct btp_koops_stacktrace
+struct sr_koops_stacktrace
 {
     /**
      * @brief Version of the kernel.
@@ -75,17 +75,17 @@ struct btp_koops_stacktrace
     /**
      * @brief Call trace.  It might be NULL as it is not mandatory.
      */
-    struct btp_koops_frame *frames;
+    struct sr_koops_frame *frames;
 };
 
 /**
  * Creates and initializes a new stack trace structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_koops_stacktrace_free().
+ * calling the function sr_koops_stacktrace_free().
  */
-struct btp_koops_stacktrace *
-btp_koops_stacktrace_new();
+struct sr_koops_stacktrace *
+sr_koops_stacktrace_new();
 
 /**
  * Initializes all members of the stacktrace structure to their default
@@ -94,7 +94,7 @@ btp_koops_stacktrace_new();
  * stack.
  */
 void
-btp_koops_stacktrace_init(struct btp_koops_stacktrace *stacktrace);
+sr_koops_stacktrace_init(struct sr_koops_stacktrace *stacktrace);
 
 /**
  * Releases the memory held by the stacktrace.
@@ -102,7 +102,7 @@ btp_koops_stacktrace_init(struct btp_koops_stacktrace *stacktrace);
  * If the stacktrace is NULL, no operation is performed.
  */
 void
-btp_koops_stacktrace_free(struct btp_koops_stacktrace *stacktrace);
+sr_koops_stacktrace_free(struct sr_koops_stacktrace *stacktrace);
 
 /**
  * Creates a duplicate of a stacktrace.
@@ -110,16 +110,16 @@ btp_koops_stacktrace_free(struct btp_koops_stacktrace *stacktrace);
  * The stacktrace to be copied. It's not modified by this function.
  * @returns
  * This function never returns NULL.  The returned duplicate must be
- * released by calling the function btp_koops_stacktrace_free().
+ * released by calling the function sr_koops_stacktrace_free().
  */
-struct btp_koops_stacktrace *
-btp_koops_stacktrace_dup(struct btp_koops_stacktrace *stacktrace);
+struct sr_koops_stacktrace *
+sr_koops_stacktrace_dup(struct sr_koops_stacktrace *stacktrace);
 
 /**
  * Returns the number of frames in the Kerneloops stacktrace.
  */
 int
-btp_koops_stacktrace_get_frame_count(struct btp_koops_stacktrace *stacktrace);
+sr_koops_stacktrace_get_frame_count(struct sr_koops_stacktrace *stacktrace);
 
 /**
  * Removes the frame from the stack trace and then deletes it.
@@ -128,8 +128,8 @@ btp_koops_stacktrace_get_frame_count(struct btp_koops_stacktrace *stacktrace);
  * False if the frame was not found in the thread.
  */
 bool
-btp_koops_stacktrace_remove_frame(struct btp_koops_stacktrace *stacktrace,
-                                  struct btp_koops_frame *frame);
+sr_koops_stacktrace_remove_frame(struct sr_koops_stacktrace *stacktrace,
+                                 struct sr_koops_frame *frame);
 
 /**
  * Parses a textual kernel oops and puts it into a structure.  If
@@ -140,12 +140,12 @@ btp_koops_stacktrace_remove_frame(struct btp_koops_stacktrace *stacktrace,
  * returns a non-NULL value, the input pointer is modified to point
  * after the stacktrace that was just parsed.
  */
-struct btp_koops_stacktrace *
-btp_koops_stacktrace_parse(const char **input,
-                           struct btp_location *location);
+struct sr_koops_stacktrace *
+sr_koops_stacktrace_parse(const char **input,
+                          struct sr_location *location);
 
 char **
-btp_koops_stacktrace_parse_modules(const char **input);
+sr_koops_stacktrace_parse_modules(const char **input);
 
 /**
  * Serializes stacktrace to string.
@@ -155,7 +155,7 @@ btp_koops_stacktrace_parse_modules(const char **input);
  * longer needed.
  */
 char *
-btp_koops_stacktrace_to_json(struct btp_koops_stacktrace *stacktrace);
+sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace);
 
 #ifdef __cplusplus
 }

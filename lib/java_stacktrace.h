@@ -18,8 +18,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_JAVA_STACKTRACE_H
-#define BTPARSER_JAVA_STACKTRACE_H
+#ifndef SATYR_JAVA_STACKTRACE_H
+#define SATYR_JAVA_STACKTRACE_H
 
 /**
  * @file
@@ -30,27 +30,27 @@
 extern "C" {
 #endif
 
-struct btp_java_thread;
-struct btp_location;
+struct sr_java_thread;
+struct sr_location;
 
 #include <stdint.h>
 
-struct btp_java_stacktrace
+struct sr_java_stacktrace
 {
     /**
      * Threads of stack trace. Always non-NULL.
      */
-    struct btp_java_thread *threads;
+    struct sr_java_thread *threads;
 };
 
 /**
  * Creates and initializes a new stacktrace structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_java_stacktrace_free().
+ * calling the function sr_java_stacktrace_free().
  */
-struct btp_java_stacktrace *
-btp_java_stacktrace_new();
+struct sr_java_stacktrace *
+sr_java_stacktrace_new();
 
 /**
  * Initializes all members of the stacktrace structure to their default
@@ -59,7 +59,7 @@ btp_java_stacktrace_new();
  * stack.
  */
 void
-btp_java_stacktrace_init(struct btp_java_stacktrace *stacktrace);
+sr_java_stacktrace_init(struct sr_java_stacktrace *stacktrace);
 
 /**
  * Releases the memory held by the stacktrace and its frames.
@@ -67,7 +67,7 @@ btp_java_stacktrace_init(struct btp_java_stacktrace *stacktrace);
  * If the stacktrace is NULL, no operation is performed.
  */
 void
-btp_java_stacktrace_free(struct btp_java_stacktrace *stacktrace);
+sr_java_stacktrace_free(struct sr_java_stacktrace *stacktrace);
 
 /**
  * Creates a duplicate of the stacktrace.
@@ -75,10 +75,10 @@ btp_java_stacktrace_free(struct btp_java_stacktrace *stacktrace);
  * The stacktrace to be copied. It's not modified by this function.
  * @returns
  * This function never returns NULL.  The returned duplicate must be
- * released by calling the function btp_java_stacktrace_free().
+ * released by calling the function sr_java_stacktrace_free().
  */
-struct btp_java_stacktrace *
-btp_java_stacktrace_dup(struct btp_java_stacktrace *stacktrace);
+struct sr_java_stacktrace *
+sr_java_stacktrace_dup(struct sr_java_stacktrace *stacktrace);
 
 /**
  * Compares two stacktraces.
@@ -88,8 +88,8 @@ btp_java_stacktrace_dup(struct btp_java_stacktrace *stacktrace);
  * found to be 'greater' than t2.
  */
 int
-btp_java_stacktrace_cmp(struct btp_java_stacktrace *stacktrace1,
-                        struct btp_java_stacktrace *stacktrace2);
+sr_java_stacktrace_cmp(struct sr_java_stacktrace *stacktrace1,
+                       struct sr_java_stacktrace *stacktrace2);
 
 /**
  * Parses a textual stack trace and puts it into a structure.  If
@@ -100,10 +100,10 @@ btp_java_stacktrace_cmp(struct btp_java_stacktrace *stacktrace1,
  * a non-NULL value, this pointer is modified to point after the
  * stacktrace that was just parsed.
  * @param location
- * The caller must provide a pointer to an instance of btp_location
+ * The caller must provide a pointer to an instance of sr_location
  * here.  The line and column members of the location are gradually
  * increased as the parser handles the input, so the location should
- * be initialized by btp_location_init() before calling this function
+ * be initialized by sr_location_init() before calling this function
  * to get reasonable values.  When this function returns false (an
  * error occurred), the structure will contain the error line, column,
  * and message.
@@ -111,11 +111,11 @@ btp_java_stacktrace_cmp(struct btp_java_stacktrace *stacktrace1,
  * A newly allocated stacktrace structure or NULL. A stacktrace struct
  * is returned when at least one thread was parsed from the input and
  * no error occurred. The returned structure should be released by
- * btp_java_stacktrace_free().
+ * sr_java_stacktrace_free().
  */
-struct btp_java_stacktrace *
-btp_java_stacktrace_parse(const char **input,
-                          struct btp_location *location);
+struct sr_java_stacktrace *
+sr_java_stacktrace_parse(const char **input,
+                         struct sr_location *location);
 
 /**
  * Serializes stacktrace to string.
@@ -125,7 +125,7 @@ btp_java_stacktrace_parse(const char **input,
  * longer needed.
  */
 char *
-btp_java_stacktrace_to_json(struct btp_java_stacktrace *stacktrace);
+sr_java_stacktrace_to_json(struct sr_java_stacktrace *stacktrace);
 
 #ifdef __cplusplus
 }

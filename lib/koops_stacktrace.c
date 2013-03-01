@@ -23,58 +23,58 @@
 #include "strbuf.h"
 #include <string.h>
 
-struct btp_koops_stacktrace *
-btp_koops_stacktrace_new()
+struct sr_koops_stacktrace *
+sr_koops_stacktrace_new()
 {
-    struct btp_koops_stacktrace *stacktrace =
-        btp_malloc(sizeof(struct btp_koops_stacktrace));
+    struct sr_koops_stacktrace *stacktrace =
+        sr_malloc(sizeof(struct sr_koops_stacktrace));
 
-    btp_koops_stacktrace_init(stacktrace);
+    sr_koops_stacktrace_init(stacktrace);
     return stacktrace;
 }
 
 void
-btp_koops_stacktrace_init(struct btp_koops_stacktrace *stacktrace)
+sr_koops_stacktrace_init(struct sr_koops_stacktrace *stacktrace)
 {
-    memset(stacktrace, 0, sizeof(struct btp_koops_stacktrace));
+    memset(stacktrace, 0, sizeof(struct sr_koops_stacktrace));
 }
 
 void
-btp_koops_stacktrace_free(struct btp_koops_stacktrace *stacktrace)
+sr_koops_stacktrace_free(struct sr_koops_stacktrace *stacktrace)
 {
     if (!stacktrace)
         return;
 
     while (stacktrace->frames)
     {
-        struct btp_koops_frame *frame = stacktrace->frames;
+        struct sr_koops_frame *frame = stacktrace->frames;
         stacktrace->frames = frame->next;
-        btp_koops_frame_free(frame);
+        sr_koops_frame_free(frame);
     }
 
     free(stacktrace->version);
     free(stacktrace);
 }
 
-struct btp_koops_stacktrace *
-btp_koops_stacktrace_dup(struct btp_koops_stacktrace *stacktrace)
+struct sr_koops_stacktrace *
+sr_koops_stacktrace_dup(struct sr_koops_stacktrace *stacktrace)
 {
-    struct btp_koops_stacktrace *result = btp_koops_stacktrace_new();
-    memcpy(result, stacktrace, sizeof(struct btp_koops_stacktrace));
+    struct sr_koops_stacktrace *result = sr_koops_stacktrace_new();
+    memcpy(result, stacktrace, sizeof(struct sr_koops_stacktrace));
 
     if (result->frames)
-        result->frames = btp_koops_frame_dup(result->frames, true);
+        result->frames = sr_koops_frame_dup(result->frames, true);
 
     if (result->version)
-        result->version = btp_strdup(result->version);
+        result->version = sr_strdup(result->version);
 
     return result;
 }
 
 int
-btp_koops_stacktrace_get_frame_count(struct btp_koops_stacktrace *stacktrace)
+sr_koops_stacktrace_get_frame_count(struct sr_koops_stacktrace *stacktrace)
 {
-    struct btp_koops_frame *frame = stacktrace->frames;
+    struct sr_koops_frame *frame = stacktrace->frames;
     int count = 0;
     while (frame)
     {
@@ -85,10 +85,10 @@ btp_koops_stacktrace_get_frame_count(struct btp_koops_stacktrace *stacktrace)
 }
 
 bool
-btp_koops_stacktrace_remove_frame(struct btp_koops_stacktrace *stacktrace,
-                                  struct btp_koops_frame *frame)
+sr_koops_stacktrace_remove_frame(struct sr_koops_stacktrace *stacktrace,
+                                 struct sr_koops_frame *frame)
 {
-    struct btp_koops_frame *loop_frame = stacktrace->frames,
+    struct sr_koops_frame *loop_frame = stacktrace->frames,
         *prev_frame = NULL;
 
     while (loop_frame)
@@ -100,7 +100,7 @@ btp_koops_stacktrace_remove_frame(struct btp_koops_stacktrace *stacktrace,
             else
                 stacktrace->frames = loop_frame->next;
 
-            btp_koops_frame_free(loop_frame);
+            sr_koops_frame_free(loop_frame);
             return true;
         }
 
@@ -112,30 +112,30 @@ btp_koops_stacktrace_remove_frame(struct btp_koops_stacktrace *stacktrace,
 
 }
 
-struct btp_koops_stacktrace *
-btp_koops_stacktrace_parse(const char **input,
-                           struct btp_location *location)
+struct sr_koops_stacktrace *
+sr_koops_stacktrace_parse(const char **input,
+                          struct sr_location *location)
 {
     const char *local_input = *input;
 
-    struct btp_koops_stacktrace *stacktrace = btp_koops_stacktrace_new();
+    struct sr_koops_stacktrace *stacktrace = sr_koops_stacktrace_new();
 
     while (*local_input)
     {
-        struct btp_koops_frame *frame = btp_koops_frame_parse(&local_input);
+        struct sr_koops_frame *frame = sr_koops_frame_parse(&local_input);
         if (!stacktrace->modules) {
-            stacktrace->modules = btp_koops_stacktrace_parse_modules(&local_input);
+            stacktrace->modules = sr_koops_stacktrace_parse_modules(&local_input);
         }
 
         if (frame)
         {
-            stacktrace->frames = btp_koops_frame_append(stacktrace->frames, frame);
-            btp_skip_char(&local_input, '\n');
+            stacktrace->frames = sr_koops_frame_append(stacktrace->frames, frame);
+            sr_skip_char(&local_input, '\n');
             continue;
         }
 
-        btp_skip_char_cspan(&local_input, "\n");
-        btp_skip_char(&local_input, '\n');
+        sr_skip_char_cspan(&local_input, "\n");
+        sr_skip_char(&local_input, '\n');
     }
 
     *input = local_input;
@@ -143,39 +143,39 @@ btp_koops_stacktrace_parse(const char **input,
 }
 
 char **
-btp_koops_stacktrace_parse_modules(const char **input)
+sr_koops_stacktrace_parse_modules(const char **input)
 {
     const char *local_input = *input;
-    btp_skip_char_span(&local_input, " \t");
+    sr_skip_char_span(&local_input, " \t");
 
     /* Skip timestamp if it's present. */
-    btp_koops_skip_timestamp(&local_input);
-    btp_skip_char_span(&local_input, " \t");
+    sr_koops_skip_timestamp(&local_input);
+    sr_skip_char_span(&local_input, " \t");
 
-    if (!btp_skip_string(&local_input, "Modules linked in:"))
+    if (!sr_skip_string(&local_input, "Modules linked in:"))
         return NULL;
 
-    btp_skip_char_span(&local_input, " \t");
+    sr_skip_char_span(&local_input, " \t");
 
     int result_size = 20, result_offset = 0;
-    char **result = btp_malloc(result_size * sizeof(char*));
+    char **result = sr_malloc(result_size * sizeof(char*));
 
     char *module;
     bool success;
-    while ((success = btp_parse_char_cspan(&local_input, " \t\n[", &module)))
+    while ((success = sr_parse_char_cspan(&local_input, " \t\n[", &module)))
     {
         // result_size is lowered by 1 because we need to terminate
         // the list by a NULL pointer.
         if (result_offset == result_size - 1)
         {
             result_size *= 2;
-            result = btp_realloc(result,
-                                 result_size * sizeof(char*));
+            result = sr_realloc(result,
+                                result_size * sizeof(char*));
         }
 
         result[result_offset] = module;
         ++result_offset;
-        btp_skip_char_span(&local_input, " \t");
+        sr_skip_char_span(&local_input, " \t");
     }
 
     result[result_offset] = NULL;
@@ -184,130 +184,130 @@ btp_koops_stacktrace_parse_modules(const char **input)
 }
 
 char *
-btp_koops_stacktrace_to_json(struct btp_koops_stacktrace *stacktrace)
+sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
+    struct sr_strbuf *strbuf = sr_strbuf_new();
 
     /* Kernel version. */
     if (stacktrace->version)
     {
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"version\": \"%s\"\n",
-                               stacktrace->version);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"version\": \"%s\"\n",
+                              stacktrace->version);
     }
 
     /* Kernel taint flags. */
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_module_proprietary\": %s\n",
-                           stacktrace->taint_module_proprietary ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_module_proprietary\": %s\n",
+                          stacktrace->taint_module_proprietary ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_module_gpl\": %s\n",
-                           stacktrace->taint_module_gpl ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_module_gpl\": %s\n",
+                          stacktrace->taint_module_gpl ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_module_out_of_tree\": %s\n",
-                           stacktrace->taint_module_out_of_tree ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_module_out_of_tree\": %s\n",
+                          stacktrace->taint_module_out_of_tree ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_forced_module\": %s\n",
-                           stacktrace->taint_forced_module ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_forced_module\": %s\n",
+                          stacktrace->taint_forced_module ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_forced_removal\": %s\n",
-                           stacktrace->taint_forced_removal ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_forced_removal\": %s\n",
+                          stacktrace->taint_forced_removal ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_smp_unsafe\": %s\n",
-                           stacktrace->taint_smp_unsafe ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_smp_unsafe\": %s\n",
+                          stacktrace->taint_smp_unsafe ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_mce\": %s\n",
-                           stacktrace->taint_mce ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_mce\": %s\n",
+                          stacktrace->taint_mce ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_page_release\": %s\n",
-                           stacktrace->taint_page_release ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_page_release\": %s\n",
+                          stacktrace->taint_page_release ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_userspace\": %s\n",
-                           stacktrace->taint_userspace ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_userspace\": %s\n",
+                          stacktrace->taint_userspace ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_died_recently\": %s\n",
-                           stacktrace->taint_died_recently ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_died_recently\": %s\n",
+                          stacktrace->taint_died_recently ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_acpi_overridden\": %s\n",
-                           stacktrace->taint_acpi_overridden ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_acpi_overridden\": %s\n",
+                          stacktrace->taint_acpi_overridden ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_warning\": %s\n",
-                           stacktrace->taint_warning ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_warning\": %s\n",
+                          stacktrace->taint_warning ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_staging_driver\": %s\n",
-                           stacktrace->taint_staging_driver ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_staging_driver\": %s\n",
+                          stacktrace->taint_staging_driver ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_firmware_workaround\": %s\n",
-                           stacktrace->taint_firmware_workaround ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_firmware_workaround\": %s\n",
+                          stacktrace->taint_firmware_workaround ? "true" : "false");
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"taint_virtual_box\": %s\n",
-                           stacktrace->taint_virtual_box ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"taint_virtual_box\": %s\n",
+                          stacktrace->taint_virtual_box ? "true" : "false");
 
     /* Modules. */
     if (stacktrace->modules)
     {
-        btp_strbuf_append_strf(strbuf, ",   \"modules\":\n");
+        sr_strbuf_append_strf(strbuf, ",   \"modules\":\n");
         char **module = stacktrace->modules;
         while (*module)
         {
             if (module == stacktrace->modules)
-                btp_strbuf_append_str(strbuf, "      [ ");
+                sr_strbuf_append_str(strbuf, "      [ ");
             else
-                btp_strbuf_append_str(strbuf, "      , ");
+                sr_strbuf_append_str(strbuf, "      , ");
 
-            btp_strbuf_append_strf(strbuf, "\"%s\"", *module);
+            sr_strbuf_append_strf(strbuf, "\"%s\"", *module);
             ++module;
             if (*module)
-                btp_strbuf_append_str(strbuf, "\n");
+                sr_strbuf_append_str(strbuf, "\n");
         }
 
-        btp_strbuf_append_str(strbuf, " ]\n");
+        sr_strbuf_append_str(strbuf, " ]\n");
     }
 
     /* Frames. */
     if (stacktrace->frames)
     {
-        struct btp_koops_frame *frame = stacktrace->frames;
-        btp_strbuf_append_str(strbuf, ",   \"frames\":\n");
+        struct sr_koops_frame *frame = stacktrace->frames;
+        sr_strbuf_append_str(strbuf, ",   \"frames\":\n");
         while (frame)
         {
             if (frame == stacktrace->frames)
-                btp_strbuf_append_str(strbuf, "      [ ");
+                sr_strbuf_append_str(strbuf, "      [ ");
             else
-                btp_strbuf_append_str(strbuf, "      , ");
+                sr_strbuf_append_str(strbuf, "      , ");
 
-            char *frame_json = btp_koops_frame_to_json(frame);
-            char *indented_frame_json = btp_indent_except_first_line(frame_json, 8);
-            btp_strbuf_append_str(strbuf, indented_frame_json);
+            char *frame_json = sr_koops_frame_to_json(frame);
+            char *indented_frame_json = sr_indent_except_first_line(frame_json, 8);
+            sr_strbuf_append_str(strbuf, indented_frame_json);
             free(indented_frame_json);
             free(frame_json);
             frame = frame->next;
             if (frame)
-                btp_strbuf_append_str(strbuf, "\n");
+                sr_strbuf_append_str(strbuf, "\n");
         }
 
-        btp_strbuf_append_str(strbuf, " ]\n");
+        sr_strbuf_append_str(strbuf, " ]\n");
     }
 
     if (strbuf->len > 0)
         strbuf->buf[0] = '{';
     else
-        btp_strbuf_append_char(strbuf, '{');
+        sr_strbuf_append_char(strbuf, '{');
 
-    btp_strbuf_append_char(strbuf, '}');
-    return btp_strbuf_free_nobuf(strbuf);
+    sr_strbuf_append_char(strbuf, '}');
+    return sr_strbuf_free_nobuf(strbuf);
 }

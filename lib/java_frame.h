@@ -18,8 +18,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_JAVA_FRAME_H
-#define BTPARSER_JAVA_FRAME_H
+#ifndef SATYR_JAVA_FRAME_H
+#define SATYR_JAVA_FRAME_H
 
 /**
  * @file
@@ -33,10 +33,10 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
-struct btp_strbuf;
-struct btp_location;
+struct sr_strbuf;
+struct sr_location;
 
-struct btp_java_frame
+struct sr_java_frame
 {
     /**
      * FQDN - Fully qualified domain name. Can be NULL.
@@ -84,26 +84,26 @@ struct btp_java_frame
      */
     char *message;
 
-    struct btp_java_frame *next;
+    struct sr_java_frame *next;
 };
 
 /**
  * Creates and initializes a new frame structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_java_frame_free().
+ * calling the function sr_java_frame_free().
  */
-struct btp_java_frame *
-btp_java_frame_new();
+struct sr_java_frame *
+sr_java_frame_new();
 
 /**
  * Creates and initializes a new exception in frame structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_java_frame_free().
+ * calling the function sr_java_frame_free().
  */
-struct btp_java_frame *
-btp_java_frame_new_exception();
+struct sr_java_frame *
+sr_java_frame_new_exception();
 
 /**
  * Initializes all members of the frame structure to their default
@@ -112,7 +112,7 @@ btp_java_frame_new_exception();
  * stack.
  */
 void
-btp_java_frame_init(struct btp_java_frame *frame);
+sr_java_frame_init(struct sr_java_frame *frame);
 
 /**
  * Releases the memory held by the frame. The frame siblings are not
@@ -121,7 +121,7 @@ btp_java_frame_init(struct btp_java_frame *frame);
  * If the frame is NULL, no operation is performed.
  */
 void
-btp_java_frame_free(struct btp_java_frame *frame);
+sr_java_frame_free(struct sr_java_frame *frame);
 
 /**
  * Releases the memory held by the frame all its siblings.
@@ -129,7 +129,7 @@ btp_java_frame_free(struct btp_java_frame *frame);
  * If the frame is NULL, no operation is performed.
  */
 void
-btp_java_frame_free_full(struct btp_java_frame *frame);
+sr_java_frame_free_full(struct sr_java_frame *frame);
 
 /**
  * Gets a number of frame in list.
@@ -138,8 +138,8 @@ btp_java_frame_free_full(struct btp_java_frame *frame);
  * @returns
  * A number of frames.
  */
-struct btp_java_frame *
-btp_java_frame_get_last(struct btp_java_frame *frame);
+struct sr_java_frame *
+sr_java_frame_get_last(struct sr_java_frame *frame);
 
 /**
  * Creates a duplicate of the frame.
@@ -152,11 +152,11 @@ btp_java_frame_get_last(struct btp_java_frame *frame);
  * set to NULL.
  * @returns
  * This function never returns NULL. The returned duplicate frame must
- * be released by calling the function btp_java_frame_free().
+ * be released by calling the function sr_java_frame_free().
  */
-struct btp_java_frame *
-btp_java_frame_dup(struct btp_java_frame *frame,
-                   bool siblings);
+struct sr_java_frame *
+sr_java_frame_dup(struct sr_java_frame *frame,
+                  bool siblings);
 
 /**
  * Compares two frames.
@@ -172,8 +172,8 @@ btp_java_frame_dup(struct btp_java_frame *frame,
  * if frame1 is found to be 'greater' than frame2.
  */
 int
-btp_java_frame_cmp(struct btp_java_frame *frame1,
-                   struct btp_java_frame *frame2);
+sr_java_frame_cmp(struct sr_java_frame *frame1,
+                  struct sr_java_frame *frame2);
 
 /**
  * Compares two frames.
@@ -189,8 +189,8 @@ btp_java_frame_cmp(struct btp_java_frame *frame1,
  * if frame1 is found to be 'greater' than frame2.
  */
 int
-btp_java_frame_cmp_distance(struct btp_java_frame *frame1,
-                            struct btp_java_frame *frame2);
+sr_java_frame_cmp_distance(struct sr_java_frame *frame1,
+                           struct sr_java_frame *frame2);
 
 
 /**
@@ -201,8 +201,8 @@ btp_java_frame_cmp_distance(struct btp_java_frame *frame1,
  * function.
  */
 void
-btp_java_frame_append_to_str(struct btp_java_frame *frame,
-                             struct btp_strbuf *dest);
+sr_java_frame_append_to_str(struct sr_java_frame *frame,
+                            struct sr_strbuf *dest);
 
 /**
  * If the input contains proper exception with frames, parse the exception,
@@ -210,19 +210,19 @@ btp_java_frame_append_to_str(struct btp_java_frame *frame,
  * representing the exception. Otherwise to not modify the input pointer
  * and return NULL.
  * @param location
- * The caller must provide a pointer to struct btp_location here.  The
+ * The caller must provide a pointer to struct sr_location here.  The
  * line and column members are gradually increased as the parser
  * handles the input, keep this in mind to get reasonable values.
  * When this function returns NULL (an error occurred), the structure
  * will contain the error line, column, and message.
  * @returns
  * NULL or newly allocated structure, which should be released by
- * calling btp_java_frame_free().
+ * calling sr_java_frame_free().
  */
 
-struct btp_java_frame *
-btp_java_frame_parse_exception(const char **input,
-                               struct btp_location *location);
+struct sr_java_frame *
+sr_java_frame_parse_exception(const char **input,
+                              struct sr_location *location);
 
 /**
  * If the input contains a complete frame, this function parses the
@@ -231,18 +231,18 @@ btp_java_frame_parse_exception(const char **input,
  * frame, the function does not modify input and returns NULL.
  * @returns
  * Allocated pointer with a frame structure. The pointer should be
- * released by btp_java_frame_free().
+ * released by sr_java_frame_free().
  * @param location
- * The caller must provide a pointer to an instance of btp_location
+ * The caller must provide a pointer to an instance of sr_location
  * here.  When this function returns NULL, the structure will contain
  * the error line, column, and message.  The line and column members
  * of the location are gradually increased as the parser handles the
  * input, so the location should be initialized before calling this
  * function to get reasonable values.
  */
-struct btp_java_frame *
-btp_java_frame_parse(const char **input,
-                     struct btp_location *location);
+struct sr_java_frame *
+sr_java_frame_parse(const char **input,
+                    struct sr_location *location);
 
 /**
  * Returns a textual representation of the frame.
@@ -251,7 +251,7 @@ btp_java_frame_parse(const char **input,
  * function.
  */
 char *
-btp_java_frame_to_json(struct btp_java_frame *frame);
+sr_java_frame_to_json(struct sr_java_frame *frame);
 
 #ifdef __cplusplus
 }

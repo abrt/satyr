@@ -17,19 +17,19 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_CORE_UNWIND_H
-#define BTPARSER_CORE_UNWIND_H
+#ifndef SATYR_CORE_UNWIND_H
+#define SATYR_CORE_UNWIND_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct btp_core_stacktrace;
+struct sr_core_stacktrace;
 
-struct btp_core_stacktrace *
-btp_parse_coredump(const char *coredump_filename,
-                   const char *executable_filename,
-                   char **error_message);
+struct sr_core_stacktrace *
+sr_parse_coredump(const char *coredump_filename,
+                  const char *executable_filename,
+                  char **error_message);
 
 #ifdef __cplusplus
 }

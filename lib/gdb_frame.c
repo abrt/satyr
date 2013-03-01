@@ -26,16 +26,16 @@
 #include <string.h>
 #include <stdarg.h>
 
-struct btp_gdb_frame *
-btp_gdb_frame_new()
+struct sr_gdb_frame *
+sr_gdb_frame_new()
 {
-    struct btp_gdb_frame *frame = btp_malloc(sizeof(struct btp_gdb_frame));
-    btp_gdb_frame_init(frame);
+    struct sr_gdb_frame *frame = sr_malloc(sizeof(struct sr_gdb_frame));
+    sr_gdb_frame_init(frame);
     return frame;
 }
 
 void
-btp_gdb_frame_init(struct btp_gdb_frame *frame)
+sr_gdb_frame_init(struct sr_gdb_frame *frame)
 {
     frame->function_name = NULL;
     frame->function_type = NULL;
@@ -49,7 +49,7 @@ btp_gdb_frame_init(struct btp_gdb_frame *frame)
 }
 
 void
-btp_gdb_frame_free(struct btp_gdb_frame *frame)
+sr_gdb_frame_free(struct sr_gdb_frame *frame)
 {
     if (!frame)
         return;
@@ -61,38 +61,38 @@ btp_gdb_frame_free(struct btp_gdb_frame *frame)
     free(frame);
 }
 
-struct btp_gdb_frame *
-btp_gdb_frame_dup(struct btp_gdb_frame *frame, bool siblings)
+struct sr_gdb_frame *
+sr_gdb_frame_dup(struct sr_gdb_frame *frame, bool siblings)
 {
-    struct btp_gdb_frame *result = btp_gdb_frame_new();
-    memcpy(result, frame, sizeof(struct btp_gdb_frame));
+    struct sr_gdb_frame *result = sr_gdb_frame_new();
+    memcpy(result, frame, sizeof(struct sr_gdb_frame));
 
     /* Handle siblings. */
     if (siblings)
     {
         if (result->next)
-            result->next = btp_gdb_frame_dup(result->next, true);
+            result->next = sr_gdb_frame_dup(result->next, true);
     }
     else
         result->next = NULL; /* Do not copy that. */
 
     /* Duplicate all strings. */
     if (result->function_name)
-        result->function_name = btp_strdup(result->function_name);
+        result->function_name = sr_strdup(result->function_name);
     if (result->function_type)
-        result->function_type = btp_strdup(result->function_type);
+        result->function_type = sr_strdup(result->function_type);
     if (result->source_file)
-        result->source_file = btp_strdup(result->source_file);
+        result->source_file = sr_strdup(result->source_file);
     if (result->library_name)
-        result->library_name = btp_strdup(result->library_name);
+        result->library_name = sr_strdup(result->library_name);
 
     return result;
 }
 
 bool
-btp_gdb_frame_calls_func(struct btp_gdb_frame *frame,
-                         const char *function_name,
-                         ...)
+sr_gdb_frame_calls_func(struct sr_gdb_frame *frame,
+                        const char *function_name,
+                        ...)
 {
     if (!frame->function_name ||
         0 != strcmp(frame->function_name, function_name))
@@ -123,9 +123,9 @@ btp_gdb_frame_calls_func(struct btp_gdb_frame *frame,
 }
 
 int
-btp_gdb_frame_cmp(struct btp_gdb_frame *frame1,
-                  struct btp_gdb_frame *frame2,
-                  bool compare_number)
+sr_gdb_frame_cmp(struct sr_gdb_frame *frame1,
+                 struct sr_gdb_frame *frame2,
+                 bool compare_number)
 {
     /* Singnal handler. */
     if (frame1->signal_handler_called)
@@ -144,19 +144,19 @@ btp_gdb_frame_cmp(struct btp_gdb_frame *frame1,
     }
 
     /* Function. */
-    int function_name = btp_strcmp0(frame1->function_name,
-                                    frame2->function_name);
+    int function_name = sr_strcmp0(frame1->function_name,
+                                   frame2->function_name);
     if (function_name != 0)
         return function_name;
 
-    int function_type = btp_strcmp0(frame1->function_type,
-                                    frame2->function_type);
+    int function_type = sr_strcmp0(frame1->function_type,
+                                   frame2->function_type);
     if (function_type != 0)
         return function_type;
 
     /* Sourcefile. */
-    int source_file = btp_strcmp0(frame1->source_file,
-                                  frame2->source_file);
+    int source_file = sr_strcmp0(frame1->source_file,
+                                 frame2->source_file);
     if (source_file != 0)
         return source_file;
 
@@ -166,8 +166,8 @@ btp_gdb_frame_cmp(struct btp_gdb_frame *frame1,
         return source_line;
 
     /* Library name. */
-    int library_name = btp_strcmp0(frame1->library_name,
-                                   frame2->library_name);
+    int library_name = sr_strcmp0(frame1->library_name,
+                                  frame2->library_name);
     if (library_name != 0)
         return library_name;
 
@@ -183,15 +183,15 @@ btp_gdb_frame_cmp(struct btp_gdb_frame *frame1,
 }
 
 int
-btp_gdb_frame_cmp_distance(struct btp_gdb_frame *frame1,
-                           struct btp_gdb_frame *frame2)
+sr_gdb_frame_cmp_distance(struct sr_gdb_frame *frame1,
+                          struct sr_gdb_frame *frame2)
 {
-    if (btp_strcmp0(frame1->function_name, "??") == 0 &&
-        btp_strcmp0(frame2->function_name, "??") == 0)
+    if (sr_strcmp0(frame1->function_name, "??") == 0 &&
+        sr_strcmp0(frame2->function_name, "??") == 0)
         return -1;
 
-    int function_name = btp_strcmp0(frame1->function_name,
-                                    frame2->function_name);
+    int function_name = sr_strcmp0(frame1->function_name,
+                                   frame2->function_name);
     if (function_name != 0)
         return function_name;
 
@@ -205,14 +205,14 @@ btp_gdb_frame_cmp_distance(struct btp_gdb_frame *frame1,
     return 0;
 }
 
-struct btp_gdb_frame *
-btp_gdb_frame_append(struct btp_gdb_frame *dest,
-                     struct btp_gdb_frame *item)
+struct sr_gdb_frame *
+sr_gdb_frame_append(struct sr_gdb_frame *dest,
+                    struct sr_gdb_frame *item)
 {
     if (!dest)
         return item;
 
-    struct btp_gdb_frame *dest_loop = dest;
+    struct sr_gdb_frame *dest_loop = dest;
     while (dest_loop->next)
         dest_loop = dest_loop->next;
 
@@ -221,30 +221,30 @@ btp_gdb_frame_append(struct btp_gdb_frame *dest,
 }
 
 void
-btp_gdb_frame_append_to_str(struct btp_gdb_frame *frame,
-                            struct btp_strbuf *str,
+sr_gdb_frame_append_to_str(struct sr_gdb_frame *frame,
+                           struct sr_strbuf *str,
                             bool verbose)
 {
     if (verbose)
-        btp_strbuf_append_strf(str, " #%d", frame->number);
+        sr_strbuf_append_strf(str, " #%d", frame->number);
     else
-        btp_strbuf_append_str(str, " ");
+        sr_strbuf_append_str(str, " ");
 
     if (frame->function_type)
-        btp_strbuf_append_strf(str, " %s", frame->function_type);
+        sr_strbuf_append_strf(str, " %s", frame->function_type);
     if (frame->function_name)
-        btp_strbuf_append_strf(str, " %s", frame->function_name);
+        sr_strbuf_append_strf(str, " %s", frame->function_name);
     if (verbose && frame->source_file)
     {
         if (frame->function_name)
-            btp_strbuf_append_str(str, " at");
-        btp_strbuf_append_strf(str, " %s", frame->source_file);
+            sr_strbuf_append_str(str, " at");
+        sr_strbuf_append_strf(str, " %s", frame->source_file);
     }
 
     if (frame->signal_handler_called)
-        btp_strbuf_append_str(str, " <signal handler called>");
+        sr_strbuf_append_str(str, " <signal handler called>");
 
-    btp_strbuf_append_str(str, "\n");
+    sr_strbuf_append_str(str, "\n");
 }
 
 /**
@@ -260,7 +260,7 @@ static const char *
 findfirstabnul(const char *input,
                const char *a,
                const char *b,
-               struct btp_location *location)
+               struct sr_location *location)
 {
     size_t alen = strlen(a);
     size_t blen = strlen(b);
@@ -271,18 +271,18 @@ findfirstabnul(const char *input,
             return p;
         if (strncmp(p, b, blen) == 0)
             return p;
-        btp_location_eat_char(location, *p);
+        sr_location_eat_char(location, *p);
         ++p;
     }
     return p;
 }
 
-struct btp_gdb_frame *
-btp_gdb_frame_parse(const char **input,
-                    struct btp_location *location)
+struct sr_gdb_frame *
+sr_gdb_frame_parse(const char **input,
+                   struct sr_location *location)
 {
     const char *local_input = *input;
-    struct btp_gdb_frame *header = btp_gdb_frame_parse_header(input, location);
+    struct sr_gdb_frame *header = sr_gdb_frame_parse_header(input, location);
     if (!header)
         return NULL;
 
@@ -291,11 +291,11 @@ btp_gdb_frame_parse(const char **input,
     if (*local_input != '\0')
     {
         /* skip the newline */
-        btp_location_eat_char(location, *local_input);
+        sr_location_eat_char(location, *local_input);
         ++local_input;
     }
 
-    if (btp_debug_parser)
+    if (sr_debug_parser)
     {
         printf("frame #%u %s\n",
                header->number,
@@ -307,23 +307,23 @@ btp_gdb_frame_parse(const char **input,
 }
 
 int
-btp_gdb_frame_parse_frame_start(const char **input, uint32_t *number)
+sr_gdb_frame_parse_frame_start(const char **input, uint32_t *number)
 {
     const char *local_input = *input;
 
     /* Read the hash sign. */
-    if (!btp_skip_char(&local_input, '#'))
+    if (!sr_skip_char(&local_input, '#'))
         return 0;
     int count = 1;
 
     /* Read the frame position. */
-    int digits = btp_parse_uint32(&local_input, number);
+    int digits = sr_parse_uint32(&local_input, number);
     count += digits;
     if (0 == digits)
         return 0;
 
     /* Read all the spaces after the positon. */
-    int spaces = btp_skip_char_sequence(&local_input, ' ');
+    int spaces = sr_skip_char_sequence(&local_input, ' ');
     count += spaces;
     if (0 == spaces)
         return 0;
@@ -333,21 +333,21 @@ btp_gdb_frame_parse_frame_start(const char **input, uint32_t *number)
 }
 
 int
-btp_gdb_frame_parseadd_operator(const char **input,
-                                struct btp_strbuf *target)
+sr_gdb_frame_parseadd_operator(const char **input,
+                               struct sr_strbuf *target)
 {
     const char *local_input = *input;
-    if (0 == btp_skip_string(&local_input, "operator"))
+    if (0 == sr_skip_string(&local_input, "operator"))
         return 0;
 
 #define OP(x) \
-    if (0 < btp_skip_string(&local_input, x))      \
-    {                                              \
-        btp_strbuf_append_str(target, "operator"); \
-        btp_strbuf_append_str(target, x);          \
-        int length = local_input - *input;         \
-        *input = local_input;                      \
-        return length;                             \
+    if (0 < sr_skip_string(&local_input, x))      \
+    {                                             \
+        sr_strbuf_append_str(target, "operator"); \
+        sr_strbuf_append_str(target, x);          \
+        int length = local_input - *input;        \
+        *input = local_input;                     \
+        return length;                            \
     }
 
     OP(">>=")OP(">>")OP(">=")OP(">");
@@ -375,31 +375,31 @@ btp_gdb_frame_parseadd_operator(const char **input,
     return 0;
 }
 
-#define FUNCTION_NAME_CHARS BTP_alnum "@.:=!*+-[]~&/%^|,_"
+#define FUNCTION_NAME_CHARS SR_alnum "@.:=!*+-[]~&/%^|,_"
 
 int
-btp_gdb_frame_parse_function_name_chunk(const char **input,
-                                        bool space_allowed,
-                                        char **target)
+sr_gdb_frame_parse_function_name_chunk(const char **input,
+                                       bool space_allowed,
+                                       char **target)
 {
     const char *local_input = *input;
-    struct btp_strbuf *buf = btp_strbuf_new();
+    struct sr_strbuf *buf = sr_strbuf_new();
     while (*local_input)
     {
-        if (0 < btp_gdb_frame_parseadd_operator(&local_input, buf))
+        if (0 < sr_gdb_frame_parseadd_operator(&local_input, buf))
         {
             /* Space is allowed after operator even when it
                is not normally allowed. */
-            if (btp_skip_char(&local_input, ' '))
+            if (sr_skip_char(&local_input, ' '))
             {
                 /* ...but if ( follows, it is not allowed. */
-                if (btp_skip_char(&local_input, '('))
+                if (sr_skip_char(&local_input, '('))
                 {
                     /* Return back both the space and (. */
                     local_input -= 2;
                 }
                 else
-                    btp_strbuf_append_char(buf, ' ');
+                    sr_strbuf_append_char(buf, ' ');
             }
         }
 
@@ -409,103 +409,103 @@ btp_gdb_frame_parse_function_name_chunk(const char **input,
                 break;
         }
 
-        btp_strbuf_append_char(buf, *local_input);
+        sr_strbuf_append_char(buf, *local_input);
         ++local_input;
     }
 
     if (buf->len == 0)
     {
-        btp_strbuf_free(buf);
+        sr_strbuf_free(buf);
         return 0;
     }
 
-    *target = btp_strbuf_free_nobuf(buf);
+    *target = sr_strbuf_free_nobuf(buf);
     int total_char_count = local_input - *input;
     *input = local_input;
     return total_char_count;
 }
 
 int
-btp_gdb_frame_parse_function_name_braces(const char **input, char **target)
+sr_gdb_frame_parse_function_name_braces(const char **input, char **target)
 {
     const char *local_input = *input;
-    if (!btp_skip_char(&local_input, '('))
+    if (!sr_skip_char(&local_input, '('))
         return 0;
 
-    struct btp_strbuf *buf = btp_strbuf_new();
-    btp_strbuf_append_char(buf, '(');
+    struct sr_strbuf *buf = sr_strbuf_new();
+    sr_strbuf_append_char(buf, '(');
     while (true)
     {
         char *namechunk = NULL;
-        if (0 < btp_gdb_frame_parse_function_name_chunk(&local_input, true, &namechunk) ||
-            0 < btp_gdb_frame_parse_function_name_braces(&local_input, &namechunk) ||
-            0 < btp_gdb_frame_parse_function_name_template(&local_input, &namechunk))
+        if (0 < sr_gdb_frame_parse_function_name_chunk(&local_input, true, &namechunk) ||
+            0 < sr_gdb_frame_parse_function_name_braces(&local_input, &namechunk) ||
+            0 < sr_gdb_frame_parse_function_name_template(&local_input, &namechunk))
         {
-            btp_strbuf_append_str(buf, namechunk);
+            sr_strbuf_append_str(buf, namechunk);
             free(namechunk);
         }
         else
             break;
     }
 
-    if (!btp_skip_char(&local_input, ')'))
+    if (!sr_skip_char(&local_input, ')'))
     {
-        btp_strbuf_free(buf);
+        sr_strbuf_free(buf);
         return 0;
     }
 
-    btp_strbuf_append_char(buf, ')');
-    *target = btp_strbuf_free_nobuf(buf);
+    sr_strbuf_append_char(buf, ')');
+    *target = sr_strbuf_free_nobuf(buf);
     int total_char_count = local_input - *input;
     *input = local_input;
     return total_char_count;
 }
 
 int
-btp_gdb_frame_parse_function_name_template(const char **input, char **target)
+sr_gdb_frame_parse_function_name_template(const char **input, char **target)
 {
     const char *local_input = *input;
-    if (!btp_skip_char(&local_input, '<'))
+    if (!sr_skip_char(&local_input, '<'))
         return 0;
 
-    struct btp_strbuf *buf = btp_strbuf_new();
-    btp_strbuf_append_char(buf, '<');
+    struct sr_strbuf *buf = sr_strbuf_new();
+    sr_strbuf_append_char(buf, '<');
     while (true)
     {
         char *namechunk = NULL;
-        if (0 < btp_gdb_frame_parse_function_name_chunk(&local_input, true, &namechunk) ||
-            0 < btp_gdb_frame_parse_function_name_braces(&local_input, &namechunk) ||
-            0 < btp_gdb_frame_parse_function_name_template(&local_input, &namechunk))
+        if (0 < sr_gdb_frame_parse_function_name_chunk(&local_input, true, &namechunk) ||
+            0 < sr_gdb_frame_parse_function_name_braces(&local_input, &namechunk) ||
+            0 < sr_gdb_frame_parse_function_name_template(&local_input, &namechunk))
         {
-            btp_strbuf_append_str(buf, namechunk);
+            sr_strbuf_append_str(buf, namechunk);
             free(namechunk);
         }
         else
             break;
     }
 
-    if (!btp_skip_char(&local_input, '>'))
+    if (!sr_skip_char(&local_input, '>'))
     {
-        btp_strbuf_free(buf);
+        sr_strbuf_free(buf);
         return 0;
     }
 
-    btp_strbuf_append_char(buf, '>');
-    *target = btp_strbuf_free_nobuf(buf);
+    sr_strbuf_append_char(buf, '>');
+    *target = sr_strbuf_free_nobuf(buf);
     int total_char_count = local_input - *input;
     *input = local_input;
     return total_char_count;
 }
 
 bool
-btp_gdb_frame_parse_function_name(const char **input,
-                                  char **function_name,
-                                  char **function_type,
-                                  struct btp_location *location)
+sr_gdb_frame_parse_function_name(const char **input,
+                                 char **function_name,
+                                 char **function_type,
+                                 struct sr_location *location)
 {
     /* Handle unknown function name, represended by double question
        mark. */
-    if (btp_parse_string(input, "??", function_name))
+    if (sr_parse_string(input, "??", function_name))
     {
         *function_type = NULL;
         location->column += 2;
@@ -514,7 +514,7 @@ btp_gdb_frame_parse_function_name(const char **input,
 
     const char *local_input = *input;
     /* Up to three parts of function name. */
-    struct btp_strbuf *buf0 = btp_strbuf_new(), *buf1 = NULL;
+    struct sr_strbuf *buf0 = sr_strbuf_new(), *buf1 = NULL;
 
     /* First character:
        '~' for destructor
@@ -524,31 +524,31 @@ btp_gdb_frame_parse_function_name(const char **input,
      */
     char first;
     char *namechunk;
-    if (btp_parse_char_limited(&local_input, "~*_" BTP_alpha, &first))
+    if (sr_parse_char_limited(&local_input, "~*_" SR_alpha, &first))
     {
         /* If it's a start of 'o'perator, put the 'o' back! */
         if (first == 'o')
             --local_input;
         else
         {
-            btp_strbuf_append_char(buf0, first);
+            sr_strbuf_append_char(buf0, first);
             ++location->column;
         }
     }
     else
     {
-        int chars = btp_gdb_frame_parse_function_name_braces(&local_input,
-                                                             &namechunk);
+        int chars = sr_gdb_frame_parse_function_name_braces(&local_input,
+                                                            &namechunk);
         if (0 < chars)
         {
-            btp_strbuf_append_str(buf0, namechunk);
+            sr_strbuf_append_str(buf0, namechunk);
             free(namechunk);
             location->column += chars;
         }
         else
         {
             location->message = "Expected function name.";
-            btp_strbuf_free(buf0);
+            sr_strbuf_free(buf0);
             return false;
         }
     }
@@ -557,54 +557,54 @@ btp_gdb_frame_parse_function_name(const char **input,
     while (true)
     {
         char *namechunk = NULL;
-        int chars = btp_gdb_frame_parse_function_name_chunk(&local_input,
-                                                            false,
-                                                            &namechunk);
+        int chars = sr_gdb_frame_parse_function_name_chunk(&local_input,
+                                                           false,
+                                                           &namechunk);
 
         if (0 == chars)
         {
-            chars = btp_gdb_frame_parse_function_name_braces(&local_input,
-                                                             &namechunk);
+            chars = sr_gdb_frame_parse_function_name_braces(&local_input,
+                                                            &namechunk);
         }
 
         if (0 == chars)
         {
-            chars = btp_gdb_frame_parse_function_name_template(&local_input,
-                                                               &namechunk);
+            chars = sr_gdb_frame_parse_function_name_template(&local_input,
+                                                              &namechunk);
         }
 
         if (0 == chars)
             break;
 
-        btp_strbuf_append_str(buf0, namechunk);
+        sr_strbuf_append_str(buf0, namechunk);
         free(namechunk);
         location->column += chars;
     }
 
     /* Function name MUST be ended by empty space. */
     char space;
-    if (!btp_parse_char_limited(&local_input, BTP_space, &space))
+    if (!sr_parse_char_limited(&local_input, SR_space, &space))
     {
-        btp_strbuf_free(buf0);
+        sr_strbuf_free(buf0);
         location->message = "Space or newline expected after function name.";
         return false;
     }
 
     /* Some C++ function names and function types might contain suffix
        " const". */
-    int chars = btp_skip_string(&local_input, "const");
+    int chars = sr_skip_string(&local_input, "const");
     if (0 < chars)
     {
-        btp_strbuf_append_char(buf0, space);
-        btp_location_eat_char(location, space);
-        btp_strbuf_append_str(buf0, "const");
+        sr_strbuf_append_char(buf0, space);
+        sr_location_eat_char(location, space);
+        sr_strbuf_append_str(buf0, "const");
         location->column += chars;
 
         /* Check the empty space after function name again.*/
-        if (!btp_parse_char_limited(&local_input, BTP_space, &space))
+        if (!sr_parse_char_limited(&local_input, SR_space, &space))
         {
             /* Function name MUST be ended by empty space. */
-            btp_strbuf_free(buf0);
+            sr_strbuf_free(buf0);
             location->message = "Space or newline expected after function name.";
             return false;
         }
@@ -613,16 +613,16 @@ btp_gdb_frame_parse_function_name(const char **input,
     /* Maybe the first series was just a type of the function, and now
        the real function follows. Now, we know it must not start with
        '(', nor with '<'. */
-    chars = btp_gdb_frame_parse_function_name_chunk(&local_input,
-                                                    false,
-                                                    &namechunk);
+    chars = sr_gdb_frame_parse_function_name_chunk(&local_input,
+                                                   false,
+                                                   &namechunk);
     if (0 < chars)
     {
         /* Eat the space separator first. */
-        btp_location_eat_char(location, space);
+        sr_location_eat_char(location, space);
 
-        buf1 = btp_strbuf_new();
-        btp_strbuf_append_str(buf1, namechunk);
+        buf1 = sr_strbuf_new();
+        sr_strbuf_append_str(buf1, namechunk);
         free(namechunk);
         location->column += chars;
 
@@ -630,53 +630,53 @@ btp_gdb_frame_parse_function_name(const char **input,
         while (true)
         {
             char *namechunk = NULL;
-            chars = btp_gdb_frame_parse_function_name_chunk(&local_input,
-                                                            false,
-                                                            &namechunk);
+            chars = sr_gdb_frame_parse_function_name_chunk(&local_input,
+                                                           false,
+                                                           &namechunk);
             if (0 == chars)
             {
-                chars = btp_gdb_frame_parse_function_name_braces(&local_input,
-                                                                 &namechunk);
+                chars = sr_gdb_frame_parse_function_name_braces(&local_input,
+                                                                &namechunk);
             }
             if (0 == chars)
             {
-                chars = btp_gdb_frame_parse_function_name_template(&local_input,
-                                                                   &namechunk);
+                chars = sr_gdb_frame_parse_function_name_template(&local_input,
+                                                                  &namechunk);
             }
             if (0 == chars)
                 break;
 
-            btp_strbuf_append_str(buf1, namechunk);
+            sr_strbuf_append_str(buf1, namechunk);
             free(namechunk);
             location->column += chars;
         }
 
         /* Function name MUST be ended by empty space. */
-        if (!btp_parse_char_limited(&local_input, BTP_space, &space))
+        if (!sr_parse_char_limited(&local_input, SR_space, &space))
         {
-            btp_strbuf_free(buf0);
-            btp_strbuf_free(buf1);
+            sr_strbuf_free(buf0);
+            sr_strbuf_free(buf1);
             location->message = "Space or newline expected after function name.";
             return false;
         }
     }
 
     /* Again, some C++ function names might contain suffix " const" */
-    chars = btp_skip_string(&local_input, "const");
+    chars = sr_skip_string(&local_input, "const");
     if (0 < chars)
     {
-        struct btp_strbuf *buf = buf1 ? buf1 : buf0;
-        btp_strbuf_append_char(buf, space);
-        btp_location_eat_char(location, space);
-        btp_strbuf_append_str(buf, "const");
+        struct sr_strbuf *buf = buf1 ? buf1 : buf0;
+        sr_strbuf_append_char(buf, space);
+        sr_location_eat_char(location, space);
+        sr_strbuf_append_str(buf, "const");
         location->column += chars;
 
         /* Check the empty space after function name again.*/
-        if (!btp_skip_char_limited(&local_input, BTP_space))
+        if (!sr_skip_char_limited(&local_input, SR_space))
         {
             /* Function name MUST be ended by empty space. */
-            btp_strbuf_free(buf0);
-            btp_strbuf_free(buf1);
+            sr_strbuf_free(buf0);
+            sr_strbuf_free(buf1);
             location->message = "Space or newline expected after function name.";
             return false;
         }
@@ -687,12 +687,12 @@ btp_gdb_frame_parse_function_name(const char **input,
 
     if (buf1)
     {
-        *function_name = btp_strbuf_free_nobuf(buf1);
-        *function_type = btp_strbuf_free_nobuf(buf0);
+        *function_name = sr_strbuf_free_nobuf(buf1);
+        *function_type = sr_strbuf_free_nobuf(buf0);
     }
     else
     {
-        *function_name = btp_strbuf_free_nobuf(buf0);
+        *function_name = sr_strbuf_free_nobuf(buf0);
         *function_type = NULL;
     }
 
@@ -701,11 +701,11 @@ btp_gdb_frame_parse_function_name(const char **input,
 }
 
 bool
-btp_gdb_frame_skip_function_args(const char **input,
-                                 struct btp_location *location)
+sr_gdb_frame_skip_function_args(const char **input,
+                                struct sr_location *location)
 {
     const char *local_input = *input;
-    if (!btp_skip_char(&local_input, '('))
+    if (!sr_skip_char(&local_input, '('))
     {
         location->message = "Expected '(' to start function argument list.";
         return false;
@@ -751,7 +751,7 @@ btp_gdb_frame_skip_function_args(const char **input,
                     break;
             }
         }
-        btp_location_eat_char(location, *local_input);
+        sr_location_eat_char(location, *local_input);
         ++local_input;
     }
     while (*local_input);
@@ -762,7 +762,7 @@ btp_gdb_frame_skip_function_args(const char **input,
         return false;
     }
 
-    if (!btp_skip_char(&local_input, ')'))
+    if (!sr_skip_char(&local_input, ')'))
     {
         location->message = "Expected ')' to close the function parameter list.";
         return false;
@@ -774,17 +774,17 @@ btp_gdb_frame_skip_function_args(const char **input,
 }
 
 bool
-btp_gdb_frame_parse_function_call(const char **input,
-                                  char **function_name,
-                                  char **function_type,
-                                  struct btp_location *location)
+sr_gdb_frame_parse_function_call(const char **input,
+                                 char **function_name,
+                                 char **function_type,
+                                 struct sr_location *location)
 {
     const char *local_input = *input;
     char *name = NULL, *type = NULL;
-    if (!btp_gdb_frame_parse_function_name(&local_input,
-                                           &name,
-                                           &type,
-                                           location))
+    if (!sr_gdb_frame_parse_function_name(&local_input,
+                                          &name,
+                                          &type,
+                                          location))
     {
         /* The location message is set by the function returning
          * false, no need to update it here. */
@@ -792,10 +792,10 @@ btp_gdb_frame_parse_function_call(const char **input,
     }
 
     int line, column;
-    if (0 == btp_skip_char_span_location(&local_input,
-                                         " \n",
-                                         &line,
-                                         &column))
+    if (0 == sr_skip_char_span_location(&local_input,
+                                        " \n",
+                                        &line,
+                                        &column))
     {
         free(name);
         free(type);
@@ -803,9 +803,9 @@ btp_gdb_frame_parse_function_call(const char **input,
         return false;
     }
 
-    btp_location_add(location, line, column);
+    sr_location_add(location, line, column);
 
-    if (!btp_gdb_frame_skip_function_args(&local_input, location))
+    if (!sr_gdb_frame_skip_function_args(&local_input, location))
     {
         free(name);
         free(type);
@@ -821,16 +821,16 @@ btp_gdb_frame_parse_function_call(const char **input,
 }
 
 bool
-btp_gdb_frame_parse_address_in_function(const char **input,
-                                        uint64_t *address,
-                                        char **function_name,
-                                        char **function_type,
-                                        struct btp_location *location)
+sr_gdb_frame_parse_address_in_function(const char **input,
+                                       uint64_t *address,
+                                       char **function_name,
+                                       char **function_type,
+                                       struct sr_location *location)
 {
     const char *local_input = *input;
 
     /* Read memory address in hexadecimal format. */
-    int digits = btp_parse_hexadecimal_0xuint64(&local_input, address);
+    int digits = sr_parse_hexadecimal_0xuint64(&local_input, address);
     location->column += digits;
     /* Memory address is optional. It is not present for inlined frames. */
     if (digits == 0)
@@ -838,7 +838,7 @@ btp_gdb_frame_parse_address_in_function(const char **input,
     else
     {
         /* Skip spaces. */
-        int chars = btp_skip_char_sequence(&local_input, ' ');
+        int chars = sr_skip_char_sequence(&local_input, ' ');
         location->column += chars;
         if (0 == chars)
         {
@@ -847,7 +847,7 @@ btp_gdb_frame_parse_address_in_function(const char **input,
         }
 
         /* Skip keyword "in". */
-        chars = btp_skip_string(&local_input, "in");
+        chars = sr_skip_string(&local_input, "in");
         location->column += chars;
         if (0 == chars)
         {
@@ -856,7 +856,7 @@ btp_gdb_frame_parse_address_in_function(const char **input,
         }
 
         /* Skip spaces. */
-        chars = btp_skip_char_sequence(&local_input, ' ');
+        chars = sr_skip_char_sequence(&local_input, ' ');
         location->column += chars;
         if (0 == chars)
         {
@@ -865,11 +865,11 @@ btp_gdb_frame_parse_address_in_function(const char **input,
         }
 
         /* C++ specific case for "0xfafa in vtable for function ()" */
-        chars = btp_skip_string(&local_input, "vtable");
+        chars = sr_skip_string(&local_input, "vtable");
         location->column += chars;
         if (0 <  chars)
         {
-            chars = btp_skip_char_sequence(&local_input, ' ');
+            chars = sr_skip_char_sequence(&local_input, ' ');
             location->column += chars;
             if (0 == chars)
             {
@@ -877,7 +877,7 @@ btp_gdb_frame_parse_address_in_function(const char **input,
                 return false;
             }
 
-            chars = btp_skip_string(&local_input, "for");
+            chars = sr_skip_string(&local_input, "for");
             location->column += chars;
             if (0 == chars)
             {
@@ -885,7 +885,7 @@ btp_gdb_frame_parse_address_in_function(const char **input,
                 return false;
             }
 
-            chars = btp_skip_char_sequence(&local_input, ' ');
+            chars = sr_skip_char_sequence(&local_input, ' ');
             location->column += chars;
             if (0 == chars)
             {
@@ -895,10 +895,10 @@ btp_gdb_frame_parse_address_in_function(const char **input,
         }
     }
 
-    if (!btp_gdb_frame_parse_function_call(&local_input,
-                                           function_name,
-                                           function_type,
-                                           location))
+    if (!sr_gdb_frame_parse_function_call(&local_input,
+                                          function_name,
+                                          function_type,
+                                          location))
     {
         /* Do not update location here, it has been modified by the
            called function. */
@@ -910,24 +910,24 @@ btp_gdb_frame_parse_address_in_function(const char **input,
 }
 
 bool
-btp_gdb_frame_parse_file_location(const char **input,
-                                  char **file,
-                                  uint32_t *file_line,
-                                  struct btp_location *location)
+sr_gdb_frame_parse_file_location(const char **input,
+                                 char **file,
+                                 uint32_t *file_line,
+                                 struct sr_location *location)
 {
     const char *local_input = *input;
     int line, column;
-    if (0 == btp_skip_char_span_location(&local_input, " \n", &line, &column))
+    if (0 == sr_skip_char_span_location(&local_input, " \n", &line, &column))
     {
         location->message = "Expected a space or a newline.";
         return false;
     }
-    btp_location_add(location, line, column);
+    sr_location_add(location, line, column);
 
-    int chars = btp_skip_string(&local_input, "at");
+    int chars = sr_skip_string(&local_input, "at");
     if (0 == chars)
     {
-        chars = btp_skip_string(&local_input, "from");
+        chars = sr_skip_string(&local_input, "from");
         if (0 == chars)
         {
             location->message = "Expected 'at' or 'from'.";
@@ -936,7 +936,7 @@ btp_gdb_frame_parse_file_location(const char **input,
     }
     location->column += chars;
 
-    int spaces = btp_skip_char_sequence(&local_input, ' ');
+    int spaces = sr_skip_char_sequence(&local_input, ' ');
     location->column += spaces;
     if (0 == spaces)
     {
@@ -945,7 +945,7 @@ btp_gdb_frame_parse_file_location(const char **input,
     }
 
     char *file_name;
-    chars = btp_parse_char_span(&local_input, BTP_alnum "_/\\+.-", &file_name);
+    chars = sr_parse_char_span(&local_input, SR_alnum "_/\\+.-", &file_name);
     location->column += chars;
     if (0 == chars)
     {
@@ -953,10 +953,10 @@ btp_gdb_frame_parse_file_location(const char **input,
         return false;
     }
 
-    if (btp_skip_char(&local_input, ':'))
+    if (sr_skip_char(&local_input, ':'))
     {
         location->column += 1;
-        int digits = btp_parse_uint32(&local_input, file_line);
+        int digits = sr_parse_uint32(&local_input, file_line);
         location->column += digits;
         if (0 == digits)
         {
@@ -973,81 +973,81 @@ btp_gdb_frame_parse_file_location(const char **input,
     return true;
 }
 
-struct btp_gdb_frame *
-btp_gdb_frame_parse_header(const char **input,
-                           struct btp_location *location)
+struct sr_gdb_frame *
+sr_gdb_frame_parse_header(const char **input,
+                          struct sr_location *location)
 {
     const char *local_input = *input;
     /* im - intermediate */
-    struct btp_gdb_frame *imframe = btp_gdb_frame_new();
-    int chars = btp_gdb_frame_parse_frame_start(&local_input,
-                                                &imframe->number);
+    struct sr_gdb_frame *imframe = sr_gdb_frame_new();
+    int chars = sr_gdb_frame_parse_frame_start(&local_input,
+                                               &imframe->number);
 
     location->column += chars;
     if (0 == chars)
     {
         location->message = "Frame start sequence expected.";
-        btp_gdb_frame_free(imframe);
+        sr_gdb_frame_free(imframe);
         return NULL;
     }
 
-    struct btp_location internal_location;
-    btp_location_init(&internal_location);
-    if (btp_gdb_frame_parse_address_in_function(&local_input,
-                                                &imframe->address,
-                                                &imframe->function_name,
-                                                &imframe->function_type,
-                                                &internal_location))
+    struct sr_location internal_location;
+    sr_location_init(&internal_location);
+    if (sr_gdb_frame_parse_address_in_function(&local_input,
+                                               &imframe->address,
+                                               &imframe->function_name,
+                                               &imframe->function_type,
+                                               &internal_location))
     {
-        btp_location_add(location,
-                         internal_location.line,
-                         internal_location.column);
+        sr_location_add(location,
+                        internal_location.line,
+                        internal_location.column);
 
         /* Optional section " from file.c:65" */
         /* Optional section " at file.c:65" */
-        btp_location_init(&internal_location);
-        if (btp_gdb_frame_parse_file_location(&local_input,
-                                              &imframe->source_file,
-                                              &imframe->source_line,
-                                              &internal_location))
+        sr_location_init(&internal_location);
+        if (sr_gdb_frame_parse_file_location(&local_input,
+                                             &imframe->source_file,
+                                             &imframe->source_line,
+                                             &internal_location))
         {
-            btp_location_add(location,
-                             internal_location.line,
-                             internal_location.column);
+            sr_location_add(location,
+                            internal_location.line,
+                            internal_location.column);
         }
     }
     else
     {
-        btp_location_init(&internal_location);
-        if (btp_gdb_frame_parse_function_call(&local_input,
-                                              &imframe->function_name,
-                                              &imframe->function_type,
-                                              &internal_location))
+        sr_location_init(&internal_location);
+        if (sr_gdb_frame_parse_function_call(&local_input,
+                                             &imframe->function_name,
+                                             &imframe->function_type,
+                                             &internal_location))
         {
-            btp_location_add(location,
-                             internal_location.line,
-                             internal_location.column);
+            sr_location_add(location,
+                            internal_location.line,
+                            internal_location.column);
 
             /* Mandatory section " at file.c:65" */
-            btp_location_init(&internal_location);
-            if (!btp_gdb_frame_parse_file_location(&local_input,
-                                                   &imframe->source_file,
-                                                   &imframe->source_line,
-                                                   &internal_location))
+            sr_location_init(&internal_location);
+            if (!sr_gdb_frame_parse_file_location(&local_input,
+                                                  &imframe->source_file,
+                                                  &imframe->source_line,
+                                                  &internal_location))
             {
                 location->message = "Function call in the frame header "
                     "misses mandatory \"at file.c:xy\" section";
-                btp_gdb_frame_free(imframe);
+                sr_gdb_frame_free(imframe);
                 return NULL;
             }
 
-            btp_location_add(location,
-                             internal_location.line,
-                             internal_location.column);
+            sr_location_add(location,
+                            internal_location.line,
+                            internal_location.column);
         }
         else
         {
-            int chars = btp_skip_string(&local_input, "<signal handler called>");
+            int chars = sr_skip_string(&local_input, "<signal handler called>");
             if (0 < chars)
             {
                 location->column += chars;
@@ -1056,7 +1056,7 @@ btp_gdb_frame_parse_header(const char **input,
             else
             {
                 location->message = "Frame header variant not recognized.";
-                btp_gdb_frame_free(imframe);
+                sr_gdb_frame_free(imframe);
                 return NULL;
             }
         }
@@ -1067,9 +1067,9 @@ btp_gdb_frame_parse_header(const char **input,
 }
 
 void
-btp_gdb_frame_remove_func_prefix(struct btp_gdb_frame *frame,
-                                 const char *prefix,
-                                 int num)
+sr_gdb_frame_remove_func_prefix(struct sr_gdb_frame *frame,
+                                const char *prefix,
+                                int num)
 {
     int prefix_len, func_len;
 

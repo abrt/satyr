@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_GDB_THREAD_H
-#define BTPARSER_GDB_THREAD_H
+#ifndef SATYR_GDB_THREAD_H
+#define SATYR_GDB_THREAD_H
 
 /**
  * @file
@@ -32,39 +32,39 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
-struct btp_gdb_frame;
-struct btp_strbuf;
-struct btp_location;
+struct sr_gdb_frame;
+struct sr_strbuf;
+struct sr_location;
 
 /**
  * @brief A thread of execution of a GDB-produced stack trace.
  *
  * Represents a thread containing frames.
  */
-struct btp_gdb_thread
+struct sr_gdb_thread
 {
     uint32_t number;
 
     /**
      * Thread's frames, starting from the top of the stack.
      */
-    struct btp_gdb_frame *frames;
+    struct sr_gdb_frame *frames;
 
     /**
      * A sibling thread, or NULL if this is the last thread in a
      * stacktrace.
      */
-    struct btp_gdb_thread *next;
+    struct sr_gdb_thread *next;
 };
 
 /**
  * Creates and initializes a new frame structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_gdb_thread_free().
+ * calling the function sr_gdb_thread_free().
  */
-struct btp_gdb_thread *
-btp_gdb_thread_new();
+struct sr_gdb_thread *
+sr_gdb_thread_new();
 
 /**
  * Initializes all members of the thread to default values.
@@ -73,7 +73,7 @@ btp_gdb_thread_new();
  * stack.
  */
 void
-btp_gdb_thread_init(struct btp_gdb_thread *thread);
+sr_gdb_thread_init(struct sr_gdb_thread *thread);
 
 /**
  * Releases the memory held by the thread. The thread siblings are not
@@ -82,7 +82,7 @@ btp_gdb_thread_init(struct btp_gdb_thread *thread);
  * If thread is NULL, no operation is performed.
  */
 void
-btp_gdb_thread_free(struct btp_gdb_thread *thread);
+sr_gdb_thread_free(struct sr_gdb_thread *thread);
 
 /**
  * Creates a duplicate of the thread.
@@ -94,9 +94,9 @@ btp_gdb_thread_free(struct btp_gdb_thread *thread);
  * false, thread->next is not duplicated for the new frame, but it is
  * set to NULL.
  */
-struct btp_gdb_thread *
-btp_gdb_thread_dup(struct btp_gdb_thread *thread,
-                   bool siblings);
+struct sr_gdb_thread *
+sr_gdb_thread_dup(struct sr_gdb_thread *thread,
+                  bool siblings);
 
 /**
  * Compares two threads. When comparing the threads, it compares also
@@ -107,23 +107,23 @@ btp_gdb_thread_dup(struct btp_gdb_thread *thread,
  * found to be 'greater' than t2.
  */
 int
-btp_gdb_thread_cmp(struct btp_gdb_thread *thread1,
-                   struct btp_gdb_thread *thread2);
+sr_gdb_thread_cmp(struct sr_gdb_thread *thread1,
+                  struct sr_gdb_thread *thread2);
 
 /**
  * Appends 'item' at the end of the list 'dest'.
  * @returns
  * This function returns the 'dest' thread.
  */
-struct btp_gdb_thread *
-btp_gdb_thread_append(struct btp_gdb_thread *dest,
-                      struct btp_gdb_thread *item);
+struct sr_gdb_thread *
+sr_gdb_thread_append(struct sr_gdb_thread *dest,
+                     struct sr_gdb_thread *item);
 
 /**
  * Returns the number of frames in the thread.
  */
 int
-btp_gdb_thread_get_frame_count(struct btp_gdb_thread *thread);
+sr_gdb_thread_get_frame_count(struct sr_gdb_thread *thread);
 
 /**
  * Counts the number of 'good' frames and the number of all frames in
@@ -135,9 +135,9 @@ btp_gdb_thread_get_frame_count(struct btp_gdb_thread *thread);
  * all_count.
  */
 void
-btp_gdb_thread_quality_counts(struct btp_gdb_thread *thread,
-                              int *ok_count,
-                              int *all_count);
+sr_gdb_thread_quality_counts(struct sr_gdb_thread *thread,
+                             int *ok_count,
+                             int *all_count);
 
 /**
  * Returns the quality of the thread. The quality is the ratio of the
@@ -152,7 +152,7 @@ btp_gdb_thread_quality_counts(struct btp_gdb_thread *thread,
  * function returns 1.
  */
 float
-btp_gdb_thread_quality(struct btp_gdb_thread *thread);
+sr_gdb_thread_quality(struct sr_gdb_thread *thread);
 
 /**
  * Removes the frame from the thread and then deletes it.
@@ -161,8 +161,8 @@ btp_gdb_thread_quality(struct btp_gdb_thread *thread);
  * False if the frame was not found in the thread.
  */
 bool
-btp_gdb_thread_remove_frame(struct btp_gdb_thread *thread,
-                            struct btp_gdb_frame *frame);
+sr_gdb_thread_remove_frame(struct sr_gdb_thread *thread,
+                           struct sr_gdb_frame *frame);
 
 /**
  * Removes all the frames from the thread that are above certain
@@ -173,23 +173,23 @@ btp_gdb_thread_remove_frame(struct btp_gdb_thread *thread,
  * False if the frame was not found in the thread.
  */
 bool
-btp_gdb_thread_remove_frames_above(struct btp_gdb_thread *thread,
-                                   struct btp_gdb_frame *frame);
+sr_gdb_thread_remove_frames_above(struct sr_gdb_thread *thread,
+                                  struct sr_gdb_frame *frame);
 
 /**
  * Keeps only the top n frames in the thread.
  */
 void
-btp_gdb_thread_remove_frames_below_n(struct btp_gdb_thread *thread,
-                                     int n);
+sr_gdb_thread_remove_frames_below_n(struct sr_gdb_thread *thread,
+                                    int n);
 
 /**
  * Appends a textual representation of 'thread' to the 'str'.
  */
 void
-btp_gdb_thread_append_to_str(struct btp_gdb_thread *thread,
-                             struct btp_strbuf *dest,
-                             bool verbose);
+sr_gdb_thread_append_to_str(struct sr_gdb_thread *thread,
+                            struct sr_strbuf *dest,
+                            bool verbose);
 
 /**
  * If the input contains proper thread with frames, parse the thread,
@@ -197,18 +197,18 @@ btp_gdb_thread_append_to_str(struct btp_gdb_thread *thread,
  * representing the thread.  Otherwise to not modify the input pointer
  * and return NULL.
  * @param location
- * The caller must provide a pointer to struct btp_location here.  The
+ * The caller must provide a pointer to struct sr_location here.  The
  * line and column members are gradually increased as the parser
  * handles the input, keep this in mind to get reasonable values.
  * When this function returns NULL (an error occurred), the structure
  * will contain the error line, column, and message.
  * @returns
  * NULL or newly allocated structure, which should be released by
- * calling btp_gdb_thread_free().
+ * calling sr_gdb_thread_free().
  */
-struct btp_gdb_thread *
-btp_gdb_thread_parse(const char **input,
-                     struct btp_location *location);
+struct sr_gdb_thread *
+sr_gdb_thread_parse(const char **input,
+                    struct sr_location *location);
 
 /**
  * If the input contains a LWP section in form of "(LWP [0-9]+), move
@@ -219,7 +219,7 @@ btp_gdb_thread_parse(const char **input,
  * contain a LWP section.
  */
 int
-btp_gdb_thread_skip_lwp(const char **input);
+sr_gdb_thread_skip_lwp(const char **input);
 
 /**
  * Create a thread from function and library names.
@@ -228,10 +228,10 @@ btp_gdb_thread_skip_lwp(const char **input);
  * by space, one frame per line.
  * @returns
  * Newly allocated structure, which should be released by
- * calling btp_gdb_thread_free().
+ * calling sr_gdb_thread_free().
  */
-struct btp_gdb_thread *
-btp_gdb_thread_parse_funs(const char *input);
+struct sr_gdb_thread *
+sr_gdb_thread_parse_funs(const char *input);
 
 /**
  * Prepare a string representing thread which contains just the function
@@ -239,10 +239,10 @@ btp_gdb_thread_parse_funs(const char *input);
  * comparison.
  * @returns
  * Newly allocated string, which should be released by
- * calling free(). The string can be parsed by btp_gdb_thread_parse_funs().
+ * calling free(). The string can be parsed by sr_gdb_thread_parse_funs().
  */
 char *
-btp_gdb_thread_format_funs(struct btp_gdb_thread *thread);
+sr_gdb_thread_format_funs(struct sr_gdb_thread *thread);
 
 #ifdef __cplusplus
 }

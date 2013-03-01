@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_PY_CLUSTER_H
-#define BTPARSER_PY_CLUSTER_H
+#ifndef SATYR_PY_CLUSTER_H
+#define SATYR_PY_CLUSTER_H
 
 /**
  * @file
@@ -32,32 +32,32 @@ extern "C" {
 #include <Python.h>
 #include <structmember.h>
 
-extern PyTypeObject btp_py_dendrogram_type;
+extern PyTypeObject sr_py_dendrogram_type;
 
-struct btp_py_dendrogram
+struct sr_py_dendrogram
 {
     PyObject_HEAD
-    struct btp_dendrogram *dendrogram;
+    struct sr_dendrogram *dendrogram;
 };
 
 /* constructor */
-PyObject *btp_py_dendrogram_new(PyTypeObject *object,
-                                PyObject *args,
-                                PyObject *kwds);
+PyObject *sr_py_dendrogram_new(PyTypeObject *object,
+                               PyObject *args,
+                               PyObject *kwds);
 
 /* destructor */
-void btp_py_dendrogram_free(PyObject *object);
+void sr_py_dendrogram_free(PyObject *object);
 
 /* str */
-PyObject *btp_py_dendrogram_str(PyObject *self);
+PyObject *sr_py_dendrogram_str(PyObject *self);
 
 /* getters & setters */
-PyObject *btp_py_dendrogram_get_size(PyObject *self, PyObject *args);
-PyObject *btp_py_dendrogram_get_object(PyObject *self, PyObject *args);
-PyObject *btp_py_dendrogram_get_merge_level(PyObject *self, PyObject *args);
+PyObject *sr_py_dendrogram_get_size(PyObject *self, PyObject *args);
+PyObject *sr_py_dendrogram_get_object(PyObject *self, PyObject *args);
+PyObject *sr_py_dendrogram_get_merge_level(PyObject *self, PyObject *args);
 
 /* methods */
-PyObject *btp_py_dendrogram_cut(PyObject *self, PyObject *args);
+PyObject *sr_py_dendrogram_cut(PyObject *self, PyObject *args);
 
 #ifdef __cplusplus
 }

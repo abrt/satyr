@@ -6,13 +6,13 @@
 #include "lib/location.h"
 #include "lib/normalize.h"
 
-#define stacktrace_doc "btparser.Kerneloops - class representing a kerneloops stacktrace\n" \
+#define stacktrace_doc "satyr.Kerneloops - class representing a kerneloops stacktrace\n" \
                       "Usage:\n" \
-                      "btparser.Kerneloops() - creates an empty kerneloops stacktrace\n" \
-                      "btparser.Kerneloops(str) - parses str and fills the kerneloops stacktrace object"
+                      "satyr.Kerneloops() - creates an empty kerneloops stacktrace\n" \
+                      "satyr.Kerneloops(str) - parses str and fills the kerneloops stacktrace object"
 
 #define b_dup_doc "Usage: stacktrace.dup()\n" \
-                  "Returns: btparser.Kerneloops - a new clone of kerneloops stacktrace\n" \
+                  "Returns: satyr.Kerneloops - a new clone of kerneloops stacktrace\n" \
                   "Clones the kerneloops object. All new structures are independent " \
                   "on the original object."
 
@@ -28,27 +28,27 @@ static PyMethodDef
 koops_stacktrace_methods[] =
 {
     /* getters & setters */
-    { "get_modules",          btp_py_koops_stacktrace_get_modules,          METH_NOARGS,  b_get_modules_doc           },
+    { "get_modules",          sr_py_koops_stacktrace_get_modules,          METH_NOARGS,  b_get_modules_doc           },
     /* methods */
-    { "dup",                  btp_py_koops_stacktrace_dup,                  METH_NOARGS,  b_dup_doc                   },
-    { "normalize",            btp_py_koops_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc             },
+    { "dup",                  sr_py_koops_stacktrace_dup,                  METH_NOARGS,  b_dup_doc                   },
+    { "normalize",            sr_py_koops_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc             },
     { NULL },
 };
 
 static PyMemberDef
 koops_stacktrace_members[] =
 {
-    { (char *)"frames",       T_OBJECT_EX, offsetof(struct btp_py_koops_stacktrace, frames),     0,    b_frames_doc     },
+    { (char *)"frames",       T_OBJECT_EX, offsetof(struct sr_py_koops_stacktrace, frames),     0,    b_frames_doc     },
     { NULL },
 };
 
-PyTypeObject btp_py_koops_stacktrace_type = {
+PyTypeObject sr_py_koops_stacktrace_type = {
     PyObject_HEAD_INIT(NULL)
     0,
-    "btparser.Kerneloops",          /* tp_name */
-    sizeof(struct btp_py_koops_stacktrace),        /* tp_basicsize */
+    "satyr.Kerneloops",          /* tp_name */
+    sizeof(struct sr_py_koops_stacktrace),        /* tp_basicsize */
     0,                              /* tp_itemsize */
-    btp_py_koops_stacktrace_free,   /* tp_dealloc */
+    sr_py_koops_stacktrace_free,    /* tp_dealloc */
     NULL,                           /* tp_print */
     NULL,                           /* tp_getattr */
     NULL,                           /* tp_setattr */
@@ -59,7 +59,7 @@ PyTypeObject btp_py_koops_stacktrace_type = {
     NULL,                           /* tp_as_mapping */
     NULL,                           /* tp_hash */
     NULL,                           /* tp_call */
-    btp_py_koops_stacktrace_str,    /* tp_str */
+    sr_py_koops_stacktrace_str,     /* tp_str */
     NULL,                           /* tp_getattro */
     NULL,                           /* tp_setattro */
     NULL,                           /* tp_as_buffer */
@@ -81,7 +81,7 @@ PyTypeObject btp_py_koops_stacktrace_type = {
     0,                              /* tp_dictoffset */
     NULL,                           /* tp_init */
     NULL,                           /* tp_alloc */
-    btp_py_koops_stacktrace_new,    /* tp_new */
+    sr_py_koops_stacktrace_new,     /* tp_new */
     NULL,                           /* tp_free */
     NULL,                           /* tp_is_gc */
     NULL,                           /* tp_bases */
@@ -93,12 +93,12 @@ PyTypeObject btp_py_koops_stacktrace_type = {
 
 /* helpers */
 int
-koops_stacktrace_prepare_linked_list(struct btp_py_koops_stacktrace *stacktrace)
+koops_stacktrace_prepare_linked_list(struct sr_py_koops_stacktrace *stacktrace)
 {
     int i;
     PyObject *item;
 
-    struct btp_py_koops_frame *current = NULL, *prev = NULL;
+    struct sr_py_koops_frame *current = NULL, *prev = NULL;
     for (i = 0; i < PyList_Size(stacktrace->frames); ++i)
     {
         item = PyList_GetItem(stacktrace->frames, i);
@@ -106,16 +106,16 @@ koops_stacktrace_prepare_linked_list(struct btp_py_koops_stacktrace *stacktrace)
             return -1;
 
         Py_INCREF(item);
-        if (!PyObject_TypeCheck(item, &btp_py_koops_frame_type))
+        if (!PyObject_TypeCheck(item, &sr_py_koops_frame_type))
         {
             Py_XDECREF(current);
             Py_XDECREF(prev);
             PyErr_SetString(PyExc_TypeError,
-                            "frames must be a list of btparser.KerneloopsFrame objects");
+                            "frames must be a list of satyr.KerneloopsFrame objects");
             return -1;
         }
 
-        current = (struct btp_py_koops_frame*)item;
+        current = (struct sr_py_koops_frame*)item;
         if (i == 0)
             stacktrace->stacktrace->frames = current->frame;
         else
@@ -135,9 +135,9 @@ koops_stacktrace_prepare_linked_list(struct btp_py_koops_stacktrace *stacktrace)
 }
 
 PyObject *
-btp_py_koops_stacktrace_get_modules(PyObject *self, PyObject *args) 
+sr_py_koops_stacktrace_get_modules(PyObject *self, PyObject *args) 
 {
-    struct btp_koops_stacktrace *st = ((struct btp_py_koops_stacktrace*)self)->stacktrace;
+    struct sr_koops_stacktrace *st = ((struct sr_py_koops_stacktrace*)self)->stacktrace;
     char **iter = st->modules;
 
     PyObject *result = PyList_New(0);
@@ -153,19 +153,19 @@ btp_py_koops_stacktrace_get_modules(PyObject *self, PyObject *args)
 }
 
 PyObject *
-koops_frame_linked_list_to_python_list(struct btp_koops_stacktrace *stacktrace)
+koops_frame_linked_list_to_python_list(struct sr_koops_stacktrace *stacktrace)
 {
     PyObject *result = PyList_New(0);
     if (!result)
         return PyErr_NoMemory();
 
-    struct btp_koops_frame *frame = stacktrace->frames;
-    struct btp_py_koops_frame *item;
+    struct sr_koops_frame *frame = stacktrace->frames;
+    struct sr_py_koops_frame *item;
 
     while(frame)
     {
-        item = (struct btp_py_koops_frame*)
-            PyObject_New(struct btp_py_koops_frame, &btp_py_koops_frame_type);
+        item = (struct sr_py_koops_frame*)
+            PyObject_New(struct sr_py_koops_frame, &sr_py_koops_frame_type);
 
         if (!item)
             return PyErr_NoMemory();
@@ -181,7 +181,7 @@ koops_frame_linked_list_to_python_list(struct btp_koops_stacktrace *stacktrace)
 }
 
 int
-koops_free_frame_python_list(struct btp_py_koops_stacktrace *stacktrace)
+koops_free_frame_python_list(struct sr_py_koops_stacktrace *stacktrace)
 {
     int i;
     PyObject *item;
@@ -200,13 +200,13 @@ koops_free_frame_python_list(struct btp_py_koops_stacktrace *stacktrace)
 
 /* constructor */
 PyObject *
-btp_py_koops_stacktrace_new(PyTypeObject *object,
-                            PyObject *args,
-                            PyObject *kwds)
+sr_py_koops_stacktrace_new(PyTypeObject *object,
+                           PyObject *args,
+                           PyObject *kwds)
 {
-    struct btp_py_koops_stacktrace *bo = (struct btp_py_koops_stacktrace*)
-        PyObject_New(struct btp_py_koops_stacktrace,
-                     &btp_py_koops_stacktrace_type);
+    struct sr_py_koops_stacktrace *bo = (struct sr_py_koops_stacktrace*)
+        PyObject_New(struct sr_py_koops_stacktrace,
+                     &sr_py_koops_stacktrace_type);
 
     if (!bo)
         return PyErr_NoMemory();
@@ -217,9 +217,9 @@ btp_py_koops_stacktrace_new(PyTypeObject *object,
 
     if (str)
     {
-        struct btp_location location;
-        btp_location_init(&location);
-        bo->stacktrace = btp_koops_stacktrace_parse(&str, &location);
+        struct sr_location location;
+        sr_location_init(&location);
+        bo->stacktrace = sr_koops_stacktrace_parse(&str, &location);
         if (!bo->stacktrace)
         {
             PyErr_SetString(PyExc_ValueError, location.message);
@@ -230,7 +230,7 @@ btp_py_koops_stacktrace_new(PyTypeObject *object,
     }
     else
     {
-        bo->stacktrace = btp_koops_stacktrace_new();
+        bo->stacktrace = sr_koops_stacktrace_new();
         bo->frames = PyList_New(0);
     }
 
@@ -239,24 +239,24 @@ btp_py_koops_stacktrace_new(PyTypeObject *object,
 
 /* destructor */
 void
-btp_py_koops_stacktrace_free(PyObject *object)
+sr_py_koops_stacktrace_free(PyObject *object)
 {
-    struct btp_py_koops_stacktrace *this = (struct btp_py_koops_stacktrace*)object;
+    struct sr_py_koops_stacktrace *this = (struct sr_py_koops_stacktrace*)object;
     koops_free_frame_python_list(this);
     this->stacktrace->frames = NULL;
-    btp_koops_stacktrace_free(this->stacktrace);
+    sr_koops_stacktrace_free(this->stacktrace);
     PyObject_Del(object);
 }
 
 /* str */
 PyObject *
-btp_py_koops_stacktrace_str(PyObject *self)
+sr_py_koops_stacktrace_str(PyObject *self)
 {
-    struct btp_py_koops_stacktrace *this = (struct btp_py_koops_stacktrace *)self;
-    struct btp_strbuf *buf = btp_strbuf_new();
-    btp_strbuf_append_strf(buf, "Kerneloops with %d frames",
+    struct sr_py_koops_stacktrace *this = (struct sr_py_koops_stacktrace *)self;
+    struct sr_strbuf *buf = sr_strbuf_new();
+    sr_strbuf_append_strf(buf, "Kerneloops with %d frames",
                            PyList_Size(this->frames));
-    char *str = btp_strbuf_free_nobuf(buf);
+    char *str = sr_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
@@ -264,20 +264,20 @@ btp_py_koops_stacktrace_str(PyObject *self)
 
 /* methods */
 PyObject *
-btp_py_koops_stacktrace_dup(PyObject *self, PyObject *args)
+sr_py_koops_stacktrace_dup(PyObject *self, PyObject *args)
 {
-    struct btp_py_koops_stacktrace *this = (struct btp_py_koops_stacktrace*)self;
+    struct sr_py_koops_stacktrace *this = (struct sr_py_koops_stacktrace*)self;
     if (koops_stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
-    struct btp_py_koops_stacktrace *bo = (struct btp_py_koops_stacktrace*)
-        PyObject_New(struct btp_py_koops_stacktrace,
-                     &btp_py_koops_stacktrace_type);
+    struct sr_py_koops_stacktrace *bo = (struct sr_py_koops_stacktrace*)
+        PyObject_New(struct sr_py_koops_stacktrace,
+                     &sr_py_koops_stacktrace_type);
 
     if (!bo)
         return PyErr_NoMemory();
 
-    bo->stacktrace = btp_koops_stacktrace_dup(this->stacktrace);
+    bo->stacktrace = sr_koops_stacktrace_dup(this->stacktrace);
     if (!bo->stacktrace)
         return NULL;
 
@@ -289,25 +289,25 @@ btp_py_koops_stacktrace_dup(PyObject *self, PyObject *args)
 }
 
 PyObject *
-btp_py_koops_stacktrace_normalize(PyObject *self, PyObject *args)
+sr_py_koops_stacktrace_normalize(PyObject *self, PyObject *args)
 {
-    struct btp_py_koops_stacktrace *this = (struct btp_py_koops_stacktrace*)self;
+    struct sr_py_koops_stacktrace *this = (struct sr_py_koops_stacktrace*)self;
     if (koops_stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* destroys the linked list and frees some parts */
     /* need to rebuild python list manually */
-    struct btp_koops_stacktrace *tmp = btp_koops_stacktrace_dup(this->stacktrace);
-    btp_normalize_koops_stacktrace(tmp);
+    struct sr_koops_stacktrace *tmp = sr_koops_stacktrace_dup(this->stacktrace);
+    sr_normalize_koops_stacktrace(tmp);
     if (koops_free_frame_python_list(this) < 0)
     {
-        btp_koops_stacktrace_free(tmp);
+        sr_koops_stacktrace_free(tmp);
         return NULL;
     }
 
     this->stacktrace->frames = tmp->frames;
     tmp->frames = NULL;
-    btp_koops_stacktrace_free(tmp);
+    sr_koops_stacktrace_free(tmp);
 
     this->frames = koops_frame_linked_list_to_python_list(this->stacktrace);
     if (!this->frames)

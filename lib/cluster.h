@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_CLUSTER_H
-#define BTPARSER_CLUSTER_H
+#ifndef SATYR_CLUSTER_H
+#define SATYR_CLUSTER_H
 
 /**
  * @file
@@ -32,12 +32,12 @@
 extern "C" {
 #endif
 
-struct btp_distances;
+struct sr_distances;
 
 /**
  * @brief A dendrogram created by clustering.
  */
-struct btp_dendrogram
+struct sr_dendrogram
 {
     /* How many objects were clustered. */
     int size;
@@ -57,10 +57,10 @@ struct btp_dendrogram
  * Number of objects.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * btp_dendrogram_free().
+ * sr_dendrogram_free().
  */
-struct btp_dendrogram *
-btp_dendrogram_new(int size);
+struct sr_dendrogram *
+sr_dendrogram_new(int size);
 
 /**
  * Releases the memory held by the dendrogram.
@@ -68,7 +68,7 @@ btp_dendrogram_new(int size);
  * If dendrogram is NULL, no operation is performed.
  */
 void
-btp_dendrogram_free(struct btp_dendrogram *dendrogram);
+sr_dendrogram_free(struct sr_dendrogram *dendrogram);
 
 /**
  * Performs hierarchical agglomerative clustering on objects.
@@ -76,20 +76,20 @@ btp_dendrogram_free(struct btp_dendrogram *dendrogram);
  * Distances between the objects. The structure is not modified by
  * calling this function.
  */
-struct btp_dendrogram *
-btp_distances_cluster_objects(struct btp_distances *distances);
+struct sr_dendrogram *
+sr_distances_cluster_objects(struct sr_distances *distances);
 
 /**
  * @brief A cluster of objects from a dendrogram.
  */
-struct btp_cluster
+struct sr_cluster
 {
     /* Number of objects in the cluster. */
     int size;
     /* Array of indices of the objects. */
     int *objects;
     /* A sibling cluster, or NULL if this is the last cluster. */
-    struct btp_cluster *next;
+    struct sr_cluster *next;
 };
 
 /**
@@ -98,10 +98,10 @@ struct btp_cluster
  * Number of objects in the cluster.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * btp_cluster_free().
+ * sr_cluster_free().
  */
-struct btp_cluster *
-btp_cluster_new(int size);
+struct sr_cluster *
+sr_cluster_new(int size);
 
 /**
  * Releases the memory held by the cluster.
@@ -109,7 +109,7 @@ btp_cluster_new(int size);
  * If cluster is NULL, no operation is performed.
  */
 void
-btp_cluster_free(struct btp_cluster *cluster);
+sr_cluster_free(struct sr_cluster *cluster);
 
 /**
  * Cuts a dendrogram at specified level.
@@ -123,10 +123,10 @@ btp_cluster_free(struct btp_cluster *cluster);
  * @returns
  * List of clusters, NULL if empty.
  */
-struct btp_cluster *
-btp_dendrogram_cut(struct btp_dendrogram *dendrogram,
-                   float level,
-                   int min_size);
+struct sr_cluster *
+sr_dendrogram_cut(struct sr_dendrogram *dendrogram,
+                  float level,
+                  int min_size);
 
 #ifdef __cplusplus
 }

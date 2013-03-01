@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_ABRT_H
-#define BTPARSER_ABRT_H
+#ifndef SATYR_ABRT_H
+#define SATYR_ABRT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,27 +27,27 @@ extern "C" {
 #include <stdbool.h>
 
 bool
-btp_abrt_print_report_from_dir(const char *directory,
-                               char **error_message);
+sr_abrt_print_report_from_dir(const char *directory,
+                              char **error_message);
 
 bool
-btp_abrt_create_core_stacktrace(const char *directory,
-                                char **error_message);
-
-struct btp_rpm_package *
-btp_abrt_parse_dso_list(const char *text);
-
-struct btp_rpm_package *
-btp_abrt_rpm_packages_from_dir(const char *directory,
+sr_abrt_create_core_stacktrace(const char *directory,
                                char **error_message);
 
-struct btp_operating_system *
-btp_abrt_operating_system_from_dir(const char *directory,
-                                   char **error_message);
+struct sr_rpm_package *
+sr_abrt_parse_dso_list(const char *text);
 
-struct btp_report *
-btp_abrt_report_from_dir(const char *directory,
-                         char **error_message);
+struct sr_rpm_package *
+sr_abrt_rpm_packages_from_dir(const char *directory,
+                              char **error_message);
+
+struct sr_operating_system *
+sr_abrt_operating_system_from_dir(const char *directory,
+                                  char **error_message);
+
+struct sr_report *
+sr_abrt_report_from_dir(const char *directory,
+                        char **error_message);
 
 #ifdef __cplusplus
 }

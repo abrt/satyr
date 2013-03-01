@@ -10,10 +10,10 @@ m4_define([UTILS],
 #include <lib/metrics.h>
 #include <lib/normalize.h>
 
-static struct btp_gdb_thread *
+static struct sr_gdb_thread *
 create_thread(int count, ...)
 {
-  struct btp_gdb_thread *thread = btp_gdb_thread_new();
+  struct sr_gdb_thread *thread = sr_gdb_thread_new();
   if (count == 0)
      return thread;
 
@@ -24,13 +24,13 @@ create_thread(int count, ...)
   for (i=0; i < count; i++)
   {
     const char *fname = va_arg(argp, const char*);
-    struct btp_gdb_frame *frame = btp_gdb_frame_new();
-    frame->function_name = btp_strdup(fname);
+    struct sr_gdb_frame *frame = sr_gdb_frame_new();
+    frame->function_name = sr_strdup(fname);
 
     if (!thread->frames)
       thread->frames = frame;
     else
-      btp_gdb_frame_append(thread->frames, frame);
+      sr_gdb_frame_append(thread->frames, frame);
   }
 
   va_end(argp);
@@ -52,12 +52,12 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(0);
-  struct btp_gdb_thread *thread2 = create_thread(3, "??", "ds", "main");
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
-  assert(is_dist_equal(0.0, btp_gdb_thread_jarowinkler_distance(thread1, thread2)));
-  assert(is_dist_equal(1.0, btp_gdb_thread_jaccard_distance(thread1, thread2)));
-  assert(3 == btp_gdb_thread_levenshtein_distance(thread1, thread2, false));
+  struct sr_gdb_thread *thread1 = create_thread(0);
+  struct sr_gdb_thread *thread2 = create_thread(3, "??", "ds", "main");
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  assert(is_dist_equal(0.0, sr_gdb_thread_jarowinkler_distance(thread1, thread2)));
+  assert(is_dist_equal(1.0, sr_gdb_thread_jaccard_distance(thread1, thread2)));
+  assert(3 == sr_gdb_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -69,12 +69,12 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(0);
-  struct btp_gdb_thread *thread2 = create_thread(0);
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
-  assert(is_dist_equal(1.0, btp_gdb_thread_jarowinkler_distance(thread1, thread2)));
-  assert(is_dist_equal(0.0, btp_gdb_thread_jaccard_distance(thread1, thread2)));
-  assert(0 == btp_gdb_thread_levenshtein_distance(thread1, thread2, false));
+  struct sr_gdb_thread *thread1 = create_thread(0);
+  struct sr_gdb_thread *thread2 = create_thread(0);
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  assert(is_dist_equal(1.0, sr_gdb_thread_jarowinkler_distance(thread1, thread2)));
+  assert(is_dist_equal(0.0, sr_gdb_thread_jaccard_distance(thread1, thread2)));
+  assert(0 == sr_gdb_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -86,12 +86,12 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(2, "??", "sd");
-  struct btp_gdb_thread *thread2 = create_thread(3, "??", "ds", "main");
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
-  assert(is_dist_equal(0.0, btp_gdb_thread_jarowinkler_distance(thread1, thread2)));
-  assert(is_dist_equal(1.0, btp_gdb_thread_jaccard_distance(thread1, thread2)));
-  assert(3 == btp_gdb_thread_levenshtein_distance(thread1, thread2, false));
+  struct sr_gdb_thread *thread1 = create_thread(2, "??", "sd");
+  struct sr_gdb_thread *thread2 = create_thread(3, "??", "ds", "main");
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  assert(is_dist_equal(0.0, sr_gdb_thread_jarowinkler_distance(thread1, thread2)));
+  assert(is_dist_equal(1.0, sr_gdb_thread_jaccard_distance(thread1, thread2)));
+  assert(3 == sr_gdb_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -103,12 +103,12 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(1, "??");
-  struct btp_gdb_thread *thread2 = create_thread(3, "??", "ds", "main");
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
-  assert(is_dist_equal(0.0, btp_gdb_thread_jarowinkler_distance(thread1, thread2)));
-  assert(is_dist_equal(1.0, btp_gdb_thread_jaccard_distance(thread1, thread2)));
-  assert(3 == btp_gdb_thread_levenshtein_distance(thread1, thread2, false));
+  struct sr_gdb_thread *thread1 = create_thread(1, "??");
+  struct sr_gdb_thread *thread2 = create_thread(3, "??", "ds", "main");
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  assert(is_dist_equal(0.0, sr_gdb_thread_jarowinkler_distance(thread1, thread2)));
+  assert(is_dist_equal(1.0, sr_gdb_thread_jaccard_distance(thread1, thread2)));
+  assert(3 == sr_gdb_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -120,10 +120,10 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(3, "??", "ds", "main");
-  struct btp_gdb_thread *thread2 = create_thread(3, "??", "ds", "main");
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
-  assert(0 == btp_gdb_thread_levenshtein_distance(thread1, thread2, false));
+  struct sr_gdb_thread *thread1 = create_thread(3, "??", "ds", "main");
+  struct sr_gdb_thread *thread2 = create_thread(3, "??", "ds", "main");
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  assert(0 == sr_gdb_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -135,10 +135,10 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(4, "dg", "??", "ds", "main");
-  struct btp_gdb_thread *thread2 = create_thread(4, "dg", "??", "ds", "main");
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
-  assert(0 == btp_gdb_thread_levenshtein_distance(thread1, thread2, false));
+  struct sr_gdb_thread *thread1 = create_thread(4, "dg", "??", "ds", "main");
+  struct sr_gdb_thread *thread2 = create_thread(4, "dg", "??", "ds", "main");
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  assert(0 == sr_gdb_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -150,10 +150,10 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(3, "dg", "??", "ds");
-  struct btp_gdb_thread *thread2 = create_thread(4, "dg", "??", "ds", "main");
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
-  assert(1 == btp_gdb_thread_levenshtein_distance(thread1, thread2, false));
+  struct sr_gdb_thread *thread1 = create_thread(3, "dg", "??", "ds");
+  struct sr_gdb_thread *thread2 = create_thread(4, "dg", "??", "ds", "main");
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  assert(1 == sr_gdb_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -165,10 +165,10 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(2, "dg", "??");
-  struct btp_gdb_thread *thread2 = create_thread(3, "dg", "??", "main");
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
-  assert(2 == btp_gdb_thread_levenshtein_distance(thread1, thread2, false));
+  struct sr_gdb_thread *thread1 = create_thread(2, "dg", "??");
+  struct sr_gdb_thread *thread2 = create_thread(3, "dg", "??", "main");
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  assert(2 == sr_gdb_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -180,10 +180,10 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(3, "dg", "??", "??");
-  struct btp_gdb_thread *thread2 = create_thread(4, "dg", "??", "??", "main");
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
-  assert(3 == btp_gdb_thread_levenshtein_distance(thread1, thread2, false));
+  struct sr_gdb_thread *thread1 = create_thread(3, "dg", "??", "??");
+  struct sr_gdb_thread *thread2 = create_thread(4, "dg", "??", "??", "main");
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  assert(3 == sr_gdb_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -195,10 +195,10 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(3, "??", "??", "main");
-  struct btp_gdb_thread *thread2 = create_thread(2, "??", "??");
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
-  assert(3 == btp_gdb_thread_levenshtein_distance(thread1, thread2, false));
+  struct sr_gdb_thread *thread1 = create_thread(3, "??", "??", "main");
+  struct sr_gdb_thread *thread2 = create_thread(2, "??", "??");
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  assert(3 == sr_gdb_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -210,13 +210,13 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(5, "ale", "asd", "??", "agd", "dsa");
+  struct sr_gdb_thread *thread1 = create_thread(5, "ale", "asd", "??", "agd", "dsa");
 
-  struct btp_gdb_thread *thread2 = create_thread(5, "ale", "huga", "asd", "??", "agd");
+  struct sr_gdb_thread *thread2 = create_thread(5, "ale", "huga", "asd", "??", "agd");
 
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
 
-  assert(2 == btp_gdb_thread_levenshtein_distance(thread1, thread2, true));
+  assert(2 == sr_gdb_thread_levenshtein_distance(thread1, thread2, true));
   return 0;
 }
 ])
@@ -228,13 +228,13 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(4, "asd", "??", "agd", "dsa");
+  struct sr_gdb_thread *thread1 = create_thread(4, "asd", "??", "agd", "dsa");
 
-  struct btp_gdb_thread *thread2 = create_thread(4, "asd", "agd", "??", "dsa");
+  struct sr_gdb_thread *thread2 = create_thread(4, "asd", "agd", "??", "dsa");
 
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
 
-  assert(2 == btp_gdb_thread_levenshtein_distance(thread1, thread2, true));
+  assert(2 == sr_gdb_thread_levenshtein_distance(thread1, thread2, true));
   return 0;
 }
 ])
@@ -246,10 +246,10 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(4, "a", "b", "c", "d");
-  struct btp_gdb_thread *thread2 = create_thread(4, "b", "a", "d", "c");
+  struct sr_gdb_thread *thread1 = create_thread(4, "a", "b", "c", "d");
+  struct sr_gdb_thread *thread2 = create_thread(4, "b", "a", "d", "c");
 
-  assert(2 == btp_gdb_thread_levenshtein_distance(thread1, thread2, true));
+  assert(2 == sr_gdb_thread_levenshtein_distance(thread1, thread2, true));
   return 0;
 }
 ])
@@ -261,10 +261,10 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(4, "a", "b", "c", "d");
-  struct btp_gdb_thread *thread2 = create_thread(4, "b", "a", "d", "c");
+  struct sr_gdb_thread *thread1 = create_thread(4, "a", "b", "c", "d");
+  struct sr_gdb_thread *thread2 = create_thread(4, "b", "a", "d", "c");
 
-  assert(3 == btp_gdb_thread_levenshtein_distance(thread1, thread2, false));
+  assert(3 == sr_gdb_thread_levenshtein_distance(thread1, thread2, false));
   return 0;
 }
 ])
@@ -276,13 +276,13 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(4, "asd", "agd", "agd", "??");
+  struct sr_gdb_thread *thread1 = create_thread(4, "asd", "agd", "agd", "??");
 
-  struct btp_gdb_thread *thread2 = create_thread(3, "asd", "agd", "??");
+  struct sr_gdb_thread *thread2 = create_thread(3, "asd", "agd", "??");
 
-  btp_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+  sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
 
-  assert(is_dist_equal(0.0, btp_gdb_thread_jaccard_distance(thread1, thread2)));
+  assert(is_dist_equal(0.0, sr_gdb_thread_jaccard_distance(thread1, thread2)));
   return 0;
 }
 ])
@@ -294,11 +294,11 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(3, "asd", "agd", "agd");
+  struct sr_gdb_thread *thread1 = create_thread(3, "asd", "agd", "agd");
 
-  struct btp_gdb_thread *thread2 = create_thread(2, "sad", "agd");
+  struct sr_gdb_thread *thread2 = create_thread(2, "sad", "agd");
 
-  assert(is_dist_equal(2/3.0, btp_gdb_thread_jaccard_distance(thread1, thread2)));
+  assert(is_dist_equal(2/3.0, sr_gdb_thread_jaccard_distance(thread1, thread2)));
   return 0;
 }
 ])
@@ -310,11 +310,11 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *thread1 = create_thread(5, "asd", "agd", "gad", "sad", "abc");
+  struct sr_gdb_thread *thread1 = create_thread(5, "asd", "agd", "gad", "sad", "abc");
 
-  struct btp_gdb_thread *thread2 = create_thread(4, "sad", "sad", "sad", "gad");
+  struct sr_gdb_thread *thread2 = create_thread(4, "sad", "sad", "sad", "gad");
 
-  assert(is_dist_equal(3/5.0, btp_gdb_thread_jaccard_distance(thread1, thread2)));
+  assert(is_dist_equal(3/5.0, sr_gdb_thread_jaccard_distance(thread1, thread2)));
   return 0;
 }
 ])
@@ -327,17 +327,17 @@ int
 main()
 {
   int m = 50, n = 100, i, j;
-  struct btp_distances *distances = btp_distances_new(m, n);
+  struct sr_distances *distances = sr_distances_new(m, n);
   float x;
 
   for (i = 0; i < m; i++)
     for (j = 0; j < n; j++)
-      btp_distances_set_distance(distances, i, j, i + j / 1000.0);
+      sr_distances_set_distance(distances, i, j, i + j / 1000.0);
 
   for (i = 0; i < m; i++)
     for (j = 0; j < n; j++)
     {
-      x = btp_distances_get_distance(distances, i, j);
+      x = sr_distances_get_distance(distances, i, j);
       if (i == j)
          assert(x == 0.0);
       else if (j < m && i < j)
@@ -357,19 +357,19 @@ UTILS
 int
 main()
 {
-  struct btp_gdb_thread *threads[[4]];
+  struct sr_gdb_thread *threads[[4]];
   threads[[0]] = create_thread(4, "asd", "agd", "das", "??");
   threads[[1]] = create_thread(3, "asd", "agd", "??");
   threads[[2]] = create_thread(3, "asd", "agd", "??");
   threads[[3]] = create_thread(3, "dg", "??", "??");
 
-  struct btp_distances *distances = btp_gdb_threads_compare(threads, 3, 4, btp_gdb_thread_jaccard_distance);
-  assert(is_dist_equal(0.6, btp_distances_get_distance(distances, 0, 1)));
-  assert(is_dist_equal(0.6, btp_distances_get_distance(distances, 0, 2)));
-  assert(is_dist_equal(1.0, btp_distances_get_distance(distances, 0, 3)));
-  assert(is_dist_equal(0.0, btp_distances_get_distance(distances, 1, 2)));
-  assert(is_dist_equal(1.0, btp_distances_get_distance(distances, 1, 3)));
-  assert(is_dist_equal(1.0, btp_distances_get_distance(distances, 2, 3)));
+  struct sr_distances *distances = sr_gdb_threads_compare(threads, 3, 4, sr_gdb_thread_jaccard_distance);
+  assert(is_dist_equal(0.6, sr_distances_get_distance(distances, 0, 1)));
+  assert(is_dist_equal(0.6, sr_distances_get_distance(distances, 0, 2)));
+  assert(is_dist_equal(1.0, sr_distances_get_distance(distances, 0, 3)));
+  assert(is_dist_equal(0.0, sr_distances_get_distance(distances, 1, 2)));
+  assert(is_dist_equal(1.0, sr_distances_get_distance(distances, 1, 3)));
+  assert(is_dist_equal(1.0, sr_distances_get_distance(distances, 2, 3)));
 
   return 0;
 }

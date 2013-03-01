@@ -18,8 +18,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_PYTHON_STACKTRACE_H
-#define BTPARSER_PYTHON_STACKTRACE_H
+#ifndef SATYR_PYTHON_STACKTRACE_H
+#define SATYR_PYTHON_STACKTRACE_H
 
 /**
  * @file
@@ -32,10 +32,10 @@ extern "C" {
 
 #include <stdint.h>
 
-struct btp_python_frame;
-struct btp_location;
+struct sr_python_frame;
+struct sr_location;
 
-struct btp_python_stacktrace
+struct sr_python_stacktrace
 {
     /* Name of the source file where an exception has been raised. */
     char *file_name;
@@ -48,17 +48,17 @@ struct btp_python_stacktrace
     /* Exception class name. */
     char *exception_name;
 
-    struct btp_python_frame *frames;
+    struct sr_python_frame *frames;
 };
 
 /**
  * Creates and initializes a new stacktrace structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_python_stacktrace_free().
+ * calling the function sr_python_stacktrace_free().
  */
-struct btp_python_stacktrace *
-btp_python_stacktrace_new();
+struct sr_python_stacktrace *
+sr_python_stacktrace_new();
 
 /**
  * Initializes all members of the stacktrace structure to their default
@@ -67,7 +67,7 @@ btp_python_stacktrace_new();
  * stack.
  */
 void
-btp_python_stacktrace_init(struct btp_python_stacktrace *stacktrace);
+sr_python_stacktrace_init(struct sr_python_stacktrace *stacktrace);
 
 /**
  * Releases the memory held by the stacktrace and its frames.
@@ -75,7 +75,7 @@ btp_python_stacktrace_init(struct btp_python_stacktrace *stacktrace);
  * If the stacktrace is NULL, no operation is performed.
  */
 void
-btp_python_stacktrace_free(struct btp_python_stacktrace *stacktrace);
+sr_python_stacktrace_free(struct sr_python_stacktrace *stacktrace);
 
 /**
  * Creates a duplicate of the stacktrace.
@@ -83,16 +83,16 @@ btp_python_stacktrace_free(struct btp_python_stacktrace *stacktrace);
  * The stacktrace to be copied. It's not modified by this function.
  * @returns
  * This function never returns NULL.  The returned duplicate must be
- * released by calling the function btp_python_stacktrace_free().
+ * released by calling the function sr_python_stacktrace_free().
  */
-struct btp_python_stacktrace *
-btp_python_stacktrace_dup(struct btp_python_stacktrace *stacktrace);
+struct sr_python_stacktrace *
+sr_python_stacktrace_dup(struct sr_python_stacktrace *stacktrace);
 
 /**
  * Returns the number of frames in the stacktrace.
  */
 int
-btp_python_stacktrace_get_frame_count(struct btp_python_stacktrace *stacktrace);
+sr_python_stacktrace_get_frame_count(struct sr_python_stacktrace *stacktrace);
 
 /**
  * Parses a textual Python stacktrace and puts it into a structure.
@@ -103,9 +103,9 @@ btp_python_stacktrace_get_frame_count(struct btp_python_stacktrace *stacktrace);
  * returns a non-NULL value, the input pointer is modified to point
  * after the stacktrace that was just parsed.
  */
-struct btp_python_stacktrace *
-btp_python_stacktrace_parse(const char **input,
-                            struct btp_location *location);
+struct sr_python_stacktrace *
+sr_python_stacktrace_parse(const char **input,
+                           struct sr_location *location);
 
 /**
  * Serializes stacktrace to string.
@@ -115,7 +115,7 @@ btp_python_stacktrace_parse(const char **input,
  * longer needed.
  */
 char *
-btp_python_stacktrace_to_json(struct btp_python_stacktrace *stacktrace);
+sr_python_stacktrace_to_json(struct sr_python_stacktrace *stacktrace);
 
 #ifdef __cplusplus
 }

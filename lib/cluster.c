@@ -25,22 +25,22 @@
 #include <string.h>
 #include <assert.h>
 
-struct btp_dendrogram *
-btp_dendrogram_new(int size)
+struct sr_dendrogram *
+sr_dendrogram_new(int size)
 {
-    struct btp_dendrogram *dendrogram = btp_malloc(sizeof(struct btp_dendrogram));
+    struct sr_dendrogram *dendrogram = sr_malloc(sizeof(struct sr_dendrogram));
 
     assert(size > 1);
 
     dendrogram->size = size;
-    dendrogram->order = btp_malloc(sizeof(*dendrogram->order) * size);
-    dendrogram->merge_levels = btp_malloc(sizeof(*dendrogram->merge_levels) * (size - 1));
+    dendrogram->order = sr_malloc(sizeof(*dendrogram->order) * size);
+    dendrogram->merge_levels = sr_malloc(sizeof(*dendrogram->merge_levels) * (size - 1));
 
     return dendrogram;
 }
 
 void
-btp_dendrogram_free(struct btp_dendrogram *dendrogram)
+sr_dendrogram_free(struct sr_dendrogram *dendrogram)
 {
     if (!dendrogram)
         return;
@@ -103,17 +103,17 @@ cluster_reverse(struct cluster *cluster)
     }
 }
 
-struct btp_dendrogram *
-btp_distances_cluster_objects(struct btp_distances *distances)
+struct sr_dendrogram *
+sr_distances_cluster_objects(struct sr_distances *distances)
 {
     int i, j, merges, m = distances->m, n = distances->n;
 
-    struct btp_distances *cluster_distances;
+    struct sr_distances *cluster_distances;
     struct cluster clusters[n];
 
     float merge_levels[n];
 
-    cluster_distances = btp_distances_dup(distances);
+    cluster_distances = sr_distances_dup(distances);
 
     /* Start with one cluster per each object. */
     for (i = 0; i < n; i++)
@@ -144,7 +144,7 @@ btp_distances_cluster_objects(struct btp_distances *distances)
                 if (!clusters[j].size)
                     continue;
 
-                dist = btp_distances_get_distance(cluster_distances, i, j);
+                dist = sr_distances_get_distance(cluster_distances, i, j);
 
                 if (first || min_dist > dist)
                 {
@@ -168,8 +168,8 @@ btp_distances_cluster_objects(struct btp_distances *distances)
             if (!(c2 < m || i < m))
                 continue;
 
-            dists[0] = btp_distances_get_distance(cluster_distances, i, c1);
-            dists[1] = btp_distances_get_distance(cluster_distances, i, c2);
+            dists[0] = sr_distances_get_distance(cluster_distances, i, c1);
+            dists[1] = sr_distances_get_distance(cluster_distances, i, c2);
 
             /* The cluster distance algorithm is hardcoded for now. */
             switch (3)
@@ -188,22 +188,22 @@ btp_distances_cluster_objects(struct btp_distances *distances)
                     break;
             }
 
-            btp_distances_set_distance(cluster_distances, i, c1, dist);
+            sr_distances_set_distance(cluster_distances, i, c1, dist);
         }
 
         /* With full distance matrix, merge the sequences of the two clusters
          * so outer objects with minimal distance will be next to each other. */
         if (m + 1 == n)
         {
-            dists[0] = btp_distances_get_distance(distances,
+            dists[0] = sr_distances_get_distance(distances,
                     clusters[c1].objects[0], clusters[c2].objects[0]);
-            dists[1] = btp_distances_get_distance(distances,
+            dists[1] = sr_distances_get_distance(distances,
                     clusters[c1].objects[clusters[c1].size - 1],
                     clusters[c2].objects[0]);
-            dists[2] = btp_distances_get_distance(distances,
+            dists[2] = sr_distances_get_distance(distances,
                     clusters[c1].objects[0],
                     clusters[c2].objects[clusters[c2].size - 1]);
-            dists[3] = btp_distances_get_distance(distances,
+            dists[3] = sr_distances_get_distance(distances,
                     clusters[c1].objects[clusters[c1].size - 1],
                     clusters[c2].objects[clusters[c2].size - 1]);
             if (dists[1] <= dists[0] && dists[1] <= dists[2] &&
@@ -246,7 +246,7 @@ btp_distances_cluster_objects(struct btp_distances *distances)
         cluster_clean(&clusters[c2]);
     }
 
-    struct btp_dendrogram *dendrogram = btp_dendrogram_new(n);
+    struct sr_dendrogram *dendrogram = sr_dendrogram_new(n);
 
     for (i = 0; i < n; i++)
         dendrogram->order[i] = clusters[0].objects[i];
@@ -255,25 +255,25 @@ btp_distances_cluster_objects(struct btp_distances *distances)
         dendrogram->merge_levels[i - 1] = merge_levels[clusters[0].objects[i]];
 
     cluster_clean(&clusters[0]);
-    btp_distances_free(cluster_distances);
+    sr_distances_free(cluster_distances);
 
     return dendrogram;
 }
 
-struct btp_cluster *
-btp_cluster_new(int size)
+struct sr_cluster *
+sr_cluster_new(int size)
 {
-    struct btp_cluster *cluster = btp_malloc(sizeof(struct btp_cluster));
+    struct sr_cluster *cluster = sr_malloc(sizeof(struct sr_cluster));
 
     cluster->size = size;
-    cluster->objects = btp_malloc(sizeof(*cluster->objects) * size);
+    cluster->objects = sr_malloc(sizeof(*cluster->objects) * size);
     cluster->next = NULL;
 
     return cluster;
 }
 
 void
-btp_cluster_free(struct btp_cluster *cluster)
+sr_cluster_free(struct sr_cluster *cluster)
 {
     if (!cluster)
         return;
@@ -281,11 +281,11 @@ btp_cluster_free(struct btp_cluster *cluster)
     free(cluster);
 }
 
-struct btp_cluster *
-btp_dendrogram_cut(struct btp_dendrogram *dendrogram, float level, int min_size)
+struct sr_cluster *
+sr_dendrogram_cut(struct sr_dendrogram *dendrogram, float level, int min_size)
 {
     int first;
-    struct btp_cluster *cluster = NULL, *cluster_tmp;
+    struct sr_cluster *cluster = NULL, *cluster_tmp;
     int i, j;
 
     for (i = first = 0; i < dendrogram->size; i++)
@@ -295,7 +295,7 @@ btp_dendrogram_cut(struct btp_dendrogram *dendrogram, float level, int min_size)
             /* End of the current cluster found, save it. */
             if (min_size <= i - first + 1)
             {
-                cluster_tmp = btp_cluster_new(i - first + 1);
+                cluster_tmp = sr_cluster_new(i - first + 1);
                 for (j = first; j <= i; j++)
                     cluster_tmp->objects[j - first] = dendrogram->order[j];
 

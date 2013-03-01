@@ -23,16 +23,16 @@
 #include "json.h"
 #include <string.h>
 
-struct btp_core_frame *
-btp_core_frame_new()
+struct sr_core_frame *
+sr_core_frame_new()
 {
-    struct btp_core_frame *frame = btp_malloc(sizeof(struct btp_core_frame));
-    btp_core_frame_init(frame);
+    struct sr_core_frame *frame = sr_malloc(sizeof(struct sr_core_frame));
+    sr_core_frame_init(frame);
     return frame;
 }
 
 void
-btp_core_frame_init(struct btp_core_frame *frame)
+sr_core_frame_init(struct sr_core_frame *frame)
 {
     frame->address = -1;
     frame->build_id = NULL;
@@ -44,7 +44,7 @@ btp_core_frame_init(struct btp_core_frame *frame)
 }
 
 void
-btp_core_frame_free(struct btp_core_frame *frame)
+sr_core_frame_free(struct sr_core_frame *frame)
 {
     if (!frame)
         return;
@@ -56,36 +56,36 @@ btp_core_frame_free(struct btp_core_frame *frame)
     free(frame);
 }
 
-struct btp_core_frame *
-btp_core_frame_dup(struct btp_core_frame *frame, bool siblings)
+struct sr_core_frame *
+sr_core_frame_dup(struct sr_core_frame *frame, bool siblings)
 {
-    struct btp_core_frame *result = btp_core_frame_new();
-    memcpy(result, frame, sizeof(struct btp_core_frame));
+    struct sr_core_frame *result = sr_core_frame_new();
+    memcpy(result, frame, sizeof(struct sr_core_frame));
 
     /* Handle siblings. */
     if (siblings)
     {
         if (result->next)
-            result->next = btp_core_frame_dup(result->next, true);
+            result->next = sr_core_frame_dup(result->next, true);
     }
     else
         result->next = NULL; /* Do not copy that. */
 
     /* Duplicate all strings if the copy is not shallow. */
     if (result->build_id)
-        result->build_id = btp_strdup(result->build_id);
+        result->build_id = sr_strdup(result->build_id);
     if (result->function_name)
-        result->function_name = btp_strdup(result->function_name);
+        result->function_name = sr_strdup(result->function_name);
     if (result->file_name)
-        result->file_name = btp_strdup(result->file_name);
+        result->file_name = sr_strdup(result->file_name);
     if (result->fingerprint)
-        result->fingerprint = btp_strdup(result->fingerprint);
+        result->fingerprint = sr_strdup(result->fingerprint);
 
     return result;
 }
 
 bool
-btp_core_frame_calls_func(struct btp_core_frame *frame,
+sr_core_frame_calls_func(struct sr_core_frame *frame,
                           const char *function_name,
                           ...)
 {
@@ -121,12 +121,12 @@ btp_core_frame_calls_func(struct btp_core_frame *frame,
 }
 
 int
-btp_core_frame_cmp(struct btp_core_frame *frame1,
-                   struct btp_core_frame *frame2)
+sr_core_frame_cmp(struct sr_core_frame *frame1,
+                  struct sr_core_frame *frame2)
 {
     /* Build ID. */
-    int build_id = btp_strcmp0(frame1->build_id,
-                               frame2->build_id);
+    int build_id = sr_strcmp0(frame1->build_id,
+                              frame2->build_id);
     if (build_id != 0)
         return build_id;
 
@@ -136,19 +136,19 @@ btp_core_frame_cmp(struct btp_core_frame *frame1,
         return build_id_offset;
 
     /* Function name. */
-    int function_name = btp_strcmp0(frame1->function_name,
+    int function_name = sr_strcmp0(frame1->function_name,
                                     frame2->function_name);
     if (function_name != 0)
         return function_name;
 
     /* File name */
-    int file_name = btp_strcmp0(frame1->file_name,
+    int file_name = sr_strcmp0(frame1->file_name,
                                 frame2->file_name);
     if (file_name != 0)
         return file_name;
 
     /* Fingerprint. */
-    int fingerprint = btp_strcmp0(frame1->fingerprint,
+    int fingerprint = sr_strcmp0(frame1->fingerprint,
                                   frame2->fingerprint);
     if (fingerprint != 0)
         return fingerprint;
@@ -157,17 +157,17 @@ btp_core_frame_cmp(struct btp_core_frame *frame1,
 }
 
 int
-btp_core_frame_cmp_distance(struct btp_core_frame *frame1,
-                            struct btp_core_frame *frame2)
+sr_core_frame_cmp_distance(struct sr_core_frame *frame1,
+                           struct sr_core_frame *frame2)
 {
     /* Function name. */
-    int function_name = btp_strcmp0(frame1->function_name,
+    int function_name = sr_strcmp0(frame1->function_name,
                                     frame2->function_name);
     if (function_name != 0)
         return function_name;
 
     /* Fingerprint. */
-    int fingerprint = btp_strcmp0(frame1->fingerprint,
+    int fingerprint = sr_strcmp0(frame1->fingerprint,
                                   frame2->fingerprint);
     if (fingerprint != 0)
         return fingerprint;
@@ -175,14 +175,14 @@ btp_core_frame_cmp_distance(struct btp_core_frame *frame1,
     return 0;
 }
 
-struct btp_core_frame *
-btp_core_frame_append(struct btp_core_frame *dest,
-                      struct btp_core_frame *item)
+struct sr_core_frame *
+sr_core_frame_append(struct sr_core_frame *dest,
+                     struct sr_core_frame *item)
 {
     if (!dest)
         return item;
 
-    struct btp_core_frame *dest_loop = dest;
+    struct sr_core_frame *dest_loop = dest;
     while (dest_loop->next)
         dest_loop = dest_loop->next;
 
@@ -190,17 +190,17 @@ btp_core_frame_append(struct btp_core_frame *dest,
     return dest;
 }
 
-struct btp_core_frame *
-btp_core_frame_from_json(struct btp_json_value *root,
-                         char **error_message)
+struct sr_core_frame *
+sr_core_frame_from_json(struct sr_json_value *root,
+                        char **error_message)
 {
-    if (root->type != BTP_JSON_OBJECT)
+    if (root->type != SR_JSON_OBJECT)
     {
-        *error_message = btp_strdup("Invalid type of root value; object expected.");
+        *error_message = sr_strdup("Invalid type of root value; object expected.");
         return NULL;
     }
 
-    struct btp_core_frame *result = btp_core_frame_new();
+    struct sr_core_frame *result = sr_core_frame_new();
 
     /* Read address. */
     for (unsigned i = 0; i < root->u.object.length; ++i)
@@ -208,10 +208,10 @@ btp_core_frame_from_json(struct btp_json_value *root,
         if (0 != strcmp("address", root->u.object.values[i].name))
             continue;
 
-        if (root->u.object.values[i].value->type != BTP_JSON_INTEGER)
+        if (root->u.object.values[i].value->type != SR_JSON_INTEGER)
         {
-            *error_message = btp_strdup("Invalid type of \"address\"; integer expected.");
-            btp_core_frame_free(result);
+            *error_message = sr_strdup("Invalid type of \"address\"; integer expected.");
+            sr_core_frame_free(result);
             return NULL;
         }
 
@@ -225,14 +225,14 @@ btp_core_frame_from_json(struct btp_json_value *root,
         if (0 != strcmp("build_id", root->u.object.values[i].name))
             continue;
 
-        if (root->u.object.values[i].value->type != BTP_JSON_STRING)
+        if (root->u.object.values[i].value->type != SR_JSON_STRING)
         {
-            *error_message = btp_strdup("Invalid type of \"build_id\"; string expected.");
-            btp_core_frame_free(result);
+            *error_message = sr_strdup("Invalid type of \"build_id\"; string expected.");
+            sr_core_frame_free(result);
             return NULL;
         }
 
-        result->build_id = btp_strdup(root->u.object.values[i].value->u.string.ptr);
+        result->build_id = sr_strdup(root->u.object.values[i].value->u.string.ptr);
         break;
     }
 
@@ -242,10 +242,10 @@ btp_core_frame_from_json(struct btp_json_value *root,
         if (0 != strcmp("build_id_offset", root->u.object.values[i].name))
             continue;
 
-        if (root->u.object.values[i].value->type != BTP_JSON_INTEGER)
+        if (root->u.object.values[i].value->type != SR_JSON_INTEGER)
         {
-            *error_message = btp_strdup("Invalid type of \"build_id_offset\"; integer expected.");
-            btp_core_frame_free(result);
+            *error_message = sr_strdup("Invalid type of \"build_id_offset\"; integer expected.");
+            sr_core_frame_free(result);
             return NULL;
         }
 
@@ -259,14 +259,14 @@ btp_core_frame_from_json(struct btp_json_value *root,
         if (0 != strcmp("function_name", root->u.object.values[i].name))
             continue;
 
-        if (root->u.object.values[i].value->type != BTP_JSON_STRING)
+        if (root->u.object.values[i].value->type != SR_JSON_STRING)
         {
-            *error_message = btp_strdup("Invalid type of \"function_name\"; string expected.");
-            btp_core_frame_free(result);
+            *error_message = sr_strdup("Invalid type of \"function_name\"; string expected.");
+            sr_core_frame_free(result);
             return NULL;
         }
 
-        result->function_name = btp_strdup(root->u.object.values[i].value->u.string.ptr);
+        result->function_name = sr_strdup(root->u.object.values[i].value->u.string.ptr);
         break;
     }
 
@@ -276,14 +276,14 @@ btp_core_frame_from_json(struct btp_json_value *root,
         if (0 != strcmp("file_name", root->u.object.values[i].name))
             continue;
 
-        if (root->u.object.values[i].value->type != BTP_JSON_STRING)
+        if (root->u.object.values[i].value->type != SR_JSON_STRING)
         {
-            *error_message = btp_strdup("Invalid type of \"file_name\"; string expected.");
-            btp_core_frame_free(result);
+            *error_message = sr_strdup("Invalid type of \"file_name\"; string expected.");
+            sr_core_frame_free(result);
             return NULL;
         }
 
-        result->file_name = btp_strdup(root->u.object.values[i].value->u.string.ptr);
+        result->file_name = sr_strdup(root->u.object.values[i].value->u.string.ptr);
         break;
     }
 
@@ -293,14 +293,14 @@ btp_core_frame_from_json(struct btp_json_value *root,
         if (0 != strcmp("fingerprint", root->u.object.values[i].name))
             continue;
 
-        if (root->u.object.values[i].value->type != BTP_JSON_STRING)
+        if (root->u.object.values[i].value->type != SR_JSON_STRING)
         {
-            *error_message = btp_strdup("Invalid type of \"fingerprint\"; string expected.");
-            btp_core_frame_free(result);
+            *error_message = sr_strdup("Invalid type of \"fingerprint\"; string expected.");
+            sr_core_frame_free(result);
             return NULL;
         }
 
-        result->fingerprint = btp_strdup(root->u.object.values[i].value->u.string.ptr);
+        result->fingerprint = sr_strdup(root->u.object.values[i].value->u.string.ptr);
         break;
     }
 
@@ -308,57 +308,57 @@ btp_core_frame_from_json(struct btp_json_value *root,
 }
 
 char *
-btp_core_frame_to_json(struct btp_core_frame *frame)
+sr_core_frame_to_json(struct sr_core_frame *frame)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
-    btp_strbuf_append_strf(strbuf,
-                           "{   \"address\": %"PRIu64"\n",
-                           frame->address);
+    struct sr_strbuf *strbuf = sr_strbuf_new();
+    sr_strbuf_append_strf(strbuf,
+                          "{   \"address\": %"PRIu64"\n",
+                          frame->address);
 
     if (frame->build_id)
     {
-        char *escaped = btp_json_escape(frame->build_id);
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"build_id\": \"%s\"\n",
-                               escaped);
+        char *escaped = sr_json_escape(frame->build_id);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"build_id\": \"%s\"\n",
+                              escaped);
 
         free(escaped);
     }
 
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"build_id_offset\": %"PRIu64"\n",
-                           frame->build_id_offset);
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"build_id_offset\": %"PRIu64"\n",
+                          frame->build_id_offset);
 
     if (frame->function_name)
     {
-        char *escaped = btp_json_escape(frame->function_name);
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"function_name\": \"%s\"\n",
-                               escaped);
+        char *escaped = sr_json_escape(frame->function_name);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"function_name\": \"%s\"\n",
+                              escaped);
 
         free(escaped);
     }
 
     if (frame->file_name)
     {
-        char *escaped = btp_json_escape(frame->file_name);
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"file_name\": \"%s\"\n",
-                               escaped);
+        char *escaped = sr_json_escape(frame->file_name);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"file_name\": \"%s\"\n",
+                              escaped);
 
         free(escaped);
     }
 
     if (frame->fingerprint)
     {
-        char *escaped = btp_json_escape(frame->fingerprint);
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"fingerprint\": \"%s\"\n",
-                               escaped);
+        char *escaped = sr_json_escape(frame->fingerprint);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"fingerprint\": \"%s\"\n",
+                              escaped);
 
         free(escaped);
     }
 
-    btp_strbuf_append_char(strbuf, '}');
-    return btp_strbuf_free_nobuf(strbuf);
+    sr_strbuf_append_char(strbuf, '}');
+    return sr_strbuf_free_nobuf(strbuf);
 }

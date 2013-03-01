@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_CORE_FINGERPRINT_H
-#define BTPARSER_CORE_FINGERPRINT_H
+#ifndef SATYR_CORE_FINGERPRINT_H
+#define SATYR_CORE_FINGERPRINT_H
 
 /**
  * @file
@@ -33,20 +33,20 @@ extern "C" {
 
 #include <stdbool.h>
 
-struct btp_core_stacktrace;
-struct btp_core_thread;
+struct sr_core_stacktrace;
+struct sr_core_thread;
 
 bool
-btp_core_fingerprint_generate(struct btp_core_stacktrace *stacktrace,
-                              char **error_message);
+sr_core_fingerprint_generate(struct sr_core_stacktrace *stacktrace,
+                             char **error_message);
 
 bool
-btp_core_fingerprint_generate_for_binary(struct btp_core_thread *thread,
-                                         const char *binary_path,
-                                         char **error_message);
+sr_core_fingerprint_generate_for_binary(struct sr_core_thread *thread,
+                                        const char *binary_path,
+                                        char **error_message);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // BTPARSER_CORE_FINGERPRINT_H
+#endif // SATYR_CORE_FINGERPRINT_H

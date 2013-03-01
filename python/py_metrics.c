@@ -3,10 +3,10 @@
 #include "lib/strbuf.h"
 #include "lib/metrics.h"
 
-#define distances_doc "btparser.Distances - class representing distances between objects\n" \
+#define distances_doc "satyr.Distances - class representing distances between objects\n" \
                       "Usage:\n" \
-                      "btparser.Distances(m, n) - creates an m-by-n distance matrix\n" \
-                      "btparser.Distances(dist_name, [threads], m) - compares first m threads with others\n" \
+                      "satyr.Distances(m, n) - creates an m-by-n distance matrix\n" \
+                      "satyr.Distances(dist_name, [threads], m) - compares first m threads with others\n" \
                       "dist_name: \"jaccard\" or \"levenshtein\"\n"
 
 #define di_get_size_doc "Usage: distances.get_size()\n" \
@@ -19,7 +19,7 @@
                             "Sets distance between objects i and j to d"
 
 #define di_dup_doc "Usage: distances.dup()\n" \
-                   "Returns: btparser.Distances - a new clone of the distances\n" \
+                   "Returns: satyr.Distances - a new clone of the distances\n" \
                    "Clones the distances object. All new structures are independent\n" \
                    "on the original object."
 
@@ -27,23 +27,23 @@ static PyMethodDef
 distances_methods[] =
 {
     /* getters & setters */
-    { "get_size",       btp_py_distances_get_size,     METH_NOARGS,  di_get_size_doc      },
-    { "get_distance",   btp_py_distances_get_distance, METH_VARARGS, di_get_distance_doc  },
-    { "set_distance",   btp_py_distances_set_distance, METH_VARARGS, di_set_distance_doc  },
+    { "get_size",       sr_py_distances_get_size,     METH_NOARGS,  di_get_size_doc      },
+    { "get_distance",   sr_py_distances_get_distance, METH_VARARGS, di_get_distance_doc  },
+    { "set_distance",   sr_py_distances_set_distance, METH_VARARGS, di_set_distance_doc  },
     /* methods */
-    { "dup",            btp_py_distances_dup,          METH_NOARGS,  di_dup_doc           },
+    { "dup",            sr_py_distances_dup,          METH_NOARGS,  di_dup_doc           },
     { NULL },
 };
 
 PyTypeObject
-btp_py_distances_type =
+sr_py_distances_type =
 {
     PyObject_HEAD_INIT(NULL)
     0,
-    "btparser.Distances",       /* tp_name */
-    sizeof(struct btp_py_distances),    /* tp_basicsize */
+    "satyr.Distances",       /* tp_name */
+    sizeof(struct sr_py_distances),    /* tp_basicsize */
     0,                          /* tp_itemsize */
-    btp_py_distances_free,       /* tp_dealloc */
+    sr_py_distances_free,       /* tp_dealloc */
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
@@ -54,7 +54,7 @@ btp_py_distances_type =
     NULL,                       /* tp_as_mapping */
     NULL,                       /* tp_hash */
     NULL,                       /* tp_call */
-    btp_py_distances_str,        /* tp_str */
+    sr_py_distances_str,        /* tp_str */
     NULL,                       /* tp_getattro */
     NULL,                       /* tp_setattro */
     NULL,                       /* tp_as_buffer */
@@ -66,7 +66,7 @@ btp_py_distances_type =
     0,                          /* tp_weaklistoffset */
     NULL,                       /* tp_iter */
     NULL,                       /* tp_iternext */
-    distances_methods,           /* tp_methods */
+    distances_methods,          /* tp_methods */
     NULL,                       /* tp_members */
     NULL,                       /* tp_getset */
     NULL,                       /* tp_base */
@@ -76,7 +76,7 @@ btp_py_distances_type =
     0,                          /* tp_dictoffset */
     NULL,                       /* tp_init */
     NULL,                       /* tp_alloc */
-    btp_py_distances_new,        /* tp_new */
+    sr_py_distances_new,        /* tp_new */
     NULL,                       /* tp_free */
     NULL,                       /* tp_is_gc */
     NULL,                       /* tp_bases */
@@ -88,10 +88,10 @@ btp_py_distances_type =
 
 /* constructor */
 PyObject *
-btp_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
+sr_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
-    struct btp_py_distances *o = (struct btp_py_distances*)
-        PyObject_New(struct btp_py_distances, &btp_py_distances_type);
+    struct sr_py_distances *o = (struct sr_py_distances*)
+        PyObject_New(struct sr_py_distances, &sr_py_distances_type);
 
     if (!o)
         return PyErr_NoMemory();
@@ -103,17 +103,17 @@ btp_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
     if (PyArg_ParseTuple(args, "sO!i", &dist_name, &PyList_Type, &thread_list, &m))
     {
         n = PyList_Size(thread_list);
-        struct btp_gdb_thread *threads[n];
+        struct sr_gdb_thread *threads[n];
 
         for (i = 0; i < n; i++)
         {
             PyObject *obj = PyList_GetItem(thread_list, i);
-            if (!PyObject_TypeCheck(obj, &btp_py_gdb_thread_type))
+            if (!PyObject_TypeCheck(obj, &sr_py_gdb_thread_type))
             {
-                PyErr_SetString(PyExc_TypeError, "Must be a list of btparser.Thread objects");
+                PyErr_SetString(PyExc_TypeError, "Must be a list of satyr.Thread objects");
                 return NULL;
             }
-            threads[i] = ((struct btp_py_gdb_thread*)obj)->thread;
+            threads[i] = ((struct sr_py_gdb_thread*)obj)->thread;
         }
         if (m < 1 || n < 2)
         {
@@ -121,19 +121,19 @@ btp_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
             return NULL;
         }
 
-        btp_dist_thread_type dist_func;
+        sr_dist_thread_type dist_func;
 
         if (!strcmp(dist_name, "jaccard"))
-            dist_func = btp_gdb_thread_jaccard_distance;
+            dist_func = sr_gdb_thread_jaccard_distance;
         else if (!strcmp(dist_name, "levenshtein"))
-            dist_func = btp_gdb_thread_levenshtein_distance_f;
+            dist_func = sr_gdb_thread_levenshtein_distance_f;
         else
         {
             PyErr_SetString(PyExc_ValueError, "Unknown name of distance function");
             return NULL;
         }
 
-        o->distances = btp_gdb_threads_compare(threads, m, n, dist_func);
+        o->distances = sr_gdb_threads_compare(threads, m, n, dist_func);
     }
     else if (PyArg_ParseTuple(args, "ii", &m, &n))
     {
@@ -144,7 +144,7 @@ btp_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
             return NULL;
         }
 
-        o->distances = btp_distances_new(m, n);
+        o->distances = sr_distances_new(m, n);
     }
     else
         return NULL;
@@ -154,21 +154,21 @@ btp_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 
 /* destructor */
 void
-btp_py_distances_free(PyObject *object)
+sr_py_distances_free(PyObject *object)
 {
-    struct btp_py_distances *this = (struct btp_py_distances *)object;
-    btp_distances_free(this->distances);
+    struct sr_py_distances *this = (struct sr_py_distances *)object;
+    sr_distances_free(this->distances);
     PyObject_Del(object);
 }
 
 PyObject *
-btp_py_distances_str(PyObject *self)
+sr_py_distances_str(PyObject *self)
 {
-    struct btp_py_distances *this = (struct btp_py_distances *)self;
-    struct btp_strbuf *buf = btp_strbuf_new();
-    btp_strbuf_append_strf(buf, "%d-by-%d distance matrix",
+    struct sr_py_distances *this = (struct sr_py_distances *)self;
+    struct sr_strbuf *buf = sr_strbuf_new();
+    sr_strbuf_append_strf(buf, "%d-by-%d distance matrix",
                            this->distances->m, this->distances->n);
-    char *str = btp_strbuf_free_nobuf(buf);
+    char *str = sr_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
@@ -176,16 +176,16 @@ btp_py_distances_str(PyObject *self)
 
 /* getters & setters */
 PyObject *
-btp_py_distances_get_size(PyObject *self, PyObject *args)
+sr_py_distances_get_size(PyObject *self, PyObject *args)
 {
-    struct btp_py_distances *this = (struct btp_py_distances *)self;
+    struct sr_py_distances *this = (struct sr_py_distances *)self;
     return Py_BuildValue("ii", this->distances->m, this->distances->n);
 }
 
 PyObject *
-btp_py_distances_get_distance(PyObject *self, PyObject *args)
+sr_py_distances_get_distance(PyObject *self, PyObject *args)
 {
-    struct btp_py_distances *this = (struct btp_py_distances *)self;
+    struct sr_py_distances *this = (struct sr_py_distances *)self;
     int i, j;
     if (!PyArg_ParseTuple(args, "ii", &i, &j))
         return NULL;
@@ -196,13 +196,13 @@ btp_py_distances_get_distance(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    return Py_BuildValue("f", btp_distances_get_distance(this->distances, i, j));
+    return Py_BuildValue("f", sr_distances_get_distance(this->distances, i, j));
 }
 
 PyObject *
-btp_py_distances_set_distance(PyObject *self, PyObject *args)
+sr_py_distances_set_distance(PyObject *self, PyObject *args)
 {
-    struct btp_py_distances *this = (struct btp_py_distances *)self;
+    struct sr_py_distances *this = (struct sr_py_distances *)self;
     int i, j;
     float f;
     if (!PyArg_ParseTuple(args, "iif", &i, &j, &f))
@@ -214,22 +214,22 @@ btp_py_distances_set_distance(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    btp_distances_set_distance(this->distances, i, j, f);
+    sr_distances_set_distance(this->distances, i, j, f);
     Py_RETURN_NONE;
 }
 
 /* methods */
 PyObject *
-btp_py_distances_dup(PyObject *self, PyObject *args)
+sr_py_distances_dup(PyObject *self, PyObject *args)
 {
-    struct btp_py_distances *this = (struct btp_py_distances*)self;
-    struct btp_py_distances *o = (struct btp_py_distances*)
-        PyObject_New(struct btp_py_distances, &btp_py_distances_type);
+    struct sr_py_distances *this = (struct sr_py_distances*)self;
+    struct sr_py_distances *o = (struct sr_py_distances*)
+        PyObject_New(struct sr_py_distances, &sr_py_distances_type);
 
     if (!o)
         return PyErr_NoMemory();
 
-    o->distances = btp_distances_dup(this->distances);
+    o->distances = sr_distances_dup(this->distances);
     if (!o->distances)
         return NULL;
 

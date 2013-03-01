@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_DEB_H
-#define BTPARSER_DEB_H
+#ifndef SATYR_DEB_H
+#define SATYR_DEB_H
 
 /**
  * @file
@@ -31,13 +31,13 @@ extern "C" {
 
 #include <stdbool.h>
 
-struct btp_deb_package
+struct sr_deb_package
 {
-    struct btp_deb_package *next;
+    struct sr_deb_package *next;
 };
 
 void
-btp_deb_package_free(struct btp_deb_package *package, bool recursive);
+sr_deb_package_free(struct sr_deb_package *package, bool recursive);
 
 #ifdef __cplusplus
 }

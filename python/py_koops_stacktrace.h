@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_PY_KOOPS_STACKTRACE_H
-#define BTPARSER_PY_KOOPS_STACKTRACE_H
+#ifndef SATYR_PY_KOOPS_STACKTRACE_H
+#define SATYR_PY_KOOPS_STACKTRACE_H
 
 /**
  * @file
@@ -32,32 +32,32 @@ extern "C" {
 #include <Python.h>
 #include <structmember.h>
 
-PyTypeObject btp_py_koops_stacktrace_type;
+PyTypeObject sr_py_koops_stacktrace_type;
 
-struct btp_py_koops_stacktrace
+struct sr_py_koops_stacktrace
 {
     PyObject_HEAD
     PyObject *frames;
-    struct btp_koops_stacktrace *stacktrace;
+    struct sr_koops_stacktrace *stacktrace;
 };
 
 /* constructor */
-PyObject *btp_py_koops_stacktrace_new(PyTypeObject *object,
-                                      PyObject *args,
-                                      PyObject *kwds);
+PyObject *sr_py_koops_stacktrace_new(PyTypeObject *object,
+                                     PyObject *args,
+                                     PyObject *kwds);
 
 /* destructor */
-void btp_py_koops_stacktrace_free(PyObject *object);
+void sr_py_koops_stacktrace_free(PyObject *object);
 
 /* str */
-PyObject *btp_py_koops_stacktrace_str(PyObject *self);
+PyObject *sr_py_koops_stacktrace_str(PyObject *self);
 
 /* getters & setters */
-PyObject *btp_py_koops_stacktrace_get_modules(PyObject *self, PyObject *args);
+PyObject *sr_py_koops_stacktrace_get_modules(PyObject *self, PyObject *args);
 
 /* methods */
-PyObject *btp_py_koops_stacktrace_dup(PyObject *self, PyObject *args);
-PyObject *btp_py_koops_stacktrace_normalize(PyObject *self, PyObject *args);
+PyObject *sr_py_koops_stacktrace_dup(PyObject *self, PyObject *args);
+PyObject *sr_py_koops_stacktrace_normalize(PyObject *self, PyObject *args);
 
 
 #ifdef __cplusplus

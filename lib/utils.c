@@ -32,46 +32,46 @@
 #include <ctype.h>
 
 bool
-btp_debug_parser = false;
+sr_debug_parser = false;
 
 static const char
 hexdigits_locase[] = "0123456789abcdef";
 
 void *
-btp_malloc(size_t size)
+sr_malloc(size_t size)
 {
     void *ptr = malloc(size);
     if (!ptr)
     {
-        fprintf(stderr, "btp_malloc: out of memory");
+        fprintf(stderr, "sr_malloc: out of memory");
         exit(1);
     }
     return ptr;
 }
 
 void *
-btp_mallocz(size_t size)
+sr_mallocz(size_t size)
 {
-    void *ptr = btp_malloc(size);
+    void *ptr = sr_malloc(size);
     memset(ptr, 0, size);
     return ptr;
 }
 
 void *
-btp_realloc(void *ptr, size_t size)
+sr_realloc(void *ptr, size_t size)
 {
     void *result = realloc(ptr, size);
     /* When size is 0, realloc may return NULL on success. */
     if (!result && size > 0)
     {
-        fprintf(stderr, "btp_realloc: out of memory");
+        fprintf(stderr, "sr_realloc: out of memory");
         exit(1);
     }
     return result;
 }
 
 char *
-btp_vasprintf(const char *format, va_list p)
+sr_vasprintf(const char *format, va_list p)
 {
     int r;
     char *string_ptr;
@@ -84,14 +84,14 @@ btp_vasprintf(const char *format, va_list p)
     va_list p2;
     va_copy(p2, p);
     r = vsnprintf(NULL, 0, format, p);
-    string_ptr = btpmalloc(r+1);
+    string_ptr = sr_malloc(r+1);
     r = vsnprintf(string_ptr, r+1, format, p2);
     va_end(p2);
 #endif
 
     if (r < 0)
     {
-        fprintf(stderr, "btp: out of memory");
+        fprintf(stderr, "satyr: out of memory");
         exit(1);
     }
 
@@ -99,13 +99,13 @@ btp_vasprintf(const char *format, va_list p)
 }
 
 char *
-btp_asprintf(const char *format, ...)
+sr_asprintf(const char *format, ...)
 {
     va_list p;
     char *string_ptr;
 
     va_start(p, format);
-    string_ptr = btp_vasprintf(format, p);
+    string_ptr = sr_vasprintf(format, p);
     va_end(p);
 
     return string_ptr;
@@ -113,25 +113,25 @@ btp_asprintf(const char *format, ...)
 
 
 char *
-btp_strdup(const char *s)
+sr_strdup(const char *s)
 {
-    return btp_strndup(s, strlen(s));
+    return sr_strndup(s, strlen(s));
 }
 
 char *
-btp_strndup(const char *s, size_t n)
+sr_strndup(const char *s, size_t n)
 {
     char *result = strndup(s, n);
     if (result == NULL)
     {
-        fprintf(stderr, "btp: out of memory");
+        fprintf(stderr, "satyr: out of memory");
         exit(1);
     }
     return result;
 }
 
 void
-btp_struniq(char **strings, size_t *size)
+sr_struniq(char **strings, size_t *size)
 {
     if (*size < 1)
         return;
@@ -149,7 +149,7 @@ btp_struniq(char **strings, size_t *size)
 }
 
 int
-btp_strcmp0(const char *s1, const char *s2)
+sr_strcmp0(const char *s1, const char *s2)
 {
     if (s1)
         return s2 ? strcmp(s1, s2) : 1;
@@ -158,7 +158,7 @@ btp_strcmp0(const char *s1, const char *s2)
 }
 
 char *
-btp_strchr_location(const char *s, int c, int *line, int *column)
+sr_strchr_location(const char *s, int c, int *line, int *column)
 {
     *line = 1;
     *column = 0;
@@ -168,17 +168,17 @@ btp_strchr_location(const char *s, int c, int *line, int *column)
        character we were looking for.  */
     while (*s != '\0' && *s != (char)c)
     {
-        btp_location_eat_char_ext(line, column, *s);
+        sr_location_eat_char_ext(line, column, *s);
         ++s;
     }
     return ((*s == c) ? (char*)s : NULL);
 }
 
 char *
-btp_strstr_location(const char *haystack,
-                    const char *needle,
-                    int *line,
-                    int *column)
+sr_strstr_location(const char *haystack,
+                   const char *needle,
+                   int *line,
+                   int *column)
 {
     *line = 1;
     *column = 0;
@@ -190,23 +190,23 @@ btp_strstr_location(const char *haystack,
 
     needlelen = strlen(needle);
     int chrline, chrcolumn;
-    for (;(haystack = btp_strchr_location(haystack, *needle, &chrline, &chrcolumn)) != NULL; ++haystack)
+    for (;(haystack = sr_strchr_location(haystack, *needle, &chrline, &chrcolumn)) != NULL; ++haystack)
     {
-        btp_location_add_ext(line, column, chrline, chrcolumn);
+        sr_location_add_ext(line, column, chrline, chrcolumn);
 
         if (strncmp(haystack, needle, needlelen) == 0)
             return (char*)haystack;
 
-        btp_location_eat_char_ext(line, column, *haystack);
+        sr_location_eat_char_ext(line, column, *haystack);
     }
     return NULL;
 }
 
 size_t
-btp_strspn_location(const char *s,
-                    const char *accept,
-                    int *line,
-                    int *column)
+sr_strspn_location(const char *s,
+                   const char *accept,
+                   int *line,
+                   int *column)
 {
     *line = 1;
     *column = 0;
@@ -216,22 +216,22 @@ btp_strspn_location(const char *s,
         if (strchr(accept, *sc) == NULL)
             return (sc - s);
 
-        btp_location_eat_char_ext(line, column, *sc);
+        sr_location_eat_char_ext(line, column, *sc);
     }
     return sc - s; /* terminating nulls don't match */
 }
 
 char *
-btp_file_to_string(const char *filename,
-                   char **error_message)
+sr_file_to_string(const char *filename,
+                  char **error_message)
 {
     /* Open input file, and parse it. */
     int fd = open(filename, O_RDONLY | O_LARGEFILE);
     if (fd < 0)
     {
-        *error_message = btp_asprintf("Unable to open '%s': %s.",
-                                      filename,
-                                      strerror(errno));
+        *error_message = sr_asprintf("Unable to open '%s': %s.",
+                                     filename,
+                                     strerror(errno));
 
         return NULL;
     }
@@ -239,9 +239,9 @@ btp_file_to_string(const char *filename,
     off_t size = lseek(fd, 0, SEEK_END);
     if (size == (off_t)-1) /* EOVERFLOW? */
     {
-        *error_message = btp_asprintf("Unable to seek in '%s': %s.",
-                                      filename,
-                                      strerror(errno));
+        *error_message = sr_asprintf("Unable to seek in '%s': %s.",
+                                     filename,
+                                     strerror(errno));
 
 	close(fd);
 	return NULL;
@@ -252,18 +252,18 @@ btp_file_to_string(const char *filename,
     static const size_t FILE_SIZE_LIMIT = 20000000; /* ~ 20 MB */
     if (size > FILE_SIZE_LIMIT)
     {
-        *error_message = btp_asprintf("Input file too big (%lld). Maximum size is %zd.",
-                                      (long long)size,
-                                      FILE_SIZE_LIMIT);
+        *error_message = sr_asprintf("Input file too big (%lld). Maximum size is %zd.",
+                                     (long long)size,
+                                     FILE_SIZE_LIMIT);
 
         close(fd);
         return NULL;
     }
 
-    char *contents = btp_malloc(size + 1);
+    char *contents = sr_malloc(size + 1);
     if (size != read(fd, contents, size))
     {
-        *error_message = btp_asprintf("Unable to read from '%s'.", filename);
+        *error_message = sr_asprintf("Unable to read from '%s'.", filename);
         close(fd);
         free(contents);
         return NULL;
@@ -277,17 +277,17 @@ btp_file_to_string(const char *filename,
 }
 
 bool
-btp_string_to_file(const char *filename,
-                   char *contents,
-                   char **error_message)
+sr_string_to_file(const char *filename,
+                  char *contents,
+                  char **error_message)
 {
     /* Open the file. */
     int fd = open(filename, O_WRONLY | O_LARGEFILE | O_TRUNC | O_CREAT, 0640);
     if (fd < 0)
     {
-        *error_message = btp_asprintf("Unable to open '%s': %s.",
-                                      filename,
-                                      strerror(errno));
+        *error_message = sr_asprintf("Unable to open '%s': %s.",
+                                     filename,
+                                     strerror(errno));
 
         return false;
     }
@@ -300,9 +300,9 @@ btp_string_to_file(const char *filename,
         if (-1 == write_result)
             error = strerror(errno);
 
-        *error_message = btp_asprintf("Unable to write to '%s': %s.",
-                                      filename,
-                                      error);
+        *error_message = sr_asprintf("Unable to write to '%s': %s.",
+                                     filename,
+                                     error);
 
         return false;
     }
@@ -310,9 +310,9 @@ btp_string_to_file(const char *filename,
     int close_result = close(fd);
     if (-1 == close_result)
     {
-        *error_message = btp_asprintf("Unable to close '%s': %s.",
-                                      filename,
-                                      strerror(errno));
+        *error_message = sr_asprintf("Unable to close '%s': %s.",
+                                     filename,
+                                     strerror(errno));
 
         return false;
     }
@@ -321,7 +321,7 @@ btp_string_to_file(const char *filename,
 }
 
 bool
-btp_skip_char(const char **input, char c)
+sr_skip_char(const char **input, char c)
 {
     if (**input != c)
         return false;
@@ -330,7 +330,7 @@ btp_skip_char(const char **input, char c)
 }
 
 bool
-btp_skip_char_limited(const char **input, const char *allowed)
+sr_skip_char_limited(const char **input, const char *allowed)
 {
     if (strchr(allowed, **input) == NULL)
         return false;
@@ -339,7 +339,7 @@ btp_skip_char_limited(const char **input, const char *allowed)
 }
 
 bool
-btp_parse_char_limited(const char **input, const char *allowed, char *result)
+sr_parse_char_limited(const char **input, const char *allowed, char *result)
 {
     if (**input == '\0')
         return false;
@@ -351,19 +351,19 @@ btp_parse_char_limited(const char **input, const char *allowed, char *result)
 }
 
 int
-btp_skip_char_sequence(const char **input, char c)
+sr_skip_char_sequence(const char **input, char c)
 {
     int count = 0;
 
     /* Skip all the occurences of c. */
-    while (btp_skip_char(input, c))
+    while (sr_skip_char(input, c))
         ++count;
 
     return count;
 }
 
 int
-btp_skip_char_span(const char **input, const char *chars)
+sr_skip_char_span(const char **input, const char *chars)
 {
     size_t count = strspn(*input, chars);
     if (0 == count)
@@ -373,12 +373,12 @@ btp_skip_char_span(const char **input, const char *chars)
 }
 
 int
-btp_skip_char_span_location(const char **input,
-                            const char *chars,
-                            int *line,
-                            int *column)
+sr_skip_char_span_location(const char **input,
+                           const char *chars,
+                           int *line,
+                           int *column)
 {
-    size_t count = btp_strspn_location(*input, chars, line, column);
+    size_t count = sr_strspn_location(*input, chars, line, column);
     if (0 == count)
         return count;
     *input += count;
@@ -386,18 +386,18 @@ btp_skip_char_span_location(const char **input,
 }
 
 int
-btp_parse_char_span(const char **input, const char *accept, char **result)
+sr_parse_char_span(const char **input, const char *accept, char **result)
 {
     size_t count = strspn(*input, accept);
     if (count == 0)
         return 0;
-    *result = btp_strndup(*input, count);
+    *result = sr_strndup(*input, count);
     *input += count;
     return count;
 }
 
 int
-btp_skip_char_cspan(const char **input, const char *reject)
+sr_skip_char_cspan(const char **input, const char *reject)
 {
     size_t count = strcspn(*input, reject);
     if (0 == count)
@@ -407,18 +407,18 @@ btp_skip_char_cspan(const char **input, const char *reject)
 }
 
 bool
-btp_parse_char_cspan(const char **input, const char *reject, char **result)
+sr_parse_char_cspan(const char **input, const char *reject, char **result)
 {
     size_t count = strcspn(*input, reject);
     if (count == 0)
         return false;
-    *result = btp_strndup(*input, count);
+    *result = sr_strndup(*input, count);
     *input += count;
     return true;
 }
 
 int
-btp_skip_string(const char **input, const char *string)
+sr_skip_string(const char **input, const char *string)
 {
     const char *local_input = *input;
     const char *local_string = string;
@@ -435,7 +435,7 @@ btp_skip_string(const char **input, const char *string)
 }
 
 bool
-btp_parse_string(const char **input, const char *string, char **result)
+sr_parse_string(const char **input, const char *string, char **result)
 {
     const char *local_input = *input;
     const char *local_string = string;
@@ -446,13 +446,13 @@ btp_parse_string(const char **input, const char *string, char **result)
     }
     if (*local_string != '\0')
         return false;
-    *result = btp_strndup(string, local_input - *input);
+    *result = sr_strndup(string, local_input - *input);
     *input = local_input;
     return true;
 }
 
 char
-btp_parse_digit(const char **input)
+sr_parse_digit(const char **input)
 {
     char digit = **input;
     if (digit < '0' || digit > '9')
@@ -462,19 +462,19 @@ btp_parse_digit(const char **input)
 }
 
 int
-btp_skip_uint(const char **input)
+sr_skip_uint(const char **input)
 {
-    return btp_skip_char_span(input, "0123456789");
+    return sr_skip_char_span(input, "0123456789");
 }
 
 int
-btp_parse_uint32(const char **input, uint32_t *result)
+sr_parse_uint32(const char **input, uint32_t *result)
 {
     const char *local_input = *input;
     char *numstr;
-    int length = btp_parse_char_span(&local_input,
-                                     "0123456789",
-                                     &numstr);
+    int length = sr_parse_char_span(&local_input,
+                                    "0123456789",
+                                    &numstr);
 
     if (0 == length)
         return 0;
@@ -495,13 +495,13 @@ btp_parse_uint32(const char **input, uint32_t *result)
 }
 
 int
-btp_parse_uint64(const char **input, uint64_t *result)
+sr_parse_uint64(const char **input, uint64_t *result)
 {
     const char *local_input = *input;
     char *numstr;
-    int length = btp_parse_char_span(&local_input,
-                                     "0123456789",
-                                     &numstr);
+    int length = sr_parse_char_span(&local_input,
+                                    "0123456789",
+                                    &numstr);
     if (0 == length)
         return 0;
 
@@ -519,24 +519,24 @@ btp_parse_uint64(const char **input, uint64_t *result)
 }
 
 int
-btp_skip_hexadecimal_uint(const char **input)
+sr_skip_hexadecimal_uint(const char **input)
 {
-    return btp_skip_char_span(input, "abcdefABCDEF0123456789");
+    return sr_skip_char_span(input, "abcdefABCDEF0123456789");
 }
 
 int
-btp_skip_hexadecimal_0xuint(const char **input)
+sr_skip_hexadecimal_0xuint(const char **input)
 {
     const char *local_input = *input;
-    if (!btp_skip_char(&local_input, '0'))
+    if (!sr_skip_char(&local_input, '0'))
         return 0;
 
-    if (!btp_skip_char(&local_input, 'x'))
+    if (!sr_skip_char(&local_input, 'x'))
         return 0;
 
     int count = 2;
-    count += btp_skip_hexadecimal_uint(&local_input);
-    if (2 == count) /* btp_skip_char_span returned 0 */
+    count += sr_skip_hexadecimal_uint(&local_input);
+    if (2 == count) /* sr_skip_char_span returned 0 */
         return 0;
 
     *input = local_input;
@@ -544,15 +544,15 @@ btp_skip_hexadecimal_0xuint(const char **input)
 }
 
 int
-btp_parse_hexadecimal_uint64(const char **input, uint64_t *result)
+sr_parse_hexadecimal_uint64(const char **input, uint64_t *result)
 {
     const char *local_input = *input;
     char *numstr;
-    int count = btp_parse_char_span(&local_input,
-                                    "abcdefABCDEF0123456789",
-                                    &numstr);
+    int count = sr_parse_char_span(&local_input,
+                                   "abcdefABCDEF0123456789",
+                                   &numstr);
 
-    if (0 == count) /* btp_parse_char_span returned 0 */
+    if (0 == count) /* sr_parse_char_span returned 0 */
         return 0;
 
     char *endptr;
@@ -569,18 +569,18 @@ btp_parse_hexadecimal_uint64(const char **input, uint64_t *result)
 }
 
 int
-btp_parse_hexadecimal_0xuint64(const char **input, uint64_t *result)
+sr_parse_hexadecimal_0xuint64(const char **input, uint64_t *result)
 {
     const char *local_input = *input;
-    if (!btp_skip_char(&local_input, '0'))
+    if (!sr_skip_char(&local_input, '0'))
         return 0;
 
-    if (!btp_skip_char(&local_input, 'x'))
+    if (!sr_skip_char(&local_input, 'x'))
         return 0;
 
     int count = 2;
-    count += btp_parse_hexadecimal_uint64(&local_input, result);
-    if (2 == count) /* btp_parse_hexadecimal_uint64 returned 0 */
+    count += sr_parse_hexadecimal_uint64(&local_input, result);
+    if (2 == count) /* sr_parse_hexadecimal_uint64 returned 0 */
         return 0;
 
     *input = local_input;
@@ -588,7 +588,7 @@ btp_parse_hexadecimal_0xuint64(const char **input, uint64_t *result)
 }
 
 char *
-btp_skip_whitespace(const char *s)
+sr_skip_whitespace(const char *s)
 {
 	/* NB: isspace('\0') returns 0 */
 	while (isspace(*s))
@@ -598,7 +598,7 @@ btp_skip_whitespace(const char *s)
 }
 
 char *
-btp_skip_non_whitespace(const char *s)
+sr_skip_non_whitespace(const char *s)
 {
 	while (*s && !isspace(*s))
             ++s;
@@ -607,7 +607,7 @@ btp_skip_non_whitespace(const char *s)
 }
 
 char *
-btp_bin2hex(char *dst, const char *str, int count)
+sr_bin2hex(char *dst, const char *str, int count)
 {
     while (count)
     {
@@ -622,55 +622,55 @@ btp_bin2hex(char *dst, const char *str, int count)
 }
 
 char *
-btp_indent(const char *input, int spaces)
+sr_indent(const char *input, int spaces)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
+    struct sr_strbuf *strbuf = sr_strbuf_new();
     if (*input)
     {
         for (int i = 0; i < spaces; ++i)
-            btp_strbuf_append_char(strbuf, ' ');
+            sr_strbuf_append_char(strbuf, ' ');
     }
 
-    char *indented = btp_indent_except_first_line(input, spaces);
-    btp_strbuf_append_str(strbuf, indented);
+    char *indented = sr_indent_except_first_line(input, spaces);
+    sr_strbuf_append_str(strbuf, indented);
     free(indented);
 
-    return btp_strbuf_free_nobuf(strbuf);
+    return sr_strbuf_free_nobuf(strbuf);
 }
 
 char *
-btp_indent_except_first_line(const char *input, int spaces)
+sr_indent_except_first_line(const char *input, int spaces)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
+    struct sr_strbuf *strbuf = sr_strbuf_new();
 
     const char *c = input;
     while (*c)
     {
         if (*c == '\n')
         {
-            btp_strbuf_append_char(strbuf, '\n');
+            sr_strbuf_append_char(strbuf, '\n');
             if (*++c)
             {
                 for (int i = 0; i < spaces; ++i)
-                    btp_strbuf_append_char(strbuf, ' ');
+                    sr_strbuf_append_char(strbuf, ' ');
             }
 
             continue;
         }
         else
-            btp_strbuf_append_char(strbuf, *c);
+            sr_strbuf_append_char(strbuf, *c);
 
         ++c;
     }
 
-    return btp_strbuf_free_nobuf(strbuf);
+    return sr_strbuf_free_nobuf(strbuf);
 }
 
 char *
-btp_build_path(const char *first_element, ...)
+sr_build_path(const char *first_element, ...)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
-    btp_strbuf_append_str(strbuf, first_element);
+    struct sr_strbuf *strbuf = sr_strbuf_new();
+    sr_strbuf_append_str(strbuf, first_element);
 
     va_list elements;
     va_start(elements, first_element);
@@ -678,10 +678,10 @@ btp_build_path(const char *first_element, ...)
     const char *element;
     while ((element = va_arg(elements, const char *)))
     {
-        btp_strbuf_append_char(strbuf, '/');
-        btp_strbuf_append_str(strbuf, element);
+        sr_strbuf_append_char(strbuf, '/');
+        sr_strbuf_append_str(strbuf, element);
     }
 
     va_end(elements);
-    return btp_strbuf_free_nobuf(strbuf);
+    return sr_strbuf_free_nobuf(strbuf);
 }

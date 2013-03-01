@@ -1,11 +1,11 @@
-# Checking the btparser. -*- Autotest -*-
+# Checking the satyr. -*- Autotest -*-
 
 AT_BANNER([GDB threads])
 
-## --------------------------- ##
-## btp_gdb_thread_remove_frame ##
-## --------------------------- ##
-AT_TESTFUN([btp_gdb_thread_remove_frame],
+## -------------------------- ##
+## sr_gdb_thread_remove_frame ##
+## -------------------------- ##
+AT_TESTFUN([sr_gdb_thread_remove_frame],
 [[
 #include <lib/gdb_thread.h>
 #include <lib/gdb_frame.h>
@@ -17,60 +17,60 @@ AT_TESTFUN([btp_gdb_thread_remove_frame],
 int
 main(void)
 {
-  struct btp_gdb_frame *frame2 = btp_gdb_frame_new();
-  frame2->function_name = btp_strdup("write");
+  struct sr_gdb_frame *frame2 = sr_gdb_frame_new();
+  frame2->function_name = sr_strdup("write");
   frame2->number = 2;
-  frame2->source_file = btp_strdup("gfileutils.c");
+  frame2->source_file = sr_strdup("gfileutils.c");
   frame2->source_line = 120;
   frame2->address = 0x322160e7fdULL;
 
-  struct btp_gdb_frame *frame1 = btp_gdb_frame_new();
-  frame1->function_name = btp_strdup("write_to_temp_file");
+  struct sr_gdb_frame *frame1 = sr_gdb_frame_new();
+  frame1->function_name = sr_strdup("write_to_temp_file");
   frame1->number = 1;
-  frame1->source_file = btp_strdup("gfileutils.c");
+  frame1->source_file = sr_strdup("gfileutils.c");
   frame1->source_line = 980;
   frame1->address = 0x322160e7fdULL;
   frame1->next = frame2;
 
-  struct btp_gdb_frame *frame0 = btp_gdb_frame_new();
-  frame0->function_name = btp_strdup("fsync");
+  struct sr_gdb_frame *frame0 = sr_gdb_frame_new();
+  frame0->function_name = sr_strdup("fsync");
   frame0->number = 0;
-  frame0->source_file = btp_strdup("../sysdeps/unix/syscall-template.S");
+  frame0->source_file = sr_strdup("../sysdeps/unix/syscall-template.S");
   frame0->source_line = 82;
   frame0->address = 0x322160e7fdULL;
   frame0->next = frame1;
 
-  struct btp_gdb_thread thread;
-  btp_gdb_thread_init(&thread);
+  struct sr_gdb_thread thread;
+  sr_gdb_thread_init(&thread);
   thread.number = 3;
   thread.frames = frame0;
 
   /* Remove the frame from the top of the stack. */
-  assert(btp_gdb_thread_remove_frame(&thread, frame0));
+  assert(sr_gdb_thread_remove_frame(&thread, frame0));
   assert(frame1 == thread.frames);
   assert(frame2 == thread.frames->next);
 
   /* Remove the frame from the bottom of the stack. */
-  assert(btp_gdb_thread_remove_frame(&thread, frame2));
+  assert(sr_gdb_thread_remove_frame(&thread, frame2));
   assert(frame1 == thread.frames);
   assert(NULL == thread.frames->next);
 
   /* Remove the last remaining frame. */
-  assert(btp_gdb_thread_remove_frame(&thread, frame1));
+  assert(sr_gdb_thread_remove_frame(&thread, frame1));
   assert(NULL == thread.frames);
 
   /* Remove nonexistant frame -> should return false. */
-  assert(!btp_gdb_thread_remove_frame(&thread, frame0));
+  assert(!sr_gdb_thread_remove_frame(&thread, frame0));
   assert(NULL == thread.frames);
 
   return 0;
 }
 ]])
 
-## ---------------------------------- ##
-## btp_gdb_thread_remove_frames_above ##
-## ---------------------------------- ##
-AT_TESTFUN([btp_gdb_thread_remove_frames_above],
+## --------------------------------- ##
+## sr_gdb_thread_remove_frames_above ##
+## --------------------------------- ##
+AT_TESTFUN([sr_gdb_thread_remove_frames_above],
 [[
 #include <lib/gdb_thread.h>
 #include <lib/gdb_frame.h>
@@ -82,61 +82,61 @@ AT_TESTFUN([btp_gdb_thread_remove_frames_above],
 int
 main(void)
 {
-  struct btp_gdb_frame *frame2 = btp_gdb_frame_new();
-  frame2->function_name = btp_strdup("write");
+  struct sr_gdb_frame *frame2 = sr_gdb_frame_new();
+  frame2->function_name = sr_strdup("write");
   frame2->number = 2;
-  frame2->source_file = btp_strdup("gfileutils.c");
+  frame2->source_file = sr_strdup("gfileutils.c");
   frame2->source_line = 120;
   frame2->address = 0x322160e7fdULL;
 
-  struct btp_gdb_frame *frame1 = btp_gdb_frame_new();
-  frame1->function_name = btp_strdup("write_to_temp_file");
+  struct sr_gdb_frame *frame1 = sr_gdb_frame_new();
+  frame1->function_name = sr_strdup("write_to_temp_file");
   frame1->number = 1;
-  frame1->source_file = btp_strdup("gfileutils.c");
+  frame1->source_file = sr_strdup("gfileutils.c");
   frame1->source_line = 980;
   frame1->address = 0x322160e7fdULL;
   frame1->next = frame2;
 
-  struct btp_gdb_frame *frame0 = btp_gdb_frame_new();
-  frame0->function_name = btp_strdup("fsync");
+  struct sr_gdb_frame *frame0 = sr_gdb_frame_new();
+  frame0->function_name = sr_strdup("fsync");
   frame0->number = 0;
-  frame0->source_file = btp_strdup("../sysdeps/unix/syscall-template.S");
+  frame0->source_file = sr_strdup("../sysdeps/unix/syscall-template.S");
   frame0->source_line = 82;
   frame0->address = 0x322160e7fdULL;
   frame0->next = frame1;
 
-  struct btp_gdb_thread thread;
-  btp_gdb_thread_init(&thread);
+  struct sr_gdb_thread thread;
+  sr_gdb_thread_init(&thread);
   thread.number = 3;
   thread.frames = frame0;
 
   /* Remove the frames above the top of the stack. */
-  assert(btp_gdb_thread_remove_frames_above(&thread, frame0));
+  assert(sr_gdb_thread_remove_frames_above(&thread, frame0));
   assert(frame0 == thread.frames);
   assert(frame1 == thread.frames->next);
 
   /* Remove the frames above the second frame from the top of the stack. */
-  assert(btp_gdb_thread_remove_frames_above(&thread, frame1));
+  assert(sr_gdb_thread_remove_frames_above(&thread, frame1));
   assert(frame1 == thread.frames);
   assert(frame2 == thread.frames->next);
 
   /* Remove the frames above the bottom of the stack. */
-  assert(btp_gdb_thread_remove_frames_above(&thread, frame2));
+  assert(sr_gdb_thread_remove_frames_above(&thread, frame2));
   assert(frame2 == thread.frames);
   assert(NULL == thread.frames->next);
 
   /* Remove frames above a nonexistant frame -> should return false. */
-  assert(!btp_gdb_thread_remove_frames_above(&thread, frame0));
+  assert(!sr_gdb_thread_remove_frames_above(&thread, frame0));
   assert(frame2 == thread.frames);
 
   return 0;
 }
 ]])
 
-## ------------------------------------ ##
-## btp_gdb_thread_remove_frames_below_n ##
-## ------------------------------------ ##
-AT_TESTFUN([btp_gdb_thread_remove_frames_below_n],
+## ----------------------------------- ##
+## sr_gdb_thread_remove_frames_below_n ##
+## ----------------------------------- ##
+AT_TESTFUN([sr_gdb_thread_remove_frames_below_n],
 [[
 #include <lib/gdb_thread.h>
 #include <lib/gdb_frame.h>
@@ -148,62 +148,62 @@ AT_TESTFUN([btp_gdb_thread_remove_frames_below_n],
 int
 main(void)
 {
-  struct btp_gdb_frame *frame2 = btp_gdb_frame_new();
-  frame2->function_name = btp_strdup("write");
+  struct sr_gdb_frame *frame2 = sr_gdb_frame_new();
+  frame2->function_name = sr_strdup("write");
   frame2->number = 2;
-  frame2->source_file = btp_strdup("gfileutils.c");
+  frame2->source_file = sr_strdup("gfileutils.c");
   frame2->source_line = 120;
   frame2->address = 0x322160e7fdULL;
 
-  struct btp_gdb_frame *frame1 = btp_gdb_frame_new();
-  frame1->function_name = btp_strdup("write_to_temp_file");
+  struct sr_gdb_frame *frame1 = sr_gdb_frame_new();
+  frame1->function_name = sr_strdup("write_to_temp_file");
   frame1->number = 1;
-  frame1->source_file = btp_strdup("gfileutils.c");
+  frame1->source_file = sr_strdup("gfileutils.c");
   frame1->source_line = 980;
   frame1->address = 0x322160e7fdULL;
   frame1->next = frame2;
 
-  struct btp_gdb_frame *frame0 = btp_gdb_frame_new();
-  frame0->function_name = btp_strdup("fsync");
+  struct sr_gdb_frame *frame0 = sr_gdb_frame_new();
+  frame0->function_name = sr_strdup("fsync");
   frame0->number = 0;
-  frame0->source_file = btp_strdup("../sysdeps/unix/syscall-template.S");
+  frame0->source_file = sr_strdup("../sysdeps/unix/syscall-template.S");
   frame0->source_line = 82;
   frame0->address = 0x322160e7fdULL;
   frame0->next = frame1;
 
-  struct btp_gdb_thread thread;
-  btp_gdb_thread_init(&thread);
+  struct sr_gdb_thread thread;
+  sr_gdb_thread_init(&thread);
   thread.number = 3;
   thread.frames = frame0;
 
   /* Remove no frame as n is too large. */
-  btp_gdb_thread_remove_frames_below_n(&thread, 5);
+  sr_gdb_thread_remove_frames_below_n(&thread, 5);
   assert(frame0 == thread.frames);
   assert(frame1 == thread.frames->next);
   assert(frame2 == thread.frames->next->next);
   assert(NULL == thread.frames->next->next->next);
 
   /* Remove the frames below 1. */
-  btp_gdb_thread_remove_frames_below_n(&thread, 1);
+  sr_gdb_thread_remove_frames_below_n(&thread, 1);
   assert(frame0 == thread.frames);
   assert(NULL == thread.frames->next);
 
   /* Remove the frames below 0. */
-  btp_gdb_thread_remove_frames_below_n(&thread, 0);
+  sr_gdb_thread_remove_frames_below_n(&thread, 0);
   assert(NULL == thread.frames);
 
   /* Try to remove frames when no frame is present. */
-  btp_gdb_thread_remove_frames_below_n(&thread, 4);
+  sr_gdb_thread_remove_frames_below_n(&thread, 4);
   assert(NULL == thread.frames);
 
   return 0;
 }
 ]])
 
-## -------------------- ##
-## btp_gdb_thread_parse ##
-## -------------------- ##
-AT_TESTFUN([btp_gdb_thread_parse],
+## ------------------- ##
+## sr_gdb_thread_parse ##
+## ------------------- ##
+AT_TESTFUN([sr_gdb_thread_parse],
 [[
 #include <lib/gdb_thread.h>
 #include <lib/gdb_frame.h>
@@ -214,22 +214,22 @@ AT_TESTFUN([btp_gdb_thread_parse],
 
 static void
 check(char *input,
-      struct btp_gdb_thread *expected_thread)
+      struct sr_gdb_thread *expected_thread)
 {
   printf("===============================================\n"
          "Testing input: %s",
 	 input);
 
   char *old_input = input;
-  struct btp_location location;
-  btp_location_init(&location);
-  struct btp_gdb_thread *thread = btp_gdb_thread_parse(&input, &location);
+  struct sr_location location;
+  sr_location_init(&location);
+  struct sr_gdb_thread *thread = sr_gdb_thread_parse(&input, &location);
   assert(!expected_thread || thread);
   if (thread)
   {
     assert(*input == '\0');
-    assert(0 == btp_gdb_thread_cmp(thread, expected_thread));
-    btp_gdb_thread_free(thread);
+    assert(0 == sr_gdb_thread_cmp(thread, expected_thread));
+    sr_gdb_thread_free(thread);
   }
   else
   {
@@ -243,8 +243,8 @@ int
 main(void)
 {
   /* Basic test. */
-  struct btp_gdb_frame frame0, frame1;
-  btp_gdb_frame_init(&frame0);
+  struct sr_gdb_frame frame0, frame1;
+  sr_gdb_frame_init(&frame0);
   frame0.function_name = "fsync";
   frame0.number = 0;
   frame0.source_file = "../sysdeps/unix/syscall-template.S";
@@ -252,15 +252,15 @@ main(void)
   frame0.address = 0x322160e7fdULL;
   frame0.next = &frame1;
 
-  btp_gdb_frame_init(&frame1);
+  sr_gdb_frame_init(&frame1);
   frame1.function_name = "write_to_temp_file";
   frame1.number = 1;
   frame1.source_file = "gfileutils.c";
   frame1.source_line = 980;
   frame1.address = 0x322160e7fdULL;
 
-  struct btp_gdb_thread thread;
-  btp_gdb_thread_init(&thread);
+  struct sr_gdb_thread thread;
+  sr_gdb_thread_init(&thread);
   thread.number = 3;
   thread.frames = &frame0;
 
@@ -299,10 +299,10 @@ main(void)
 }
 ]])
 
-## ------------------------------ ##
-## btp_gdb_thread_parse-locations ##
-## ------------------------------ ##
-AT_TESTFUN([btp_gdb_thread_parse-locations],
+## ----------------------------- ##
+## sr_gdb_thread_parse-locations ##
+## ----------------------------- ##
+AT_TESTFUN([sr_gdb_thread_parse-locations],
 [[
 #include <lib/gdb_thread.h>
 #include <lib/gdb_frame.h>
@@ -320,9 +320,9 @@ check(char *input,
       int expected_column)
 {
   char *old_input = input;
-  struct btp_location location;
-  btp_location_init(&location);
-  assert(NULL == btp_gdb_thread_parse(&input, &location));
+  struct sr_location location;
+  sr_location_init(&location);
+  assert(NULL == sr_gdb_thread_parse(&input, &location));
 
   /* Check that the pointer is not moved. */
   assert(old_input == input);
@@ -369,10 +369,10 @@ main(void)
 }
 ]])
 
-## ----------------------- ##
-## btp_gdb_thread_skip_lwp ##
-## ----------------------- ##
-AT_TESTFUN([btp_gdb_thread_skip_lwp],
+## ---------------------- ##
+## sr_gdb_thread_skip_lwp ##
+## ---------------------- ##
+AT_TESTFUN([sr_gdb_thread_skip_lwp],
 [[
 #include <lib/gdb_thread.h>
 #include <assert.h>
@@ -383,7 +383,7 @@ check(char *input,
       int expected_count)
 {
   char *old_input = input;
-  assert(expected_count == btp_gdb_thread_skip_lwp(&input));
+  assert(expected_count == sr_gdb_thread_skip_lwp(&input));
   assert(input - old_input == expected_count);
 }
 

@@ -18,8 +18,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_GDB_STACKTRACE_H
-#define BTPARSER_GDB_STACKTRACE_H
+#ifndef SATYR_GDB_STACKTRACE_H
+#define SATYR_GDB_STACKTRACE_H
 
 /**
  * @file
@@ -32,9 +32,9 @@ extern "C" {
 
 #include <stdbool.h>
 
-struct btp_gdb_thread;
-struct btp_gdb_frame;
-struct btp_location;
+struct sr_gdb_thread;
+struct sr_gdb_frame;
+struct sr_location;
 
 /**
  * @brief A stack trace produced by GDB.
@@ -45,9 +45,9 @@ struct btp_location;
  * This structure represents a stacktrace as produced by the GNU
  * Debugger.
  */
-struct btp_gdb_stacktrace
+struct sr_gdb_stacktrace
 {
-    struct btp_gdb_thread *threads;
+    struct sr_gdb_thread *threads;
 
     /**
      * The frame where the crash happened according to debugger.  It
@@ -55,22 +55,22 @@ struct btp_gdb_stacktrace
      * belongs, because some threads end with mutually
      * indistinguishable frames.
      */
-    struct btp_gdb_frame *crash;
+    struct sr_gdb_frame *crash;
 
     /**
      * Shared libraries loaded at the moment of crash.
      */
-    struct btp_gdb_sharedlib *libs;
+    struct sr_gdb_sharedlib *libs;
 };
 
 /**
  * Creates and initializes a new stack trace structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_gdb_stacktrace_free().
+ * calling the function sr_gdb_stacktrace_free().
  */
-struct btp_gdb_stacktrace *
-btp_gdb_stacktrace_new();
+struct sr_gdb_stacktrace *
+sr_gdb_stacktrace_new();
 
 /**
  * Initializes all members of the stacktrace structure to their default
@@ -79,7 +79,7 @@ btp_gdb_stacktrace_new();
  * stack.
  */
 void
-btp_gdb_stacktrace_init(struct btp_gdb_stacktrace *stacktrace);
+sr_gdb_stacktrace_init(struct sr_gdb_stacktrace *stacktrace);
 
 /**
  * Releases the memory held by the stacktrace, its threads, frames,
@@ -88,7 +88,7 @@ btp_gdb_stacktrace_init(struct btp_gdb_stacktrace *stacktrace);
  * If the stacktrace is NULL, no operation is performed.
  */
 void
-btp_gdb_stacktrace_free(struct btp_gdb_stacktrace *stacktrace);
+sr_gdb_stacktrace_free(struct sr_gdb_stacktrace *stacktrace);
 
 /**
  * Creates a duplicate of a stacktrace.
@@ -96,10 +96,10 @@ btp_gdb_stacktrace_free(struct btp_gdb_stacktrace *stacktrace);
  * The stacktrace to be copied. It's not modified by this function.
  * @returns
  * This function never returns NULL.  The returned duplicate must be
- * released by calling the function btp_gdb_stacktrace_free().
+ * released by calling the function sr_gdb_stacktrace_free().
  */
-struct btp_gdb_stacktrace *
-btp_gdb_stacktrace_dup(struct btp_gdb_stacktrace *stacktrace);
+struct sr_gdb_stacktrace *
+sr_gdb_stacktrace_dup(struct sr_gdb_stacktrace *stacktrace);
 
 /**
  * Returns a number of threads in the stacktrace.
@@ -107,7 +107,7 @@ btp_gdb_stacktrace_dup(struct btp_gdb_stacktrace *stacktrace);
  * It's not modified by calling this function.
  */
 int
-btp_gdb_stacktrace_get_thread_count(struct btp_gdb_stacktrace *stacktrace);
+sr_gdb_stacktrace_get_thread_count(struct sr_gdb_stacktrace *stacktrace);
 
 /**
  * Removes all threads from the stacktrace and deletes them, except the
@@ -118,8 +118,8 @@ btp_gdb_stacktrace_get_thread_count(struct btp_gdb_stacktrace *stacktrace);
  * and then deleted.
  */
 void
-btp_gdb_stacktrace_remove_threads_except_one(struct btp_gdb_stacktrace *stacktrace,
-                                            struct btp_gdb_thread *thread);
+sr_gdb_stacktrace_remove_threads_except_one(struct sr_gdb_stacktrace *stacktrace,
+                                            struct sr_gdb_thread *thread);
 
 /**
  * Searches all threads and tries to find the one that caused the
@@ -128,8 +128,8 @@ btp_gdb_stacktrace_remove_threads_except_one(struct btp_gdb_stacktrace *stacktra
  * It must be non-NULL pointer. It's not modified by calling this
  * function.
  */
-struct btp_gdb_thread *
-btp_gdb_stacktrace_find_crash_thread(struct btp_gdb_stacktrace *stacktrace);
+struct sr_gdb_thread *
+sr_gdb_stacktrace_find_crash_thread(struct sr_gdb_stacktrace *stacktrace);
 
 /**
  * Remove frames from the bottom of threads in the stacktrace, until
@@ -138,8 +138,8 @@ btp_gdb_stacktrace_find_crash_thread(struct btp_gdb_stacktrace *stacktrace);
  * Must be non-NULL pointer.
  */
 void
-btp_gdb_stacktrace_limit_frame_depth(struct btp_gdb_stacktrace *stacktrace,
-                                     int depth);
+sr_gdb_stacktrace_limit_frame_depth(struct sr_gdb_stacktrace *stacktrace,
+                                    int depth);
 
 /**
  * Evaluates the quality of the stacktrace. The quality is the ratio of
@@ -154,7 +154,7 @@ btp_gdb_stacktrace_limit_frame_depth(struct btp_gdb_stacktrace *stacktrace,
  * stacktrace is known (all function names are known).
  */
 float
-btp_gdb_stacktrace_quality_simple(struct btp_gdb_stacktrace *stacktrace);
+sr_gdb_stacktrace_quality_simple(struct sr_gdb_stacktrace *stacktrace);
 
 /**
  * Evaluates the quality of the stacktrace. The quality is determined
@@ -171,7 +171,7 @@ btp_gdb_stacktrace_quality_simple(struct btp_gdb_stacktrace *stacktrace);
  * than distant frames.
  */
 float
-btp_gdb_stacktrace_quality_complex(struct btp_gdb_stacktrace *stacktrace);
+sr_gdb_stacktrace_quality_complex(struct sr_gdb_stacktrace *stacktrace);
 
 /**
  * Returns textual representation of the stacktrace.
@@ -183,8 +183,8 @@ btp_gdb_stacktrace_quality_complex(struct btp_gdb_stacktrace *stacktrace);
  * releasing the returned memory using function free().
  */
 char *
-btp_gdb_stacktrace_to_text(struct btp_gdb_stacktrace *stacktrace,
-                           bool verbose);
+sr_gdb_stacktrace_to_text(struct sr_gdb_stacktrace *stacktrace,
+                          bool verbose);
 
 /**
  * Analyzes the stacktrace to get the frame where a crash occurred.
@@ -192,13 +192,13 @@ btp_gdb_stacktrace_to_text(struct btp_gdb_stacktrace *stacktrace,
  * It must be non-NULL pointer. It's not modified by calling this
  * function.
  * @returns
- * The returned value must be released by calling btp_gdb_frame_free()
+ * The returned value must be released by calling sr_gdb_frame_free()
  * when it's no longer needed, because it is a deep copy of the crash
  * frame from the stacktrace.  NULL is returned if the crash frame is
  * not found.
  */
-struct btp_gdb_frame *
-btp_gdb_stacktrace_get_crash_frame(struct btp_gdb_stacktrace *stacktrace);
+struct sr_gdb_frame *
+sr_gdb_stacktrace_get_crash_frame(struct sr_gdb_stacktrace *stacktrace);
 
 /**
  * Calculates the duplication hash string of the stacktrace.
@@ -210,18 +210,18 @@ btp_gdb_stacktrace_get_crash_frame(struct btp_gdb_stacktrace *stacktrace);
  * releasing the returned memory using function free().
  */
 char *
-btp_gdb_stacktrace_get_duplication_hash(struct btp_gdb_stacktrace *stacktrace);
+sr_gdb_stacktrace_get_duplication_hash(struct sr_gdb_stacktrace *stacktrace);
 
 /**
  * Parses a textual stack trace and puts it into a structure.  If
  * parsing fails, the input parameter is not changed and NULL is
  * returned.
  * @code
- * struct btp_location location;
- * btp_location_init(&location);
+ * struct sr_location location;
+ * sr_location_init(&location);
  * char *input = "...";
- * struct btp_gdb_stacktrace *stacktrace;
- * stacktrace = btp_gdb_stacktrace_parse(input, location);
+ * struct sr_gdb_stacktrace *stacktrace;
+ * stacktrace = sr_gdb_stacktrace_parse(input, location);
  * if (!stacktrace)
  * {
  *   fprintf(stderr,
@@ -232,17 +232,17 @@ btp_gdb_stacktrace_get_duplication_hash(struct btp_gdb_stacktrace *stacktrace);
  *           location.message);
  *   exit(-1);
  * }
- * btp_gdb_stacktrace_free(stacktrace);
+ * sr_gdb_stacktrace_free(stacktrace);
  * @endcode
  * @param input
  * Pointer to the string with the stacktrace. If this function returns
  * a non-NULL value, this pointer is modified to point after the
  * stacktrace that was just parsed.
  * @param location
- * The caller must provide a pointer to an instance of btp_location
+ * The caller must provide a pointer to an instance of sr_location
  * here.  The line and column members of the location are gradually
  * increased as the parser handles the input, so the location should
- * be initialized by btp_location_init() before calling this function
+ * be initialized by sr_location_init() before calling this function
  * to get reasonable values.  When this function returns false (an
  * error occurred), the structure will contain the error line, column,
  * and message.
@@ -250,11 +250,11 @@ btp_gdb_stacktrace_get_duplication_hash(struct btp_gdb_stacktrace *stacktrace);
  * A newly allocated stacktrace structure or NULL. A stacktrace struct
  * is returned when at least one thread was parsed from the input and
  * no error occurred. The returned structure should be released by
- * btp_gdb_stacktrace_free().
+ * sr_gdb_stacktrace_free().
  */
-struct btp_gdb_stacktrace *
-btp_gdb_stacktrace_parse(const char **input,
-                         struct btp_location *location);
+struct sr_gdb_stacktrace *
+sr_gdb_stacktrace_parse(const char **input,
+                        struct sr_location *location);
 
 /**
  * Parse stacktrace header if it is available in the stacktrace.  The
@@ -279,16 +279,16 @@ btp_gdb_stacktrace_parse(const char **input,
  * @endcode
  */
 bool
-btp_gdb_stacktrace_parse_header(const char **input,
-                                struct btp_gdb_frame **frame,
-                                struct btp_location *location);
+sr_gdb_stacktrace_parse_header(const char **input,
+                               struct sr_gdb_frame **frame,
+                               struct sr_location *location);
 
 /**
  * Set library names in all frames in the stacktrace according to the
  * the sharedlib data.
  */
 void
-btp_gdb_stacktrace_set_libnames(struct btp_gdb_stacktrace *stacktrace);
+sr_gdb_stacktrace_set_libnames(struct sr_gdb_stacktrace *stacktrace);
 
 // TODO: move somewhere else and refactor
 /**
@@ -304,11 +304,11 @@ btp_gdb_stacktrace_set_libnames(struct btp_gdb_stacktrace *stacktrace);
  * @returns
  * A newly allocated thread structure or NULL. NULL is returned when the
  * crashing thread could not be found. The returned structure should be
- * released by btp_gdb_thread_free() by the caller.
+ * released by sr_gdb_thread_free() by the caller.
  */
-struct btp_gdb_thread *
-btp_gdb_stacktrace_get_optimized_thread(struct btp_gdb_stacktrace *stacktrace,
-                                        int max_frames);
+struct sr_gdb_thread *
+sr_gdb_stacktrace_get_optimized_thread(struct sr_gdb_stacktrace *stacktrace,
+                                       int max_frames);
 
 #ifdef __cplusplus
 }

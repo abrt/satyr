@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_PY_GDB_SHAREDLIB_H
-#define BTPARSER_PY_GDB_SHAREDLIB_H
+#ifndef SATYR_PY_GDB_SHAREDLIB_H
+#define SATYR_PY_GDB_SHAREDLIB_H
 
 /**
  * @file
@@ -32,37 +32,37 @@ extern "C" {
 #include <Python.h>
 #include <structmember.h>
 
-extern PyTypeObject btp_py_gdb_sharedlib_type;
+extern PyTypeObject sr_py_gdb_sharedlib_type;
 
-struct btp_py_gdb_sharedlib
+struct sr_py_gdb_sharedlib
 {
     PyObject_HEAD
-    struct btp_gdb_sharedlib *sharedlib;
+    struct sr_gdb_sharedlib *sharedlib;
     int syms_ok;
     int syms_wrong;
     int syms_not_found;
 };
 
 /* constructor */
-PyObject *btp_py_gdb_sharedlib_new(PyTypeObject *object,
-                                   PyObject *args,
-                                   PyObject *kwds);
+PyObject *sr_py_gdb_sharedlib_new(PyTypeObject *object,
+                                  PyObject *args,
+                                  PyObject *kwds);
 
 /* destructor */
-void btp_py_gdb_sharedlib_free(PyObject *object);
+void sr_py_gdb_sharedlib_free(PyObject *object);
 
 /* str */
-PyObject *btp_py_gdb_sharedlib_str(PyObject *self);
+PyObject *sr_py_gdb_sharedlib_str(PyObject *self);
 
 /* getters & setters */
-PyObject *btp_py_gdb_sharedlib_get_from(PyObject *self, PyObject *args);
-PyObject *btp_py_gdb_sharedlib_set_from(PyObject *self, PyObject *args);
-PyObject *btp_py_gdb_sharedlib_get_to(PyObject *self, PyObject *args);
-PyObject *btp_py_gdb_sharedlib_set_to(PyObject *self, PyObject *args);
-PyObject *btp_py_gdb_sharedlib_get_soname(PyObject *self, PyObject *args);
-PyObject *btp_py_gdb_sharedlib_set_soname(PyObject *self, PyObject *args);
-PyObject *btp_py_gdb_sharedlib_get_symbols(PyObject *self, PyObject *args);
-PyObject *btp_py_gdb_sharedlib_set_symbols(PyObject *self, PyObject *args);
+PyObject *sr_py_gdb_sharedlib_get_from(PyObject *self, PyObject *args);
+PyObject *sr_py_gdb_sharedlib_set_from(PyObject *self, PyObject *args);
+PyObject *sr_py_gdb_sharedlib_get_to(PyObject *self, PyObject *args);
+PyObject *sr_py_gdb_sharedlib_set_to(PyObject *self, PyObject *args);
+PyObject *sr_py_gdb_sharedlib_get_soname(PyObject *self, PyObject *args);
+PyObject *sr_py_gdb_sharedlib_set_soname(PyObject *self, PyObject *args);
+PyObject *sr_py_gdb_sharedlib_get_symbols(PyObject *self, PyObject *args);
+PyObject *sr_py_gdb_sharedlib_set_symbols(PyObject *self, PyObject *args);
 
 #ifdef __cplusplus
 }

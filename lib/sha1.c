@@ -49,15 +49,15 @@
 
 /* Generic 64-byte helpers for 64-byte block hashes */
 static void
-common64_hash(struct btp_sha1_state *state, const void *buffer, size_t len);
+common64_hash(struct sr_sha1_state *state, const void *buffer, size_t len);
 
 static void
-common64_end(struct btp_sha1_state *state, int swap_needed);
+common64_end(struct sr_sha1_state *state, int swap_needed);
 
 /* sha1 specific code */
 
 static void
-sha1_process_block64(struct btp_sha1_state *state)
+sha1_process_block64(struct sr_sha1_state *state)
 {
     static const uint32_t rconsts[] = {
         0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xCA62C1D6
@@ -130,7 +130,7 @@ sha1_process_block64(struct btp_sha1_state *state)
 }
 
 void
-btp_sha1_begin(struct btp_sha1_state *state)
+sr_sha1_begin(struct sr_sha1_state *state)
 {
     state->hash[0] = 0x67452301;
     state->hash[1] = 0xefcdab89;
@@ -142,7 +142,7 @@ btp_sha1_begin(struct btp_sha1_state *state)
 }
 
 void
-btp_sha1_hash(struct btp_sha1_state *state,
+sr_sha1_hash(struct sr_sha1_state *state,
               const void *buffer,
               size_t len)
 {
@@ -151,7 +151,7 @@ btp_sha1_hash(struct btp_sha1_state *state,
 
 /* May be used also for sha256 */
 void
-btp_sha1_end(struct btp_sha1_state *state, void *resbuf)
+sr_sha1_end(struct sr_sha1_state *state, void *resbuf)
 {
     unsigned hash_size;
 
@@ -179,7 +179,7 @@ btp_sha1_end(struct btp_sha1_state *state, void *resbuf)
  * bytes worth to pass on.
  */
 static void
-common64_hash(struct btp_sha1_state *state,
+common64_hash(struct sr_sha1_state *state,
               const void *buffer,
               size_t len)
 {
@@ -209,7 +209,7 @@ common64_hash(struct btp_sha1_state *state,
 
 /* Process the remaining bytes in the buffer */
 static void
-common64_end(struct btp_sha1_state *state,
+common64_end(struct sr_sha1_state *state,
              int swap_needed)
 {
     unsigned bufpos = state->total64 & 63;

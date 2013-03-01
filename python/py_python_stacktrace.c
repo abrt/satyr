@@ -7,10 +7,10 @@
 #include "lib/location.h"
 #include "lib/normalize.h"
 
-#define stacktrace_doc "btparser.PythonStacktrace - class representing a python stacktrace\n" \
+#define stacktrace_doc "satyr.PythonStacktrace - class representing a python stacktrace\n" \
                       "Usage:\n" \
-                      "btparser.PythonStacktrace() - creates an empty python stacktrace\n" \
-                      "btparser.PythonStacktrace(str) - parses str and fills the python stacktrace object"
+                      "satyr.PythonStacktrace() - creates an empty python stacktrace\n" \
+                      "satyr.PythonStacktrace(str) - parses str and fills the python stacktrace object"
 
 #define f_get_file_name_doc "Usage: frame.get_file_name()\n" \
                                 "Returns: string - file name"
@@ -31,7 +31,7 @@
                                 "newname: string - new function name"
 
 #define f_dup_doc "Usage: stacktrace.dup()\n" \
-                  "Returns: btparser.PythonStacktrace - a new clone of python stacktrace\n" \
+                  "Returns: satyr.PythonStacktrace - a new clone of python stacktrace\n" \
                   "Clones the PythonStacktrace object. All new structures are independent " \
                   "on the original object."
 
@@ -47,32 +47,32 @@ static PyMethodDef
 python_stacktrace_methods[] =
 {
     /* getters & setters */
-    { "get_file_name",             btp_py_python_stacktrace_get_file_name,         METH_NOARGS,      f_get_file_name_doc             },
-    { "set_file_name",             btp_py_python_stacktrace_set_file_name,         METH_VARARGS,     f_set_file_name_doc             },
-    { "get_file_line",             btp_py_python_stacktrace_get_file_line,         METH_NOARGS,      f_get_file_line_doc             },
-    { "set_file_line",             btp_py_python_stacktrace_set_file_line,         METH_VARARGS,     f_set_file_line_doc             },
-    { "get_exception_name",        btp_py_python_stacktrace_get_exception_name,    METH_NOARGS,      f_get_exception_name_doc        },
-    { "set_exception_name",        btp_py_python_stacktrace_set_exception_name,    METH_VARARGS,     f_set_exception_name_doc        },
+    { "get_file_name",             sr_py_python_stacktrace_get_file_name,         METH_NOARGS,      f_get_file_name_doc             },
+    { "set_file_name",             sr_py_python_stacktrace_set_file_name,         METH_VARARGS,     f_set_file_name_doc             },
+    { "get_file_line",             sr_py_python_stacktrace_get_file_line,         METH_NOARGS,      f_get_file_line_doc             },
+    { "set_file_line",             sr_py_python_stacktrace_set_file_line,         METH_VARARGS,     f_set_file_line_doc             },
+    { "get_exception_name",        sr_py_python_stacktrace_get_exception_name,    METH_NOARGS,      f_get_exception_name_doc        },
+    { "set_exception_name",        sr_py_python_stacktrace_set_exception_name,    METH_VARARGS,     f_set_exception_name_doc        },
     /* methods */
-    { "dup",                       btp_py_python_stacktrace_dup,                  METH_NOARGS,       f_dup_doc                       },
-//    { "normalize",                 btp_py_python_stacktrace_normalize,            METH_NOARGS,       f_normalize_doc                 },
+    { "dup",                       sr_py_python_stacktrace_dup,                  METH_NOARGS,       f_dup_doc                       },
+//    { "normalize",                 sr_py_python_stacktrace_normalize,            METH_NOARGS,       f_normalize_doc                 },
     { NULL },
 };
 
 static PyMemberDef
 python_stacktrace_members[] =
 {
-    { (char *)"frames",       T_OBJECT_EX, offsetof(struct btp_py_python_stacktrace, frames),     0,  f_frames_doc     },
+    { (char *)"frames",       T_OBJECT_EX, offsetof(struct sr_py_python_stacktrace, frames),     0,  f_frames_doc     },
     { NULL },
 };
 
-PyTypeObject btp_py_python_stacktrace_type = {
+PyTypeObject sr_py_python_stacktrace_type = {
     PyObject_HEAD_INIT(NULL)
     0,
-    "btparser.PythonStacktrace",    /* tp_name */
-    sizeof(struct btp_py_python_stacktrace), /* tp_basicsize */
+    "satyr.PythonStacktrace",    /* tp_name */
+    sizeof(struct sr_py_python_stacktrace), /* tp_basicsize */
     0,                              /* tp_itemsize */
-    btp_py_python_stacktrace_free,  /* tp_dealloc */
+    sr_py_python_stacktrace_free,   /* tp_dealloc */
     NULL,                           /* tp_print */
     NULL,                           /* tp_getattr */
     NULL,                           /* tp_setattr */
@@ -83,7 +83,7 @@ PyTypeObject btp_py_python_stacktrace_type = {
     NULL,                           /* tp_as_mapping */
     NULL,                           /* tp_hash */
     NULL,                           /* tp_call */
-    btp_py_python_stacktrace_str,   /* tp_str */
+    sr_py_python_stacktrace_str,    /* tp_str */
     NULL,                           /* tp_getattro */
     NULL,                           /* tp_setattro */
     NULL,                           /* tp_as_buffer */
@@ -105,7 +105,7 @@ PyTypeObject btp_py_python_stacktrace_type = {
     0,                              /* tp_dictoffset */
     NULL,                           /* tp_init */
     NULL,                           /* tp_alloc */
-    btp_py_python_stacktrace_new,   /* tp_new */
+    sr_py_python_stacktrace_new,    /* tp_new */
     NULL,                           /* tp_free */
     NULL,                           /* tp_is_gc */
     NULL,                           /* tp_bases */
@@ -117,12 +117,12 @@ PyTypeObject btp_py_python_stacktrace_type = {
 
 /* helpers */
 int
-python_stacktrace_prepare_linked_list(struct btp_py_python_stacktrace *stacktrace)
+python_stacktrace_prepare_linked_list(struct sr_py_python_stacktrace *stacktrace)
 {
     int i;
     PyObject *item;
 
-    struct btp_py_python_frame *current = NULL, *prev = NULL;
+    struct sr_py_python_frame *current = NULL, *prev = NULL;
     for (i = 0; i < PyList_Size(stacktrace->frames); ++i)
     {
         item = PyList_GetItem(stacktrace->frames, i);
@@ -130,16 +130,16 @@ python_stacktrace_prepare_linked_list(struct btp_py_python_stacktrace *stacktrac
             return -1;
 
         Py_INCREF(item);
-        if (!PyObject_TypeCheck(item, &btp_py_python_frame_type))
+        if (!PyObject_TypeCheck(item, &sr_py_python_frame_type))
         {
             Py_XDECREF(current);
             Py_XDECREF(prev);
             PyErr_SetString(PyExc_TypeError,
-                            "frames must be a list of btparser.PythonFrame objects");
+                            "frames must be a list of satyr.PythonFrame objects");
             return -1;
         }
 
-        current = (struct btp_py_python_frame*)item;
+        current = (struct sr_py_python_frame*)item;
         if (i == 0)
             stacktrace->stacktrace->frames = current->frame;
         else
@@ -159,19 +159,19 @@ python_stacktrace_prepare_linked_list(struct btp_py_python_stacktrace *stacktrac
 }
 
 PyObject *
-python_frame_linked_list_to_python_list(struct btp_python_stacktrace *stacktrace)
+python_frame_linked_list_to_python_list(struct sr_python_stacktrace *stacktrace)
 {
     PyObject *result = PyList_New(0);
     if (!result)
         return PyErr_NoMemory();
 
-    struct btp_python_frame *frame = stacktrace->frames;
-    struct btp_py_python_frame *item;
+    struct sr_python_frame *frame = stacktrace->frames;
+    struct sr_py_python_frame *item;
 
     while(frame)
     {
-        item = (struct btp_py_python_frame*)
-            PyObject_New(struct btp_py_python_frame, &btp_py_python_frame_type);
+        item = (struct sr_py_python_frame*)
+            PyObject_New(struct sr_py_python_frame, &sr_py_python_frame_type);
 
         if (!item)
             return PyErr_NoMemory();
@@ -187,7 +187,7 @@ python_frame_linked_list_to_python_list(struct btp_python_stacktrace *stacktrace
 }
 
 int
-python_free_frame_python_list(struct btp_py_python_stacktrace *stacktrace)
+python_free_frame_python_list(struct sr_py_python_stacktrace *stacktrace)
 {
     int i;
     PyObject *item;
@@ -206,13 +206,13 @@ python_free_frame_python_list(struct btp_py_python_stacktrace *stacktrace)
 
 /* constructor */
 PyObject *
-btp_py_python_stacktrace_new(PyTypeObject *object,
+sr_py_python_stacktrace_new(PyTypeObject *object,
                             PyObject *args,
                             PyObject *kwds)
 {
-    struct btp_py_python_stacktrace *bo = (struct btp_py_python_stacktrace*)
-        PyObject_New(struct btp_py_python_stacktrace,
-                     &btp_py_python_stacktrace_type);
+    struct sr_py_python_stacktrace *bo = (struct sr_py_python_stacktrace*)
+        PyObject_New(struct sr_py_python_stacktrace,
+                     &sr_py_python_stacktrace_type);
 
     if (!bo)
         return PyErr_NoMemory();
@@ -223,9 +223,9 @@ btp_py_python_stacktrace_new(PyTypeObject *object,
 
     if (str)
     {
-        struct btp_location location;
-        btp_location_init(&location);
-        bo->stacktrace = btp_python_stacktrace_parse(&str, &location);
+        struct sr_location location;
+        sr_location_init(&location);
+        bo->stacktrace = sr_python_stacktrace_parse(&str, &location);
         if (!bo->stacktrace)
         {
             PyErr_SetString(PyExc_ValueError, location.message);
@@ -236,7 +236,7 @@ btp_py_python_stacktrace_new(PyTypeObject *object,
     }
     else
     {
-        bo->stacktrace = btp_python_stacktrace_new();
+        bo->stacktrace = sr_python_stacktrace_new();
         bo->frames = PyList_New(0);
     }
 
@@ -245,24 +245,24 @@ btp_py_python_stacktrace_new(PyTypeObject *object,
 
 /* destructor */
 void
-btp_py_python_stacktrace_free(PyObject *object)
+sr_py_python_stacktrace_free(PyObject *object)
 {
-    struct btp_py_python_stacktrace *this = (struct btp_py_python_stacktrace*)object;
+    struct sr_py_python_stacktrace *this = (struct sr_py_python_stacktrace*)object;
     python_free_frame_python_list(this);
     this->stacktrace->frames = NULL;
-    btp_python_stacktrace_free(this->stacktrace);
+    sr_python_stacktrace_free(this->stacktrace);
     PyObject_Del(object);
 }
 
 /* str */
 PyObject *
-btp_py_python_stacktrace_str(PyObject *self)
+sr_py_python_stacktrace_str(PyObject *self)
 {
-    struct btp_py_python_stacktrace *this = (struct btp_py_python_stacktrace *)self;
-    struct btp_strbuf *buf = btp_strbuf_new();
-    btp_strbuf_append_strf(buf, "Python stacktrace with %d frames",
+    struct sr_py_python_stacktrace *this = (struct sr_py_python_stacktrace *)self;
+    struct sr_strbuf *buf = sr_strbuf_new();
+    sr_strbuf_append_strf(buf, "Python stacktrace with %d frames",
                            PyList_Size(this->frames));
-    char *str = btp_strbuf_free_nobuf(buf);
+    char *str = sr_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
@@ -272,33 +272,33 @@ btp_py_python_stacktrace_str(PyObject *self)
 
 /* file_name */
 PyObject *
-btp_py_python_stacktrace_get_file_name(PyObject *self, PyObject *args)
+sr_py_python_stacktrace_get_file_name(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", ((struct btp_py_python_stacktrace*)self)->stacktrace->file_name);
+    return Py_BuildValue("s", ((struct sr_py_python_stacktrace*)self)->stacktrace->file_name);
 }
 
 PyObject *
-btp_py_python_stacktrace_set_file_name(PyObject *self, PyObject *args)
+sr_py_python_stacktrace_set_file_name(PyObject *self, PyObject *args)
 {
     char *newvalue;
     if (!PyArg_ParseTuple(args, "s", &newvalue))
         return NULL;
 
-    struct btp_python_stacktrace *stacktrace = ((struct btp_py_python_stacktrace*)self)->stacktrace;
+    struct sr_python_stacktrace *stacktrace = ((struct sr_py_python_stacktrace*)self)->stacktrace;
     free(stacktrace->file_name);
-    stacktrace->file_name = btp_strdup(newvalue);
+    stacktrace->file_name = sr_strdup(newvalue);
     Py_RETURN_NONE;
 }
 
 /* file_line */
 PyObject *
-btp_py_python_stacktrace_get_file_line(PyObject *self, PyObject *args)
+sr_py_python_stacktrace_get_file_line(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("i", ((struct btp_py_python_stacktrace*)self)->stacktrace->file_line);
+    return Py_BuildValue("i", ((struct sr_py_python_stacktrace*)self)->stacktrace->file_line);
 }
 
 PyObject *
-btp_py_python_stacktrace_set_file_line(PyObject *self, PyObject *args)
+sr_py_python_stacktrace_set_file_line(PyObject *self, PyObject *args)
 {
     int newvalue;
     if (!PyArg_ParseTuple(args, "i", &newvalue))
@@ -310,47 +310,47 @@ btp_py_python_stacktrace_set_file_line(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    struct btp_python_stacktrace *stacktrace = ((struct btp_py_python_stacktrace*)self)->stacktrace;
+    struct sr_python_stacktrace *stacktrace = ((struct sr_py_python_stacktrace*)self)->stacktrace;
     stacktrace->file_line = newvalue;
     Py_RETURN_NONE;
 }
 
 /* exception_name */
 PyObject *
-btp_py_python_stacktrace_get_exception_name(PyObject *self, PyObject *args)
+sr_py_python_stacktrace_get_exception_name(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", ((struct btp_py_python_stacktrace*)self)->stacktrace->exception_name);
+    return Py_BuildValue("s", ((struct sr_py_python_stacktrace*)self)->stacktrace->exception_name);
 }
 
 PyObject *
-btp_py_python_stacktrace_set_exception_name(PyObject *self, PyObject *args)
+sr_py_python_stacktrace_set_exception_name(PyObject *self, PyObject *args)
 {
     char *newvalue;
     if (!PyArg_ParseTuple(args, "s", &newvalue))
         return NULL;
 
-    struct btp_python_stacktrace *stacktrace = ((struct btp_py_python_stacktrace*)self)->stacktrace;
+    struct sr_python_stacktrace *stacktrace = ((struct sr_py_python_stacktrace*)self)->stacktrace;
     free(stacktrace->file_name);
-    stacktrace->file_name = btp_strdup(newvalue);
+    stacktrace->file_name = sr_strdup(newvalue);
     Py_RETURN_NONE;
 }
 
 /* methods */
 PyObject *
-btp_py_python_stacktrace_dup(PyObject *self, PyObject *args)
+sr_py_python_stacktrace_dup(PyObject *self, PyObject *args)
 {
-    struct btp_py_python_stacktrace *this = (struct btp_py_python_stacktrace*)self;
+    struct sr_py_python_stacktrace *this = (struct sr_py_python_stacktrace*)self;
     if (python_stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
-    struct btp_py_python_stacktrace *bo = (struct btp_py_python_stacktrace*)
-        PyObject_New(struct btp_py_python_stacktrace,
-                     &btp_py_python_stacktrace_type);
+    struct sr_py_python_stacktrace *bo = (struct sr_py_python_stacktrace*)
+        PyObject_New(struct sr_py_python_stacktrace,
+                     &sr_py_python_stacktrace_type);
 
     if (!bo)
         return PyErr_NoMemory();
 
-    bo->stacktrace = btp_python_stacktrace_dup(this->stacktrace);
+    bo->stacktrace = sr_python_stacktrace_dup(this->stacktrace);
     if (!bo->stacktrace)
         return NULL;
 
@@ -366,21 +366,21 @@ btp_py_python_stacktrace_dup(PyObject *self, PyObject *args)
  *
 
 PyObject *
-btp_py_python_stacktrace_normalize(PyObject *self, PyObject *args)
+sr_py_python_stacktrace_normalize(PyObject *self, PyObject *args)
 {
-    struct btp_py_python_stacktrace *this = (struct btp_py_python_stacktrace*)self;
+    struct sr_py_python_stacktrace *this = (struct sr_py_python_stacktrace*)self;
 
-    struct btp_python_stacktrace *tmp = btp_python_stacktrace_dup(this->stacktrace);
-    btp_normalize_python_stacktrace(tmp);
+    struct sr_python_stacktrace *tmp = sr_python_stacktrace_dup(this->stacktrace);
+    sr_normalize_python_stacktrace(tmp);
     if (python_free_frame_python_list(this) < 0)
     {
-        btp_python_stacktrace_free(tmp);
+        sr_python_stacktrace_free(tmp);
         return NULL;
     }
 
     this->stacktrace->frames = tmp->frames;
     tmp->frames = NULL;
-    btp_python_stacktrace_free(tmp);
+    sr_python_stacktrace_free(tmp);
 
     this->frames = python_frame_linked_list_to_python_list(this->stacktrace);
     if (!this->frames)

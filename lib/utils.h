@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_UTILS_H
-#define BTPARSER_UTILS_H
+#ifndef SATYR_UTILS_H
+#define SATYR_UTILS_H
 
 /**
  * @file
@@ -36,71 +36,71 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
-#define BTP_lower "abcdefghijklmnopqrstuvwxyz"
-#define BTP_upper "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-#define BTP_alpha BTP_lower BTP_upper
-#define BTP_space " \t\r\n\v\f"
-#define BTP_digit "0123456789"
-#define BTP_alnum BTP_alpha BTP_digit
+#define SR_lower "abcdefghijklmnopqrstuvwxyz"
+#define SR_upper "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define SR_alpha SR_lower SR_upper
+#define SR_space " \t\r\n\v\f"
+#define SR_digit "0123456789"
+#define SR_alnum SR_alpha SR_digit
 
 /**
  * Debugging output to stdout while parsing.
  * Default value is false.
  */
 extern bool
-btp_debug_parser;
+sr_debug_parser;
 
 /**
  * Never returns NULL.
  */
 void *
-btp_malloc(size_t size);
+sr_malloc(size_t size);
 
 /**
  * Never returns NULL.
  */
 void *
-btp_mallocz(size_t size);
+sr_mallocz(size_t size);
 
 /**
  * Never returns NULL.
  */
 void *
-btp_realloc(void *ptr, size_t size);
+sr_realloc(void *ptr, size_t size);
 
 /**
  * Never returns NULL.
  */
 char *
-btp_vasprintf(const char *format, va_list p);
+sr_vasprintf(const char *format, va_list p);
 
 /**
  * Never returns NULL.
  */
 char *
-btp_asprintf(const char *format, ...);
+sr_asprintf(const char *format, ...);
 
 /**
  * Never returns NULL.
  */
 char *
-btp_strdup(const char *s);
+sr_strdup(const char *s);
 
 /**
  * Never returns NULL.
  */
 char *
-btp_strndup(const char *s, size_t n);
+sr_strndup(const char *s, size_t n);
 
 void
-btp_struniq(char **strings, size_t *size);
+sr_struniq(char **strings, size_t *size);
 
 /**
  * A strcmp() variant that works also with NULL parameters.  NULL is
  * considered to be less than a string.
  */
 int
-btp_strcmp0(const char *s1, const char *s2);
+sr_strcmp0(const char *s1, const char *s2);
 
 /**
  * A strchr() variant providing line and column in the string s
@@ -113,7 +113,7 @@ btp_strcmp0(const char *s1, const char *s2);
  * return NULL.
  */
 char *
-btp_strchr_location(const char *s, int c, int *line, int *column);
+sr_strchr_location(const char *s, int c, int *line, int *column);
 
 /**
  * A strstr() variant providing line and column of the haystick
@@ -126,10 +126,10 @@ btp_strchr_location(const char *s, int c, int *line, int *column);
  * return NULL.
  */
 char *
-btp_strstr_location(const char *haystack,
-                    const char *needle,
-                    int *line,
-                    int *column);
+sr_strstr_location(const char *haystack,
+                   const char *needle,
+                   int *line,
+                   int *column);
 
 /**
  * A strspn() variant providing line and column of the string s which
@@ -140,10 +140,10 @@ btp_strstr_location(const char *haystack,
  * Starts from 0.
  */
 size_t
-btp_strspn_location(const char *s,
-                    const char *accept,
-                    int *line,
-                    int *column);
+sr_strspn_location(const char *s,
+                   const char *accept,
+                   int *line,
+                   int *column);
 
 /**
  * Loads file contents to a string.
@@ -151,13 +151,13 @@ btp_strspn_location(const char *s,
  * File contents. If file opening/reading fails, NULL is returned.
  */
 char *
-btp_file_to_string(const char *filename,
-                   char **error_message);
+sr_file_to_string(const char *filename,
+                  char **error_message);
 
 bool
-btp_string_to_file(const char *filename,
-                   char *contents,
-                   char **error_message);
+sr_string_to_file(const char *filename,
+                  char *contents,
+                  char **error_message);
 
 /**
  * If the input contains character c in the current positon, move the
@@ -165,7 +165,7 @@ btp_string_to_file(const char *filename,
  * not modify the input and return false.
  */
 bool
-btp_skip_char(const char **input, char c);
+sr_skip_char(const char **input, char c);
 
 /**
  * If the input contains one of allowed characters, move
@@ -173,7 +173,7 @@ btp_skip_char(const char **input, char c);
  * Otherwise do not modify the input and return false.
  */
 bool
-btp_skip_char_limited(const char **input, const char *allowed);
+sr_skip_char_limited(const char **input, const char *allowed);
 
 /**
  * If the input contains one of allowed characters, store
@@ -182,9 +182,9 @@ btp_skip_char_limited(const char **input, const char *allowed);
  * the input and return false.
  */
 bool
-btp_parse_char_limited(const char **input,
-                       const char *allowed,
-                       char *result);
+sr_parse_char_limited(const char **input,
+                      const char *allowed,
+                      char *result);
 
 /**
  * If the input contains the character c one or more times, update it
@@ -192,7 +192,7 @@ btp_parse_char_limited(const char **input,
  * skipped, thus zero if **input does not contain c.
  */
 int
-btp_skip_char_sequence(const char **input, char c);
+sr_skip_char_sequence(const char **input, char c);
 
 /**
  * If the input contains one or more characters from string chars,
@@ -202,7 +202,7 @@ btp_skip_char_sequence(const char **input, char c);
  * The number of characters skipped.
  */
 int
-btp_skip_char_span(const char **input, const char *chars);
+sr_skip_char_span(const char **input, const char *chars);
 
 /**
  * If the input contains one or more characters from string chars,
@@ -216,10 +216,10 @@ btp_skip_char_span(const char **input, const char *chars);
  * The number of characters skipped.
  */
 int
-btp_skip_char_span_location(const char **input,
-                            const char *chars,
-                            int *line,
-                            int *column);
+sr_skip_char_span_location(const char **input,
+                           const char *chars,
+                           int *line,
+                           int *column);
 
 /**
  * If the input contains one or more characters from string accept,
@@ -231,9 +231,9 @@ btp_skip_char_span_location(const char **input,
  * to free the result.
  */
 int
-btp_parse_char_span(const char **input,
-                    const char *accept,
-                    char **result);
+sr_parse_char_span(const char **input,
+                   const char *accept,
+                   char **result);
 
 /**
  * If the input contains one or more characters which are not
@@ -243,7 +243,7 @@ btp_parse_char_span(const char **input,
  * The number of characters skipped.
  */
 int
-btp_skip_char_cspan(const char **input, const char *reject);
+sr_skip_char_cspan(const char **input, const char *reject);
 
 /**
  * If the input contains characters which are not in string reject,
@@ -255,9 +255,9 @@ btp_skip_char_cspan(const char **input, const char *reject);
  * free the result.
  */
 bool
-btp_parse_char_cspan(const char **input,
-                     const char *reject,
-                     char **result);
+sr_parse_char_cspan(const char **input,
+                    const char *reject,
+                    char **result);
 
 /**
  * If the input contains the string, move the input pointer after
@@ -267,7 +267,7 @@ btp_parse_char_cspan(const char **input,
  * string.
  */
 int
-btp_skip_string(const char **input, const char *string);
+sr_skip_string(const char **input, const char *string);
 
 /**
  * If the input contains the string, copy the string to result,
@@ -278,7 +278,7 @@ btp_skip_string(const char **input, const char *string);
  * the result.
  */
 bool
-btp_parse_string(const char **input, const char *string, char **result);
+sr_parse_string(const char **input, const char *string, char **result);
 
 /**
  * If the input contains digit 0-9, return it as a character
@@ -286,7 +286,7 @@ btp_parse_string(const char **input, const char *string, char **result);
  * '\0' and do not modify the input.
  */
 char
-btp_parse_digit(const char **input);
+sr_parse_digit(const char **input);
 
 /**
  * If the input contains [0-9]+, move the input pointer
@@ -296,7 +296,7 @@ btp_parse_digit(const char **input);
  * digit.
  */
 int
-btp_skip_uint(const char **input);
+sr_skip_uint(const char **input);
 
 /**
  * If the input contains [0-9]+, parse it, move the input pointer
@@ -305,10 +305,10 @@ btp_skip_uint(const char **input);
  * Number of parsed characters. 0 if input does not contain a number.
  */
 int
-btp_parse_uint32(const char **input, uint32_t *result);
+sr_parse_uint32(const char **input, uint32_t *result);
 
 int
-btp_parse_uint64(const char **input, uint64_t *result);
+sr_parse_uint64(const char **input, uint64_t *result);
 
 /**
  * If the input contains [0-9a-f]+, move the input pointer
@@ -318,7 +318,7 @@ btp_parse_uint64(const char **input, uint64_t *result);
  * not contain a hexadecimal number.
  */
 int
-btp_skip_hexadecimal_uint(const char **input);
+sr_skip_hexadecimal_uint(const char **input);
 
 /**
  * If the input contains 0x[0-9a-f]+, move the input pointer
@@ -328,7 +328,7 @@ btp_skip_hexadecimal_uint(const char **input);
  * not contain a hexadecimal number.
  */
 int
-btp_skip_hexadecimal_0xuint(const char **input);
+sr_skip_hexadecimal_0xuint(const char **input);
 
 /**
  * If the input contains [0-9a-f]+, parse the number, and move the
@@ -338,7 +338,7 @@ btp_skip_hexadecimal_0xuint(const char **input);
  * contain a hexadecimal number.
  */
 int
-btp_parse_hexadecimal_uint64(const char **input, uint64_t *result);
+sr_parse_hexadecimal_uint64(const char **input, uint64_t *result);
 
 /**
  * If the input contains 0x[0-9a-f]+, parse the number, and move the
@@ -348,28 +348,28 @@ btp_parse_hexadecimal_uint64(const char **input, uint64_t *result);
  * contain a hexadecimal number.
  */
 int
-btp_parse_hexadecimal_0xuint64(const char **input, uint64_t *result);
+sr_parse_hexadecimal_0xuint64(const char **input, uint64_t *result);
 
 char *
-btp_skip_whitespace(const char *s);
+sr_skip_whitespace(const char *s);
 
 char *
-btp_skip_non_whitespace(const char *s);
+sr_skip_non_whitespace(const char *s);
 
 /**
  * Emit a string of hex representation of bytes.
  */
 char *
-btp_bin2hex(char *dst, const char *str, int count);
+sr_bin2hex(char *dst, const char *str, int count);
 
 char *
-btp_indent(const char *input, int spaces);
+sr_indent(const char *input, int spaces);
 
 char *
-btp_indent_except_first_line(const char *input, int spaces);
+sr_indent_except_first_line(const char *input, int spaces);
 
 char *
-btp_build_path(const char *first_element, ...);
+sr_build_path(const char *first_element, ...);
 
 #ifdef __cplusplus
 }

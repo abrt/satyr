@@ -201,7 +201,7 @@ find_new_function_name_glibc(const char *function_name,
         call_match(function_name, source_file, "__" func "_sse42", func, "/sysdeps/", "libc.so", NULL) || \
         call_match(function_name, source_file, "__" func "_ia32", func, "/sysdeps", "libc.so", NULL)) \
         {                                                               \
-            return btp_strdup(func);                                    \
+            return sr_strdup(func);                                     \
         }
 
         NORMALIZE_ARCH_SPECIFIC("memchr");
@@ -230,31 +230,31 @@ find_new_function_name_glibc(const char *function_name,
 }
 
 void
-btp_normalize_gdb_thread(struct btp_gdb_thread *thread)
+sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
 {
     /* Find the exit frame and remove everything above it. */
-    struct btp_gdb_frame *exit_frame = btp_glibc_thread_find_exit_frame(thread);
+    struct sr_gdb_frame *exit_frame = sr_glibc_thread_find_exit_frame(thread);
     if (exit_frame)
     {
-        bool success = btp_gdb_thread_remove_frames_above(thread, exit_frame);
+        bool success = sr_gdb_thread_remove_frames_above(thread, exit_frame);
         assert(success); /* if this fails, some code become broken */
-        success = btp_gdb_thread_remove_frame(thread, exit_frame);
+        success = sr_gdb_thread_remove_frame(thread, exit_frame);
         assert(success); /* if this fails, some code become broken */
     }
 
     /* Normalize function names by removing various prefixes that
      * occur only in some cases.
      */
-    struct btp_gdb_frame *frame = thread->frames;
+    struct sr_gdb_frame *frame = thread->frames;
     while (frame)
     {
         /* Remove IA__ prefix used in GLib, GTK and GDK. */
-        btp_gdb_frame_remove_func_prefix(frame, "IA__gdk", strlen("IA__"));
-        btp_gdb_frame_remove_func_prefix(frame, "IA__g_", strlen("IA__"));
-        btp_gdb_frame_remove_func_prefix(frame, "IA__gtk", strlen("IA__"));
+        sr_gdb_frame_remove_func_prefix(frame, "IA__gdk", strlen("IA__"));
+        sr_gdb_frame_remove_func_prefix(frame, "IA__g_", strlen("IA__"));
+        sr_gdb_frame_remove_func_prefix(frame, "IA__gtk", strlen("IA__"));
 
         /* Remove __GI_ (glibc internal) prefix. */
-        btp_gdb_frame_remove_func_prefix(frame, "__GI_", strlen("__GI_"));
+        sr_gdb_frame_remove_func_prefix(frame, "__GI_", strlen("__GI_"));
 
         frame = frame->next;
     }
@@ -281,7 +281,7 @@ btp_normalize_gdb_thread(struct btp_gdb_thread *thread)
     frame = thread->frames;
     while (frame)
     {
-        struct btp_gdb_frame *next_frame = frame->next;
+        struct sr_gdb_frame *next_frame = frame->next;
 
         /* Remove frames which are not a cause of the crash. */
         bool removable =
@@ -298,12 +298,12 @@ btp_normalize_gdb_thread(struct btp_gdb_thread *thread)
 
         if (removable_with_above)
         {
-            bool success = btp_gdb_thread_remove_frames_above(thread, frame);
+            bool success = sr_gdb_thread_remove_frames_above(thread, frame);
             assert(success);
         }
 
         if (removable || removable_with_above)
-            btp_gdb_thread_remove_frame(thread, frame);
+            sr_gdb_thread_remove_frame(thread, frame);
 
         frame = next_frame;
     }
@@ -325,7 +325,7 @@ btp_normalize_gdb_thread(struct btp_gdb_thread *thread)
         thread->frames->function_name &&
         0 == strcmp(thread->frames->function_name, "??"))
     {
-        btp_gdb_thread_remove_frame(thread, thread->frames);
+        sr_gdb_thread_remove_frame(thread, thread->frames);
     }
 
     /* If the last frame has address 0x0000 and its name is '??',
@@ -338,7 +338,7 @@ btp_normalize_gdb_thread(struct btp_gdb_thread *thread)
      * #3  0x0000000000000000 in ?? ()
      * @endcode
      */
-    struct btp_gdb_frame *last = thread->frames;
+    struct sr_gdb_frame *last = thread->frames;
     while (last && last->next)
         last = last->next;
     if (last &&
@@ -346,20 +346,20 @@ btp_normalize_gdb_thread(struct btp_gdb_thread *thread)
         last->function_name &&
         0 == strcmp(last->function_name, "??"))
     {
-        btp_gdb_thread_remove_frame(thread, last);
+        sr_gdb_thread_remove_frame(thread, last);
     }
 
     /* Merge recursively called functions into single frame */
-    struct btp_gdb_frame *curr_frame = thread->frames;
-    struct btp_gdb_frame *prev_frame = NULL;
+    struct sr_gdb_frame *curr_frame = thread->frames;
+    struct sr_gdb_frame *prev_frame = NULL;
     while (curr_frame)
     {
         if (prev_frame &&
-            0 != btp_strcmp0(prev_frame->function_name, "??") &&
-            0 == btp_strcmp0(prev_frame->function_name, curr_frame->function_name))
+            0 != sr_strcmp0(prev_frame->function_name, "??") &&
+            0 == sr_strcmp0(prev_frame->function_name, curr_frame->function_name))
         {
             prev_frame->next = curr_frame->next;
-            btp_gdb_frame_free(curr_frame);
+            sr_gdb_frame_free(curr_frame);
             curr_frame = prev_frame->next;
             continue;
         }
@@ -370,12 +370,12 @@ btp_normalize_gdb_thread(struct btp_gdb_thread *thread)
 }
 
 void
-btp_normalize_gdb_stacktrace(struct btp_gdb_stacktrace *stacktrace)
+sr_normalize_gdb_stacktrace(struct sr_gdb_stacktrace *stacktrace)
 {
-    struct btp_gdb_thread *thread = stacktrace->threads;
+    struct sr_gdb_thread *thread = stacktrace->threads;
     while (thread)
     {
-        btp_normalize_gdb_thread(thread);
+        sr_normalize_gdb_thread(thread);
         thread = thread->next;
     }
 }
@@ -383,16 +383,16 @@ btp_normalize_gdb_stacktrace(struct btp_gdb_stacktrace *stacktrace)
 static int
 ptrstrcmp(const void *s1, const void *s2)
 {
-    return btp_strcmp0(*(const char**)s1, *(const char**)s2);
+    return sr_strcmp0(*(const char**)s1, *(const char**)s2);
 }
 
 void
-btp_normalize_koops_stacktrace(struct btp_koops_stacktrace *stacktrace)
+sr_normalize_koops_stacktrace(struct sr_koops_stacktrace *stacktrace)
 {
     /* Normalize function names by removing the suffixes identified by
      * the dot character.
      */
-    struct btp_koops_frame *frame = stacktrace->frames;
+    struct sr_koops_frame *frame = stacktrace->frames;
     while (frame)
     {
         char *dot = strchr(frame->function_name, '.');
@@ -424,7 +424,7 @@ btp_normalize_koops_stacktrace(struct btp_koops_stacktrace *stacktrace)
     frame = stacktrace->frames;
     while (frame)
     {
-        struct btp_koops_frame *next_frame = frame->next;
+        struct sr_koops_frame *next_frame = frame->next;
 
         bool in_blacklist = bsearch(&frame->function_name,
                                     blacklist,
@@ -435,7 +435,7 @@ btp_normalize_koops_stacktrace(struct btp_koops_stacktrace *stacktrace)
         /* do not drop frames belonging to a module */
         if (!frame->module_name && in_blacklist)
         {
-            bool success = btp_koops_stacktrace_remove_frame(stacktrace, frame);
+            bool success = sr_koops_stacktrace_remove_frame(stacktrace, frame);
             assert(success || !"failed to remove frame");
         }
 
@@ -444,15 +444,15 @@ btp_normalize_koops_stacktrace(struct btp_koops_stacktrace *stacktrace)
 }
 
 static bool
-next_functions_similar(struct btp_gdb_frame *frame1,
-                       struct btp_gdb_frame *frame2)
+next_functions_similar(struct sr_gdb_frame *frame1,
+                       struct sr_gdb_frame *frame2)
 {
     if ((!frame1->next && frame2->next) ||
         (frame1->next && !frame2->next) ||
         (frame1->next && frame2->next &&
-         (0 != btp_strcmp0(frame1->next->function_name,
-                         frame2->next->function_name) ||
-          0 == btp_strcmp0(frame1->next->function_name, "??") ||
+         (0 != sr_strcmp0(frame1->next->function_name,
+                          frame2->next->function_name) ||
+          0 == sr_strcmp0(frame1->next->function_name, "??") ||
          (frame1->next->library_name && frame2->next->library_name &&
           0 != strcmp(frame1->next->library_name, frame2->next->library_name)))))
         return false;
@@ -460,8 +460,8 @@ next_functions_similar(struct btp_gdb_frame *frame1,
 }
 
 void
-btp_normalize_gdb_paired_unknown_function_names(struct btp_gdb_thread *thread1,
-                                                struct btp_gdb_thread *thread2)
+sr_normalize_gdb_paired_unknown_function_names(struct sr_gdb_thread *thread1,
+                                               struct sr_gdb_thread *thread2)
 
 {
     if (!thread1->frames || !thread2->frames)
@@ -470,47 +470,47 @@ btp_normalize_gdb_paired_unknown_function_names(struct btp_gdb_thread *thread1,
     }
 
     int i = 0;
-    struct btp_gdb_frame *curr_frame1 = thread1->frames;
-    struct btp_gdb_frame *curr_frame2 = thread2->frames;
+    struct sr_gdb_frame *curr_frame1 = thread1->frames;
+    struct sr_gdb_frame *curr_frame2 = thread2->frames;
 
-    if (0 == btp_strcmp0(curr_frame1->function_name, "??") &&
-        0 == btp_strcmp0(curr_frame2->function_name, "??") &&
+    if (0 == sr_strcmp0(curr_frame1->function_name, "??") &&
+        0 == sr_strcmp0(curr_frame2->function_name, "??") &&
         !(curr_frame1->library_name && curr_frame2->library_name &&
           strcmp(curr_frame1->library_name, curr_frame2->library_name)) &&
         next_functions_similar(curr_frame1, curr_frame2))
     {
         free(curr_frame1->function_name);
-        curr_frame1->function_name = btp_asprintf("__unknown_function_%d", i);
+        curr_frame1->function_name = sr_asprintf("__unknown_function_%d", i);
         free(curr_frame2->function_name);
-        curr_frame2->function_name = btp_asprintf("__unknown_function_%d", i);
+        curr_frame2->function_name = sr_asprintf("__unknown_function_%d", i);
         i++;
     }
 
-    struct btp_gdb_frame *prev_frame1 = curr_frame1;
-    struct btp_gdb_frame *prev_frame2 = curr_frame2;
+    struct sr_gdb_frame *prev_frame1 = curr_frame1;
+    struct sr_gdb_frame *prev_frame2 = curr_frame2;
     curr_frame1 = curr_frame1->next;
     curr_frame2 = curr_frame2->next;
 
     while (curr_frame1)
     {
-        if (0 == btp_strcmp0(curr_frame1->function_name, "??"))
+        if (0 == sr_strcmp0(curr_frame1->function_name, "??"))
         {
             while (curr_frame2)
             {
-                if (0 == btp_strcmp0(curr_frame2->function_name, "??") &&
+                if (0 == sr_strcmp0(curr_frame2->function_name, "??") &&
                     !(curr_frame1->library_name && curr_frame2->library_name &&
                       strcmp(curr_frame1->library_name, curr_frame2->library_name)) &&
-                    0 != btp_strcmp0(prev_frame2->function_name, "??") &&
+                    0 != sr_strcmp0(prev_frame2->function_name, "??") &&
                     next_functions_similar(curr_frame1, curr_frame2) &&
-                    0 == btp_strcmp0(prev_frame1->function_name,
+                    0 == sr_strcmp0(prev_frame1->function_name,
                                      prev_frame2->function_name) &&
                     !(prev_frame1->library_name && prev_frame2->library_name &&
                       strcmp(prev_frame1->library_name, prev_frame2->library_name)))
                 {
                     free(curr_frame1->function_name);
-                    curr_frame1->function_name = btp_asprintf("__unknown_function_%d", i);
+                    curr_frame1->function_name = sr_asprintf("__unknown_function_%d", i);
                     free(curr_frame2->function_name);
-                    curr_frame2->function_name = btp_asprintf("__unknown_function_%d", i);
+                    curr_frame2->function_name = sr_asprintf("__unknown_function_%d", i);
                     i++;
                     break;
                 }
@@ -526,40 +526,40 @@ btp_normalize_gdb_paired_unknown_function_names(struct btp_gdb_thread *thread1,
 }
 
 void
-btp_gdb_normalize_optimize_thread(struct btp_gdb_thread *thread)
+sr_gdb_normalize_optimize_thread(struct sr_gdb_thread *thread)
 {
-    struct btp_gdb_frame *frame = thread->frames;
+    struct sr_gdb_frame *frame = thread->frames;
     while (frame)
     {
-        struct btp_gdb_frame *next_frame = frame->next;
+        struct sr_gdb_frame *next_frame = frame->next;
 
         /* Remove main(). */
         if (frame->function_name &&
                 strcmp(frame->function_name, "main") == 0)
-            btp_gdb_thread_remove_frame(thread, frame);
+            sr_gdb_thread_remove_frame(thread, frame);
 
         frame = next_frame;
     }
 }
 
-struct btp_gdb_frame *
-btp_glibc_thread_find_exit_frame(struct btp_gdb_thread *thread)
+struct sr_gdb_frame *
+sr_glibc_thread_find_exit_frame(struct sr_gdb_thread *thread)
 {
-    struct btp_gdb_frame *frame = thread->frames;
-    struct btp_gdb_frame *result = NULL;
+    struct sr_gdb_frame *frame = thread->frames;
+    struct sr_gdb_frame *result = NULL;
     while (frame)
     {
         bool is_exit_frame =
-            btp_gdb_frame_calls_func(frame, "__run_exit_handlers", "exit.c", NULL) ||
-            btp_gdb_frame_calls_func(frame, "raise", "pt-raise.c", "libc.so", "libc-", "libpthread.so", NULL) ||
-            btp_gdb_frame_calls_func(frame, "__GI_raise", "raise.c", NULL) ||
-            btp_gdb_frame_calls_func(frame, "exit", "exit.c", NULL) ||
-            btp_gdb_frame_calls_func(frame, "abort", "abort.c", "libc.so", "libc-", NULL) ||
-            btp_gdb_frame_calls_func(frame, "__GI_abort", "abort.c", NULL) ||
+            sr_gdb_frame_calls_func(frame, "__run_exit_handlers", "exit.c", NULL) ||
+            sr_gdb_frame_calls_func(frame, "raise", "pt-raise.c", "libc.so", "libc-", "libpthread.so", NULL) ||
+            sr_gdb_frame_calls_func(frame, "__GI_raise", "raise.c", NULL) ||
+            sr_gdb_frame_calls_func(frame, "exit", "exit.c", NULL) ||
+            sr_gdb_frame_calls_func(frame, "abort", "abort.c", "libc.so", "libc-", NULL) ||
+            sr_gdb_frame_calls_func(frame, "__GI_abort", "abort.c", NULL) ||
             /* Terminates a function in case of buffer overflow. */
-            btp_gdb_frame_calls_func(frame, "__chk_fail", "chk_fail.c", "libc.so", NULL) ||
-            btp_gdb_frame_calls_func(frame, "__stack_chk_fail", "stack_chk_fail.c", "libc.so", NULL) ||
-            btp_gdb_frame_calls_func(frame, "kill", "syscall-template.S", NULL);
+            sr_gdb_frame_calls_func(frame, "__chk_fail", "chk_fail.c", "libc.so", NULL) ||
+            sr_gdb_frame_calls_func(frame, "__stack_chk_fail", "stack_chk_fail.c", "libc.so", NULL) ||
+            sr_gdb_frame_calls_func(frame, "kill", "syscall-template.S", NULL);
 
         if (is_exit_frame)
             result = frame;

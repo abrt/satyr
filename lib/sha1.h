@@ -27,8 +27,8 @@
     bytes stored in memory. It runs at 22 cycles per byte on a Pentium
     P4 processor.
 */
-#ifndef BTPARSER_SHA1_H
-#define BTPARSER_SHA1_H
+#ifndef SATYR_SHA1_H
+#define SATYR_SHA1_H
 
 /**
  * @file
@@ -44,13 +44,13 @@ extern "C" {
 #include <stdint.h>
 #include <string.h>
 
-#define BTP_SHA1_RESULT_BIN_LEN (5 * 4)
-#define BTP_SHA1_RESULT_LEN (5 * 4 * 2 + 1)
+#define SR_SHA1_RESULT_BIN_LEN (5 * 4)
+#define SR_SHA1_RESULT_LEN (5 * 4 * 2 + 1)
 
 /**
  * @brief Internal state of a SHA-1 hash algorithm.
  */
-struct btp_sha1_state
+struct sr_sha1_state
 {
     /* always correctly aligned for uint64_t */
     uint8_t wbuffer[64];
@@ -62,15 +62,15 @@ struct btp_sha1_state
 };
 
 void
-btp_sha1_begin(struct btp_sha1_state *state);
+sr_sha1_begin(struct sr_sha1_state *state);
 
 void
-btp_sha1_hash(struct btp_sha1_state *state,
-              const void *buffer,
-              size_t len);
+sr_sha1_hash(struct sr_sha1_state *state,
+             const void *buffer,
+             size_t len);
 
 void
-btp_sha1_end(struct btp_sha1_state *state, void *resbuf);
+sr_sha1_end(struct sr_sha1_state *state, void *resbuf);
 
 #ifdef __cplusplus
 }

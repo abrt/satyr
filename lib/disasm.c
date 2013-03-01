@@ -31,7 +31,7 @@
 /**
  * @brief Internal state of a disassembler.
  */
-struct btp_disasm_state
+struct sr_disasm_state
 {
 #if HAVE_LIBOPCODES
     bfd *bfd_file;
@@ -44,46 +44,46 @@ struct btp_disasm_state
 /**
  * Captures disassembler output into a strbuf.  This is used as a hook
  * in init_disassemble_info() of libopcodes, which is called from
- * btp_disasm_init().
+ * sr_disasm_init().
  */
 static int
 buffer_printf(void *buffer, const char *fmt, ...)
 {
-    struct btp_strbuf *strbuf = buffer;
+    struct sr_strbuf *strbuf = buffer;
     va_list p;
     int orig_len = strbuf->len;
 
     va_start(p, fmt);
-    buffer = btp_strbuf_append_strfv(buffer, fmt, p);
+    buffer = sr_strbuf_append_strfv(buffer, fmt, p);
     va_end(p);
 
     return (strbuf->len - orig_len);
 }
 #endif // HAVE_LIBOPCODES
 
-struct btp_disasm_state *
-btp_disasm_init(const char *file_name,
-                char **error_message)
+struct sr_disasm_state *
+sr_disasm_init(const char *file_name,
+               char **error_message)
 {
 #if HAVE_LIBOPCODES
-    struct btp_disasm_state *state =
-        btp_malloc(sizeof(struct btp_disasm_state));
+    struct sr_disasm_state *state =
+        sr_malloc(sizeof(struct sr_disasm_state));
 
     state->bfd_file = bfd_openr(file_name, NULL);
     if (!state->bfd_file)
     {
-        *error_message = btp_asprintf("Failed to open file %s: %s",
-                                      file_name,
-                                      bfd_errmsg(bfd_get_error()));
+        *error_message = sr_asprintf("Failed to open file %s: %s",
+                                     file_name,
+                                     bfd_errmsg(bfd_get_error()));
         free(state);
         return NULL;
     }
 
     if (!bfd_check_format(state->bfd_file, bfd_object))
     {
-        *error_message = btp_asprintf("Invalid file format of %s: %s",
-                                      file_name,
-                                      bfd_errmsg(bfd_get_error()));
+        *error_message = sr_asprintf("Invalid file format of %s: %s",
+                                     file_name,
+                                     bfd_errmsg(bfd_get_error()));
         bfd_close(state->bfd_file);
         free(state);
         return NULL;
@@ -94,7 +94,7 @@ btp_disasm_init(const char *file_name,
 
     if (!section)
     {
-        *error_message = btp_asprintf(
+        *error_message = sr_asprintf(
             "Failed to find .text section in %s: %s",
             file_name,
             bfd_errmsg(bfd_get_error()));
@@ -107,7 +107,7 @@ btp_disasm_init(const char *file_name,
     state->disassembler = disassembler(state->bfd_file);
     if (!state->disassembler)
     {
-        *error_message = btp_asprintf(
+        *error_message = sr_asprintf(
             "Unable to find disassembler for %s",
             file_name);
 
@@ -129,13 +129,13 @@ btp_disasm_init(const char *file_name,
     disassemble_init_for_target(&state->info);
     return state;
 #else // HAVE_LIBOPCODES
-    *error_message = btp_asprintf("btparser compiled without libopcodes");
+    *error_message = sr_asprintf("satyr compiled without libopcodes");
     return NULL;
 #endif // HAVE_LIBOPCODES
 }
 
 void
-btp_disasm_free(struct btp_disasm_state *state)
+sr_disasm_free(struct sr_disasm_state *state)
 {
     if (!state)
         return;
@@ -147,17 +147,17 @@ btp_disasm_free(struct btp_disasm_state *state)
 }
 
 char **
-btp_disasm_get_function_instructions(struct btp_disasm_state *state,
-                                     uint64_t start_offset,
-                                     uint64_t size,
-                                     char **error_message)
+sr_disasm_get_function_instructions(struct sr_disasm_state *state,
+                                    uint64_t start_offset,
+                                    uint64_t size,
+                                    char **error_message)
 {
 #if HAVE_LIBOPCODES
     asection *section = state->info.section;
     if (start_offset < section->vma
         || (start_offset + size) > section->vma + section->size)
     {
-        *error_message = btp_asprintf(
+        *error_message = sr_asprintf(
             "Invalid function range 0x%"PRIx64" - 0x%"PRIx64
             " for section.  Section range is 0x%"PRIx64" - 0x%"PRIx64".",
             start_offset,
@@ -175,12 +175,12 @@ btp_disasm_get_function_instructions(struct btp_disasm_state *state,
     bfd_vma pc = start_offset;
     while (pc < start_offset + size)
     {
-        state->info.stream = btp_strbuf_new();
+        state->info.stream = sr_strbuf_new();
         int count = state->disassembler(pc, &state->info);
         pc += count;
         if (count == 0)
         {
-            *error_message = btp_asprintf(
+            *error_message = sr_asprintf(
                 "Failed to disassemble a part of function on "
                 "offset 0x%"PRIx64, pc);
             return NULL;
@@ -191,23 +191,23 @@ btp_disasm_get_function_instructions(struct btp_disasm_state *state,
         if (result_count + 2 == result_capacity)
         {
             result_capacity *= 2;
-            result = btp_realloc(result, result_capacity * sizeof(char*));
+            result = sr_realloc(result, result_capacity * sizeof(char*));
         }
 
-        result[result_count] = btp_strbuf_free_nobuf(state->info.stream);
+        result[result_count] = sr_strbuf_free_nobuf(state->info.stream);
         ++result_count;
     }
 
     result[result_count] = NULL;
     return result;
 #else // HAVE_LIBOPCODES
-    *error_message = btp_asprintf("btparser compiled without libopcodes");
+    *error_message = sr_asprintf("satyr compiled without libopcodes");
     return NULL;
 #endif // HAVE_LIBOPCODES
 }
 
 void
-btp_disasm_instructions_free(char **instructions)
+sr_disasm_instructions_free(char **instructions)
 {
     size_t offset = 0;
     while (instructions[offset])
@@ -220,8 +220,8 @@ btp_disasm_instructions_free(char **instructions)
 }
 
 bool
-btp_disasm_instruction_is_one_of(char *instruction,
-                                 const char **mnemonics)
+sr_disasm_instruction_is_one_of(char *instruction,
+                                const char **mnemonics)
 {
     while (*mnemonics)
     {
@@ -239,12 +239,12 @@ btp_disasm_instruction_is_one_of(char *instruction,
 }
 
 bool
-btp_disasm_instruction_present(char **instructions,
-                               const char **mnemonics)
+sr_disasm_instruction_present(char **instructions,
+                              const char **mnemonics)
 {
     while (*instructions)
     {
-        if (btp_disasm_instruction_is_one_of(*instructions,
+        if (sr_disasm_instruction_is_one_of(*instructions,
                                              mnemonics))
         {
             return true;
@@ -257,13 +257,13 @@ btp_disasm_instruction_present(char **instructions,
 }
 
 bool
-btp_disasm_instruction_parse_single_address_operand(char *instruction,
-                                                    uint64_t *dest)
+sr_disasm_instruction_parse_single_address_operand(char *instruction,
+                                                   uint64_t *dest)
 {
     /* Parse the mnemonic. */
     const char *p = instruction;
-    p = btp_skip_non_whitespace(p);
-    p = btp_skip_whitespace(p);
+    p = sr_skip_non_whitespace(p);
+    p = sr_skip_whitespace(p);
 
     /* Parse the address. */
     int chars_read;
@@ -284,7 +284,7 @@ btp_disasm_instruction_parse_single_address_operand(char *instruction,
 }
 
 uint64_t *
-btp_disasm_get_callee_addresses(char **instructions)
+sr_disasm_get_callee_addresses(char **instructions)
 {
     static const char *call_mnems[] = {"call", "callb", "callw",
                                        "calll", "callq", NULL};
@@ -294,10 +294,10 @@ btp_disasm_get_callee_addresses(char **instructions)
     while (instructions[instruction_offset])
     {
         char *instruction = instructions[instruction_offset];
-        if (btp_disasm_instruction_is_one_of(instruction, call_mnems))
+        if (sr_disasm_instruction_is_one_of(instruction, call_mnems))
         {
             uint64_t address;
-            if (btp_disasm_instruction_parse_single_address_operand(
+            if (sr_disasm_instruction_parse_single_address_operand(
                     instruction, &address))
                 ++result_size;
         }
@@ -312,10 +312,10 @@ btp_disasm_get_callee_addresses(char **instructions)
     while (instructions[instruction_offset])
     {
         char *instruction = instructions[instruction_offset];
-        if (btp_disasm_instruction_is_one_of(instruction, call_mnems))
+        if (sr_disasm_instruction_is_one_of(instruction, call_mnems))
         {
             uint64_t address;
-            if (btp_disasm_instruction_parse_single_address_operand(instruction, &address))
+            if (sr_disasm_instruction_parse_single_address_operand(instruction, &address))
             {
                 /* Check if address is already stored in the list. */
                 size_t result_loop = 0;
@@ -341,31 +341,31 @@ btp_disasm_get_callee_addresses(char **instructions)
 }
 
 char *
-btp_disasm_instructions_to_text(char **instructions)
+sr_disasm_instructions_to_text(char **instructions)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
+    struct sr_strbuf *strbuf = sr_strbuf_new();
     while (*instructions)
     {
-        btp_strbuf_append_str(strbuf, *instructions);
-        btp_strbuf_append_char(strbuf, '\n');
+        sr_strbuf_append_str(strbuf, *instructions);
+        sr_strbuf_append_char(strbuf, '\n');
         ++instructions;
     }
 
-    return btp_strbuf_free_nobuf(strbuf);
+    return sr_strbuf_free_nobuf(strbuf);
 }
 
 char *
-btp_disasm_binary_to_text(struct btp_disasm_state *state,
-                          uint64_t start_offset,
-                          uint64_t size,
-                          char **error_message)
+sr_disasm_binary_to_text(struct sr_disasm_state *state,
+                         uint64_t start_offset,
+                         uint64_t size,
+                         char **error_message)
 {
 #if HAVE_LIBOPCODES
     asection *section = state->info.section;
     if (start_offset < section->vma
         || (start_offset + size) > section->vma + section->size)
     {
-        *error_message = btp_asprintf(
+        *error_message = sr_asprintf(
             "Invalid function range: 0x%"PRIx64" - 0x%"PRIx64,
             start_offset,
             start_offset + size);
@@ -373,7 +373,7 @@ btp_disasm_binary_to_text(struct btp_disasm_state *state,
         return NULL;
     }
 
-    char *code = btp_malloc(size);
+    char *code = sr_malloc(size);
     bool success = bfd_get_section_contents(state->bfd_file,
                                             state->info.section,
                                             code,
@@ -382,22 +382,22 @@ btp_disasm_binary_to_text(struct btp_disasm_state *state,
 
     if (!success)
     {
-        *error_message = btp_strdup("Failed to get section contents.");
+        *error_message = sr_strdup("Failed to get section contents.");
         return NULL;
     }
 
-    struct btp_strbuf *strbuf = btp_strbuf_new();
+    struct sr_strbuf *strbuf = sr_strbuf_new();
     for (int i = 0; i < size; ++i)
     {
-        btp_strbuf_append_strf(strbuf, "0x%02x ", (unsigned char)code[i]);
+        sr_strbuf_append_strf(strbuf, "0x%02x ", (unsigned char)code[i]);
         if ((i + 1) % 12 == 0)
-            btp_strbuf_append_char(strbuf, '\n');
+            sr_strbuf_append_char(strbuf, '\n');
     }
 
     free(code);
-    return btp_strbuf_free_nobuf(strbuf);
+    return sr_strbuf_free_nobuf(strbuf);
 #else // HAVE_LIBOPCODES
-    *error_message = btp_asprintf("btparser compiled without libopcodes");
+    *error_message = sr_asprintf("satyr compiled without libopcodes");
     return NULL;
 #endif // HAVE_LIBOPCODES
 }

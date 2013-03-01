@@ -1,11 +1,11 @@
-# Checking the btparser. -*- Autotest -*-
+# Checking the satyr. -*- Autotest -*-
 
 AT_BANNER([ABRT])
 
-## ----------------------- ##
-## btp_abrt_parse_dso_list ##
-## ----------------------- ##
-AT_TESTFUN([btp_abrt_parse_dso_list],
+## ---------------------- ##
+## sr_abrt_parse_dso_list ##
+## ---------------------- ##
+AT_TESTFUN([sr_abrt_parse_dso_list],
 [[
 #include <lib/abrt.h>
 #include <lib/rpm.h>
@@ -44,11 +44,11 @@ main(void)
     "/usr/lib64/libunwind.so.8.0.1 libunwind-1.1-1.fc19.x86_64 (None) 1350312182\n"
     "/lib64/libpthread-2.12.so glibc-2.12-1.80.el6_3.5.x86_64 (Scientific Linux) 1346116822\n";
 
-  struct btp_rpm_package *packages =
-    btp_abrt_parse_dso_list(dso_list);
+  struct sr_rpm_package *packages =
+    sr_abrt_parse_dso_list(dso_list);
 
   assert(packages);
-  btp_rpm_package_free(packages, true);
+  sr_rpm_package_free(packages, true);
   return 0;
 }
 ]])

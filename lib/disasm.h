@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_DISASSEMBLER_H
-#define BTPARSER_DISASSEMBLER_H
+#ifndef SATYR_DISASSEMBLER_H
+#define SATYR_DISASSEMBLER_H
 
 /**
  * @file
@@ -34,57 +34,57 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
-struct btp_disasm_state;
+struct sr_disasm_state;
 
-struct btp_disasm_state *
-btp_disasm_init(const char *file_name,
-                char **error_message);
+struct sr_disasm_state *
+sr_disasm_init(const char *file_name,
+               char **error_message);
 
 void
-btp_disasm_free(struct btp_disasm_state *state);
+sr_disasm_free(struct sr_disasm_state *state);
 
 /**
  * Disassemble the function starting at 'start_offset' and taking
  * 'size' bytes, returning a list of (char*) instructions.
  */
 char **
-btp_disasm_get_function_instructions(struct btp_disasm_state *state,
-                                     uint64_t start_offset,
-                                     uint64_t size,
-                                     char **error_message);
+sr_disasm_get_function_instructions(struct sr_disasm_state *state,
+                                    uint64_t start_offset,
+                                    uint64_t size,
+                                    char **error_message);
 
 void
-btp_disasm_instructions_free(char **instructions);
+sr_disasm_instructions_free(char **instructions);
 
 bool
-btp_disasm_instruction_is_one_of(char *instruction,
-                                 const char **mnemonics);
+sr_disasm_instruction_is_one_of(char *instruction,
+                                const char **mnemonics);
 
 bool
-btp_disasm_instruction_present(char **instructions,
-                               const char **mnemonics);
+sr_disasm_instruction_present(char **instructions,
+                              const char **mnemonics);
 
 bool
-btp_disasm_instruction_parse_single_address_operand(char *instruction,
-                                                    uint64_t *dest);
+sr_disasm_instruction_parse_single_address_operand(char *instruction,
+                                                   uint64_t *dest);
 
 /* Given list of instructions, returns lists of addresses that are
  * (directly) called by them.  The list is terminated by address 0.
  */
 uint64_t *
-btp_disasm_get_callee_addresses(char **instructions);
+sr_disasm_get_callee_addresses(char **instructions);
 
 char *
-btp_disasm_instructions_to_text(char **instructions);
+sr_disasm_instructions_to_text(char **instructions);
 
 char *
-btp_disasm_binary_to_text(struct btp_disasm_state *state,
-                          uint64_t start_offset,
-                          uint64_t size,
-                          char **error_message);
+sr_disasm_binary_to_text(struct sr_disasm_state *state,
+                         uint64_t start_offset,
+                         uint64_t size,
+                         char **error_message);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // BTPARSER_DISASSEMBLER_H
+#endif // SATYR_DISASSEMBLER_H

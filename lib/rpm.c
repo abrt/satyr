@@ -33,24 +33,24 @@
 #include <assert.h>
 #include <string.h>
 
-struct btp_rpm_package *
-btp_rpm_package_new()
+struct sr_rpm_package *
+sr_rpm_package_new()
 {
-    struct btp_rpm_package *package =
-        btp_malloc(sizeof(struct btp_rpm_package));
+    struct sr_rpm_package *package =
+        sr_malloc(sizeof(struct sr_rpm_package));
 
-    btp_rpm_package_init(package);
+    sr_rpm_package_init(package);
     return package;
 }
 
 void
-btp_rpm_package_init(struct btp_rpm_package *package)
+sr_rpm_package_init(struct sr_rpm_package *package)
 {
-    memset(package, 0, sizeof(struct btp_rpm_package));
+    memset(package, 0, sizeof(struct sr_rpm_package));
 }
 
 void
-btp_rpm_package_free(struct btp_rpm_package *package,
+sr_rpm_package_free(struct sr_rpm_package *package,
                      bool recursive)
 {
     if (!package)
@@ -60,18 +60,18 @@ btp_rpm_package_free(struct btp_rpm_package *package,
     free(package->version);
     free(package->release);
     free(package->architecture);
-    btp_rpm_consistency_free(package->consistency, true);
+    sr_rpm_consistency_free(package->consistency, true);
     if (package->next && recursive)
-        btp_rpm_package_free(package->next, true);
+        sr_rpm_package_free(package->next, true);
 
     free(package);
 }
 
 int
-btp_rpm_package_cmp(struct btp_rpm_package *package1,
-                    struct btp_rpm_package *package2)
+sr_rpm_package_cmp(struct sr_rpm_package *package1,
+                   struct sr_rpm_package *package2)
 {
-    int nevra = btp_rpm_package_cmp_nevra(package1, package2);
+    int nevra = sr_rpm_package_cmp_nevra(package1, package2);
     if (nevra != 0)
         return nevra;
 
@@ -81,8 +81,8 @@ btp_rpm_package_cmp(struct btp_rpm_package *package1,
         return install_time;
 
     /* Consistency. */
-    int consistency = btp_rpm_consistency_cmp_recursive(package1->consistency,
-                                                        package2->consistency);
+    int consistency = sr_rpm_consistency_cmp_recursive(package1->consistency,
+                                                       package2->consistency);
 
     if (consistency)
         return consistency;
@@ -91,10 +91,10 @@ btp_rpm_package_cmp(struct btp_rpm_package *package1,
 }
 
 int
-btp_rpm_package_cmp_nevra(struct btp_rpm_package *package1,
-                          struct btp_rpm_package *package2)
+sr_rpm_package_cmp_nevra(struct sr_rpm_package *package1,
+                         struct sr_rpm_package *package2)
 {
-    int nvr = btp_rpm_package_cmp_nvr(package1, package2);
+    int nvr = sr_rpm_package_cmp_nvr(package1, package2);
     if (nvr != 0)
         return nvr;
 
@@ -104,7 +104,7 @@ btp_rpm_package_cmp_nevra(struct btp_rpm_package *package1,
         return epoch;
 
     /* Architecture. */
-    int architecture = btp_strcmp0(package1->architecture,
+    int architecture = sr_strcmp0(package1->architecture,
                                    package2->architecture);
     if (architecture != 0)
         return architecture;
@@ -113,21 +113,21 @@ btp_rpm_package_cmp_nevra(struct btp_rpm_package *package1,
 }
 
 int
-btp_rpm_package_cmp_nvr(struct btp_rpm_package *package1,
-                         struct btp_rpm_package *package2)
+sr_rpm_package_cmp_nvr(struct sr_rpm_package *package1,
+                       struct sr_rpm_package *package2)
 {
     /* Name. */
-    int name = btp_strcmp0(package1->name, package2->name);
+    int name = sr_strcmp0(package1->name, package2->name);
     if (name != 0)
         return name;
 
     /* Version. */
-    int version = btp_strcmp0(package1->version, package2->version);
+    int version = sr_strcmp0(package1->version, package2->version);
     if (version != 0)
         return version;
 
     /* Release. */
-    int release = btp_strcmp0(package1->release, package2->release);
+    int release = sr_strcmp0(package1->release, package2->release);
     if (release != 0)
         return release;
 
@@ -135,20 +135,20 @@ btp_rpm_package_cmp_nvr(struct btp_rpm_package *package1,
 }
 
 static int
-cmp_nevra_qsort_wrapper(struct btp_rpm_package **package1,
-                        struct btp_rpm_package **package2)
+cmp_nevra_qsort_wrapper(struct sr_rpm_package **package1,
+                        struct sr_rpm_package **package2)
 {
-    return btp_rpm_package_cmp_nevra(*package1, *package2);
+    return sr_rpm_package_cmp_nevra(*package1, *package2);
 }
 
-struct btp_rpm_package *
-btp_rpm_package_append(struct btp_rpm_package *dest,
-                       struct btp_rpm_package *item)
+struct sr_rpm_package *
+sr_rpm_package_append(struct sr_rpm_package *dest,
+                      struct sr_rpm_package *item)
 {
     if (!dest)
         return item;
 
-    struct btp_rpm_package *dest_loop = dest;
+    struct sr_rpm_package *dest_loop = dest;
     while (dest_loop->next)
         dest_loop = dest_loop->next;
 
@@ -157,10 +157,10 @@ btp_rpm_package_append(struct btp_rpm_package *dest,
 }
 
 int
-btp_rpm_package_count(struct btp_rpm_package *packages)
+sr_rpm_package_count(struct sr_rpm_package *packages)
 {
     int count = 0;
-    struct btp_rpm_package *loop = packages;
+    struct sr_rpm_package *loop = packages;
     while (loop)
     {
         ++count;
@@ -170,14 +170,14 @@ btp_rpm_package_count(struct btp_rpm_package *packages)
     return count;
 }
 
-struct btp_rpm_package *
-btp_rpm_package_sort(struct btp_rpm_package *packages)
+struct sr_rpm_package *
+sr_rpm_package_sort(struct sr_rpm_package *packages)
 {
-    size_t count = btp_rpm_package_count(packages);
-    struct btp_rpm_package **array = btp_malloc(count * sizeof(struct btp_rpm_package*));
+    size_t count = sr_rpm_package_count(packages);
+    struct sr_rpm_package **array = sr_malloc(count * sizeof(struct sr_rpm_package*));
 
     /* Copy the linked list to an array. */
-    struct btp_rpm_package *list_loop = packages, **array_loop = array;
+    struct sr_rpm_package *list_loop = packages, **array_loop = array;
     while (list_loop)
     {
         *array_loop = list_loop;
@@ -186,7 +186,7 @@ btp_rpm_package_sort(struct btp_rpm_package *packages)
     }
 
     /* Sort the array. */
-    qsort(array, count, sizeof(struct btp_rpm_package*), (comparison_fn_t)cmp_nevra_qsort_wrapper);
+    qsort(array, count, sizeof(struct sr_rpm_package*), (comparison_fn_t)cmp_nevra_qsort_wrapper);
 
     /* Create a linked list from the sorted array. */
     for (size_t loop = 0; loop < count; ++loop)
@@ -200,25 +200,25 @@ btp_rpm_package_sort(struct btp_rpm_package *packages)
     return array[0];
 }
 
-struct btp_rpm_package *
-btp_rpm_package_uniq(struct btp_rpm_package *packages)
+struct sr_rpm_package *
+sr_rpm_package_uniq(struct sr_rpm_package *packages)
 {
-    struct btp_rpm_package *loop = packages, *prev = NULL;
+    struct sr_rpm_package *loop = packages, *prev = NULL;
     while (loop && loop->next)
     {
         /* architecture is sometimes missing */
-        if (0 == btp_rpm_package_cmp_nvr(loop, loop->next))
+        if (0 == sr_rpm_package_cmp_nvr(loop, loop->next))
         {
             /* the architectures were not compared */
             if (loop->architecture && loop->next->architecture &&
-                0 != btp_strcmp0(loop->architecture, loop->next->architecture))
+                0 != sr_strcmp0(loop->architecture, loop->next->architecture))
                 continue;
 
             /* keep the record with install_time */
             if (loop->install_time)
             {
-                struct btp_rpm_package *next = loop->next->next;
-                btp_rpm_package_free(loop->next, false);
+                struct sr_rpm_package *next = loop->next->next;
+                sr_rpm_package_free(loop->next, false);
                 loop->next = next;
             }
             else
@@ -228,7 +228,7 @@ btp_rpm_package_uniq(struct btp_rpm_package *packages)
                 else
                     packages = loop->next;
 
-                btp_rpm_package_free(loop, false);
+                sr_rpm_package_free(loop, false);
                 loop = prev->next;
             }
 
@@ -258,7 +258,7 @@ header_get_string(Header header,
         return false;
 
     const char *str = rpmtdGetString(tag_data);
-    *result = (str ? btp_strdup(str) : NULL);
+    *result = (str ? sr_strdup(str) : NULL);
     rpmtdFree(tag_data);
     return str;
 }
@@ -285,48 +285,48 @@ header_get_uint32(Header header,
     return num;
 }
 
-static struct btp_rpm_package *
+static struct sr_rpm_package *
 header_to_rpm_info(Header header,
                    char **error_message)
 {
-    struct btp_rpm_package *rpm = btp_rpm_package_new();
+    struct sr_rpm_package *rpm = sr_rpm_package_new();
 
     if (!header_get_string(header, RPMTAG_NAME, &rpm->name))
     {
-        btp_rpm_package_free(rpm, false);
-        *error_message = btp_asprintf("Failed to find package name.");
+        sr_rpm_package_free(rpm, false);
+        *error_message = sr_asprintf("Failed to find package name.");
         return NULL;
     }
 
     bool success = header_get_uint32(header, RPMTAG_EPOCH, &rpm->epoch);
     if (!success)
     {
-        *error_message = btp_asprintf("Failed to find package epoch.");
-        btp_rpm_package_free(rpm, false);
+        *error_message = sr_asprintf("Failed to find package epoch.");
+        sr_rpm_package_free(rpm, false);
         return NULL;
     }
 
     success = header_get_string(header, RPMTAG_VERSION, &rpm->version);
     if (!success)
     {
-        *error_message = btp_asprintf("Failed to find package version.");
-        btp_rpm_package_free(rpm, false);
+        *error_message = sr_asprintf("Failed to find package version.");
+        sr_rpm_package_free(rpm, false);
         return NULL;
     }
 
     success = header_get_string(header, RPMTAG_RELEASE, &rpm->release);
     if (!success)
     {
-        *error_message = btp_asprintf("Failed to find package release.");
-        btp_rpm_package_free(rpm, false);
+        *error_message = sr_asprintf("Failed to find package release.");
+        sr_rpm_package_free(rpm, false);
         return NULL;
     }
 
     success = header_get_string(header, RPMTAG_ARCH, &rpm->architecture);
     if (!success)
     {
-        *error_message = btp_asprintf("Failed to find package architecture.");
-        btp_rpm_package_free(rpm, false);
+        *error_message = sr_asprintf("Failed to find package architecture.");
+        sr_rpm_package_free(rpm, false);
         return NULL;
     }
 
@@ -334,8 +334,8 @@ header_to_rpm_info(Header header,
     success = header_get_uint32(header, RPMTAG_INSTALLTIME, &install_time);
     if (!success)
     {
-        *error_message = btp_asprintf("Failed to find package installation time.");
-        btp_rpm_package_free(rpm, false);
+        *error_message = sr_asprintf("Failed to find package installation time.");
+        sr_rpm_package_free(rpm, false);
         return NULL;
     }
 
@@ -349,13 +349,13 @@ header_to_rpm_info(Header header,
  * Takes 0.06 second for bash package consisting of 92 files.
  * Takes 0.75 second for emacs-common package consisting of 2585 files.
  */
-struct btp_rpm_package *
-btp_rpm_package_get_by_name(const char *name, char **error_message)
+struct sr_rpm_package *
+sr_rpm_package_get_by_name(const char *name, char **error_message)
 {
 #ifdef HAVE_LIBRPM
     if (rpmReadConfigFiles(NULL, NULL))
     {
-        *error_message = btp_asprintf("Failed to read RPM configuration files.");
+        *error_message = sr_asprintf("Failed to read RPM configuration files.");
         return NULL;
     }
 
@@ -365,39 +365,39 @@ btp_rpm_package_get_by_name(const char *name, char **error_message)
                                                 name,
                                                 strlen(name));
 
-    struct btp_rpm_package *result = NULL;
+    struct sr_rpm_package *result = NULL;
     Header header;
     while ((header = rpmdbNextIterator(iter)))
     {
-        struct btp_rpm_package *package = header_to_rpm_info(header,
-                                                             error_message);
+        struct sr_rpm_package *package = header_to_rpm_info(header,
+                                                            error_message);
         if (!package)
         {
-            btp_rpm_package_free(result, true);
+            sr_rpm_package_free(result, true);
             result = NULL;
             break;
         }
 
-        result = btp_rpm_package_append(result, package);
+        result = sr_rpm_package_append(result, package);
     }
 
     rpmdbFreeIterator(iter);
     rpmtsFree(ts);
     return result;
 #else
-    *error_message = btp_asprintf("btparser compiled without rpm");
+    *error_message = sr_asprintf("satyr compiled without rpm");
     return NULL;
 #endif
 }
 
-struct btp_rpm_package *
-btp_rpm_package_get_by_path(const char *path,
-                            char **error_message)
+struct sr_rpm_package *
+sr_rpm_package_get_by_path(const char *path,
+                           char **error_message)
 {
 #ifdef HAVE_LIBRPM
     if (rpmReadConfigFiles(NULL, NULL))
     {
-        *error_message = btp_asprintf("Failed to read RPM configuration files.");
+        *error_message = sr_asprintf("Failed to read RPM configuration files.");
         return NULL;
     }
 
@@ -407,127 +407,127 @@ btp_rpm_package_get_by_path(const char *path,
                                                 path,
                                                 strlen(path));
 
-    struct btp_rpm_package *result = NULL;
+    struct sr_rpm_package *result = NULL;
     Header header;
     while ((header = rpmdbNextIterator(iter)))
     {
-        struct btp_rpm_package *package = header_to_rpm_info(header,
-                                                             error_message);
+        struct sr_rpm_package *package = header_to_rpm_info(header,
+                                                            error_message);
         if (!package)
         {
-            btp_rpm_package_free(result, true);
+            sr_rpm_package_free(result, true);
             result = NULL;
             break;
         }
 
-        result = btp_rpm_package_append(result, package);
+        result = sr_rpm_package_append(result, package);
     }
 
     rpmdbFreeIterator(iter);
     rpmtsFree(ts);
     return result;
 #else
-    *error_message = btp_asprintf("btparser compiled without rpm");
+    *error_message = sr_asprintf("satyr compiled without rpm");
     return NULL;
 #endif
 }
 
 char *
-btp_rpm_package_to_json(struct btp_rpm_package *package,
-                        bool recursive)
+sr_rpm_package_to_json(struct sr_rpm_package *package,
+                       bool recursive)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
+    struct sr_strbuf *strbuf = sr_strbuf_new();
 
     if (recursive)
     {
-        struct btp_rpm_package *p = package;
+        struct sr_rpm_package *p = package;
         while (p)
         {
             if (p == package)
-                btp_strbuf_append_str(strbuf, "[ ");
+                sr_strbuf_append_str(strbuf, "[ ");
             else
-                btp_strbuf_append_str(strbuf, ", ");
+                sr_strbuf_append_str(strbuf, ", ");
 
-            char *package_json = btp_rpm_package_to_json(p, false);
-            char *indented_package_json = btp_indent_except_first_line(package_json, 2);
-            btp_strbuf_append_str(strbuf, indented_package_json);
+            char *package_json = sr_rpm_package_to_json(p, false);
+            char *indented_package_json = sr_indent_except_first_line(package_json, 2);
+            sr_strbuf_append_str(strbuf, indented_package_json);
             free(indented_package_json);
             free(package_json);
             p = p->next;
             if (p)
-                btp_strbuf_append_str(strbuf, "\n");
+                sr_strbuf_append_str(strbuf, "\n");
         }
 
-        btp_strbuf_append_str(strbuf, " ]");
+        sr_strbuf_append_str(strbuf, " ]");
     }
     else
     {
         /* Name. */
         if (package->name)
         {
-            btp_strbuf_append_strf(strbuf,
-                                   ",   \"name\": \"%s\"\n",
-                                   package->name);
+            sr_strbuf_append_strf(strbuf,
+                                  ",   \"name\": \"%s\"\n",
+                                  package->name);
         }
 
         /* Epoch. */
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"epoch\": %"PRIu32"\n",
-                               package->epoch);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"epoch\": %"PRIu32"\n",
+                              package->epoch);
 
         /* Version. */
         if (package->version)
         {
-            btp_strbuf_append_strf(strbuf,
-                                   ",   \"version\": \"%s\"\n",
-                                   package->version);
+            sr_strbuf_append_strf(strbuf,
+                                  ",   \"version\": \"%s\"\n",
+                                  package->version);
         }
 
         /* Release. */
         if (package->release)
         {
-            btp_strbuf_append_strf(strbuf,
-                                   ",   \"release\": \"%s\"\n",
-                                   package->release);
+            sr_strbuf_append_strf(strbuf,
+                                  ",   \"release\": \"%s\"\n",
+                                  package->release);
         }
 
         /* Architecture. */
         if (package->architecture)
         {
-            btp_strbuf_append_strf(strbuf,
-                                   ",   \"architecture\": \"%s\"\n",
-                                   package->architecture);
+            sr_strbuf_append_strf(strbuf,
+                                  ",   \"architecture\": \"%s\"\n",
+                                  package->architecture);
         }
 
         /* Install time. */
         if (package->install_time > 0)
         {
-            btp_strbuf_append_strf(strbuf,
-                                   ",   \"install_time\": %"PRIu64"\n",
-                                   package->install_time);
+            sr_strbuf_append_strf(strbuf,
+                                  ",   \"install_time\": %"PRIu64"\n",
+                                  package->install_time);
         }
 
         /* Consistency. */
         if (package->consistency)
         {
             // TODO
-            //btp_strbuf_append_strf(strbuf,
-            //                       ",   \"consistency\": \"%s\"\n",
-            //                       package->architecture);
+            //sr_strbuf_append_strf(strbuf,
+            //                      ",   \"consistency\": \"%s\"\n",
+            //                      package->architecture);
         }
 
         strbuf->buf[0] = '{';
-        btp_strbuf_append_str(strbuf, "}");
+        sr_strbuf_append_str(strbuf, "}");
     }
 
-    return btp_strbuf_free_nobuf(strbuf);
+    return sr_strbuf_free_nobuf(strbuf);
 }
 
 bool
-btp_rpm_package_parse_nvr(const char *text,
-                          char **name,
-                          char **version,
-                          char **release)
+sr_rpm_package_parse_nvr(const char *text,
+                         char **name,
+                         char **version,
+                         char **release)
 {
     char *last_dash = strrchr(text, '-');
     if (!last_dash)
@@ -551,25 +551,25 @@ btp_rpm_package_parse_nvr(const char *text,
     }
 
     // Release is after the last dash.
-    *release = btp_strdup(last_dash + 1);
+    *release = sr_strdup(last_dash + 1);
 
     // Version is before the last dash.
-    *version = btp_strndup(last_but_one_dash + 1,
-                           last_dash - last_but_one_dash - 1);
+    *version = sr_strndup(last_but_one_dash + 1,
+                          last_dash - last_but_one_dash - 1);
 
     // Name is before version.
-    *name = btp_strndup(text, last_but_one_dash - text);
+    *name = sr_strndup(text, last_but_one_dash - text);
 
     return true;
 }
 
 bool
-btp_rpm_package_parse_nevra(const char *text,
-                            char **name,
-                            uint32_t *epoch,
-                            char **version,
-                            char **release,
-                            char **architecture)
+sr_rpm_package_parse_nevra(const char *text,
+                           char **name,
+                           uint32_t *epoch,
+                           char **version,
+                           char **release,
+                           char **architecture)
 {
     char *last_dot = strrchr(text, '.');
     if (!last_dot || 0 == strlen(last_dot))
@@ -604,20 +604,20 @@ btp_rpm_package_parse_nevra(const char *text,
     }
 
     // Architecture is after the last dot.
-    *architecture = btp_strdup(last_dot + 1);
+    *architecture = sr_strdup(last_dot + 1);
 
     // Release is after the last dash.
-    *release = btp_strndup(last_dash + 1, last_dot - last_dash - 1);
+    *release = sr_strndup(last_dash + 1, last_dot - last_dash - 1);
 
     // Epoch is optional.
     if (colon)
     {
         // Version is before the last dash.
-        *version = btp_strndup(colon + 1,
-                               last_dash - colon - 1);
+        *version = sr_strndup(colon + 1,
+                              last_dash - colon - 1);
 
-        char *epoch_str = btp_strndup(last_but_one_dash + 1,
-                                      colon - last_but_one_dash - 1);
+        char *epoch_str = sr_strndup(last_but_one_dash + 1,
+                                     colon - last_but_one_dash - 1);
 
         char *endptr;
         errno = 0;
@@ -639,54 +639,54 @@ btp_rpm_package_parse_nevra(const char *text,
     else
     {
         // Version is before the last dash.
-        *version = btp_strndup(last_but_one_dash + 1,
-                               last_dash - last_but_one_dash - 1);
+        *version = sr_strndup(last_but_one_dash + 1,
+                              last_dash - last_but_one_dash - 1);
 
         *epoch = 0;
     }
 
     // Name is before version.
-    *name = btp_strndup(text, last_but_one_dash - text);
+    *name = sr_strndup(text, last_but_one_dash - text);
 
     return true;
 }
 
-struct btp_rpm_consistency *
-btp_rpm_consistency_new()
+struct sr_rpm_consistency *
+sr_rpm_consistency_new()
 {
-    struct btp_rpm_consistency *consistency =
-        btp_malloc(sizeof(struct btp_rpm_consistency));
+    struct sr_rpm_consistency *consistency =
+        sr_malloc(sizeof(struct sr_rpm_consistency));
 
-    btp_rpm_consistency_init(consistency);
+    sr_rpm_consistency_init(consistency);
     return consistency;
 }
 
 void
-btp_rpm_consistency_init(struct btp_rpm_consistency *consistency)
+sr_rpm_consistency_init(struct sr_rpm_consistency *consistency)
 {
-    memset(consistency, 0, sizeof(struct btp_rpm_consistency));
+    memset(consistency, 0, sizeof(struct sr_rpm_consistency));
 }
 
 void
-btp_rpm_consistency_free(struct btp_rpm_consistency *consistency,
-                         bool recursive)
+sr_rpm_consistency_free(struct sr_rpm_consistency *consistency,
+                        bool recursive)
 {
     if (!consistency)
         return;
 
     free(consistency->path);
     if (consistency->next && recursive)
-        btp_rpm_consistency_free(consistency->next, true);
+        sr_rpm_consistency_free(consistency->next, true);
 
     free(consistency);
 }
 
 int
-btp_rpm_consistency_cmp(struct btp_rpm_consistency *consistency1,
-                        struct btp_rpm_consistency *consistency2)
+sr_rpm_consistency_cmp(struct sr_rpm_consistency *consistency1,
+                       struct sr_rpm_consistency *consistency2)
 {
     /* Path. */
-    int path = btp_strcmp0(consistency1->path, consistency2->path);
+    int path = sr_strcmp0(consistency1->path, consistency2->path);
     if (path != 0)
         return path;
 
@@ -739,19 +739,19 @@ btp_rpm_consistency_cmp(struct btp_rpm_consistency *consistency1,
 }
 
 int
-btp_rpm_consistency_cmp_recursive(struct btp_rpm_consistency *consistency1,
-                                  struct btp_rpm_consistency *consistency2)
+sr_rpm_consistency_cmp_recursive(struct sr_rpm_consistency *consistency1,
+                                 struct sr_rpm_consistency *consistency2)
 {
     if (consistency1)
     {
         if (consistency2)
         {
-            int cmp = btp_rpm_consistency_cmp(consistency1, consistency2);
+            int cmp = sr_rpm_consistency_cmp(consistency1, consistency2);
             if (cmp != 0)
                 return cmp;
             else
             {
-                return btp_rpm_consistency_cmp_recursive(
+                return sr_rpm_consistency_cmp_recursive(
                     consistency1->next,
                     consistency2->next);
             }
@@ -763,14 +763,14 @@ btp_rpm_consistency_cmp_recursive(struct btp_rpm_consistency *consistency1,
         return consistency2 ? -1 : 0;
 }
 
-struct btp_rpm_consistency *
-btp_rpm_consistency_append(struct btp_rpm_consistency *dest,
-                           struct btp_rpm_consistency *item)
+struct sr_rpm_consistency *
+sr_rpm_consistency_append(struct sr_rpm_consistency *dest,
+                          struct sr_rpm_consistency *item)
 {
     if (!dest)
         return item;
 
-    struct btp_rpm_consistency *dest_loop = dest;
+    struct sr_rpm_consistency *dest_loop = dest;
     while (dest_loop->next)
         dest_loop = dest_loop->next;
 

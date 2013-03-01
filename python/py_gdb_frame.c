@@ -23,10 +23,10 @@
 #include "lib/utils.h"
 #include "lib/gdb_frame.h"
 
-#define frame_doc "btparser.GdbFrame - class representing a frame in a thread\n" \
+#define frame_doc "satyr.GdbFrame - class representing a frame in a thread\n" \
                   "Usage:\n" \
-                  "btparser.GdbFrame() - creates an empty frame\n" \
-                  "btparser.GdbFrame(str) - parses str and fills the frame object"
+                  "satyr.GdbFrame() - creates an empty frame\n" \
+                  "satyr.GdbFrame(str) - parses str and fills the frame object"
 
 #define f_get_function_name_doc "Usage: frame.get_function_name()\n" \
                                 "Returns: string - function name"
@@ -77,7 +77,7 @@
                               "newname: string - new library name"
 
 #define f_dup_doc "Usage: frame.dup()\n" \
-                  "Returns: btparser.GdbFrame - a new clone of frame\n" \
+                  "Returns: satyr.GdbFrame - a new clone of frame\n" \
                   "Clones the frame object. All new structures are independent " \
                   "on the original object."
 
@@ -95,7 +95,7 @@
                                  "a function with given name from a given file."
 
 #define f_cmp_doc "Usage: frame.cmp(frame2, compare_number)\n" \
-                  "frame2: btparser.Frame - another frame to compare\n" \
+                  "frame2: satyr.Frame - another frame to compare\n" \
                   "compare_number: boolean - whether to compare also thread numbers\n" \
                   "Returns: integer - distance\n" \
                   "Compares frame to frame2. Returns 0 if frame = frame2, " \
@@ -107,39 +107,39 @@ static PyMethodDef
 frame_methods[] =
 {
     /* getters & setters */
-    { "get_function_name",         btp_py_gdb_frame_get_function_name,         METH_NOARGS,  f_get_function_name_doc         },
-    { "set_function_name",         btp_py_gdb_frame_set_function_name,         METH_VARARGS, f_set_function_name_doc         },
-    { "get_function_type",         btp_py_gdb_frame_get_function_type,         METH_NOARGS,  f_get_function_type_doc         },
-    { "set_function_type",         btp_py_gdb_frame_set_function_type,         METH_VARARGS, f_set_function_type_doc         },
-    { "get_number",                btp_py_gdb_frame_get_number,                METH_NOARGS,  f_get_number_doc                },
-    { "set_number",                btp_py_gdb_frame_set_number,                METH_VARARGS, f_set_number_doc                },
-    { "get_source_file",           btp_py_gdb_frame_get_source_file,           METH_NOARGS,  f_get_source_file_doc           },
-    { "set_source_file",           btp_py_gdb_frame_set_source_file,           METH_VARARGS, f_set_source_file_doc           },
-    { "get_source_line",           btp_py_gdb_frame_get_source_line,           METH_NOARGS,  f_get_source_line_doc           },
-    { "set_source_line",           btp_py_gdb_frame_set_source_line,           METH_VARARGS, f_set_source_line_doc           },
-    { "get_signal_handler_called", btp_py_gdb_frame_get_signal_handler_called, METH_NOARGS,  f_get_signal_handler_called_doc },
-    { "set_signal_handler_called", btp_py_gdb_frame_set_signal_handler_called, METH_VARARGS, f_set_signal_handler_called_doc },
-    { "get_address",               btp_py_gdb_frame_get_address,               METH_NOARGS,  f_get_address_doc               },
-    { "set_address",               btp_py_gdb_frame_set_address,               METH_VARARGS, f_set_address_doc               },
-    { "get_library_name",          btp_py_gdb_frame_get_library_name,          METH_NOARGS,  f_get_library_name_doc          },
-    { "set_library_name",          btp_py_gdb_frame_set_library_name,          METH_VARARGS, f_set_library_name_doc          },
+    { "get_function_name",         sr_py_gdb_frame_get_function_name,         METH_NOARGS,  f_get_function_name_doc         },
+    { "set_function_name",         sr_py_gdb_frame_set_function_name,         METH_VARARGS, f_set_function_name_doc         },
+    { "get_function_type",         sr_py_gdb_frame_get_function_type,         METH_NOARGS,  f_get_function_type_doc         },
+    { "set_function_type",         sr_py_gdb_frame_set_function_type,         METH_VARARGS, f_set_function_type_doc         },
+    { "get_number",                sr_py_gdb_frame_get_number,                METH_NOARGS,  f_get_number_doc                },
+    { "set_number",                sr_py_gdb_frame_set_number,                METH_VARARGS, f_set_number_doc                },
+    { "get_source_file",           sr_py_gdb_frame_get_source_file,           METH_NOARGS,  f_get_source_file_doc           },
+    { "set_source_file",           sr_py_gdb_frame_set_source_file,           METH_VARARGS, f_set_source_file_doc           },
+    { "get_source_line",           sr_py_gdb_frame_get_source_line,           METH_NOARGS,  f_get_source_line_doc           },
+    { "set_source_line",           sr_py_gdb_frame_set_source_line,           METH_VARARGS, f_set_source_line_doc           },
+    { "get_signal_handler_called", sr_py_gdb_frame_get_signal_handler_called, METH_NOARGS,  f_get_signal_handler_called_doc },
+    { "set_signal_handler_called", sr_py_gdb_frame_set_signal_handler_called, METH_VARARGS, f_set_signal_handler_called_doc },
+    { "get_address",               sr_py_gdb_frame_get_address,               METH_NOARGS,  f_get_address_doc               },
+    { "set_address",               sr_py_gdb_frame_set_address,               METH_VARARGS, f_set_address_doc               },
+    { "get_library_name",          sr_py_gdb_frame_get_library_name,          METH_NOARGS,  f_get_library_name_doc          },
+    { "set_library_name",          sr_py_gdb_frame_set_library_name,          METH_VARARGS, f_set_library_name_doc          },
     /* methods */
-    { "dup",                       btp_py_gdb_frame_dup,                       METH_NOARGS,  f_dup_doc                       },
-    { "cmp",                       btp_py_gdb_frame_cmp,                       METH_VARARGS, f_cmp_doc                       },
-    { "calls_func",                btp_py_gdb_frame_calls_func,                METH_VARARGS, f_calls_func_doc                },
-    { "calls_func_in_file",        btp_py_gdb_frame_calls_func_in_file,        METH_VARARGS, f_calls_func_in_file_doc        },
+    { "dup",                       sr_py_gdb_frame_dup,                       METH_NOARGS,  f_dup_doc                       },
+    { "cmp",                       sr_py_gdb_frame_cmp,                       METH_VARARGS, f_cmp_doc                       },
+    { "calls_func",                sr_py_gdb_frame_calls_func,                METH_VARARGS, f_calls_func_doc                },
+    { "calls_func_in_file",        sr_py_gdb_frame_calls_func_in_file,        METH_VARARGS, f_calls_func_in_file_doc        },
     { NULL },
 };
 
 PyTypeObject
-btp_py_gdb_frame_type =
+sr_py_gdb_frame_type =
 {
     PyObject_HEAD_INIT(NULL)
     0,
-    "btparser.GdbFrame",           /* tp_name */
-    sizeof(struct btp_py_gdb_frame),        /* tp_basicsize */
+    "satyr.GdbFrame",           /* tp_name */
+    sizeof(struct sr_py_gdb_frame),        /* tp_basicsize */
     0,                          /* tp_itemsize */
-    btp_py_gdb_frame_free,       /* tp_dealloc */
+    sr_py_gdb_frame_free,       /* tp_dealloc */
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
@@ -150,7 +150,7 @@ btp_py_gdb_frame_type =
     NULL,                       /* tp_as_mapping */
     NULL,                       /* tp_hash */
     NULL,                       /* tp_call */
-    btp_py_gdb_frame_str,        /* tp_str */
+    sr_py_gdb_frame_str,        /* tp_str */
     NULL,                       /* tp_getattro */
     NULL,                       /* tp_setattro */
     NULL,                       /* tp_as_buffer */
@@ -172,7 +172,7 @@ btp_py_gdb_frame_type =
     0,                          /* tp_dictoffset */
     NULL,                       /* tp_init */
     NULL,                       /* tp_alloc */
-    btp_py_gdb_frame_new,        /* tp_new */
+    sr_py_gdb_frame_new,        /* tp_new */
     NULL,                       /* tp_free */
     NULL,                       /* tp_is_gc */
     NULL,                       /* tp_bases */
@@ -184,10 +184,10 @@ btp_py_gdb_frame_type =
 
 /* constructor */
 PyObject *
-btp_py_gdb_frame_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
+sr_py_gdb_frame_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
-    struct btp_py_gdb_frame *fo = (struct btp_py_gdb_frame*)
-        PyObject_New(struct btp_py_gdb_frame, &btp_py_gdb_frame_type);
+    struct sr_py_gdb_frame *fo = (struct sr_py_gdb_frame*)
+        PyObject_New(struct sr_py_gdb_frame, &sr_py_gdb_frame_type);
 
     if (!fo)
         return PyErr_NoMemory();
@@ -198,9 +198,9 @@ btp_py_gdb_frame_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 
     if (str)
     {
-        struct btp_location location;
-        btp_location_init(&location);
-        fo->frame = btp_gdb_frame_parse(&str, &location);
+        struct sr_location location;
+        sr_location_init(&location);
+        fo->frame = sr_gdb_frame_parse(&str, &location);
 
         if (!fo->frame)
         {
@@ -209,38 +209,38 @@ btp_py_gdb_frame_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
         }
     }
     else
-        fo->frame = btp_gdb_frame_new();
+        fo->frame = sr_gdb_frame_new();
 
     return (PyObject*)fo;
 }
 
 /* destructor */
 void
-btp_py_gdb_frame_free(PyObject *object)
+sr_py_gdb_frame_free(PyObject *object)
 {
-    struct btp_py_gdb_frame *this = (struct btp_py_gdb_frame*)object;
-    btp_gdb_frame_free(this->frame);
+    struct sr_py_gdb_frame *this = (struct sr_py_gdb_frame*)object;
+    sr_gdb_frame_free(this->frame);
     PyObject_Del(object);
 }
 
 /* str */
 PyObject *
-btp_py_gdb_frame_str(PyObject *self)
+sr_py_gdb_frame_str(PyObject *self)
 {
-    struct btp_py_gdb_frame *this = (struct btp_py_gdb_frame*)self;
-    struct btp_strbuf *buf = btp_strbuf_new();
-    btp_strbuf_append_strf(buf, "Frame #%u: ", this->frame->number);
+    struct sr_py_gdb_frame *this = (struct sr_py_gdb_frame*)self;
+    struct sr_strbuf *buf = sr_strbuf_new();
+    sr_strbuf_append_strf(buf, "Frame #%u: ", this->frame->number);
     if (!this->frame->function_name)
-        btp_strbuf_append_str(buf, "signal handler");
+        sr_strbuf_append_str(buf, "signal handler");
     else if (strncmp("??", this->frame->function_name, strlen("??")) == 0)
-        btp_strbuf_append_str(buf, "unknown function");
+        sr_strbuf_append_str(buf, "unknown function");
     else
-        btp_strbuf_append_strf(buf, "function %s", this->frame->function_name);
+        sr_strbuf_append_strf(buf, "function %s", this->frame->function_name);
     if (this->frame->address != -1)
-        btp_strbuf_append_strf(buf, " @ 0x%016lx", this->frame->address);
+        sr_strbuf_append_strf(buf, " @ 0x%016lx", this->frame->address);
     if (this->frame->library_name)
-        btp_strbuf_append_strf(buf, " (%s)", this->frame->library_name);
-    char *str = btp_strbuf_free_nobuf(buf);
+        sr_strbuf_append_strf(buf, " (%s)", this->frame->library_name);
+    char *str = sr_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
@@ -250,53 +250,53 @@ btp_py_gdb_frame_str(PyObject *self)
 
 /* function_name */
 PyObject *
-btp_py_gdb_frame_get_function_name(PyObject *self, PyObject *args)
+sr_py_gdb_frame_get_function_name(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", ((struct btp_py_gdb_frame*)self)->frame->function_name);
+    return Py_BuildValue("s", ((struct sr_py_gdb_frame*)self)->frame->function_name);
 }
 
 PyObject *
-btp_py_gdb_frame_set_function_name(PyObject *self, PyObject *args)
+sr_py_gdb_frame_set_function_name(PyObject *self, PyObject *args)
 {
     char *newvalue;
     if (!PyArg_ParseTuple(args, "s", &newvalue))
         return NULL;
 
-    struct btp_gdb_frame *frame = ((struct btp_py_gdb_frame*)self)->frame;
+    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
     free(frame->function_name);
-    frame->function_name = btp_strdup(newvalue);
+    frame->function_name = sr_strdup(newvalue);
     Py_RETURN_NONE;
 }
 
 /* function_type */
 PyObject *
-btp_py_gdb_frame_get_function_type(PyObject *self, PyObject *args)
+sr_py_gdb_frame_get_function_type(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", ((struct btp_py_gdb_frame*)self)->frame->function_type);
+    return Py_BuildValue("s", ((struct sr_py_gdb_frame*)self)->frame->function_type);
 }
 
 PyObject *
-btp_py_gdb_frame_set_function_type(PyObject *self, PyObject *args)
+sr_py_gdb_frame_set_function_type(PyObject *self, PyObject *args)
 {
     char *newvalue;
     if (!PyArg_ParseTuple(args, "s", &newvalue))
         return NULL;
 
-    struct btp_gdb_frame *frame = ((struct btp_py_gdb_frame*)self)->frame;
+    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
     free(frame->function_type);
-    frame->function_type = btp_strdup(newvalue);
+    frame->function_type = sr_strdup(newvalue);
     Py_RETURN_NONE;
 }
 
 /* number */
 PyObject *
-btp_py_gdb_frame_get_number(PyObject *self, PyObject *args)
+sr_py_gdb_frame_get_number(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("i", ((struct btp_py_gdb_frame*)self)->frame->number);
+    return Py_BuildValue("i", ((struct sr_py_gdb_frame*)self)->frame->number);
 }
 
 PyObject *
-btp_py_gdb_frame_set_number(PyObject *self, PyObject *args)
+sr_py_gdb_frame_set_number(PyObject *self, PyObject *args)
 {
     int newvalue;
     if (!PyArg_ParseTuple(args, "i", &newvalue))
@@ -308,40 +308,40 @@ btp_py_gdb_frame_set_number(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    struct btp_gdb_frame *frame = ((struct btp_py_gdb_frame*)self)->frame;
+    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
     frame->number = newvalue;
     Py_RETURN_NONE;
 }
 
 /* source_file */
 PyObject *
-btp_py_gdb_frame_get_source_file(PyObject *self, PyObject *args)
+sr_py_gdb_frame_get_source_file(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", ((struct btp_py_gdb_frame*)self)->frame->source_file);
+    return Py_BuildValue("s", ((struct sr_py_gdb_frame*)self)->frame->source_file);
 }
 
 PyObject *
-btp_py_gdb_frame_set_source_file(PyObject *self, PyObject *args)
+sr_py_gdb_frame_set_source_file(PyObject *self, PyObject *args)
 {
     char *newvalue;
     if (!PyArg_ParseTuple(args, "s", &newvalue))
         return NULL;
 
-    struct btp_gdb_frame *frame = ((struct btp_py_gdb_frame*)self)->frame;
+    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
     free(frame->source_file);
-    frame->source_file = btp_strdup(newvalue);
+    frame->source_file = sr_strdup(newvalue);
     Py_RETURN_NONE;
 }
 
 /* source_line */
 PyObject *
-btp_py_gdb_frame_get_source_line(PyObject *self, PyObject *args)
+sr_py_gdb_frame_get_source_line(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("i", ((struct btp_py_gdb_frame*)self)->frame->source_line);
+    return Py_BuildValue("i", ((struct sr_py_gdb_frame*)self)->frame->source_line);
 }
 
 PyObject *
-btp_py_gdb_frame_set_source_line(PyObject *self, PyObject *args)
+sr_py_gdb_frame_set_source_line(PyObject *self, PyObject *args)
 {
     int newvalue;
     if (!PyArg_ParseTuple(args, "i", &newvalue))
@@ -353,123 +353,123 @@ btp_py_gdb_frame_set_source_line(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    struct btp_gdb_frame *frame = ((struct btp_py_gdb_frame*)self)->frame;
+    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
     frame->source_line = newvalue;
     Py_RETURN_NONE;
 }
 
 /* signal_handler_called */
 PyObject *
-btp_py_gdb_frame_get_signal_handler_called(PyObject *self, PyObject *args)
+sr_py_gdb_frame_get_signal_handler_called(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("i", ((struct btp_py_gdb_frame*)self)->frame->signal_handler_called);
+    return Py_BuildValue("i", ((struct sr_py_gdb_frame*)self)->frame->signal_handler_called);
 }
 
 PyObject *
-btp_py_gdb_frame_set_signal_handler_called(PyObject *self, PyObject *args)
+sr_py_gdb_frame_set_signal_handler_called(PyObject *self, PyObject *args)
 {
     int newvalue;
     if (!PyArg_ParseTuple(args, "i", &newvalue))
         return NULL;
 
-    struct btp_gdb_frame *frame = ((struct btp_py_gdb_frame*)self)->frame;
+    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
     frame->signal_handler_called = newvalue ? 1 : 0;
     Py_RETURN_NONE;
 }
 
 /* address */
 PyObject *
-btp_py_gdb_frame_get_address(PyObject *self, PyObject *args)
+sr_py_gdb_frame_get_address(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct btp_py_gdb_frame*)self)->frame->address);
+    return Py_BuildValue("l", ((struct sr_py_gdb_frame*)self)->frame->address);
 }
 
 PyObject *
-btp_py_gdb_frame_set_address(PyObject *self, PyObject *args)
+sr_py_gdb_frame_set_address(PyObject *self, PyObject *args)
 {
     uint64_t newvalue;
     if (!PyArg_ParseTuple(args, "l", &newvalue))
         return NULL;
 
-    struct btp_gdb_frame *frame = ((struct btp_py_gdb_frame*)self)->frame;
+    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
     frame->address = newvalue;
     Py_RETURN_NONE;
 }
 
 /* library_name */
 PyObject *
-btp_py_gdb_frame_get_library_name(PyObject *self, PyObject *args)
+sr_py_gdb_frame_get_library_name(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", ((struct btp_py_gdb_frame*)self)->frame->library_name);
+    return Py_BuildValue("s", ((struct sr_py_gdb_frame*)self)->frame->library_name);
 }
 
 PyObject *
-btp_py_gdb_frame_set_library_name(PyObject *self, PyObject *args)
+sr_py_gdb_frame_set_library_name(PyObject *self, PyObject *args)
 {
     char *newvalue;
     if (!PyArg_ParseTuple(args, "s", &newvalue))
         return NULL;
 
-    struct btp_gdb_frame *frame = ((struct btp_py_gdb_frame*)self)->frame;
+    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
     free(frame->library_name);
-    frame->library_name = btp_strdup(newvalue);
+    frame->library_name = sr_strdup(newvalue);
     Py_RETURN_NONE;
 }
 
 
 /* methods */
 PyObject *
-btp_py_gdb_frame_dup(PyObject *self, PyObject *args)
+sr_py_gdb_frame_dup(PyObject *self, PyObject *args)
 {
-    struct btp_py_gdb_frame *this = (struct btp_py_gdb_frame*)self;
-    struct btp_py_gdb_frame *fo = (struct btp_py_gdb_frame*)
-        PyObject_New(struct btp_py_gdb_frame, &btp_py_gdb_frame_type);
+    struct sr_py_gdb_frame *this = (struct sr_py_gdb_frame*)self;
+    struct sr_py_gdb_frame *fo = (struct sr_py_gdb_frame*)
+        PyObject_New(struct sr_py_gdb_frame, &sr_py_gdb_frame_type);
 
     if (!fo)
         return PyErr_NoMemory();
 
-    fo->frame = btp_gdb_frame_dup(this->frame, false);
+    fo->frame = sr_gdb_frame_dup(this->frame, false);
 
     return (PyObject*)fo;
 }
 
 PyObject *
-btp_py_gdb_frame_cmp(PyObject *self, PyObject *args)
+sr_py_gdb_frame_cmp(PyObject *self, PyObject *args)
 {
     PyObject *compare_to;
     int compare_number;
     if (!PyArg_ParseTuple(args,
                           "O!i",
-                          &btp_py_gdb_frame_type,
+                          &sr_py_gdb_frame_type,
                           &compare_to,
                           &compare_number))
     {
         return NULL;
     }
 
-    struct btp_gdb_frame *f1 = ((struct btp_py_gdb_frame*)self)->frame;
-    struct btp_gdb_frame *f2 = ((struct btp_py_gdb_frame*)compare_to)->frame;
-    return Py_BuildValue("i", btp_gdb_frame_cmp(f1, f2, compare_number));
+    struct sr_gdb_frame *f1 = ((struct sr_py_gdb_frame*)self)->frame;
+    struct sr_gdb_frame *f2 = ((struct sr_py_gdb_frame*)compare_to)->frame;
+    return Py_BuildValue("i", sr_gdb_frame_cmp(f1, f2, compare_number));
 }
 
 PyObject *
-btp_py_gdb_frame_calls_func(PyObject *self, PyObject *args)
+sr_py_gdb_frame_calls_func(PyObject *self, PyObject *args)
 {
     char *func_name;
     if (!PyArg_ParseTuple(args, "s", &func_name))
         return NULL;
 
-    struct btp_gdb_frame *frame = ((struct btp_py_gdb_frame*)self)->frame;
-    return Py_BuildValue("i", btp_gdb_frame_calls_func(frame, func_name));
+    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
+    return Py_BuildValue("i", sr_gdb_frame_calls_func(frame, func_name));
 }
 
 PyObject *
-btp_py_gdb_frame_calls_func_in_file(PyObject *self, PyObject *args)
+sr_py_gdb_frame_calls_func_in_file(PyObject *self, PyObject *args)
 {
     char *func_name, *file_name;
     if (!PyArg_ParseTuple(args, "ss", &func_name, &file_name))
         return NULL;
 
-    struct btp_gdb_frame *frame = ((struct btp_py_gdb_frame*)self)->frame;
-    return Py_BuildValue("i", btp_gdb_frame_calls_func(frame, func_name, file_name, NULL));
+    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
+    return Py_BuildValue("i", sr_gdb_frame_calls_func(frame, func_name, file_name, NULL));
 }

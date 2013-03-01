@@ -1,5 +1,5 @@
 # @configure_input@                                     -*- shell-script -*-
-# Configurable variable values for btparser test suite.
+# Configurable variable values for satyr test suite.
 
 # We need a C compiler.
 CC='@CC@'

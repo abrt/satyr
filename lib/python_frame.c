@@ -24,24 +24,24 @@
 #include <string.h>
 #include <inttypes.h>
 
-struct btp_python_frame *
-btp_python_frame_new()
+struct sr_python_frame *
+sr_python_frame_new()
 {
-    struct btp_python_frame *frame =
-        btp_malloc(sizeof(struct btp_python_frame));
+    struct sr_python_frame *frame =
+        sr_malloc(sizeof(struct sr_python_frame));
 
-    btp_python_frame_init(frame);
+    sr_python_frame_init(frame);
     return frame;
 }
 
 void
-btp_python_frame_init(struct btp_python_frame *frame)
+sr_python_frame_init(struct sr_python_frame *frame)
 {
-    memset(frame, 0, sizeof(struct btp_python_frame));
+    memset(frame, 0, sizeof(struct sr_python_frame));
 }
 
 void
-btp_python_frame_free(struct btp_python_frame *frame)
+sr_python_frame_free(struct sr_python_frame *frame)
 {
     if (!frame)
         return;
@@ -52,47 +52,47 @@ btp_python_frame_free(struct btp_python_frame *frame)
     free(frame);
 }
 
-struct btp_python_frame *
-btp_python_frame_dup(struct btp_python_frame *frame, bool siblings)
+struct sr_python_frame *
+sr_python_frame_dup(struct sr_python_frame *frame, bool siblings)
 {
-    struct btp_python_frame *result = btp_python_frame_new();
-    memcpy(result, frame, sizeof(struct btp_python_frame));
+    struct sr_python_frame *result = sr_python_frame_new();
+    memcpy(result, frame, sizeof(struct sr_python_frame));
 
     /* Handle siblings. */
     if (siblings)
     {
         if (result->next)
-            result->next = btp_python_frame_dup(result->next, true);
+            result->next = sr_python_frame_dup(result->next, true);
     }
     else
         result->next = NULL; /* Do not copy that. */
 
     /* Duplicate all strings. */
     if (result->file_name)
-        result->file_name = btp_strdup(result->file_name);
+        result->file_name = sr_strdup(result->file_name);
 
     if (result->function_name)
-        result->function_name = btp_strdup(result->function_name);
+        result->function_name = sr_strdup(result->function_name);
 
     if (result->line_contents)
-        result->line_contents = btp_strdup(result->line_contents);
+        result->line_contents = sr_strdup(result->line_contents);
 
     return result;
 }
 
 int
-btp_python_frame_cmp(struct btp_python_frame *frame1,
-                     struct btp_python_frame *frame2)
+sr_python_frame_cmp(struct sr_python_frame *frame1,
+                    struct sr_python_frame *frame2)
 {
     /* function_name */
-    int function_name = btp_strcmp0(frame1->function_name,
-                                    frame2->function_name);
+    int function_name = sr_strcmp0(frame1->function_name,
+                                   frame2->function_name);
     if (function_name != 0)
         return function_name;
 
     /* file_name */
-    int file_name = btp_strcmp0(frame1->file_name,
-                                frame2->file_name);
+    int file_name = sr_strcmp0(frame1->file_name,
+                               frame2->file_name);
     if (file_name != 0)
         return file_name;
 
@@ -108,8 +108,8 @@ btp_python_frame_cmp(struct btp_python_frame *frame1,
         return is_module;
 
     /* line_contents */
-    int line_contents = btp_strcmp0(frame1->line_contents,
-                                    frame2->line_contents);
+    int line_contents = sr_strcmp0(frame1->line_contents,
+                                   frame2->line_contents);
     if (line_contents != 0)
         return line_contents;
 
@@ -117,26 +117,26 @@ btp_python_frame_cmp(struct btp_python_frame *frame1,
 }
 
 int
-btp_python_frame_cmp_distance(struct btp_python_frame *frame1,
-                              struct btp_python_frame *frame2)
+sr_python_frame_cmp_distance(struct sr_python_frame *frame1,
+                             struct sr_python_frame *frame2)
 {
     /* function_name */
-    int function_name = btp_strcmp0(frame1->function_name,
-                                    frame2->function_name);
+    int function_name = sr_strcmp0(frame1->function_name,
+                                   frame2->function_name);
     if (function_name != 0)
         return function_name;
 
     return 0;
 }
 
-struct btp_python_frame *
-btp_python_frame_append(struct btp_python_frame *dest,
-                        struct btp_python_frame *item)
+struct sr_python_frame *
+sr_python_frame_append(struct sr_python_frame *dest,
+                       struct sr_python_frame *item)
 {
     if (!dest)
         return item;
 
-    struct btp_python_frame *dest_loop = dest;
+    struct sr_python_frame *dest_loop = dest;
     while (dest_loop->next)
         dest_loop = dest_loop->next;
 
@@ -144,26 +144,26 @@ btp_python_frame_append(struct btp_python_frame *dest,
     return dest;
 }
 
-struct btp_python_frame *
-btp_python_frame_parse(const char **input,
-                       struct btp_location *location)
+struct sr_python_frame *
+sr_python_frame_parse(const char **input,
+                      struct sr_location *location)
 {
     const char *local_input = *input;
 
-    if (0 == btp_skip_string(&local_input, "  File \""))
+    if (0 == sr_skip_string(&local_input, "  File \""))
     {
-        location->message = btp_asprintf("Frame header not found.");
+        location->message = sr_asprintf("Frame header not found.");
         return NULL;
     }
 
     location->column += strlen("  File \"");
-    struct btp_python_frame *frame = btp_python_frame_new();
+    struct sr_python_frame *frame = sr_python_frame_new();
 
     /* Parse file name */
-    if (!btp_parse_char_cspan(&local_input, "\"", &frame->file_name))
+    if (!sr_parse_char_cspan(&local_input, "\"", &frame->file_name))
     {
-        btp_python_frame_free(frame);
-        location->message = btp_asprintf("Unable to find the '\"' character "
+        sr_python_frame_free(frame);
+        location->message = sr_asprintf("Unable to find the '\"' character "
                 "identifying the beginning of file name.");
 
         return NULL;
@@ -171,37 +171,37 @@ btp_python_frame_parse(const char **input,
 
     location->column += strlen(frame->file_name);
 
-    if (0 == btp_skip_string(&local_input, "\", line "))
+    if (0 == sr_skip_string(&local_input, "\", line "))
     {
-        location->message = btp_asprintf("Line separator not found.");
+        location->message = sr_asprintf("Line separator not found.");
         return NULL;
     }
 
     location->column += strlen("\", line ");
 
     /* Parse line number */
-    int length = btp_parse_uint32(&local_input, &frame->file_line);
+    int length = sr_parse_uint32(&local_input, &frame->file_line);
     if (0 == length)
     {
-        location->message = btp_asprintf("Line number not found.");
+        location->message = sr_asprintf("Line number not found.");
         return NULL;
     }
 
     location->column += length;
 
-    if (0 == btp_skip_string(&local_input, ", in "))
+    if (0 == sr_skip_string(&local_input, ", in "))
     {
-        location->message = btp_asprintf("Function name separator not found.");
+        location->message = sr_asprintf("Function name separator not found.");
         return NULL;
     }
 
     location->column += strlen(", in ");
 
     /* Parse function name */
-    if (!btp_parse_char_cspan(&local_input, "\n", &frame->function_name))
+    if (!sr_parse_char_cspan(&local_input, "\n", &frame->function_name))
     {
-        btp_python_frame_free(frame);
-        location->message = btp_asprintf("Unable to find the newline character "
+        sr_python_frame_free(frame);
+        location->message = sr_asprintf("Unable to find the newline character "
                 "identifying the end of function name.");
 
         return NULL;
@@ -216,15 +216,15 @@ btp_python_frame_parse(const char **input,
         frame->function_name = NULL;
     }
 
-    btp_skip_char(&local_input, '\n');
-    btp_location_add(location, 1, 0);
+    sr_skip_char(&local_input, '\n');
+    sr_location_add(location, 1, 0);
 
     /* Parse source code line (optional). */
-    if (4 == btp_skip_string(&local_input, "    "))
+    if (4 == sr_skip_string(&local_input, "    "))
     {
-        btp_parse_char_cspan(&local_input, "\n", &frame->line_contents);
-        btp_skip_char(&local_input, '\n');
-        btp_location_add(location, 1, 0);
+        sr_parse_char_cspan(&local_input, "\n", &frame->line_contents);
+        sr_skip_char(&local_input, '\n');
+        sr_location_add(location, 1, 0);
     }
 
     *input = local_input;
@@ -232,48 +232,48 @@ btp_python_frame_parse(const char **input,
 }
 
 char *
-btp_python_frame_to_json(struct btp_python_frame *frame)
+sr_python_frame_to_json(struct sr_python_frame *frame)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
+    struct sr_strbuf *strbuf = sr_strbuf_new();
 
     /* Source file name. */
     if (frame->file_name)
     {
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"file_name\": \"%s\"\n",
-                               frame->file_name);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"file_name\": \"%s\"\n",
+                              frame->file_name);
     }
 
     /* Source file line. */
     if (frame->file_line)
     {
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"file_line\": %"PRIu32"\n",
-                               frame->file_line);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"file_line\": %"PRIu32"\n",
+                              frame->file_line);
     }
 
     /* Is module. */
-    btp_strbuf_append_strf(strbuf,
-                           ",   \"is_module\": %s\n",
-                           frame->is_module ? "true" : "false");
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"is_module\": %s\n",
+                          frame->is_module ? "true" : "false");
 
     /* Function name. */
     if (frame->function_name)
     {
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"function_name\": \"%s\"\n",
-                               frame->function_name);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"function_name\": \"%s\"\n",
+                              frame->function_name);
     }
 
     /* Line contents. */
     if (frame->line_contents)
     {
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"line_contents\": \"%s\"\n",
-                               frame->line_contents);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"line_contents\": \"%s\"\n",
+                              frame->line_contents);
     }
 
     strbuf->buf[0] = '{';
-    btp_strbuf_append_char(strbuf, '}');
-    return btp_strbuf_free_nobuf(strbuf);
+    sr_strbuf_append_char(strbuf, '}');
+    return sr_strbuf_free_nobuf(strbuf);
 }

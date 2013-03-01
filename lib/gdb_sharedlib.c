@@ -24,16 +24,16 @@
 #include <stdio.h>
 #include <string.h>
 
-struct btp_gdb_sharedlib *
-btp_gdb_sharedlib_new()
+struct sr_gdb_sharedlib *
+sr_gdb_sharedlib_new()
 {
-    struct btp_gdb_sharedlib *result = btp_malloc(sizeof(struct btp_gdb_sharedlib));
-    btp_gdb_sharedlib_init(result);
+    struct sr_gdb_sharedlib *result = sr_malloc(sizeof(struct sr_gdb_sharedlib));
+    sr_gdb_sharedlib_init(result);
     return result;
 }
 
 void
-btp_gdb_sharedlib_init(struct btp_gdb_sharedlib *sharedlib)
+sr_gdb_sharedlib_init(struct sr_gdb_sharedlib *sharedlib)
 {
     sharedlib->from = -1;
     sharedlib->to = -1;
@@ -43,7 +43,7 @@ btp_gdb_sharedlib_init(struct btp_gdb_sharedlib *sharedlib)
 }
 
 void
-btp_gdb_sharedlib_free(struct btp_gdb_sharedlib *sharedlib)
+sr_gdb_sharedlib_free(struct sr_gdb_sharedlib *sharedlib)
 {
     if (!sharedlib)
         return;
@@ -52,18 +52,18 @@ btp_gdb_sharedlib_free(struct btp_gdb_sharedlib *sharedlib)
     free(sharedlib);
 }
 
-struct btp_gdb_sharedlib *
-btp_gdb_sharedlib_dup(struct btp_gdb_sharedlib *sharedlib,
-                      bool siblings)
+struct sr_gdb_sharedlib *
+sr_gdb_sharedlib_dup(struct sr_gdb_sharedlib *sharedlib,
+                     bool siblings)
 {
-    struct btp_gdb_sharedlib *result = btp_gdb_sharedlib_new();
-    memcpy(result, sharedlib, sizeof(struct btp_gdb_sharedlib));
-    result->soname = btp_strdup(sharedlib->soname);
+    struct sr_gdb_sharedlib *result = sr_gdb_sharedlib_new();
+    memcpy(result, sharedlib, sizeof(struct sr_gdb_sharedlib));
+    result->soname = sr_strdup(sharedlib->soname);
 
     if (siblings)
     {
         if (result->next)
-            result->next = btp_gdb_sharedlib_dup(result->next, true);
+            result->next = sr_gdb_sharedlib_dup(result->next, true);
     }
     else
         result->next = NULL;
@@ -71,14 +71,14 @@ btp_gdb_sharedlib_dup(struct btp_gdb_sharedlib *sharedlib,
     return result;
 }
 
-struct btp_gdb_sharedlib *
-btp_gdb_sharedlib_append(struct btp_gdb_sharedlib *dest,
-                         struct btp_gdb_sharedlib *item)
+struct sr_gdb_sharedlib *
+sr_gdb_sharedlib_append(struct sr_gdb_sharedlib *dest,
+                        struct sr_gdb_sharedlib *item)
 {
     if (!dest)
         return item;
 
-    struct btp_gdb_sharedlib *dest_loop = dest;
+    struct sr_gdb_sharedlib *dest_loop = dest;
     while (dest_loop->next)
         dest_loop = dest_loop->next;
 
@@ -87,9 +87,9 @@ btp_gdb_sharedlib_append(struct btp_gdb_sharedlib *dest,
 }
 
 int
-btp_gdb_sharedlib_count(struct btp_gdb_sharedlib *sharedlib)
+sr_gdb_sharedlib_count(struct sr_gdb_sharedlib *sharedlib)
 {
-    struct btp_gdb_sharedlib *loop = sharedlib;
+    struct sr_gdb_sharedlib *loop = sharedlib;
     int count = 0;
     while (loop)
     {
@@ -100,11 +100,11 @@ btp_gdb_sharedlib_count(struct btp_gdb_sharedlib *sharedlib)
     return count;
 }
 
-struct btp_gdb_sharedlib *
-btp_gdb_sharedlib_find_address(struct btp_gdb_sharedlib *first,
-                               uint64_t address)
+struct sr_gdb_sharedlib *
+sr_gdb_sharedlib_find_address(struct sr_gdb_sharedlib *first,
+                              uint64_t address)
 {
-    struct btp_gdb_sharedlib *tmp = first;
+    struct sr_gdb_sharedlib *tmp = first;
 
     if (address == -1)
         return NULL;
@@ -162,8 +162,8 @@ find_sharedlib_section_start(const char *input)
     return NULL;
 }
 
-struct btp_gdb_sharedlib *
-btp_gdb_sharedlib_parse(const char *input)
+struct sr_gdb_sharedlib *
+sr_gdb_sharedlib_parse(const char *input)
 {
     char *tmp = find_sharedlib_section_start(input);
     if (!tmp)
@@ -171,9 +171,9 @@ btp_gdb_sharedlib_parse(const char *input)
 
     /* Parsing
        From                 To                  Syms Read        Shared Object Library
-       0x0123456789abcdef   0xfedcba987654321   Yes (*)|Yes|No   /usr/lib64/libbtparser.so.2.2.2
+       0x0123456789abcdef   0xfedcba987654321   Yes (*)|Yes|No   /usr/lib64/libsatyr.so.2.2.2
     */
-    struct btp_gdb_sharedlib *first = NULL, *current = NULL;
+    struct sr_gdb_sharedlib *first = NULL, *current = NULL;
     while (1)
     {
         unsigned long long from = -1, to = -1;
@@ -218,30 +218,30 @@ btp_gdb_sharedlib_parse(const char *input)
             ++tmp;
 
         /* Shared Object Library */
-        struct btp_strbuf *buf = btp_strbuf_new();
+        struct sr_strbuf *buf = sr_strbuf_new();
         while (*tmp && *tmp != '\n')
         {
-            btp_strbuf_append_char(buf, *tmp);
+            sr_strbuf_append_char(buf, *tmp);
             ++tmp;
         }
 
         if (current)
         {
             /* round 2+ */
-            current->next = btp_gdb_sharedlib_new();
+            current->next = sr_gdb_sharedlib_new();
             current = current->next;
         }
         else
         {
             /* round 1 */
-            current = btp_gdb_sharedlib_new();
+            current = sr_gdb_sharedlib_new();
             first = current;
         }
 
         current->from = from;
         current->to = to;
         current->symbols = symbols;
-        current->soname = btp_strbuf_free_nobuf(buf);
+        current->soname = sr_strbuf_free_nobuf(buf);
 
         /* we are on '\n' character, jump to next line */
         ++tmp;

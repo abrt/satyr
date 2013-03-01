@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_PY_JAVA_STACKTRACE_H
-#define BTPARSER_PY_JAVA_STACKTRACE_H
+#ifndef SATYR_PY_JAVA_STACKTRACE_H
+#define SATYR_PY_JAVA_STACKTRACE_H
 
 /**
  * @file
@@ -32,36 +32,36 @@ extern "C" {
 #include <Python.h>
 #include <structmember.h>
 
-struct btp_py_java_frame;
-struct btp_py_java_thread;
+struct sr_py_java_frame;
+struct sr_py_java_thread;
 
-PyTypeObject btp_py_java_stacktrace_type;
+PyTypeObject sr_py_java_stacktrace_type;
 
-struct btp_py_java_stacktrace
+struct sr_py_java_stacktrace
 {
     PyObject_HEAD
-    struct btp_java_stacktrace *stacktrace;
+    struct sr_java_stacktrace *stacktrace;
     PyObject *threads;
 };
 
 /* helpers */
-int java_stacktrace_prepare_linked_list(struct btp_py_java_stacktrace *stacktrace);
-PyObject *java_stacktrace_prepare_thread_list(struct btp_java_stacktrace *stacktrace);
+int java_stacktrace_prepare_linked_list(struct sr_py_java_stacktrace *stacktrace);
+PyObject *java_stacktrace_prepare_thread_list(struct sr_java_stacktrace *stacktrace);
 
 /* constructor */
-PyObject *btp_py_java_stacktrace_new(PyTypeObject *object,
+PyObject *sr_py_java_stacktrace_new(PyTypeObject *object,
                                     PyObject *args,
                                     PyObject *kwds);
 
 /* destructor */
-void btp_py_java_stacktrace_free(PyObject *object);
+void sr_py_java_stacktrace_free(PyObject *object);
 
 /* str */
-PyObject *btp_py_java_stacktrace_str(PyObject *self);
+PyObject *sr_py_java_stacktrace_str(PyObject *self);
 
 /* methods */
-PyObject *btp_py_java_stacktrace_dup(PyObject *self, PyObject *args);
-PyObject *btp_py_java_stacktrace_normalize(PyObject *self, PyObject *args);
+PyObject *sr_py_java_stacktrace_dup(PyObject *self, PyObject *args);
+PyObject *sr_py_java_stacktrace_normalize(PyObject *self, PyObject *args);
 
 #ifdef __cplusplus
 }

@@ -76,7 +76,7 @@ _set_error(char **error_msg, const char *fmt, ...)
         return;
 
     va_start(ap, fmt);
-    *error_msg = btp_vasprintf(fmt, ap);
+    *error_msg = sr_vasprintf(fmt, ap);
     va_end(ap);
 }
 
@@ -97,7 +97,7 @@ warn(const char *fmt, ...)
 {
     va_list ap;
 
-    if (!btp_debug_parser)
+    if (!sr_debug_parser)
         return;
 
     va_start(ap, fmt);
@@ -183,7 +183,7 @@ touch_module(Dwfl_Module *mod, void **userdata, const char *name,
 static struct core_handle *
 open_coredump(const char *elf_file, const char *exe_file, char **error_msg)
 {
-    struct core_handle *ch = btp_mallocz(sizeof(*ch));
+    struct core_handle *ch = sr_mallocz(sizeof(*ch));
 
     /* Initialize libelf, open the file and get its Elf handle. */
     if (elf_version(EV_CURRENT) == EV_NONE)
@@ -255,11 +255,11 @@ fail_free:
     return NULL;
 }
 
-static struct btp_core_thread *
+static struct sr_core_thread *
 unwind_thread(Dwfl *dwfl, Dwfl_Frame_State *state, char **error_msg)
 {
     int ret;
-    struct btp_core_frame *head = NULL, *tail = NULL;
+    struct sr_core_frame *head = NULL, *tail = NULL;
     pid_t tid = 0;
 
     if (state)
@@ -278,7 +278,7 @@ unwind_thread(Dwfl *dwfl, Dwfl_Frame_State *state, char **error_msg)
         }
         pc_adjusted = pc - (minus_one ? 1 : 0);
 
-        struct btp_core_frame *frame = btp_core_frame_new();
+        struct sr_core_frame *frame = sr_core_frame_new();
         frame->address = frame->build_id_offset = (uint64_t)pc;
         list_append(head, tail, frame);
 
@@ -293,8 +293,8 @@ unwind_thread(Dwfl *dwfl, Dwfl_Frame_State *state, char **error_msg)
             ret = dwfl_module_build_id(mod, &build_id_bits, &bid_addr);
             if (ret > 0)
             {
-                frame->build_id = btp_mallocz(2*ret + 1);
-                btp_bin2hex(frame->build_id, (const char *)build_id_bits, ret);
+                frame->build_id = sr_mallocz(2*ret + 1);
+                sr_bin2hex(frame->build_id, (const char *)build_id_bits, ret);
             }
 
             if (dwfl_module_info(mod, NULL, &start, NULL, NULL, NULL,
@@ -302,16 +302,16 @@ unwind_thread(Dwfl *dwfl, Dwfl_Frame_State *state, char **error_msg)
             {
                 frame->build_id_offset = (Dwarf_Addr)pc - start;
                 if (filename)
-                    frame->file_name = btp_strdup(filename);
+                    frame->file_name = sr_strdup(filename);
             }
 
             funcname = dwfl_module_addrname(mod, (GElf_Addr)pc_adjusted);
             if (funcname)
-                frame->function_name = btp_strdup(funcname);
+                frame->function_name = sr_strdup(funcname);
         }
 
         /* Do not unwind below __libc_start_main. */
-        if (0 == btp_strcmp0(frame->function_name, "__libc_start_main"))
+        if (0 == sr_strcmp0(frame->function_name, "__libc_start_main"))
             break;
 
         if (!dwfl_frame_unwind(&state))
@@ -326,18 +326,18 @@ unwind_thread(Dwfl *dwfl, Dwfl_Frame_State *state, char **error_msg)
         set_error("No frames found for thread id %d", (int)tid);
     }
 
-    struct btp_core_thread *thread = btp_core_thread_new();
+    struct sr_core_thread *thread = sr_core_thread_new();
     thread->id = (int64_t)tid;
     thread->frames = head;
     return thread;
 }
 
-struct btp_core_stacktrace *
-btp_parse_coredump(const char *core_file,
+struct sr_core_stacktrace *
+sr_parse_coredump(const char *core_file,
                    const char *exe_file,
                    char **error_msg)
 {
-    struct btp_core_stacktrace *stacktrace = NULL;
+    struct sr_core_stacktrace *stacktrace = NULL;
 
     /* Initialize error_msg to 'no error'. */
     if (error_msg)
@@ -355,17 +355,17 @@ btp_parse_coredump(const char *core_file,
         goto fail_destroy_handle;
     }
 
-    stacktrace = btp_core_stacktrace_new();
+    stacktrace = sr_core_stacktrace_new();
     if (!stacktrace)
     {
         set_error("Failed to initialize stacktrace memory");
         goto fail_destroy_handle;
     }
-    struct btp_core_thread *threads_tail = NULL;
+    struct sr_core_thread *threads_tail = NULL;
 
     do
     {
-        struct btp_core_thread *t = unwind_thread(ch->dwfl, state, error_msg);
+        struct sr_core_thread *t = unwind_thread(ch->dwfl, state, error_msg);
         if (*error_msg)
         {
             goto fail_destroy_trace;
@@ -377,13 +377,13 @@ btp_parse_coredump(const char *core_file,
 fail_destroy_trace:
     if (*error_msg)
     {
-        btp_core_stacktrace_free(stacktrace);
+        sr_core_stacktrace_free(stacktrace);
         stacktrace = NULL;
     }
 fail_destroy_handle:
     core_handle_free(ch);
 
-    stacktrace->executable = btp_strdup(executable_file);
+    stacktrace->executable = sr_strdup(executable_file);
     /* FIXME: determine signal */
     stacktrace->signal = 0;
     /* FIXME: is this the best we can do? */

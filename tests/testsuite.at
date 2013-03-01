@@ -1,4 +1,4 @@
-# Test suite for btparser.
+# Test suite for satyr.
 # See http://www.gnu.org/software/hello/manual/autoconf/Writing-Testsuites.html
 
 m4_include([utils.at])

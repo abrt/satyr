@@ -18,8 +18,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_JAVA_THREAD_H
-#define BTPARSER_JAVA_THREAD_H
+#ifndef SATYR_JAVA_THREAD_H
+#define SATYR_JAVA_THREAD_H
 
 /**
  * @file
@@ -33,16 +33,16 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
-struct btp_java_frame;
-struct btp_strbuf;
-struct btp_location;
+struct sr_java_frame;
+struct sr_strbuf;
+struct sr_location;
 
 /**
  * @brief A thread of execution of a JAVA-produced stack trace.
  *
  * Represents a thread containing frames.
  */
-struct btp_java_thread
+struct sr_java_thread
 {
     /**
      * Thread name. Can be NULL
@@ -52,23 +52,23 @@ struct btp_java_thread
     /**
      * Thread's exceptiopn. Can be NULL
      */
-    struct btp_java_frame *frames;
+    struct sr_java_frame *frames;
 
     /**
      * A sibling thread, or NULL if this is the last thread in a
      * stacktrace.
      */
-    struct btp_java_thread *next;
+    struct sr_java_thread *next;
 };
 
 /**
  * Creates and initializes a new frame structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_java_thread_free().
+ * calling the function sr_java_thread_free().
  */
-struct btp_java_thread *
-btp_java_thread_new();
+struct sr_java_thread *
+sr_java_thread_new();
 
 /**
  * Initializes all members of the thread to default values.
@@ -77,7 +77,7 @@ btp_java_thread_new();
  * stack.
  */
 void
-btp_java_thread_init(struct btp_java_thread *thread);
+sr_java_thread_init(struct sr_java_thread *thread);
 
 /**
  * Releases the memory held by the thread. The thread siblings are not
@@ -86,7 +86,7 @@ btp_java_thread_init(struct btp_java_thread *thread);
  * If thread is NULL, no operation is performed.
  */
 void
-btp_java_thread_free(struct btp_java_thread *thread);
+sr_java_thread_free(struct sr_java_thread *thread);
 
 /**
  * Creates a duplicate of the thread.
@@ -98,9 +98,9 @@ btp_java_thread_free(struct btp_java_thread *thread);
  * false, thread->next is not duplicated for the new exception, but it is
  * set to NULL.
  */
-struct btp_java_thread *
-btp_java_thread_dup(struct btp_java_thread *thread,
-                    bool siblings);
+struct sr_java_thread *
+sr_java_thread_dup(struct sr_java_thread *thread,
+                   bool siblings);
 
 /**
  * Compares two threads. When comparing the threads, it compares also
@@ -111,23 +111,23 @@ btp_java_thread_dup(struct btp_java_thread *thread,
  * found to be 'greater' than t2.
  */
 int
-btp_java_thread_cmp(struct btp_java_thread *thread1,
-                    struct btp_java_thread *thread2);
+sr_java_thread_cmp(struct sr_java_thread *thread1,
+                   struct sr_java_thread *thread2);
 
 /**
  * Appends 'item' at the end of the list 'dest'.
  * @returns
  * This function returns the 'dest' thread.
  */
-struct btp_java_thread *
-btp_java_thread_append(struct btp_java_thread *dest,
-                       struct btp_java_thread *item);
+struct sr_java_thread *
+sr_java_thread_append(struct sr_java_thread *dest,
+                      struct sr_java_thread *item);
 
 /**
  * Returns the number of frames in the thread.
  */
 int
-btp_java_thread_get_frame_count(struct btp_java_thread *thread);
+sr_java_thread_get_frame_count(struct sr_java_thread *thread);
 
 /**
  * Counts the number of 'good' frames and the number of all frames in
@@ -139,9 +139,9 @@ btp_java_thread_get_frame_count(struct btp_java_thread *thread);
  * all_count.
  */
 void
-btp_java_thread_quality_counts(struct btp_java_thread *thread,
-                               int *ok_count,
-                               int *all_count);
+sr_java_thread_quality_counts(struct sr_java_thread *thread,
+                              int *ok_count,
+                              int *all_count);
 
 /**
  * Returns the quality of the thread. The quality is the ratio of the
@@ -156,7 +156,7 @@ btp_java_thread_quality_counts(struct btp_java_thread *thread,
  * function returns 1.
  */
 float
-btp_java_thread_quality(struct btp_java_thread *thread);
+sr_java_thread_quality(struct sr_java_thread *thread);
 
 /**
  * Removes the frame from the thread and then deletes it.
@@ -165,8 +165,8 @@ btp_java_thread_quality(struct btp_java_thread *thread);
  * False if the frame was not found in the thread.
  */
 bool
-btp_java_thread_remove_frame(struct btp_java_thread *thread,
-                             struct btp_java_frame *frame);
+sr_java_thread_remove_frame(struct sr_java_thread *thread,
+                            struct sr_java_frame *frame);
 
 /**
  * Removes all the frames from the thread that are above certain
@@ -177,22 +177,22 @@ btp_java_thread_remove_frame(struct btp_java_thread *thread,
  * False if the frame was not found in the thread.
  */
 bool
-btp_java_thread_remove_frames_above(struct btp_java_thread *thread,
-                                    struct btp_java_frame *frame);
+sr_java_thread_remove_frames_above(struct sr_java_thread *thread,
+                                   struct sr_java_frame *frame);
 
 /**
  * Keeps only the top n frames in the thread.
  */
 void
-btp_java_thread_remove_frames_below_n(struct btp_java_thread *thread,
-                                      int n);
+sr_java_thread_remove_frames_below_n(struct sr_java_thread *thread,
+                                     int n);
 
 /**
  * Appends a textual representation of 'thread' to the 'str'.
  */
 void
-btp_java_thread_append_to_str(struct btp_java_thread *thread,
-                              struct btp_strbuf *dest);
+sr_java_thread_append_to_str(struct sr_java_thread *thread,
+                             struct sr_strbuf *dest);
 
 /**
  * If the input contains proper thread with frames, parse the thread,
@@ -200,18 +200,18 @@ btp_java_thread_append_to_str(struct btp_java_thread *thread,
  * representing the thread.  Otherwise to not modify the input pointer
  * and return NULL.
  * @param location
- * The caller must provide a pointer to struct btp_location here.  The
+ * The caller must provide a pointer to struct sr_location here.  The
  * line and column members are gradually increased as the parser
  * handles the input, keep this in mind to get reasonable values.
  * When this function returns NULL (an error occurred), the structure
  * will contain the error line, column, and message.
  * @returns
  * NULL or newly allocated structure, which should be released by
- * calling btp_java_thread_free().
+ * calling sr_java_thread_free().
  */
-struct btp_java_thread *
-btp_java_thread_parse(const char **input,
-                      struct btp_location *location);
+struct sr_java_thread *
+sr_java_thread_parse(const char **input,
+                     struct sr_location *location);
 
 /**
  * Prepare a string representing thread which contains just the function
@@ -222,10 +222,10 @@ btp_java_thread_parse(const char **input,
  * calling free().
  */
 char *
-btp_java_thread_format_funs(struct btp_java_thread *thread);
+sr_java_thread_format_funs(struct sr_java_thread *thread);
 
 char *
-btp_java_thread_to_json(struct btp_java_thread *thread);
+sr_java_thread_to_json(struct sr_java_thread *thread);
 
 #ifdef __cplusplus
 }

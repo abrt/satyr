@@ -25,10 +25,10 @@
 #include <ctype.h>
 #include <string.h>
 
-struct btp_unstrip_entry *
-btp_unstrip_parse(const char *unstrip_output)
+struct sr_unstrip_entry *
+sr_unstrip_parse(const char *unstrip_output)
 {
-    struct btp_unstrip_entry *result = NULL, *last = NULL;
+    struct sr_unstrip_entry *result = NULL, *last = NULL;
 
     const char *line = unstrip_output;
     while (*line)
@@ -55,30 +55,30 @@ btp_unstrip_parse(const char *unstrip_output)
         unsigned build_id_len = line - build_id;
 
         /* there may be @ADDR after the ID */
-        line = btp_skip_non_whitespace(line);
-        line = btp_skip_whitespace(line);
+        line = sr_skip_non_whitespace(line);
+        line = sr_skip_whitespace(line);
 
         /* FILE */
         const char *file_name = line;
-        line = btp_skip_non_whitespace(line);
+        line = sr_skip_non_whitespace(line);
         unsigned file_name_len = line - file_name;
-        line = btp_skip_whitespace(line);
+        line = sr_skip_whitespace(line);
 
         /* DEBUGFILE */
-        line = btp_skip_non_whitespace(line);
-        line = btp_skip_whitespace(line);
+        line = sr_skip_non_whitespace(line);
+        line = sr_skip_whitespace(line);
 
         /* MODULENAME */
         const char *mod_name = line;
-        line = btp_skip_non_whitespace(line);
+        line = sr_skip_non_whitespace(line);
         unsigned mod_name_len = line - mod_name;
 
-        struct btp_unstrip_entry *entry = btp_malloc(sizeof(struct btp_unstrip_entry));
+        struct sr_unstrip_entry *entry = sr_malloc(sizeof(struct sr_unstrip_entry));
         entry->start = start;
         entry->length = length;
-        entry->build_id = btp_strndup(build_id, build_id_len);
-        entry->file_name = btp_strndup(file_name, file_name_len);
-        entry->mod_name = btp_strndup(mod_name, mod_name_len);
+        entry->build_id = sr_strndup(build_id, build_id_len);
+        entry->file_name = sr_strndup(file_name, file_name_len);
+        entry->mod_name = sr_strndup(mod_name, mod_name_len);
         entry->next = NULL;
 
         if (!result)
@@ -97,11 +97,11 @@ eat_line:
     return result;
 }
 
-struct btp_unstrip_entry *
-btp_unstrip_find_address(struct btp_unstrip_entry *entries,
-                         uint64_t address)
+struct sr_unstrip_entry *
+sr_unstrip_find_address(struct sr_unstrip_entry *entries,
+                        uint64_t address)
 {
-    struct btp_unstrip_entry *loop = entries;
+    struct sr_unstrip_entry *loop = entries;
     while (loop)
     {
         if (loop->start <= address && loop->start + loop->length > address)
@@ -114,11 +114,11 @@ btp_unstrip_find_address(struct btp_unstrip_entry *entries,
 }
 
 void
-btp_unstrip_free(struct btp_unstrip_entry *entries)
+sr_unstrip_free(struct sr_unstrip_entry *entries)
 {
     while (entries)
     {
-        struct btp_unstrip_entry *entry = entries;
+        struct sr_unstrip_entry *entry = entries;
         entries = entry->next;
         free(entry->build_id);
         free(entry->file_name);

@@ -24,21 +24,21 @@
 #include <string.h>
 #include <stdlib.h>
 
-struct btp_callgraph *
-btp_callgraph_compute(struct btp_disasm_state *disassembler,
-                      struct btp_elf_fde *eh_frame,
-                      char **error_message)
+struct sr_callgraph *
+sr_callgraph_compute(struct sr_disasm_state *disassembler,
+                     struct sr_elf_fde *eh_frame,
+                     char **error_message)
 {
-    struct btp_elf_fde *fde_entry = eh_frame;
-    struct btp_callgraph *result = NULL, *last = NULL;
+    struct sr_elf_fde *fde_entry = eh_frame;
+    struct sr_callgraph *result = NULL, *last = NULL;
     while (fde_entry)
     {
-        struct btp_callgraph *entry = malloc(sizeof(struct btp_callgraph));
+        struct sr_callgraph *entry = malloc(sizeof(struct sr_callgraph));
         entry->address = fde_entry->start_address;
         entry->callees = NULL;
         entry->next = NULL;
 
-        char **instructions = btp_disasm_get_function_instructions(
+        char **instructions = sr_disasm_get_function_instructions(
             disassembler,
             fde_entry->start_address,
             fde_entry->length,
@@ -46,12 +46,12 @@ btp_callgraph_compute(struct btp_disasm_state *disassembler,
 
         if (!instructions)
         {
-            btp_callgraph_free(result);
+            sr_callgraph_free(result);
             free(entry);
             return NULL;
         }
 
-        entry->callees = btp_disasm_get_callee_addresses(instructions);
+        entry->callees = sr_disasm_get_callee_addresses(instructions);
 
         if (result)
         {
@@ -67,36 +67,36 @@ btp_callgraph_compute(struct btp_disasm_state *disassembler,
     return result;
 }
 
-struct btp_callgraph *
-btp_callgraph_extend(struct btp_callgraph *callgraph,
-                     uint64_t start_address,
-                     struct btp_disasm_state *disassembler,
-                     struct btp_elf_fde *eh_frame,
-                     char **error_message)
+struct sr_callgraph *
+sr_callgraph_extend(struct sr_callgraph *callgraph,
+                    uint64_t start_address,
+                    struct sr_disasm_state *disassembler,
+                    struct sr_elf_fde *eh_frame,
+                    char **error_message)
 {
-    if (btp_callgraph_find(callgraph, start_address))
+    if (sr_callgraph_find(callgraph, start_address))
         return callgraph;
 
-    struct btp_elf_fde *fde =
-        btp_elf_find_fde_for_start_address(eh_frame,
+    struct sr_elf_fde *fde =
+        sr_elf_find_fde_for_start_address(eh_frame,
                                            start_address);
 
     if (!fde)
     {
-        *error_message = btp_asprintf(
+        *error_message = sr_asprintf(
             "Unable to find FDE for address 0x%"PRIx64,
             start_address);
 
         return NULL;
     }
 
-    struct btp_callgraph *last = btp_callgraph_last(callgraph);
-    struct btp_callgraph *entry = malloc(sizeof(struct btp_callgraph));
+    struct sr_callgraph *last = sr_callgraph_last(callgraph);
+    struct sr_callgraph *entry = malloc(sizeof(struct sr_callgraph));
     entry->address = fde->exec_base + fde->start_address;
     entry->callees = NULL;
     entry->next = NULL;
 
-    char **instructions = btp_disasm_get_function_instructions(
+    char **instructions = sr_disasm_get_function_instructions(
         disassembler,
         fde->exec_base + fde->start_address,
         fde->length,
@@ -108,7 +108,7 @@ btp_callgraph_extend(struct btp_callgraph *callgraph,
         return NULL;
     }
 
-    entry->callees = btp_disasm_get_callee_addresses(instructions);
+    entry->callees = sr_disasm_get_callee_addresses(instructions);
 
     if (callgraph)
     {
@@ -121,7 +121,7 @@ btp_callgraph_extend(struct btp_callgraph *callgraph,
     uint64_t *callees = entry->callees;
     while (*callees != 0)
     {
-        struct btp_callgraph *result = btp_callgraph_extend(callgraph,
+        struct sr_callgraph *result = sr_callgraph_extend(callgraph,
                                                             *callees,
                                                             disassembler,
                                                             eh_frame,
@@ -144,19 +144,19 @@ btp_callgraph_extend(struct btp_callgraph *callgraph,
 
 
 void
-btp_callgraph_free(struct btp_callgraph *callgraph)
+sr_callgraph_free(struct sr_callgraph *callgraph)
 {
     while (callgraph)
     {
-        struct btp_callgraph *entry = callgraph;
+        struct sr_callgraph *entry = callgraph;
         callgraph = entry->next;
         free(entry->callees);
         free(entry);
     }
 }
 
-struct btp_callgraph *
-btp_callgraph_find(struct btp_callgraph *callgraph,
+struct sr_callgraph *
+sr_callgraph_find(struct sr_callgraph *callgraph,
                    uint64_t address)
 {
     while (callgraph)
@@ -170,10 +170,10 @@ btp_callgraph_find(struct btp_callgraph *callgraph,
     return NULL;
 }
 
-struct btp_callgraph *
-btp_callgraph_last(struct btp_callgraph *callgraph)
+struct sr_callgraph *
+sr_callgraph_last(struct sr_callgraph *callgraph)
 {
-    struct btp_callgraph *last = callgraph;
+    struct sr_callgraph *last = callgraph;
     if (last)
     {
         while (last->next)

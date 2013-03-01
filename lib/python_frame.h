@@ -18,8 +18,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_PYTHON_FRAME_H
-#define BTPARSER_PYTHON_FRAME_H
+#ifndef SATYR_PYTHON_FRAME_H
+#define SATYR_PYTHON_FRAME_H
 
 /**
  * @file
@@ -33,9 +33,9 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
-struct btp_location;
+struct sr_location;
 
-struct btp_python_frame
+struct sr_python_frame
 {
     char *file_name;
 
@@ -47,17 +47,17 @@ struct btp_python_frame
 
     char *line_contents;
 
-    struct btp_python_frame *next;
+    struct sr_python_frame *next;
 };
 
 /**
  * Creates and initializes a new frame structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_python_frame_free().
+ * calling the function sr_python_frame_free().
  */
-struct btp_python_frame *
-btp_python_frame_new();
+struct sr_python_frame *
+sr_python_frame_new();
 
 /**
  * Initializes all members of the frame structure to their default
@@ -66,7 +66,7 @@ btp_python_frame_new();
  * stack.
  */
 void
-btp_python_frame_init(struct btp_python_frame *frame);
+sr_python_frame_init(struct sr_python_frame *frame);
 
 /**
  * Releases the memory held by the frame. The frame siblings are not
@@ -75,7 +75,7 @@ btp_python_frame_init(struct btp_python_frame *frame);
  * If the frame is NULL, no operation is performed.
  */
 void
-btp_python_frame_free(struct btp_python_frame *frame);
+sr_python_frame_free(struct sr_python_frame *frame);
 
 /**
  * Creates a duplicate of the frame.
@@ -88,11 +88,11 @@ btp_python_frame_free(struct btp_python_frame *frame);
  * set to NULL.
  * @returns
  * This function never returns NULL. The returned duplicate frame must
- * be released by calling the function btp_python_frame_free().
+ * be released by calling the function sr_python_frame_free().
  */
-struct btp_python_frame *
-btp_python_frame_dup(struct btp_python_frame *frame,
-                     bool siblings);
+struct sr_python_frame *
+sr_python_frame_dup(struct sr_python_frame *frame,
+                    bool siblings);
 
 /**
  * Compares two python frames.
@@ -108,8 +108,8 @@ btp_python_frame_dup(struct btp_python_frame *frame,
  * if frame1 is found to be 'greater' than frame2.
  */
 int
-btp_python_frame_cmp(struct btp_python_frame *frame1,
-                     struct btp_python_frame *frame2);
+sr_python_frame_cmp(struct sr_python_frame *frame1,
+                    struct sr_python_frame *frame2);
 
 /**
  * Compares two python frames.
@@ -125,8 +125,8 @@ btp_python_frame_cmp(struct btp_python_frame *frame1,
  * if frame1 is found to be 'greater' than frame2.
  */
 int
-btp_python_frame_cmp_distance(struct btp_python_frame *frame1,
-                              struct btp_python_frame *frame2);
+sr_python_frame_cmp_distance(struct sr_python_frame *frame1,
+                             struct sr_python_frame *frame2);
 
 
 /**
@@ -135,9 +135,9 @@ btp_python_frame_cmp_distance(struct btp_python_frame *frame1,
  * This function returns the 'dest' frame.  If 'dest' is NULL, it
  * returns the 'item' frame.
  */
-struct btp_python_frame *
-btp_python_frame_append(struct btp_python_frame *dest,
-                        struct btp_python_frame *item);
+struct sr_python_frame *
+sr_python_frame_append(struct sr_python_frame *dest,
+                       struct sr_python_frame *item);
 
 /**
  * If the input contains a complete frame, this function parses the
@@ -146,18 +146,18 @@ btp_python_frame_append(struct btp_python_frame *dest,
  * frame, the function does not modify input and returns NULL.
  * @returns
  * Allocated pointer with a frame structure. The pointer should be
- * released by btp_python_frame_free().
+ * released by sr_python_frame_free().
  * @param location
- * The caller must provide a pointer to an instance of btp_location
+ * The caller must provide a pointer to an instance of sr_location
  * here.  When this function returns NULL, the structure will contain
  * the error line, column, and message.  The line and column members
  * of the location are gradually increased as the parser handles the
  * input, so the location should be initialized before calling this
  * function to get reasonable values.
  */
-struct btp_python_frame *
-btp_python_frame_parse(const char **input,
-                       struct btp_location *location);
+struct sr_python_frame *
+sr_python_frame_parse(const char **input,
+                      struct sr_location *location);
 
 /**
  * Returns a textual representation of the frame.
@@ -166,7 +166,7 @@ btp_python_frame_parse(const char **input,
  * function.
  */
 char *
-btp_python_frame_to_json(struct btp_python_frame *frame);
+sr_python_frame_to_json(struct sr_python_frame *frame);
 
 #ifdef __cplusplus
 }

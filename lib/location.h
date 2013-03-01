@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_LOCATION_H
-#define BTPARSER_LOCATION_H
+#ifndef SATYR_LOCATION_H
+#define SATYR_LOCATION_H
 
 /**
  * @file
@@ -39,7 +39,7 @@ extern "C" {
  * the place where a parser error occurred, and the message explains
  * what the parser expected and didn't find on that place.
  */
-struct btp_location
+struct sr_location
 {
     /** Starts from 1. */
     int line;
@@ -57,7 +57,7 @@ struct btp_location
  * values.  No memory is allocated or released by this function.
  */
 void
-btp_location_init(struct btp_location *location);
+sr_location_init(struct sr_location *location);
 
 /**
  * Compare two locations.
@@ -82,16 +82,16 @@ btp_location_init(struct btp_location *location);
  * order.
  */
 int
-btp_location_cmp(struct btp_location *location1,
-                 struct btp_location *location2,
-                 bool compare_messages);
+sr_location_cmp(struct sr_location *location1,
+                struct sr_location *location2,
+                bool compare_messages);
 
 /**
  * Creates a string representation of location.
  * User must delete the returned string using free().
  */
 char *
-btp_location_to_string(struct btp_location *location);
+sr_location_to_string(struct sr_location *location);
 
 /**
  * Adds a line and a column to specific location.
@@ -109,9 +109,9 @@ btp_location_to_string(struct btp_location *location);
  * Starts from 0.
  */
 void
-btp_location_add(struct btp_location *location,
-                 int add_line,
-                 int add_column);
+sr_location_add(struct sr_location *location,
+                int add_line,
+                int add_column);
 
 /**
  * Adds a line column pair to another line column pair.
@@ -126,10 +126,10 @@ btp_location_add(struct btp_location *location,
  * Starts from 0.
  */
 void
-btp_location_add_ext(int *line,
-                     int *column,
-                     int add_line,
-                     int add_column);
+sr_location_add_ext(int *line,
+                    int *column,
+                    int add_line,
+                    int add_column);
 
 /**
  * Updates the line and column of the location by moving "after" the
@@ -137,8 +137,8 @@ btp_location_add_ext(int *line,
  * and the column is set to 0. Otherwise the column is increased by 1.
  */
 void
-btp_location_eat_char(struct btp_location *location,
-                      char c);
+sr_location_eat_char(struct sr_location *location,
+                     char c);
 
 /**
  * Updates the line and the column by moving "after" the char c. If c
@@ -150,9 +150,9 @@ btp_location_eat_char(struct btp_location *location,
  * Must be a valid pointer.
  */
 void
-btp_location_eat_char_ext(int *line,
-                          int *column,
-                          char c);
+sr_location_eat_char_ext(int *line,
+                         int *column,
+                         char c);
 
 #ifdef __cplusplus
 }

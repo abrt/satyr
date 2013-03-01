@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_CORE_STACKTRACE_H
-#define BTPARSER_CORE_STACKTRACE_H
+#ifndef SATYR_CORE_STACKTRACE_H
+#define SATYR_CORE_STACKTRACE_H
 
 /**
  * @file
@@ -31,14 +31,14 @@ extern "C" {
 
 #include <inttypes.h>
 
-struct btp_core_thread;
-struct btp_location;
-struct btp_json_value;
+struct sr_core_thread;
+struct sr_location;
+struct sr_json_value;
 
 /**
  * @brief A stack trace of a core dump.
  */
-struct btp_core_stacktrace
+struct sr_core_stacktrace
 {
     /** Signal number. */
     uint8_t signal;
@@ -50,19 +50,19 @@ struct btp_core_stacktrace
      *
      * It might be NULL if the crash thread is not detected.
      */
-    struct btp_core_thread *crash_thread;
+    struct sr_core_thread *crash_thread;
 
-    struct btp_core_thread *threads;
+    struct sr_core_thread *threads;
 };
 
 /**
  * Creates and initializes a new stacktrace structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_core_stacktrace_free().
+ * calling the function sr_core_stacktrace_free().
  */
-struct btp_core_stacktrace *
-btp_core_stacktrace_new();
+struct sr_core_stacktrace *
+sr_core_stacktrace_new();
 
 /**
  * Initializes all members of the stacktrace structure to their default
@@ -71,7 +71,7 @@ btp_core_stacktrace_new();
  * stack.
  */
 void
-btp_core_stacktrace_init(struct btp_core_stacktrace *stacktrace);
+sr_core_stacktrace_init(struct sr_core_stacktrace *stacktrace);
 
 /**
  * Releases the memory held by the stacktrace, its threads and frames.
@@ -79,7 +79,7 @@ btp_core_stacktrace_init(struct btp_core_stacktrace *stacktrace);
  * If the stacktrace is NULL, no operation is performed.
  */
 void
-btp_core_stacktrace_free(struct btp_core_stacktrace *stacktrace);
+sr_core_stacktrace_free(struct sr_core_stacktrace *stacktrace);
 
 /**
  * Creates a duplicate of the stacktrace.
@@ -87,10 +87,10 @@ btp_core_stacktrace_free(struct btp_core_stacktrace *stacktrace);
  * The stacktrace to be copied. It's not modified by this function.
  * @returns
  * This function never returns NULL.  The returned duplicate must be
- * released by calling the function btp_core_stacktrace_free().
+ * released by calling the function sr_core_stacktrace_free().
  */
-struct btp_core_stacktrace *
-btp_core_stacktrace_dup(struct btp_core_stacktrace *stacktrace);
+struct sr_core_stacktrace *
+sr_core_stacktrace_dup(struct sr_core_stacktrace *stacktrace);
 
 /**
  * Returns a number of threads in the stacktrace.
@@ -98,24 +98,23 @@ btp_core_stacktrace_dup(struct btp_core_stacktrace *stacktrace);
  * It's not modified by calling this function.
  */
 int
-btp_core_stacktrace_get_thread_count(
-    struct btp_core_stacktrace *stacktrace);
+sr_core_stacktrace_get_thread_count( struct sr_core_stacktrace *stacktrace);
 
-struct btp_core_thread *
-btp_core_stacktrace_find_crash_thread(struct btp_core_stacktrace *stacktrace);
+struct sr_core_thread *
+sr_core_stacktrace_find_crash_thread(struct sr_core_stacktrace *stacktrace);
 
 /**
  * @note
  * Stacktrace can be serialized to JSON string via
- * btp_core_stacktrace_to_json().
+ * sr_core_stacktrace_to_json().
  */
-struct btp_core_stacktrace *
-btp_core_stacktrace_from_json(struct btp_json_value *root,
-                              char **error_message);
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_json(struct sr_json_value *root,
+                             char **error_message);
 
-struct btp_core_stacktrace *
-btp_core_stacktrace_from_json_text(const char *text,
-                                   char **error_message);
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_json_text(const char *text,
+                                  char **error_message);
 
 /**
  * Serializes stacktrace to string.
@@ -125,10 +124,10 @@ btp_core_stacktrace_from_json_text(const char *text,
  * longer needed.
  */
 char *
-btp_core_stacktrace_to_json(struct btp_core_stacktrace *stacktrace);
+sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace);
 
-struct btp_core_stacktrace *
-btp_core_stacktrace_create(const char *gdb_stacktrace_text,
+struct sr_core_stacktrace *
+sr_core_stacktrace_create(const char *gdb_stacktrace_text,
                           const char *unstrip_text,
                           const char *executable_path);
 

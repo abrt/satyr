@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_PY_METRICS_H
-#define BTPARSER_PY_METRICS_H
+#ifndef SATYR_PY_METRICS_H
+#define SATYR_PY_METRICS_H
 
 /**
  * @file
@@ -32,32 +32,32 @@ extern "C" {
 #include <Python.h>
 #include <structmember.h>
 
-extern PyTypeObject btp_py_distances_type;
+extern PyTypeObject sr_py_distances_type;
 
-struct btp_py_distances
+struct sr_py_distances
 {
     PyObject_HEAD
-    struct btp_distances *distances;
+    struct sr_distances *distances;
 };
 
 /* constructor */
-PyObject *btp_py_distances_new(PyTypeObject *object,
-                               PyObject *args,
-                               PyObject *kwds);
+PyObject *sr_py_distances_new(PyTypeObject *object,
+                              PyObject *args,
+                              PyObject *kwds);
 
 /* destructor */
-void btp_py_distances_free(PyObject *object);
+void sr_py_distances_free(PyObject *object);
 
 /* str */
-PyObject *btp_py_distances_str(PyObject *self);
+PyObject *sr_py_distances_str(PyObject *self);
 
 /* getters & setters */
-PyObject *btp_py_distances_get_size(PyObject *self, PyObject *args);
-PyObject *btp_py_distances_get_distance(PyObject *self, PyObject *args);
-PyObject *btp_py_distances_set_distance(PyObject *self, PyObject *args);
+PyObject *sr_py_distances_get_size(PyObject *self, PyObject *args);
+PyObject *sr_py_distances_get_distance(PyObject *self, PyObject *args);
+PyObject *sr_py_distances_set_distance(PyObject *self, PyObject *args);
 
 /* methods */
-PyObject *btp_py_distances_dup(PyObject *self, PyObject *args);
+PyObject *sr_py_distances_dup(PyObject *self, PyObject *args);
 
 #ifdef __cplusplus
 }

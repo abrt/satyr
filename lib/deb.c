@@ -20,6 +20,6 @@
 #include "deb.h"
 
 void
-btp_deb_package_free(struct btp_deb_package *package, bool recursive)
+sr_deb_package_free(struct sr_deb_package *package, bool recursive)
 {
 }

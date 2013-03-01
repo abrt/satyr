@@ -25,25 +25,25 @@
 #include <string.h>
 #include <stdarg.h>
 
-struct btp_strbuf *
-btp_strbuf_new()
+struct sr_strbuf *
+sr_strbuf_new()
 {
-    struct btp_strbuf *strbuf = btp_malloc(sizeof(struct btp_strbuf));
-    btp_strbuf_init(strbuf);
+    struct sr_strbuf *strbuf = sr_malloc(sizeof(struct sr_strbuf));
+    sr_strbuf_init(strbuf);
     return strbuf;
 }
 
 void
-btp_strbuf_init(struct btp_strbuf *strbuf)
+sr_strbuf_init(struct sr_strbuf *strbuf)
 {
     strbuf->alloc = 8;
     strbuf->len = 0;
-    strbuf->buf = btp_malloc(strbuf->alloc);
+    strbuf->buf = sr_malloc(strbuf->alloc);
     strbuf->buf[strbuf->len] = '\0';
 }
 
 void
-btp_strbuf_free(struct btp_strbuf *strbuf)
+sr_strbuf_free(struct sr_strbuf *strbuf)
 {
     if (!strbuf)
         return;
@@ -53,7 +53,7 @@ btp_strbuf_free(struct btp_strbuf *strbuf)
 }
 
 char *
-btp_strbuf_free_nobuf(struct btp_strbuf *strbuf)
+sr_strbuf_free_nobuf(struct sr_strbuf *strbuf)
 {
     char *buf = strbuf->buf;
     free(strbuf);
@@ -62,7 +62,7 @@ btp_strbuf_free_nobuf(struct btp_strbuf *strbuf)
 
 
 void
-btp_strbuf_clear(struct btp_strbuf *strbuf)
+sr_strbuf_clear(struct sr_strbuf *strbuf)
 {
     assert(strbuf->alloc > 0);
     strbuf->len = 0;
@@ -73,7 +73,7 @@ btp_strbuf_clear(struct btp_strbuf *strbuf)
  * without touching malloc/realloc.
  */
 void
-btp_strbuf_grow(struct btp_strbuf *strbuf, int num)
+sr_strbuf_grow(struct sr_strbuf *strbuf, int num)
 {
     if (strbuf->len + num + 1 > strbuf->alloc)
     {
@@ -89,34 +89,34 @@ btp_strbuf_grow(struct btp_strbuf *strbuf, int num)
     }
 }
 
-struct btp_strbuf *
-btp_strbuf_append_char(struct btp_strbuf *strbuf,
-                       char c)
+struct sr_strbuf *
+sr_strbuf_append_char(struct sr_strbuf *strbuf,
+                      char c)
 {
-    btp_strbuf_grow(strbuf, 1);
+    sr_strbuf_grow(strbuf, 1);
     strbuf->buf[strbuf->len++] = c;
     strbuf->buf[strbuf->len] = '\0';
     return strbuf;
 }
 
-struct btp_strbuf *
-btp_strbuf_append_str(struct btp_strbuf *strbuf,
-                      const char *str)
+struct sr_strbuf *
+sr_strbuf_append_str(struct sr_strbuf *strbuf,
+                     const char *str)
 {
     int len = strlen(str);
-    btp_strbuf_grow(strbuf, len);
+    sr_strbuf_grow(strbuf, len);
     assert(strbuf->len + len < strbuf->alloc);
     strcpy(strbuf->buf + strbuf->len, str);
     strbuf->len += len;
     return strbuf;
 }
 
-struct btp_strbuf *
-btp_strbuf_prepend_str(struct btp_strbuf *strbuf,
-                       const char *str)
+struct sr_strbuf *
+sr_strbuf_prepend_str(struct sr_strbuf *strbuf,
+                      const char *str)
 {
     int len = strlen(str);
-    btp_strbuf_grow(strbuf, len);
+    sr_strbuf_grow(strbuf, len);
     assert(strbuf->len + len < strbuf->alloc);
     memmove(strbuf->buf + len, strbuf->buf, strbuf->len + 1);
     memcpy(strbuf->buf, str, len);
@@ -124,47 +124,47 @@ btp_strbuf_prepend_str(struct btp_strbuf *strbuf,
     return strbuf;
 }
 
-struct btp_strbuf *
-btp_strbuf_append_strfv(struct btp_strbuf *strbuf,
-                        const char *format, va_list p)
+struct sr_strbuf *
+sr_strbuf_append_strfv(struct sr_strbuf *strbuf,
+                       const char *format, va_list p)
 {
-    char *string_ptr = btp_vasprintf(format, p);
-    btp_strbuf_append_str(strbuf, string_ptr);
+    char *string_ptr = sr_vasprintf(format, p);
+    sr_strbuf_append_str(strbuf, string_ptr);
     free(string_ptr);
     return strbuf;
 }
 
-struct btp_strbuf *
-btp_strbuf_append_strf(struct btp_strbuf *strbuf,
-                       const char *format, ...)
+struct sr_strbuf *
+sr_strbuf_append_strf(struct sr_strbuf *strbuf,
+                      const char *format, ...)
 {
     va_list p;
 
     va_start(p, format);
-    btp_strbuf_append_strfv(strbuf, format, p);
+    sr_strbuf_append_strfv(strbuf, format, p);
     va_end(p);
 
     return strbuf;
 }
 
-struct btp_strbuf *
-btp_strbuf_prepend_strfv(struct btp_strbuf *strbuf,
-                         const char *format, va_list p)
+struct sr_strbuf *
+sr_strbuf_prepend_strfv(struct sr_strbuf *strbuf,
+                        const char *format, va_list p)
 {
-    char *string_ptr = btp_vasprintf(format, p);
-    btp_strbuf_prepend_str(strbuf, string_ptr);
+    char *string_ptr = sr_vasprintf(format, p);
+    sr_strbuf_prepend_str(strbuf, string_ptr);
     free(string_ptr);
     return strbuf;
 }
 
-struct btp_strbuf *
-btp_strbuf_prepend_strf(struct btp_strbuf *strbuf,
-                        const char *format, ...)
+struct sr_strbuf *
+sr_strbuf_prepend_strf(struct sr_strbuf *strbuf,
+                       const char *format, ...)
 {
     va_list p;
 
     va_start(p, format);
-    btp_strbuf_prepend_strfv(strbuf, format, p);
+    sr_strbuf_prepend_strfv(strbuf, format, p);
     va_end(p);
 
     return strbuf;

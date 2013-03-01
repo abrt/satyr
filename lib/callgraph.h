@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_CALLGRAPH_H
-#define BTPARSER_CALLGRAPH_H
+#ifndef SATYR_CALLGRAPH_H
+#define SATYR_CALLGRAPH_H
 
 /**
  * @file
@@ -40,8 +40,8 @@ extern "C" {
 
 #include <inttypes.h>
 
-struct btp_disasm_state;
-struct btp_elf_fde;
+struct sr_disasm_state;
+struct sr_elf_fde;
 
 /**
  * @brief A call graph representing calling relationships between
@@ -51,7 +51,7 @@ struct btp_elf_fde;
  * low-level programs.  Functions are identified by their numeric
  * address (an offset to a binary file).
  */
-struct btp_callgraph
+struct sr_callgraph
 {
     /**
      * @brief Memory address of the start of a function executable code.
@@ -68,35 +68,35 @@ struct btp_callgraph
     /**
      * @brief Next node of the call graph or NULL.
      */
-    struct btp_callgraph *next;
+    struct sr_callgraph *next;
 };
 
-struct btp_callgraph *
-btp_callgraph_compute(struct btp_disasm_state *disassembler,
-                      struct btp_elf_fde *eh_frame,
-                      char **error_message);
+struct sr_callgraph *
+sr_callgraph_compute(struct sr_disasm_state *disassembler,
+                     struct sr_elf_fde *eh_frame,
+                     char **error_message);
 
 /// Assumption: when a fde is included in the callgraph, we assume
 /// that all callees are included as well.
-struct btp_callgraph *
-btp_callgraph_extend(struct btp_callgraph *callgraph,
-                     uint64_t start_address,
-                     struct btp_disasm_state *disassembler,
-                     struct btp_elf_fde *eh_frame,
-                     char **error_message);
+struct sr_callgraph *
+sr_callgraph_extend(struct sr_callgraph *callgraph,
+                    uint64_t start_address,
+                    struct sr_disasm_state *disassembler,
+                    struct sr_elf_fde *eh_frame,
+                    char **error_message);
 
 void
-btp_callgraph_free(struct btp_callgraph *callgraph);
+sr_callgraph_free(struct sr_callgraph *callgraph);
 
-struct btp_callgraph *
-btp_callgraph_find(struct btp_callgraph *callgraph,
-                   uint64_t address);
+struct sr_callgraph *
+sr_callgraph_find(struct sr_callgraph *callgraph,
+                  uint64_t address);
 
-struct btp_callgraph *
-btp_callgraph_last(struct btp_callgraph *callgraph);
+struct sr_callgraph *
+sr_callgraph_last(struct sr_callgraph *callgraph);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // BTPARSER_CALLGRAPH_H
+#endif // SATYR_CALLGRAPH_H

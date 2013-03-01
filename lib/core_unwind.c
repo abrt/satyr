@@ -31,12 +31,12 @@
 
 #if !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND
 
-struct btp_core_stacktrace *
-btp_parse_coredump(const char *coredump_filename,
-                   const char *executable_filename,
-                   char **error_message)
+struct sr_core_stacktrace *
+sr_parse_coredump(const char *coredump_filename,
+                  const char *executable_filename,
+                  char **error_message)
 {
-    *error_message = btp_asprintf("Btparser is built without unwind support");
+    *error_message = sr_asprintf("satyr is built without unwind support");
     return NULL;
 }
 

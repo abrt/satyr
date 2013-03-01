@@ -83,7 +83,7 @@ _set_error(char **error_msg, const char *fmt, ...)
         return;
 
     va_start(ap, fmt);
-    *error_msg = btp_vasprintf(fmt, ap);
+    *error_msg = sr_vasprintf(fmt, ap);
     va_end(ap);
 }
 
@@ -111,7 +111,7 @@ warn(const char *fmt, ...)
 {
     va_list ap;
 
-    if (!btp_debug_parser)
+    if (!sr_debug_parser)
         return;
 
     va_start(ap, fmt);
@@ -224,9 +224,9 @@ cb_exe_maps(Dwfl_Module *mod,
 
     if (filename)
     {
-        **tailp = btp_mallocz(sizeof(struct exe_mapping_data));
+        **tailp = sr_mallocz(sizeof(struct exe_mapping_data));
         (**tailp)->start = (uint64_t)base;
-        (**tailp)->filename = btp_strdup(filename);
+        (**tailp)->filename = sr_strdup(filename);
         *tailp = &((**tailp)->next);
     }
 
@@ -311,7 +311,7 @@ analyze_coredump(const char *elf_file,
         goto fail_dwfl;
     }
 
-    struct core_handle *ch = btp_mallocz(sizeof(*ch));
+    struct core_handle *ch = sr_mallocz(sizeof(*ch));
     ch->fd = fd;
     ch->eh = e;
     ch->dwfl = dwfl;
@@ -329,7 +329,7 @@ fail_close:
     return NULL;
 }
 
-static struct btp_core_thread *
+static struct sr_core_thread *
 unwind_thread(struct UCD_info *ui,
               unw_addr_space_t as,
               Dwfl *dwfl,
@@ -338,7 +338,7 @@ unwind_thread(struct UCD_info *ui,
 {
     int ret;
     unw_cursor_t c;
-    struct btp_core_frame *trace = NULL;
+    struct sr_core_frame *trace = NULL;
 
     _UCD_select_thread(ui, thread_no);
 
@@ -362,7 +362,7 @@ unwind_thread(struct UCD_info *ui,
         if (ip == 0)
             break;
 
-        struct btp_core_frame *entry = btp_core_frame_new();
+        struct sr_core_frame *entry = sr_core_frame_new();
         entry->address = entry->build_id_offset = ip;
         entry->build_id = entry->file_name = NULL;
         entry->function_name = NULL;
@@ -378,8 +378,8 @@ unwind_thread(struct UCD_info *ui,
             ret = dwfl_module_build_id(mod, &build_id_bits, &bid_addr);
             if (ret > 0)
             {
-                entry->build_id = btp_mallocz(2 * ret + 1);
-                btp_bin2hex(entry->build_id, (const char *)build_id_bits, ret);
+                entry->build_id = sr_mallocz(2 * ret + 1);
+                sr_bin2hex(entry->build_id, (const char *)build_id_bits, ret);
             }
 
             if (dwfl_module_info(mod, NULL, &start, NULL, NULL, NULL,
@@ -387,15 +387,15 @@ unwind_thread(struct UCD_info *ui,
             {
                 entry->build_id_offset = (Dwarf_Addr)ip - start;
                 if (filename)
-                    entry->file_name = btp_strdup(filename);
+                    entry->file_name = sr_strdup(filename);
             }
 
             funcname = dwfl_module_addrname(mod, (GElf_Addr)ip);
             if (funcname)
-                entry->function_name = btp_strdup(funcname);
+                entry->function_name = sr_strdup(funcname);
         }
 
-        trace = btp_core_frame_append(trace, entry);
+        trace = sr_core_frame_append(trace, entry);
         /*
         printf("%s 0x%llx %s %s -\n",
                 (ip_seg && ip_seg->build_id) ? ip_seg->build_id : "-",
@@ -405,7 +405,7 @@ unwind_thread(struct UCD_info *ui,
         */
 
         /* Do not unwind below __libc_start_main. */
-        if (0 == btp_strcmp0(entry->function_name, "__libc_start_main"))
+        if (0 == sr_strcmp0(entry->function_name, "__libc_start_main"))
             break;
 
         ret = unw_step(&c);
@@ -424,17 +424,17 @@ unwind_thread(struct UCD_info *ui,
         set_error("No frames found for thread %d", thread_no);
     }
 
-    struct btp_core_thread *thread = btp_core_thread_new();
+    struct sr_core_thread *thread = sr_core_thread_new();
     thread->frames = trace;
     return thread;
 }
 
-struct btp_core_stacktrace *
-btp_parse_coredump(const char *core_file,
+struct sr_core_stacktrace *
+sr_parse_coredump(const char *core_file,
                    const char *exe_file,
                    char **error_msg)
 {
-    struct btp_core_thread *trace = NULL;
+    struct sr_core_thread *trace = NULL;
 
     /* Initialize error_msg to 'no error'. */
     if (error_msg)
@@ -472,7 +472,7 @@ btp_parse_coredump(const char *core_file,
         }
     }
 
-    struct btp_core_stacktrace *stacktrace = btp_core_stacktrace_new();
+    struct sr_core_stacktrace *stacktrace = sr_core_stacktrace_new();
 
     int tnum, nthreads = _UCD_get_num_threads(ui);
     for (tnum = 0; tnum < nthreads; ++tnum)
@@ -480,11 +480,11 @@ btp_parse_coredump(const char *core_file,
         trace = unwind_thread(ui, as, ch->dwfl, tnum, error_msg);
         if (trace)
         {
-            stacktrace->threads = btp_core_thread_append(stacktrace->threads, trace);
+            stacktrace->threads = sr_core_thread_append(stacktrace->threads, trace);
         }
         else
         {
-            btp_core_stacktrace_free(stacktrace);
+            sr_core_stacktrace_free(stacktrace);
             stacktrace = NULL;
             break;
         }

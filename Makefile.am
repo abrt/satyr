@@ -23,15 +23,15 @@ EXTRA_DIST += satyr.pc.in
 
 EXTRA_DIST += autogen.sh RELEASE
 
-UPLOAD_URI = kklic@fedorahosted.org:btparser
-.PHONY: upload
-upload:
-	make dist-gzip
-	scp $(distdir).tar.gz $(UPLOAD_URI)
-	make dist-zip
-	scp $(distdir).zip $(UPLOAD_URI)
-	make dist-xz
-	scp $(distdir).tar.xz $(UPLOAD_URI)
+#UPLOAD_URI = user@fedorahosted.org:satyr
+#.PHONY: upload
+#upload:
+#	make dist-gzip
+#	scp $(distdir).tar.gz $(UPLOAD_URI)
+#	make dist-zip
+#	scp $(distdir).zip $(UPLOAD_URI)
+#	make dist-xz
+#	scp $(distdir).tar.xz $(UPLOAD_URI)
 
 RPM_DIRS = --define "_sourcedir `pwd`" \
            --define "_rpmdir `pwd`" \

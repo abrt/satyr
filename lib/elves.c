@@ -65,7 +65,7 @@ find_elf_section_by_name(Elf *elf,
     size_t shdr_string_index;
     if (0 != elf_getshdrstrndx(elf, &shdr_string_index))
     {
-        *error_message = btp_asprintf("elf_getshdrstrndx failed");
+        *error_message = sr_asprintf("elf_getshdrstrndx failed");
         return 0;
     }
 
@@ -79,7 +79,7 @@ find_elf_section_by_name(Elf *elf,
         GElf_Shdr shdr;
         if (gelf_getshdr(section, &shdr) != &shdr)
         {
-            *error_message = btp_asprintf("gelf_getshdr failed");
+            *error_message = sr_asprintf("gelf_getshdr failed");
             return 0;
         }
 
@@ -89,7 +89,7 @@ find_elf_section_by_name(Elf *elf,
 
         if (!current_section_name)
         {
-            *error_message = btp_asprintf("elf_strptr failed");
+            *error_message = sr_asprintf("elf_strptr failed");
             return 0;
         }
 
@@ -99,7 +99,7 @@ find_elf_section_by_name(Elf *elf,
             *data_dest = elf_getdata(section, NULL);
             if (!*data_dest)
             {
-                *error_message = btp_asprintf("elf_getdata failed");
+                *error_message = sr_asprintf("elf_getdata failed");
                 return 0;
             }
 
@@ -109,23 +109,23 @@ find_elf_section_by_name(Elf *elf,
         }
     }
 
-    *error_message = btp_asprintf("Section %s not found", section_name);
+    *error_message = sr_asprintf("Section %s not found", section_name);
     return 0;
 }
 #endif /* WITH_ELFUTILS */
 
-struct btp_elf_plt_entry *
-btp_elf_get_procedure_linkage_table(const char *filename,
-                                    char **error_message)
+struct sr_elf_plt_entry *
+sr_elf_get_procedure_linkage_table(const char *filename,
+                                   char **error_message)
 {
 #ifdef WITH_ELFUTILS
     /* Open the input file. */
     int fd = open(filename, O_RDONLY);
     if (fd < 0)
     {
-        *error_message = btp_asprintf("Failed to open file %s: %s",
-                                      filename,
-                                      strerror(errno));
+        *error_message = sr_asprintf("Failed to open file %s: %s",
+                                     filename,
+                                     strerror(errno));
 
         return NULL;
     }
@@ -134,9 +134,9 @@ btp_elf_get_procedure_linkage_table(const char *filename,
     Elf *elf = elf_begin(fd, ELF_C_READ, NULL);
     if (!elf)
     {
-        *error_message = btp_asprintf("Failed to run elf_begin on file %s: %s",
-                                      filename,
-                                      elf_errmsg(-1));
+        *error_message = sr_asprintf("Failed to run elf_begin on file %s: %s",
+                                     filename,
+                                     elf_errmsg(-1));
 
         close(fd);
         return NULL;
@@ -153,9 +153,9 @@ btp_elf_get_procedure_linkage_table(const char *filename,
                                                         &find_section_error_message);
     if (0 == plt_section_index)
     {
-        *error_message = btp_asprintf("Failed to find .plt section for %s: %s",
-                                      filename,
-                                      find_section_error_message);
+        *error_message = sr_asprintf("Failed to find .plt section for %s: %s",
+                                     filename,
+                                     find_section_error_message);
 
         free(find_section_error_message);
         elf_end(elf);
@@ -175,9 +175,9 @@ btp_elf_get_procedure_linkage_table(const char *filename,
     {
         if (gelf_getshdr(section, &shdr) != &shdr)
         {
-            *error_message = btp_asprintf("gelf_getshdr failed for %s: %s",
-                                          filename,
-                                          elf_errmsg(-1));
+            *error_message = sr_asprintf("gelf_getshdr failed for %s: %s",
+                                         filename,
+                                         elf_errmsg(-1));
 
             elf_end(elf);
             close(fd);
@@ -190,9 +190,9 @@ btp_elf_get_procedure_linkage_table(const char *filename,
             rela_plt_data = elf_getdata(section, NULL);
             if (!rela_plt_data)
             {
-                *error_message = btp_asprintf("elf_getdata failed for %s: %s",
-                                              filename,
-                                              elf_errmsg(-1));
+                *error_message = sr_asprintf("elf_getdata failed for %s: %s",
+                                             filename,
+                                             elf_errmsg(-1));
 
                 elf_end(elf);
                 close(fd);
@@ -203,9 +203,9 @@ btp_elf_get_procedure_linkage_table(const char *filename,
             Elf_Scn *symbol_section = elf_getscn(elf, shdr.sh_link);
             if (!symbol_section)
             {
-                *error_message = btp_asprintf("elf_getscn failed for %s: %s",
-                                              filename,
-                                              elf_errmsg(-1));
+                *error_message = sr_asprintf("elf_getscn failed for %s: %s",
+                                             filename,
+                                             elf_errmsg(-1));
 
                 elf_end(elf);
                 close(fd);
@@ -215,9 +215,9 @@ btp_elf_get_procedure_linkage_table(const char *filename,
             plt_symbols = elf_getdata(symbol_section, NULL);
             if (!plt_symbols)
             {
-                *error_message = btp_asprintf("elf_getdata failed for %s: %s",
-                                              filename,
-                                              elf_errmsg(-1));
+                *error_message = sr_asprintf("elf_getdata failed for %s: %s",
+                                             filename,
+                                             elf_errmsg(-1));
 
                 elf_end(elf);
                 close(fd);
@@ -227,9 +227,9 @@ btp_elf_get_procedure_linkage_table(const char *filename,
             /* Get string table for the symbol table. */
             if (gelf_getshdr(symbol_section, &shdr) != &shdr)
             {
-                *error_message = btp_asprintf("gelf_getshdr failed for %s: %s",
-                                              filename,
-                                              elf_errmsg(-1));
+                *error_message = sr_asprintf("gelf_getshdr failed for %s: %s",
+                                             filename,
+                                             elf_errmsg(-1));
 
                 elf_end(elf);
                 close(fd);
@@ -243,8 +243,8 @@ btp_elf_get_procedure_linkage_table(const char *filename,
 
     if (0 == stringtable)
     {
-        *error_message = btp_asprintf("Unable to read symbol table for .plt for file %s",
-                                      filename);
+        *error_message = sr_asprintf("Unable to read symbol table for .plt for file %s",
+                                     filename);
 
         elf_end(elf);
         close(fd);
@@ -270,7 +270,7 @@ btp_elf_get_procedure_linkage_table(const char *filename,
      *   3463e01036:   68 01 00 00 00          pushq  $0x1
      *   3463e0103b:   e9 d0 ff ff ff          jmpq   3463e01010 <_init+0x18>
      */
-    struct btp_elf_plt_entry *result = NULL, *last = NULL;
+    struct sr_elf_plt_entry *result = NULL, *last = NULL;
     for (unsigned plt_offset = 16; plt_offset < plt_data->d_size; plt_offset += 16)
     {
         uint32_t *plt_index = (uint32_t*)(plt_data->d_buf + plt_offset + 7);
@@ -278,11 +278,11 @@ btp_elf_get_procedure_linkage_table(const char *filename,
         GElf_Rela rela;
         if (gelf_getrela(rela_plt_data, *plt_index, &rela) != &rela)
         {
-            *error_message = btp_asprintf("gelf_getrela failed for %s: %s",
-                                          filename,
-                                          elf_errmsg(-1));
+            *error_message = sr_asprintf("gelf_getrela failed for %s: %s",
+                                         filename,
+                                         elf_errmsg(-1));
 
-            btp_elf_procedure_linkage_table_free(result);
+            sr_elf_procedure_linkage_table_free(result);
             elf_end(elf);
             close(fd);
             return NULL;
@@ -291,19 +291,19 @@ btp_elf_get_procedure_linkage_table(const char *filename,
         GElf_Sym symb;
         if (gelf_getsym(plt_symbols, GELF_R_SYM(rela.r_info), &symb) != &symb)
         {
-            *error_message = btp_asprintf("gelf_getsym failed for %s: %s",
-                                          filename,
-                                          elf_errmsg(-1));
+            *error_message = sr_asprintf("gelf_getsym failed for %s: %s",
+                                         filename,
+                                         elf_errmsg(-1));
 
-            btp_elf_procedure_linkage_table_free(result);
+            sr_elf_procedure_linkage_table_free(result);
             elf_end(elf);
             close(fd);
             return NULL;
         }
 
-        struct btp_elf_plt_entry *entry = btp_malloc(sizeof(struct btp_elf_plt_entry));
-        entry->symbol_name = btp_strdup(elf_strptr(elf, stringtable,
-                                                   symb.st_name));
+        struct sr_elf_plt_entry *entry = sr_malloc(sizeof(struct sr_elf_plt_entry));
+        entry->symbol_name = sr_strdup(elf_strptr(elf, stringtable,
+                                                  symb.st_name));
 
         entry->address = (uint64_t)(plt_base + plt_offset);
         entry->next = NULL;
@@ -321,28 +321,28 @@ btp_elf_get_procedure_linkage_table(const char *filename,
     close(fd);
     return result;
 #else /* WITH_ELFUTILS */
-    *error_message = btp_asprintf("btparser compiled without elfutils");
+    *error_message = sr_asprintf("satyr compiled without elfutils");
     return NULL;
 #endif /* WITH_ELFUTILS */
 }
 
 void
-btp_elf_procedure_linkage_table_free(struct btp_elf_plt_entry *entries)
+sr_elf_procedure_linkage_table_free(struct sr_elf_plt_entry *entries)
 {
     while (entries)
     {
-        struct btp_elf_plt_entry *entry = entries;
+        struct sr_elf_plt_entry *entry = entries;
         entries = entry->next;
         free(entry->symbol_name);
         free(entry);
     }
 }
 
-struct btp_elf_plt_entry *
-btp_elf_plt_find_for_address(struct btp_elf_plt_entry *plt,
-                             uint64_t address)
+struct sr_elf_plt_entry *
+sr_elf_plt_find_for_address(struct sr_elf_plt_entry *plt,
+                            uint64_t address)
 {
-    struct btp_elf_plt_entry *entry = plt;
+    struct sr_elf_plt_entry *entry = plt;
     while (entry)
     {
         if (entry->address == address)
@@ -408,7 +408,7 @@ read_cie(Dwarf_CFI_Entry *cfi,
     /* Default FDE encoding (i.e. no R in augmentation string) is
      * DW_EH_PE_absptr.
      */
-    struct cie *cie = btp_mallocz(sizeof(struct cie));
+    struct cie *cie = sr_mallocz(sizeof(struct cie));
     cie->cie_offset = cfi_offset;
     cie->ptr_len = encoded_size(DW_EH_PE_absptr, e_ident);
 
@@ -430,8 +430,8 @@ read_cie(Dwarf_CFI_Entry *cfi,
             cie->ptr_len = encoded_size(*augmentation_data, e_ident);
             if (cie->ptr_len != 4 && cie->ptr_len != 8)
             {
-                *error_message = btp_asprintf("Unknown FDE encoding (CIE %jx)",
-                                              (uintmax_t)cfi_offset);
+                *error_message = sr_asprintf("Unknown FDE encoding (CIE %jx)",
+                                             (uintmax_t)cfi_offset);
                 free(cie);
                 return NULL;
             }
@@ -448,8 +448,8 @@ read_cie(Dwarf_CFI_Entry *cfi,
             unsigned size = encoded_size(*augmentation_data, e_ident);
             if (0 == size)
             {
-                *error_message = btp_asprintf("Unknown size for personality encoding (CIE %jx)",
-                                              (uintmax_t)cfi_offset);
+                *error_message = sr_asprintf("Unknown size for personality encoding (CIE %jx)",
+                                             (uintmax_t)cfi_offset);
 
                 free(cie);
                 return NULL;
@@ -459,8 +459,8 @@ read_cie(Dwarf_CFI_Entry *cfi,
             break;
         }
         default:
-            *error_message = btp_asprintf("Unknown augmentation char (CIE %jx)",
-                                          (uintmax_t)cfi_offset);
+            *error_message = sr_asprintf("Unknown augmentation char (CIE %jx)",
+                                         (uintmax_t)cfi_offset);
             free(cie);
             return NULL;
         }
@@ -495,18 +495,18 @@ fde_read_address(const uint8_t *p, unsigned len)
 }
 #endif /* WITH_ELFUTILS */
 
-struct btp_elf_fde *
-btp_elf_get_eh_frame(const char *filename,
-                     char **error_message)
+struct sr_elf_fde *
+sr_elf_get_eh_frame(const char *filename,
+                    char **error_message)
 {
 #ifdef WITH_ELFUTILS
     /* Open the input file. */
     int fd = open(filename, O_RDONLY);
     if (fd < 0)
     {
-        *error_message = btp_asprintf("Failed to open file %s: %s",
-                                      filename,
-                                      strerror(errno));
+        *error_message = sr_asprintf("Failed to open file %s: %s",
+                                     filename,
+                                     strerror(errno));
         return NULL;
     }
 
@@ -514,9 +514,9 @@ btp_elf_get_eh_frame(const char *filename,
     Elf *elf = elf_begin(fd, ELF_C_READ, NULL);
     if (!elf)
     {
-        *error_message = btp_asprintf("Failed to run elf_begin on file %s: %s",
-                                      filename,
-                                      elf_errmsg(-1));
+        *error_message = sr_asprintf("Failed to run elf_begin on file %s: %s",
+                                     filename,
+                                     elf_errmsg(-1));
         close(fd);
         return NULL;
     }
@@ -524,9 +524,9 @@ btp_elf_get_eh_frame(const char *filename,
     unsigned char *e_ident = (unsigned char *)elf_getident(elf, NULL);
     if (!e_ident)
     {
-        *error_message = btp_asprintf("elf_getident failed for %s: %s",
-                                      filename,
-                                      elf_errmsg(-1));
+        *error_message = sr_asprintf("elf_getident failed for %s: %s",
+                                     filename,
+                                     elf_errmsg(-1));
         elf_end(elf);
         close(fd);
         return NULL;
@@ -542,9 +542,9 @@ btp_elf_get_eh_frame(const char *filename,
                                   &shdr,
                                   &find_section_error_message))
     {
-        *error_message = btp_asprintf("Failed to find .eh_frame section for %s: %s",
-                                      filename,
-                                      find_section_error_message);
+        *error_message = sr_asprintf("Failed to find .eh_frame section for %s: %s",
+                                     filename,
+                                     find_section_error_message);
 
         free(find_section_error_message);
         elf_end(elf);
@@ -561,9 +561,9 @@ btp_elf_get_eh_frame(const char *filename,
     size_t phnum;
     if (elf_getphdrnum(elf, &phnum) != 0)
     {
-        *error_message = btp_asprintf("elf_getphdrnum failed for %s: %s",
-                                      filename,
-                                      elf_errmsg(-1));
+        *error_message = sr_asprintf("elf_getphdrnum failed for %s: %s",
+                                     filename,
+                                     elf_errmsg(-1));
         elf_end(elf);
         close(fd);
         return NULL;
@@ -576,9 +576,9 @@ btp_elf_get_eh_frame(const char *filename,
         GElf_Phdr phdr;
         if (gelf_getphdr(elf, i, &phdr) != &phdr)
         {
-            *error_message = btp_asprintf("gelf_getphdr failed for %s: %s",
-                                          filename,
-                                          elf_errmsg(-1));
+            *error_message = sr_asprintf("gelf_getphdr failed for %s: %s",
+                                         filename,
+                                         elf_errmsg(-1));
             elf_end(elf);
             close(fd);
             return NULL;
@@ -593,8 +593,8 @@ btp_elf_get_eh_frame(const char *filename,
 
     if (-1 == exec_base)
     {
-        *error_message = btp_asprintf("Can't determine executable base for %s",
-                                      filename);
+        *error_message = sr_asprintf("Can't determine executable base for %s",
+                                     filename);
 
         elf_end(elf);
         close(fd);
@@ -614,7 +614,7 @@ btp_elf_get_eh_frame(const char *filename,
      * on .eh_frame_hdr -- see http://www.airs.com/blog/archives/462
      */
 
-    struct btp_elf_fde *result = NULL, *last = NULL;
+    struct sr_elf_fde *result = NULL, *last = NULL;
     struct cie *cie_list = NULL, *cie_list_last = NULL;
 
     Dwarf_Off cfi_offset_next = 0;
@@ -642,12 +642,12 @@ btp_elf_get_eh_frame(const char *filename,
             if (cfi_offset_next > cfi_offset)
                 continue;
 
-            *error_message = btp_asprintf("dwarf_next_cfi failed for %s: %s",
-                                          filename,
-                                          dwarf_errmsg(-1));
+            *error_message = sr_asprintf("dwarf_next_cfi failed for %s: %s",
+                                         filename,
+                                         dwarf_errmsg(-1));
 
             cie_free(cie_list);
-            btp_elf_eh_frame_free(result);
+            sr_elf_eh_frame_free(result);
             elf_end(elf);
             close(fd);
             return NULL;
@@ -669,13 +669,13 @@ btp_elf_get_eh_frame(const char *filename,
                                        &cie_error_message);
             if (!cie)
             {
-                *error_message = btp_asprintf("CIE reading failed for %s: %s",
-                                              filename,
-                                              cie_error_message);
+                *error_message = sr_asprintf("CIE reading failed for %s: %s",
+                                             filename,
+                                             cie_error_message);
 
                 free(cie_error_message);
                 cie_free(cie_list);
-                btp_elf_eh_frame_free(result);
+                sr_elf_eh_frame_free(result);
                 elf_end(elf);
                 close(fd);
                 return NULL;
@@ -709,12 +709,12 @@ btp_elf_get_eh_frame(const char *filename,
 
             if (!cie)
             {
-                *error_message = btp_asprintf("CIE not found for FDE %jx in %s",
-                                              (uintmax_t)cfi_offset,
-                                              filename);
+                *error_message = sr_asprintf("CIE not found for FDE %jx in %s",
+                                             (uintmax_t)cfi_offset,
+                                             filename);
 
                 cie_free(cie_list);
-                btp_elf_eh_frame_free(result);
+                sr_elf_eh_frame_free(result);
                 elf_end(elf);
                 close(fd);
                 return NULL;
@@ -750,7 +750,7 @@ btp_elf_get_eh_frame(const char *filename,
                 initial_location -= exec_base;
             }
 
-            struct btp_elf_fde *fde = btp_malloc(sizeof(struct btp_elf_fde));
+            struct sr_elf_fde *fde = sr_malloc(sizeof(struct sr_elf_fde));
             fde->exec_base = exec_base;
             fde->start_address = initial_location;
             fde->length = address_range;
@@ -774,27 +774,27 @@ btp_elf_get_eh_frame(const char *filename,
     close(fd);
     return result;
 #else /* WITH_ELFUTILS */
-    *error_message = btp_asprintf("btparser compiled without elfutils");
+    *error_message = sr_asprintf("satyr compiled without elfutils");
     return NULL;
 #endif /* WITH_ELFUTILS */
 }
 
 void
-btp_elf_eh_frame_free(struct btp_elf_fde *entries)
+sr_elf_eh_frame_free(struct sr_elf_fde *entries)
 {
     while (entries)
     {
-        struct btp_elf_fde *entry = entries;
+        struct sr_elf_fde *entry = entries;
         entries = entry->next;
         free(entry);
     }
 }
 
-struct btp_elf_fde *
-btp_elf_find_fde_for_offset(struct btp_elf_fde *eh_frame,
-                            uint64_t build_id_offset)
+struct sr_elf_fde *
+sr_elf_find_fde_for_offset(struct sr_elf_fde *eh_frame,
+                           uint64_t build_id_offset)
 {
-    struct btp_elf_fde *fde = eh_frame;
+    struct sr_elf_fde *fde = eh_frame;
     while (fde)
     {
         if (build_id_offset >= fde->start_address &&
@@ -809,11 +809,11 @@ btp_elf_find_fde_for_offset(struct btp_elf_fde *eh_frame,
     return NULL;
 }
 
-struct btp_elf_fde *
-btp_elf_find_fde_for_address(struct btp_elf_fde *eh_frame,
-                             uint64_t address)
+struct sr_elf_fde *
+sr_elf_find_fde_for_address(struct sr_elf_fde *eh_frame,
+                            uint64_t address)
 {
-    struct btp_elf_fde *fde = eh_frame;
+    struct sr_elf_fde *fde = eh_frame;
     while (fde)
     {
         if (address >= fde->start_address + fde->exec_base &&
@@ -828,11 +828,11 @@ btp_elf_find_fde_for_address(struct btp_elf_fde *eh_frame,
     return NULL;
 }
 
-struct btp_elf_fde *
-btp_elf_find_fde_for_start_address(struct btp_elf_fde *eh_frame,
-                                   uint64_t start_address)
+struct sr_elf_fde *
+sr_elf_find_fde_for_start_address(struct sr_elf_fde *eh_frame,
+                                  uint64_t start_address)
 {
-    struct btp_elf_fde *fde = eh_frame;
+    struct sr_elf_fde *fde = eh_frame;
     while (fde)
     {
         if (start_address == fde->start_address + fde->exec_base)
@@ -845,47 +845,47 @@ btp_elf_find_fde_for_start_address(struct btp_elf_fde *eh_frame,
 }
 
 char *
-btp_elf_fde_to_json(struct btp_elf_fde *fde,
-                    bool recursive)
+sr_elf_fde_to_json(struct sr_elf_fde *fde,
+                   bool recursive)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
+    struct sr_strbuf *strbuf = sr_strbuf_new();
 
     if (recursive)
     {
-        struct btp_elf_fde *loop = fde;
+        struct sr_elf_fde *loop = fde;
         while (loop)
         {
             if (loop == fde)
-                btp_strbuf_append_str(strbuf, "[ ");
+                sr_strbuf_append_str(strbuf, "[ ");
             else
-                btp_strbuf_append_str(strbuf, ", ");
+                sr_strbuf_append_str(strbuf, ", ");
 
-            char *fde_json = btp_elf_fde_to_json(loop, false);
-            char *indented_fde_json = btp_indent_except_first_line(fde_json, 2);
-            btp_strbuf_append_str(strbuf, indented_fde_json);
+            char *fde_json = sr_elf_fde_to_json(loop, false);
+            char *indented_fde_json = sr_indent_except_first_line(fde_json, 2);
+            sr_strbuf_append_str(strbuf, indented_fde_json);
             free(indented_fde_json);
             free(fde_json);
             loop = loop->next;
             if (loop)
-                btp_strbuf_append_str(strbuf, "\n");
+                sr_strbuf_append_str(strbuf, "\n");
         }
 
-        btp_strbuf_append_str(strbuf, " ]");
+        sr_strbuf_append_str(strbuf, " ]");
     }
     else
     {
         /* Start address. */
-        btp_strbuf_append_strf(strbuf,
-                               "{   \"start_address\": %"PRIu64"\n",
-                               fde->start_address);
+        sr_strbuf_append_strf(strbuf,
+                              "{   \"start_address\": %"PRIu64"\n",
+                              fde->start_address);
 
         /* Length. */
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"length\": %"PRIu64"\n",
-                               fde->length);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"length\": %"PRIu64"\n",
+                              fde->length);
 
-        btp_strbuf_append_str(strbuf, "}");
+        sr_strbuf_append_str(strbuf, "}");
     }
 
-    return btp_strbuf_free_nobuf(strbuf);
+    return sr_strbuf_free_nobuf(strbuf);
 }

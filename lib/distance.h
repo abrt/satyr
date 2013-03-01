@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_DISTANCE_H
-#define BTPARSER_DISTANCE_H
+#ifndef SATYR_DISTANCE_H
+#define SATYR_DISTANCE_H
 
 /**
  * @file
@@ -31,18 +31,18 @@ extern "C" {
 
 #include <stdbool.h>
 
-struct btp_gdb_frame;
-struct btp_gdb_thread;
-struct btp_core_frame;
-struct btp_core_thread;
-struct btp_java_frame;
-struct btp_java_thread;
-struct btp_koops_frame;
-struct btp_koops_stacktrace;
-struct btp_python_frame;
-struct btp_python_stacktrace;
+struct sr_gdb_frame;
+struct sr_gdb_thread;
+struct sr_core_frame;
+struct sr_core_thread;
+struct sr_java_frame;
+struct sr_java_thread;
+struct sr_koops_frame;
+struct sr_koops_stacktrace;
+struct sr_python_frame;
+struct sr_python_stacktrace;
 
-enum btp_distance_type
+enum sr_distance_type
 {
     /* Jaro-Winkler distance:
      *
@@ -55,7 +55,7 @@ enum btp_distance_type
      * inequality.  Returns a number between 0 and 1: 0 = no
      * similarity, 1 = similar threads.
      */
-    BTP_DISTANCE_JARO_WINKLER,
+    SR_DISTANCE_JARO_WINKLER,
 
     /* Jaccard distance:
      *
@@ -65,7 +65,7 @@ enum btp_distance_type
      * into account.  Returns a number between 0 and 1: 0 = similar
      * threads, 1 = no similarity.
      */
-    BTP_DISTANCE_JACCARD,
+    SR_DISTANCE_JACCARD,
 
     /* Levenshtein distance:
      *
@@ -80,40 +80,40 @@ enum btp_distance_type
      * This is normalized to a result between 0 and 1 that is
      * returned.
      */
-    BTP_DISTANCE_LEVENSHTEIN,
+    SR_DISTANCE_LEVENSHTEIN,
 
     /* Damerau-Levenshtein distance:
      *
      * Like the Levenshtein distance, but with transpositions. NOTE:
      * The triangle inequality does not hold.
      */
-    BTP_DISTANCE_DAMERAU_LEVENSHTEIN
+    SR_DISTANCE_DAMERAU_LEVENSHTEIN
 };
 
 float
-btp_distance_gdb(enum btp_distance_type distance_type,
-                 struct btp_gdb_thread *thread1,
-                 struct btp_gdb_thread *thread2);
+sr_distance_gdb(enum sr_distance_type distance_type,
+                struct sr_gdb_thread *thread1,
+                struct sr_gdb_thread *thread2);
 
 float
-btp_distance_core(enum btp_distance_type distance_type,
-                  struct btp_core_thread *thread1,
-                  struct btp_core_thread *thread2);
+sr_distance_core(enum sr_distance_type distance_type,
+                 struct sr_core_thread *thread1,
+                 struct sr_core_thread *thread2);
 
 float
-btp_distance_java(enum btp_distance_type distance_type,
-                  struct btp_java_thread *thread1,
-                  struct btp_java_thread *thread2);
+sr_distance_java(enum sr_distance_type distance_type,
+                 struct sr_java_thread *thread1,
+                 struct sr_java_thread *thread2);
 
 float
-btp_distance_koops(enum btp_distance_type distance_type,
-                   struct btp_koops_stacktrace *stacktrace1,
-                   struct btp_koops_stacktrace *stacktrace2);
+sr_distance_koops(enum sr_distance_type distance_type,
+                  struct sr_koops_stacktrace *stacktrace1,
+                  struct sr_koops_stacktrace *stacktrace2);
 
 float
-btp_distance_python(enum btp_distance_type distance_type,
-                    struct btp_python_stacktrace *stacktrace1,
-                    struct btp_python_stacktrace *stacktrace2);
+sr_distance_python(enum sr_distance_type distance_type,
+                   struct sr_python_stacktrace *stacktrace1,
+                   struct sr_python_stacktrace *stacktrace2);
 
 #ifdef __cplusplus
 }

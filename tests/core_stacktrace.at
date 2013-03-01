@@ -1,12 +1,12 @@
-# Checking the btparser. -*- Autotest -*-
+# Checking the satyr. -*- Autotest -*-
 
 AT_BANNER([Core stacktraces])
 
-## --------------------------- ##
-## btp_core_stacktrace_to_json ##
-## --------------------------- ##
+## -------------------------- ##
+## sr_core_stacktrace_to_json ##
+## -------------------------- ##
 
-AT_TESTFUN([btp_core_stacktrace_to_json],
+AT_TESTFUN([sr_core_stacktrace_to_json],
 [[
 #include <lib/core_stacktrace.h>
 #include <lib/core_thread.h>
@@ -18,51 +18,51 @@ AT_TESTFUN([btp_core_stacktrace_to_json],
 int
 main(void)
 {
-  struct btp_core_frame *frame1 = btp_core_frame_new();
+  struct sr_core_frame *frame1 = sr_core_frame_new();
   frame1->address = 0xffffffff0;
-  frame1->build_id = btp_strdup("aabbccddeeff0");
+  frame1->build_id = sr_strdup("aabbccddeeff0");
   frame1->build_id_offset = 2560;
-  frame1->function_name = btp_strdup("test0");
-  frame1->file_name = btp_strdup("executable0");
+  frame1->function_name = sr_strdup("test0");
+  frame1->file_name = sr_strdup("executable0");
 
-  struct btp_core_frame *frame0 = btp_core_frame_new();;
+  struct sr_core_frame *frame0 = sr_core_frame_new();;
   frame0->address = 0xffffffff1;
-  frame0->build_id = btp_strdup("aabbccddeeff1");
+  frame0->build_id = sr_strdup("aabbccddeeff1");
   frame0->build_id_offset = 2561;
-  frame0->function_name = btp_strdup("test1");
-  frame0->file_name = btp_strdup("executable1");
-  frame0->fingerprint = btp_strdup("ab");
+  frame0->function_name = sr_strdup("test1");
+  frame0->file_name = sr_strdup("executable1");
+  frame0->fingerprint = sr_strdup("ab");
   frame0->next = frame1;
 
-  struct btp_core_thread *thread1 = btp_core_thread_new();
+  struct sr_core_thread *thread1 = sr_core_thread_new();
   thread1->frames = frame0;
 
-  struct btp_core_frame *frame3 = btp_core_frame_new();
+  struct sr_core_frame *frame3 = sr_core_frame_new();
   frame3->address = 0xffffffff3;
-  frame3->build_id = btp_strdup("aabbccddeeff3");
+  frame3->build_id = sr_strdup("aabbccddeeff3");
   frame3->build_id_offset = 2563;
-  frame3->function_name = btp_strdup("test3");
-  frame3->file_name = btp_strdup("executable3");
+  frame3->function_name = sr_strdup("test3");
+  frame3->file_name = sr_strdup("executable3");
 
-  struct btp_core_frame *frame2 = btp_core_frame_new();;
+  struct sr_core_frame *frame2 = sr_core_frame_new();;
   frame2->address = 0xffffffff2;
-  frame2->build_id = btp_strdup("aabbccddeeff2");
+  frame2->build_id = sr_strdup("aabbccddeeff2");
   frame2->build_id_offset = 2562;
-  frame2->function_name = btp_strdup("test2");
-  frame2->file_name = btp_strdup("executable2");
-  frame2->fingerprint = btp_strdup("ab");
+  frame2->function_name = sr_strdup("test2");
+  frame2->file_name = sr_strdup("executable2");
+  frame2->fingerprint = sr_strdup("ab");
   frame2->next = frame3;
 
-  struct btp_core_thread *thread0 = btp_core_thread_new();
+  struct sr_core_thread *thread0 = sr_core_thread_new();
   thread0->frames = frame2;
   thread0->next = thread1;
 
-  struct btp_core_stacktrace *stacktrace = btp_core_stacktrace_new();
+  struct sr_core_stacktrace *stacktrace = sr_core_stacktrace_new();
   stacktrace->signal = SIGKILL;
   stacktrace->crash_thread = thread1;
   stacktrace->threads = thread0;
 
-  char *json = btp_core_stacktrace_to_json(stacktrace);
+  char *json = sr_core_stacktrace_to_json(stacktrace);
   puts(json);
   assert(0 == strcmp(json,
             "{   \"signal\": 9\n"
@@ -100,7 +100,7 @@ main(void)
             "        } ]\n"
             "}"));
 
-  btp_core_stacktrace_free(stacktrace);
+  sr_core_stacktrace_free(stacktrace);
   return 0;
 }
 ]])

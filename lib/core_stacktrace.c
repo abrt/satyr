@@ -36,18 +36,18 @@
 #include <string.h>
 #include <assert.h>
 
-struct btp_core_stacktrace *
-btp_core_stacktrace_new()
+struct sr_core_stacktrace *
+sr_core_stacktrace_new()
 {
-    struct btp_core_stacktrace *stacktrace =
-        btp_malloc(sizeof(struct btp_core_stacktrace));
+    struct sr_core_stacktrace *stacktrace =
+        sr_malloc(sizeof(struct sr_core_stacktrace));
 
-    btp_core_stacktrace_init(stacktrace);
+    sr_core_stacktrace_init(stacktrace);
     return stacktrace;
 }
 
 void
-btp_core_stacktrace_init(struct btp_core_stacktrace *stacktrace)
+sr_core_stacktrace_init(struct sr_core_stacktrace *stacktrace)
 {
     stacktrace->signal = 0;
     stacktrace->executable = NULL;
@@ -56,37 +56,37 @@ btp_core_stacktrace_init(struct btp_core_stacktrace *stacktrace)
 }
 
 void
-btp_core_stacktrace_free(struct btp_core_stacktrace *stacktrace)
+sr_core_stacktrace_free(struct sr_core_stacktrace *stacktrace)
 {
     if (!stacktrace)
         return;
 
     while (stacktrace->threads)
     {
-        struct btp_core_thread *thread = stacktrace->threads;
+        struct sr_core_thread *thread = stacktrace->threads;
         stacktrace->threads = thread->next;
-        btp_core_thread_free(thread);
+        sr_core_thread_free(thread);
     }
 
     free(stacktrace);
 }
 
-struct btp_core_stacktrace *
-btp_core_stacktrace_dup(struct btp_core_stacktrace *stacktrace)
+struct sr_core_stacktrace *
+sr_core_stacktrace_dup(struct sr_core_stacktrace *stacktrace)
 {
-    struct btp_core_stacktrace *result = btp_core_stacktrace_new();
-    memcpy(result, stacktrace, sizeof(struct btp_core_stacktrace));
+    struct sr_core_stacktrace *result = sr_core_stacktrace_new();
+    memcpy(result, stacktrace, sizeof(struct sr_core_stacktrace));
 
     if (stacktrace->threads)
-        result->threads = btp_core_thread_dup(stacktrace->threads, true);
+        result->threads = sr_core_thread_dup(stacktrace->threads, true);
 
     return result;
 }
 
 int
-btp_core_stacktrace_get_thread_count(struct btp_core_stacktrace *stacktrace)
+sr_core_stacktrace_get_thread_count(struct sr_core_stacktrace *stacktrace)
 {
-    struct btp_core_thread *thread = stacktrace->threads;
+    struct sr_core_thread *thread = stacktrace->threads;
     int count = 0;
     while (thread)
     {
@@ -97,8 +97,8 @@ btp_core_stacktrace_get_thread_count(struct btp_core_stacktrace *stacktrace)
     return count;
 }
 
-struct btp_core_thread *
-btp_core_stacktrace_find_crash_thread(struct btp_core_stacktrace *stacktrace)
+struct sr_core_thread *
+sr_core_stacktrace_find_crash_thread(struct sr_core_stacktrace *stacktrace)
 {
     /* If there is no thread, be silent and report NULL. */
     if (!stacktrace->threads)
@@ -108,10 +108,10 @@ btp_core_stacktrace_find_crash_thread(struct btp_core_stacktrace *stacktrace)
     if (!stacktrace->threads->next)
         return stacktrace->threads;
 
-    struct btp_core_thread *thread = stacktrace->threads;
+    struct sr_core_thread *thread = stacktrace->threads;
     while (thread)
     {
-        if (btp_core_thread_find_exit_frame(thread))
+        if (sr_core_thread_find_exit_frame(thread))
             return thread;
 
         thread = thread->next;
@@ -120,17 +120,17 @@ btp_core_stacktrace_find_crash_thread(struct btp_core_stacktrace *stacktrace)
     return thread;
 }
 
-struct btp_core_stacktrace *
-btp_core_stacktrace_from_json(struct btp_json_value *root,
-                              char **error_message)
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_json(struct sr_json_value *root,
+                             char **error_message)
 {
-    if (root->type != BTP_JSON_OBJECT)
+    if (root->type != SR_JSON_OBJECT)
     {
-        *error_message = btp_strdup("Invalid type of root value; object expected.");
+        *error_message = sr_strdup("Invalid type of root value; object expected.");
         return NULL;
     }
 
-    struct btp_core_stacktrace *result = btp_core_stacktrace_new();
+    struct sr_core_stacktrace *result = sr_core_stacktrace_new();
 
     /* Read signal. */
     for (unsigned i = 0; i < root->u.object.length; ++i)
@@ -138,10 +138,10 @@ btp_core_stacktrace_from_json(struct btp_json_value *root,
         if (0 != strcmp("signal", root->u.object.values[i].name))
             continue;
 
-        if (root->u.object.values[i].value->type != BTP_JSON_INTEGER)
+        if (root->u.object.values[i].value->type != SR_JSON_INTEGER)
         {
-            *error_message = btp_strdup("Invalid type of \"signal\"; integer expected.");
-            btp_core_stacktrace_free(result);
+            *error_message = sr_strdup("Invalid type of \"signal\"; integer expected.");
+            sr_core_stacktrace_free(result);
             return NULL;
         }
 
@@ -155,14 +155,14 @@ btp_core_stacktrace_from_json(struct btp_json_value *root,
         if (0 != strcmp("executable", root->u.object.values[i].name))
             continue;
 
-        if (root->u.object.values[i].value->type != BTP_JSON_STRING)
+        if (root->u.object.values[i].value->type != SR_JSON_STRING)
         {
-            *error_message = btp_strdup("Invalid type of \"executable\"; string expected.");
-            btp_core_stacktrace_free(result);
+            *error_message = sr_strdup("Invalid type of \"executable\"; string expected.");
+            sr_core_stacktrace_free(result);
             return NULL;
         }
 
-        result->executable = btp_strdup(root->u.object.values[i].value->u.string.ptr);
+        result->executable = sr_strdup(root->u.object.values[i].value->u.string.ptr);
         break;
     }
 
@@ -172,26 +172,26 @@ btp_core_stacktrace_from_json(struct btp_json_value *root,
         if (0 != strcmp("threads", root->u.object.values[i].name))
             continue;
 
-        if (root->u.object.values[i].value->type != BTP_JSON_ARRAY)
+        if (root->u.object.values[i].value->type != SR_JSON_ARRAY)
         {
-            *error_message = btp_strdup("Invalid type of \"threads\"; array expected.");
-            btp_core_stacktrace_free(result);
+            *error_message = sr_strdup("Invalid type of \"threads\"; array expected.");
+            sr_core_stacktrace_free(result);
             return NULL;
         }
 
         for (unsigned j = 0; j < root->u.object.values[i].value->u.array.length; ++j)
         {
-            struct btp_core_thread *thread = btp_core_thread_from_json(
+            struct sr_core_thread *thread = sr_core_thread_from_json(
                 root->u.object.values[i].value->u.array.values[j],
                 error_message);
 
             if (!thread)
             {
-                btp_core_stacktrace_free(result);
+                sr_core_stacktrace_free(result);
                 return NULL;
             }
 
-            result->threads = btp_core_thread_append(result->threads, thread);
+            result->threads = sr_core_thread_append(result->threads, thread);
         }
 
         break;
@@ -203,18 +203,18 @@ btp_core_stacktrace_from_json(struct btp_json_value *root,
         if (0 != strcmp("crash_thread", root->u.object.values[i].name))
             continue;
 
-        if (root->u.object.values[i].value->type != BTP_JSON_INTEGER)
+        if (root->u.object.values[i].value->type != SR_JSON_INTEGER)
         {
-            *error_message = btp_strdup("Invalid type of \"crash_thread\"; integer expected.");
-            btp_core_stacktrace_free(result);
+            *error_message = sr_strdup("Invalid type of \"crash_thread\"; integer expected.");
+            sr_core_stacktrace_free(result);
             return NULL;
         }
 
         long crash_thread = root->u.object.values[i].value->u.integer;
         if (crash_thread < 0)
         {
-            *error_message = btp_strdup("Invalid index in \"crash_thread\".");
-            btp_core_stacktrace_free(result);
+            *error_message = sr_strdup("Invalid index in \"crash_thread\".");
+            sr_core_stacktrace_free(result);
             return NULL;
         }
 
@@ -223,8 +223,8 @@ btp_core_stacktrace_from_json(struct btp_json_value *root,
         {
             if (!result->crash_thread)
             {
-                *error_message = btp_strdup("Invalid index in \"crash_thread\".");
-                btp_core_stacktrace_free(result);
+                *error_message = sr_strdup("Invalid index in \"crash_thread\".");
+                sr_core_stacktrace_free(result);
                 return NULL;
             }
 
@@ -233,8 +233,8 @@ btp_core_stacktrace_from_json(struct btp_json_value *root,
 
         if (!result->crash_thread)
         {
-            *error_message = btp_strdup("Invalid index in \"crash_thread\".");
-            btp_core_stacktrace_free(result);
+            *error_message = sr_strdup("Invalid index in \"crash_thread\".");
+            sr_core_stacktrace_free(result);
             return NULL;
         }
 
@@ -244,42 +244,42 @@ btp_core_stacktrace_from_json(struct btp_json_value *root,
     return result;
 }
 
-struct btp_core_stacktrace *
-btp_core_stacktrace_from_json_text(const char *text,
-                                   char **error_message)
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_json_text(const char *text,
+                                  char **error_message)
 {
-    struct btp_json_settings settings;
-    memset(&settings, 0, sizeof(struct btp_json_settings));
-    struct btp_location location;
-    btp_location_init(&location);
-    struct btp_json_value *json_root = btp_json_parse_ex(&settings,
-                                                         text,
-                                                         &location);
+    struct sr_json_settings settings;
+    memset(&settings, 0, sizeof(struct sr_json_settings));
+    struct sr_location location;
+    sr_location_init(&location);
+    struct sr_json_value *json_root = sr_json_parse_ex(&settings,
+                                                        text,
+                                                        &location);
 
     if (!json_root)
     {
-        *error_message = btp_location_to_string(&location);
+        *error_message = sr_location_to_string(&location);
         return NULL;
     }
 
-    return btp_core_stacktrace_from_json(json_root,
-                                         error_message);
+    return sr_core_stacktrace_from_json(json_root,
+                                        error_message);
 }
 
 char *
-btp_core_stacktrace_to_json(struct btp_core_stacktrace *stacktrace)
+sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
-    btp_strbuf_append_strf(strbuf,
-                           "{   \"signal\": %"PRIu8"\n",
-                           stacktrace->signal);
+    struct sr_strbuf *strbuf = sr_strbuf_new();
+    sr_strbuf_append_strf(strbuf,
+                          "{   \"signal\": %"PRIu8"\n",
+                          stacktrace->signal);
 
     /* Crash thread offset. */
     if (stacktrace->crash_thread)
     {
         /* Calculate the offset of the crash thread. */
         uint32_t offset = 0;
-        struct btp_core_thread *thread = stacktrace->threads;
+        struct sr_core_thread *thread = stacktrace->threads;
         while (thread && thread != stacktrace->crash_thread)
         {
             thread = thread->next;
@@ -287,49 +287,49 @@ btp_core_stacktrace_to_json(struct btp_core_stacktrace *stacktrace)
         }
 
         assert(thread);
-        btp_strbuf_append_strf(strbuf, ",   \"crash_thread\": %"PRIu32"\n", offset);
+        sr_strbuf_append_strf(strbuf, ",   \"crash_thread\": %"PRIu32"\n", offset);
     }
 
-    btp_strbuf_append_str(strbuf, ",   \"threads\":\n");
+    sr_strbuf_append_str(strbuf, ",   \"threads\":\n");
 
-    struct btp_core_thread *thread = stacktrace->threads;
+    struct sr_core_thread *thread = stacktrace->threads;
     while (thread)
     {
         if (thread == stacktrace->threads)
-            btp_strbuf_append_str(strbuf, "      [ ");
+            sr_strbuf_append_str(strbuf, "      [ ");
         else
-            btp_strbuf_append_str(strbuf, "      , ");
+            sr_strbuf_append_str(strbuf, "      , ");
 
-        char *thread_json = btp_core_thread_to_json(thread);
-        char *indented_thread_json = btp_indent_except_first_line(thread_json, 8);
-        btp_strbuf_append_str(strbuf, indented_thread_json);
+        char *thread_json = sr_core_thread_to_json(thread);
+        char *indented_thread_json = sr_indent_except_first_line(thread_json, 8);
+        sr_strbuf_append_str(strbuf, indented_thread_json);
         free(indented_thread_json);
         free(thread_json);
         thread = thread->next;
         if (thread)
-            btp_strbuf_append_str(strbuf, "\n");
+            sr_strbuf_append_str(strbuf, "\n");
     }
 
-    btp_strbuf_append_str(strbuf, " ]\n");
-    btp_strbuf_append_char(strbuf, '}');
-    return btp_strbuf_free_nobuf(strbuf);
+    sr_strbuf_append_str(strbuf, " ]\n");
+    sr_strbuf_append_char(strbuf, '}');
+    return sr_strbuf_free_nobuf(strbuf);
 }
 
-struct btp_core_stacktrace *
-btp_core_stacktrace_create(const char *gdb_stacktrace_text,
-                           const char *unstrip_text,
-                           const char *executable_path)
+struct sr_core_stacktrace *
+sr_core_stacktrace_create(const char *gdb_stacktrace_text,
+                          const char *unstrip_text,
+                          const char *executable_path)
 {
     // Parse the GDB stacktrace.
-    struct btp_location location;
-    btp_location_init(&location);
+    struct sr_location location;
+    sr_location_init(&location);
 
-    struct btp_gdb_stacktrace *gdb_stacktrace =
-        btp_gdb_stacktrace_parse(&gdb_stacktrace_text, &location);
+    struct sr_gdb_stacktrace *gdb_stacktrace =
+        sr_gdb_stacktrace_parse(&gdb_stacktrace_text, &location);
 
     if (!gdb_stacktrace)
     {
-        if (btp_debug_parser)
+        if (sr_debug_parser)
         {
             fprintf(stderr, "Unable to parse stacktrace: %d:%d: %s\n",
                     location.line, location.column, location.message);
@@ -339,53 +339,53 @@ btp_core_stacktrace_create(const char *gdb_stacktrace_text,
     }
 
     // Parse the unstrip output.
-    struct btp_unstrip_entry *unstrip = btp_unstrip_parse(unstrip_text);
+    struct sr_unstrip_entry *unstrip = sr_unstrip_parse(unstrip_text);
     if (!unstrip)
     {
-        if (btp_debug_parser)
+        if (sr_debug_parser)
             fprintf(stderr, "Unable to parse unstrip output.");
 
         return NULL;
     }
 
     // Create the core stacktrace
-    struct btp_core_stacktrace *core_stacktrace =
-        btp_core_stacktrace_new();
+    struct sr_core_stacktrace *core_stacktrace =
+        sr_core_stacktrace_new();
 
-    struct btp_gdb_thread *gdb_thread = gdb_stacktrace->threads;
+    struct sr_gdb_thread *gdb_thread = gdb_stacktrace->threads;
     while (gdb_thread)
     {
-        struct btp_core_thread *core_thread = btp_core_thread_new();
+        struct sr_core_thread *core_thread = sr_core_thread_new();
 
-        struct btp_gdb_frame *gdb_frame = gdb_thread->frames;
+        struct sr_gdb_frame *gdb_frame = gdb_thread->frames;
         while (gdb_frame)
         {
             gdb_frame = gdb_frame->next;
 
-            struct btp_core_frame *core_frame = btp_core_frame_new();
+            struct sr_core_frame *core_frame = sr_core_frame_new();
             core_frame->address = gdb_frame->address;
 
-            struct btp_unstrip_entry *unstrip_entry =
-                btp_unstrip_find_address(unstrip, gdb_frame->address);
+            struct sr_unstrip_entry *unstrip_entry =
+                sr_unstrip_find_address(unstrip, gdb_frame->address);
 
             if (unstrip_entry)
             {
-                core_frame->build_id = btp_strdup(unstrip_entry->build_id);
+                core_frame->build_id = sr_strdup(unstrip_entry->build_id);
                 core_frame->build_id_offset = core_frame->address - unstrip_entry->start;
-                core_frame->file_name = btp_strdup(unstrip_entry->file_name);
+                core_frame->file_name = sr_strdup(unstrip_entry->file_name);
             }
 
             if (gdb_frame->function_name &&
                 0 != strcmp(gdb_frame->function_name, "??"))
             {
                 core_frame->function_name =
-                    btp_strdup(gdb_frame->function_name);
+                    sr_strdup(gdb_frame->function_name);
             }
         }
 
         core_stacktrace->threads =
-            btp_core_thread_append(core_stacktrace->threads,
-                                   core_thread);
+            sr_core_thread_append(core_stacktrace->threads,
+                                  core_thread);
 
         gdb_thread = gdb_thread->next;
     }

@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_NORMALIZE_H
-#define BTPARSER_NORMALIZE_H
+#ifndef SATYR_NORMALIZE_H
+#define SATYR_NORMALIZE_H
 
 /**
  * @file
@@ -33,22 +33,22 @@
 extern "C" {
 #endif
 
-struct btp_gdb_frame;
-struct btp_gdb_thread;
-struct btp_gdb_stacktrace;
-struct btp_core_frame;
-struct btp_core_thread;
-struct btp_core_stacktrace;
-struct btp_koops_stacktrace;
+struct sr_gdb_frame;
+struct sr_gdb_thread;
+struct sr_gdb_stacktrace;
+struct sr_core_frame;
+struct sr_core_thread;
+struct sr_core_stacktrace;
+struct sr_koops_stacktrace;
 
 void
-btp_normalize_gdb_thread(struct btp_gdb_thread *thread);
+sr_normalize_gdb_thread(struct sr_gdb_thread *thread);
 
 void
-btp_normalize_gdb_stacktrace(struct btp_gdb_stacktrace *stacktrace);
+sr_normalize_gdb_stacktrace(struct sr_gdb_stacktrace *stacktrace);
 
 void
-btp_normalize_koops_stacktrace(struct btp_koops_stacktrace *stacktrace);
+sr_normalize_koops_stacktrace(struct sr_koops_stacktrace *stacktrace);
 
 // TODO: move to gdb_stacktrace.h
 /**
@@ -59,8 +59,8 @@ btp_normalize_koops_stacktrace(struct btp_koops_stacktrace *stacktrace);
  * @returns
  * Returns NULL if such a frame is not found.
  */
-struct btp_gdb_frame *
-btp_glibc_thread_find_exit_frame(struct btp_gdb_thread *thread);
+struct sr_gdb_frame *
+sr_glibc_thread_find_exit_frame(struct sr_gdb_thread *thread);
 
 // TODO: move to metrics.h
 /**
@@ -69,15 +69,15 @@ btp_glibc_thread_find_exit_frame(struct btp_gdb_thread *thread);
  * Leaves unpair unknown functions unchanged.
  */
 void
-btp_normalize_gdb_paired_unknown_function_names(struct btp_gdb_thread *thread1,
-                                                struct btp_gdb_thread *thread2);
+sr_normalize_gdb_paired_unknown_function_names(struct sr_gdb_thread *thread1,
+                                               struct sr_gdb_thread *thread2);
 
 // TODO: merge into normalization or something else
 /**
  * Remove frames which are not interesting in comparison with other threads.
  */
 void
-btp_gdb_normalize_optimize_thread(struct btp_gdb_thread *thread);
+sr_gdb_normalize_optimize_thread(struct sr_gdb_thread *thread);
 
 #ifdef __cplusplus
 }

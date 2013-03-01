@@ -9,23 +9,23 @@
 #include "lib/location.h"
 #include "lib/normalize.h"
 
-#define stacktrace_doc "btparser.GdbStacktrace - class representing a stacktrace\n" \
+#define stacktrace_doc "satyr.GdbStacktrace - class representing a stacktrace\n" \
                       "Usage:\n" \
-                      "btparser.GdbStacktrace() - creates an empty stacktrace\n" \
-                      "btparser.GdbStacktrace(str) - parses str and fills the stacktrace object"
+                      "satyr.GdbStacktrace() - creates an empty stacktrace\n" \
+                      "satyr.GdbStacktrace(str) - parses str and fills the stacktrace object"
 
 #define b_dup_doc "Usage: stacktrace.dup()\n" \
-                  "Returns: btparser.GdbStacktrace - a new clone of stacktrace\n" \
+                  "Returns: satyr.GdbStacktrace - a new clone of stacktrace\n" \
                   "Clones the stacktrace object. All new structures are independent " \
                   "on the original object."
 
 #define b_find_crash_frame_doc "Usage: stacktrace.find_crash_frame()\n" \
-                               "Returns: btparser.Frame - crash frame\n" \
+                               "Returns: satyr.Frame - crash frame\n" \
                                "Finds crash frame in the stacktrace. Also sets the " \
                                "stacktrace.crashframe field."
 
 #define b_find_crash_thread_doc "Usage: stacktrace.find_crash_thread()\n" \
-                                "Returns: btparser.Thread - crash thread\n" \
+                                "Returns: satyr.Thread - crash thread\n" \
                                 "Finds crash thread in the stacktrace. Also sets the " \
                                 "stacktrace.crashthread field."
 
@@ -48,7 +48,7 @@
 
 #define b_find_address_doc "Usage: stacktrace.find_address(address)\n" \
                            "address: long - address to find" \
-                           "Returns: btparser.Sharedlib object or None if not found\n" \
+                           "Returns: satyr.Sharedlib object or None if not found\n" \
                            "Looks whether the given address belongs to a shared library."
 
 #define b_set_libnames_doc "Usage: stacktrace.set_libnames()\n" \
@@ -62,53 +62,53 @@
 
 #define b_crashframe_doc (char *)"Readonly. By default the field contains None. After " \
                          "calling the find_crash_frame method, a reference to " \
-                         "btparser.Frame object is stored into the field."
+                         "satyr.Frame object is stored into the field."
 
 #define b_crashthread_doc (char *)"Readonly. By default the field contains None. After " \
                           "calling the find_crash_thread method, a reference to " \
-                          "btparser.Thread object is stored into the field."
+                          "satyr.Thread object is stored into the field."
 
-#define b_threads_doc (char *)"A list containing the btparser.Thread objects " \
+#define b_threads_doc (char *)"A list containing the satyr.Thread objects " \
                       "representing threads in the stacktrace."
 
-#define b_libs_doc (char *)"A list containing the btparser.Sharedlib objects " \
+#define b_libs_doc (char *)"A list containing the satyr.Sharedlib objects " \
                    "representing shared libraries loaded at the moment of crash."
 
 static PyMethodDef
 gdb_stacktrace_methods[] =
 {
     /* methods */
-    { "dup",                  btp_py_gdb_stacktrace_dup,                  METH_NOARGS,  b_dup_doc                  },
-    { "find_crash_frame",     btp_py_gdb_stacktrace_find_crash_frame,     METH_NOARGS,  b_find_crash_frame_doc     },
-    { "find_crash_thread",    btp_py_gdb_stacktrace_find_crash_thread,    METH_NOARGS,  b_find_crash_thread_doc    },
-    { "limit_frame_depth",    btp_py_gdb_stacktrace_limit_frame_depth,    METH_VARARGS, b_limit_frame_depth_doc    },
-    { "quality_simple",       btp_py_gdb_stacktrace_quality_simple,       METH_NOARGS,  b_quality_simple_doc       },
-    { "quality_complex",      btp_py_gdb_stacktrace_quality_complex,      METH_NOARGS,  b_quality_complex_doc      },
-    { "get_duplication_hash", btp_py_gdb_stacktrace_get_duplication_hash, METH_NOARGS,  b_get_duplication_hash_doc },
-    { "find_address",         btp_py_gdb_stacktrace_find_address,         METH_VARARGS, b_find_address_doc         },
-    { "set_libnames",         btp_py_gdb_stacktrace_set_libnames,         METH_NOARGS,  b_set_libnames_doc         },
-    { "normalize",            btp_py_gdb_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc            },
-    { "get_optimized_thread", btp_py_gdb_stacktrace_get_optimized_thread, METH_VARARGS, b_get_optimized_thread_doc },
+    { "dup",                  sr_py_gdb_stacktrace_dup,                  METH_NOARGS,  b_dup_doc                  },
+    { "find_crash_frame",     sr_py_gdb_stacktrace_find_crash_frame,     METH_NOARGS,  b_find_crash_frame_doc     },
+    { "find_crash_thread",    sr_py_gdb_stacktrace_find_crash_thread,    METH_NOARGS,  b_find_crash_thread_doc    },
+    { "limit_frame_depth",    sr_py_gdb_stacktrace_limit_frame_depth,    METH_VARARGS, b_limit_frame_depth_doc    },
+    { "quality_simple",       sr_py_gdb_stacktrace_quality_simple,       METH_NOARGS,  b_quality_simple_doc       },
+    { "quality_complex",      sr_py_gdb_stacktrace_quality_complex,      METH_NOARGS,  b_quality_complex_doc      },
+    { "get_duplication_hash", sr_py_gdb_stacktrace_get_duplication_hash, METH_NOARGS,  b_get_duplication_hash_doc },
+    { "find_address",         sr_py_gdb_stacktrace_find_address,         METH_VARARGS, b_find_address_doc         },
+    { "set_libnames",         sr_py_gdb_stacktrace_set_libnames,         METH_NOARGS,  b_set_libnames_doc         },
+    { "normalize",            sr_py_gdb_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc            },
+    { "get_optimized_thread", sr_py_gdb_stacktrace_get_optimized_thread, METH_VARARGS, b_get_optimized_thread_doc },
     { NULL },
 };
 
 static PyMemberDef
 gdb_stacktrace_members[] =
 {
-    { (char *)"threads",     T_OBJECT_EX, offsetof(struct btp_py_gdb_stacktrace, threads),     0,        b_threads_doc     },
-    { (char *)"crashframe",  T_OBJECT_EX, offsetof(struct btp_py_gdb_stacktrace, crashframe),  READONLY, b_crashframe_doc  },
-    { (char *)"crashthread", T_OBJECT_EX, offsetof(struct btp_py_gdb_stacktrace, crashthread), READONLY, b_crashthread_doc },
-    { (char *)"libs",        T_OBJECT_EX, offsetof(struct btp_py_gdb_stacktrace, libs),        0,        b_libs_doc        },
+    { (char *)"threads",     T_OBJECT_EX, offsetof(struct sr_py_gdb_stacktrace, threads),     0,        b_threads_doc     },
+    { (char *)"crashframe",  T_OBJECT_EX, offsetof(struct sr_py_gdb_stacktrace, crashframe),  READONLY, b_crashframe_doc  },
+    { (char *)"crashthread", T_OBJECT_EX, offsetof(struct sr_py_gdb_stacktrace, crashthread), READONLY, b_crashthread_doc },
+    { (char *)"libs",        T_OBJECT_EX, offsetof(struct sr_py_gdb_stacktrace, libs),        0,        b_libs_doc        },
     { NULL },
 };
 
-PyTypeObject btp_py_gdb_stacktrace_type = {
+PyTypeObject sr_py_gdb_stacktrace_type = {
     PyObject_HEAD_INIT(NULL)
     0,
-    "btparser.GdbStacktrace",           /* tp_name */
-    sizeof(struct btp_py_gdb_stacktrace),        /* tp_basicsize */
+    "satyr.GdbStacktrace",           /* tp_name */
+    sizeof(struct sr_py_gdb_stacktrace),        /* tp_basicsize */
     0,                              /* tp_itemsize */
-    btp_py_gdb_stacktrace_free,       /* tp_dealloc */
+    sr_py_gdb_stacktrace_free,       /* tp_dealloc */
     NULL,                           /* tp_print */
     NULL,                           /* tp_getattr */
     NULL,                           /* tp_setattr */
@@ -119,7 +119,7 @@ PyTypeObject btp_py_gdb_stacktrace_type = {
     NULL,                           /* tp_as_mapping */
     NULL,                           /* tp_hash */
     NULL,                           /* tp_call */
-    btp_py_gdb_stacktrace_str,        /* tp_str */
+    sr_py_gdb_stacktrace_str,        /* tp_str */
     NULL,                           /* tp_getattro */
     NULL,                           /* tp_setattro */
     NULL,                           /* tp_as_buffer */
@@ -141,7 +141,7 @@ PyTypeObject btp_py_gdb_stacktrace_type = {
     0,                              /* tp_dictoffset */
     NULL,                           /* tp_init */
     NULL,                           /* tp_alloc */
-    btp_py_gdb_stacktrace_new,        /* tp_new */
+    sr_py_gdb_stacktrace_new,        /* tp_new */
     NULL,                           /* tp_free */
     NULL,                           /* tp_is_gc */
     NULL,                           /* tp_bases */
@@ -153,13 +153,13 @@ PyTypeObject btp_py_gdb_stacktrace_type = {
 
 /* helpers */
 int
-stacktrace_prepare_linked_list(struct btp_py_gdb_stacktrace *stacktrace)
+stacktrace_prepare_linked_list(struct sr_py_gdb_stacktrace *stacktrace)
 {
     int i;
     PyObject *item;
 
     /* thread */
-    struct btp_py_gdb_thread *current = NULL, *prev = NULL;
+    struct sr_py_gdb_thread *current = NULL, *prev = NULL;
     for (i = 0; i < PyList_Size(stacktrace->threads); ++i)
     {
         item = PyList_GetItem(stacktrace->threads, i);
@@ -167,16 +167,16 @@ stacktrace_prepare_linked_list(struct btp_py_gdb_stacktrace *stacktrace)
             return -1;
 
         Py_INCREF(item);
-        if (!PyObject_TypeCheck(item, &btp_py_gdb_thread_type))
+        if (!PyObject_TypeCheck(item, &sr_py_gdb_thread_type))
         {
             Py_XDECREF(current);
             Py_XDECREF(prev);
             PyErr_SetString(PyExc_TypeError,
-                            "threads must be a list of btparser.Thread objects");
+                            "threads must be a list of satyr.Thread objects");
             return -1;
         }
 
-        current = (struct btp_py_gdb_thread*)item;
+        current = (struct sr_py_gdb_thread*)item;
         if (thread_prepare_linked_list(current) < 0)
             return -1;
 
@@ -196,7 +196,7 @@ stacktrace_prepare_linked_list(struct btp_py_gdb_stacktrace *stacktrace)
     }
 
     /* sharedlib */
-    struct btp_py_gdb_sharedlib *currentlib = NULL, *prevlib = NULL;
+    struct sr_py_gdb_sharedlib *currentlib = NULL, *prevlib = NULL;
     for (i = 0; i < PyList_Size(stacktrace->libs); ++i)
     {
         item = PyList_GetItem(stacktrace->libs, i);
@@ -204,16 +204,16 @@ stacktrace_prepare_linked_list(struct btp_py_gdb_stacktrace *stacktrace)
             return -1;
 
         Py_INCREF(item);
-        if (!PyObject_TypeCheck(item, &btp_py_gdb_sharedlib_type))
+        if (!PyObject_TypeCheck(item, &sr_py_gdb_sharedlib_type))
         {
             Py_XDECREF(currentlib);
             Py_XDECREF(prevlib);
             PyErr_SetString(PyExc_TypeError,
-                            "libs must be a list of btparser.Sharedlib objects");
+                            "libs must be a list of satyr.Sharedlib objects");
             return -1;
         }
 
-        currentlib = (struct btp_py_gdb_sharedlib*)item;
+        currentlib = (struct sr_py_gdb_sharedlib*)item;
         if (i == 0)
             stacktrace->stacktrace->libs = currentlib->sharedlib;
         else
@@ -233,7 +233,7 @@ stacktrace_prepare_linked_list(struct btp_py_gdb_stacktrace *stacktrace)
 }
 
 int
-stacktrace_free_thread_python_list(struct btp_py_gdb_stacktrace *stacktrace)
+stacktrace_free_thread_python_list(struct sr_py_gdb_stacktrace *stacktrace)
 {
     int i;
     PyObject *item;
@@ -250,7 +250,7 @@ stacktrace_free_thread_python_list(struct btp_py_gdb_stacktrace *stacktrace)
 }
 
 int
-stacktrace_free_sharedlib_python_list(struct btp_py_gdb_stacktrace *stacktrace)
+stacktrace_free_sharedlib_python_list(struct sr_py_gdb_stacktrace *stacktrace)
 {
     int i;
     PyObject *item;
@@ -268,18 +268,18 @@ stacktrace_free_sharedlib_python_list(struct btp_py_gdb_stacktrace *stacktrace)
 }
 
 PyObject *
-thread_linked_list_to_python_list(struct btp_gdb_stacktrace *stacktrace)
+thread_linked_list_to_python_list(struct sr_gdb_stacktrace *stacktrace)
 {
     PyObject *result = PyList_New(0);
     if (!result)
         return PyErr_NoMemory();
 
-    struct btp_gdb_thread *thread = stacktrace->threads;
-    struct btp_py_gdb_thread *item;
+    struct sr_gdb_thread *thread = stacktrace->threads;
+    struct sr_py_gdb_thread *item;
     while (thread)
     {
-        item = (struct btp_py_gdb_thread*)
-            PyObject_New(struct btp_py_gdb_thread, &btp_py_gdb_thread_type);
+        item = (struct sr_py_gdb_thread*)
+            PyObject_New(struct sr_py_gdb_thread, &sr_py_gdb_thread_type);
 
         item->thread = thread;
         item->frames = frame_linked_list_to_python_list(thread);
@@ -296,18 +296,18 @@ thread_linked_list_to_python_list(struct btp_gdb_stacktrace *stacktrace)
 }
 
 PyObject *
-sharedlib_linked_list_to_python_list(struct btp_gdb_stacktrace *stacktrace)
+sharedlib_linked_list_to_python_list(struct sr_gdb_stacktrace *stacktrace)
 {
     PyObject *result = PyList_New(0);
     if (!result)
         return PyErr_NoMemory();
 
-    struct btp_gdb_sharedlib *sharedlib = stacktrace->libs;
-    struct btp_py_gdb_sharedlib *item;
+    struct sr_gdb_sharedlib *sharedlib = stacktrace->libs;
+    struct sr_py_gdb_sharedlib *item;
     while (sharedlib)
     {
-        item = (struct btp_py_gdb_sharedlib*)
-            PyObject_New(struct btp_py_gdb_sharedlib, &btp_py_gdb_sharedlib_type);
+        item = (struct sr_py_gdb_sharedlib*)
+            PyObject_New(struct sr_py_gdb_sharedlib, &sr_py_gdb_sharedlib_type);
 
         item->sharedlib = sharedlib;
         if (PyList_Append(result, (PyObject *)item) < 0)
@@ -320,18 +320,18 @@ sharedlib_linked_list_to_python_list(struct btp_gdb_stacktrace *stacktrace)
 }
 
 int
-stacktrace_rebuild_thread_python_list(struct btp_py_gdb_stacktrace *stacktrace)
+stacktrace_rebuild_thread_python_list(struct sr_py_gdb_stacktrace *stacktrace)
 {
-    struct btp_gdb_thread *newlinkedlist = btp_gdb_thread_dup(stacktrace->stacktrace->threads, true);
+    struct sr_gdb_thread *newlinkedlist = sr_gdb_thread_dup(stacktrace->stacktrace->threads, true);
     if (!newlinkedlist)
         return -1;
     if (stacktrace_free_thread_python_list(stacktrace) < 0)
     {
-        struct btp_gdb_thread *next;
+        struct sr_gdb_thread *next;
         while (newlinkedlist)
         {
             next = newlinkedlist->next;
-            btp_gdb_thread_free(newlinkedlist);
+            sr_gdb_thread_free(newlinkedlist);
             newlinkedlist = next;
         }
         return -1;
@@ -342,18 +342,18 @@ stacktrace_rebuild_thread_python_list(struct btp_py_gdb_stacktrace *stacktrace)
 }
 
 int
-stacktrace_rebuild_sharedlib_python_list(struct btp_py_gdb_stacktrace *stacktrace)
+stacktrace_rebuild_sharedlib_python_list(struct sr_py_gdb_stacktrace *stacktrace)
 {
-    struct btp_gdb_sharedlib *newlinkedlist = btp_gdb_sharedlib_dup(stacktrace->stacktrace->libs, true);
+    struct sr_gdb_sharedlib *newlinkedlist = sr_gdb_sharedlib_dup(stacktrace->stacktrace->libs, true);
     if (!newlinkedlist)
         return -1;
     if (stacktrace_free_sharedlib_python_list(stacktrace) < 0)
     {
-        struct btp_gdb_sharedlib *next;
+        struct sr_gdb_sharedlib *next;
         while (newlinkedlist)
         {
             next = newlinkedlist->next;
-            btp_gdb_sharedlib_free(newlinkedlist);
+            sr_gdb_sharedlib_free(newlinkedlist);
             newlinkedlist = next;
         }
         return -1;
@@ -365,13 +365,13 @@ stacktrace_rebuild_sharedlib_python_list(struct btp_py_gdb_stacktrace *stacktrac
 
 /* constructor */
 PyObject *
-btp_py_gdb_stacktrace_new(PyTypeObject *object,
+sr_py_gdb_stacktrace_new(PyTypeObject *object,
                           PyObject *args,
                           PyObject *kwds)
 {
-    struct btp_py_gdb_stacktrace *bo = (struct btp_py_gdb_stacktrace*)
-        PyObject_New(struct btp_py_gdb_stacktrace,
-                     &btp_py_gdb_stacktrace_type);
+    struct sr_py_gdb_stacktrace *bo = (struct sr_py_gdb_stacktrace*)
+        PyObject_New(struct sr_py_gdb_stacktrace,
+                     &sr_py_gdb_stacktrace_type);
 
     if (!bo)
         return PyErr_NoMemory();
@@ -380,14 +380,14 @@ btp_py_gdb_stacktrace_new(PyTypeObject *object,
     if (!PyArg_ParseTuple(args, "|s", &str))
         return NULL;
 
-    bo->crashframe = (struct btp_py_gdb_frame*)Py_None;
-    bo->crashthread = (struct btp_py_gdb_thread*)Py_None;
+    bo->crashframe = (struct sr_py_gdb_frame*)Py_None;
+    bo->crashthread = (struct sr_py_gdb_thread*)Py_None;
     if (str)
     {
         /* ToDo parse */
-        struct btp_location location;
-        btp_location_init(&location);
-        bo->stacktrace = btp_gdb_stacktrace_parse(&str, &location);
+        struct sr_location location;
+        sr_location_init(&location);
+        bo->stacktrace = sr_gdb_stacktrace_parse(&str, &location);
         if (!bo->stacktrace)
         {
             PyErr_SetString(PyExc_ValueError, location.message);
@@ -403,7 +403,7 @@ btp_py_gdb_stacktrace_new(PyTypeObject *object,
     else
     {
         bo->threads = PyList_New(0);
-        bo->stacktrace = btp_gdb_stacktrace_new();
+        bo->stacktrace = sr_gdb_stacktrace_new();
         bo->libs = PyList_New(0);
     }
 
@@ -412,26 +412,26 @@ btp_py_gdb_stacktrace_new(PyTypeObject *object,
 
 /* destructor */
 void
-btp_py_gdb_stacktrace_free(PyObject *object)
+sr_py_gdb_stacktrace_free(PyObject *object)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace*)object;
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)object;
     stacktrace_free_thread_python_list(this);
     stacktrace_free_sharedlib_python_list(this);
     this->stacktrace->threads = NULL;
     this->stacktrace->libs = NULL;
-    btp_gdb_stacktrace_free(this->stacktrace);
+    sr_gdb_stacktrace_free(this->stacktrace);
     PyObject_Del(object);
 }
 
 /* str */
 PyObject *
-btp_py_gdb_stacktrace_str(PyObject *self)
+sr_py_gdb_stacktrace_str(PyObject *self)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace *)self;
-    struct btp_strbuf *buf = btp_strbuf_new();
-    btp_strbuf_append_strf(buf, "Stacktrace with %d threads",
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace *)self;
+    struct sr_strbuf *buf = sr_strbuf_new();
+    sr_strbuf_append_strf(buf, "Stacktrace with %d threads",
                            PyList_Size(this->threads));
-    char *str = btp_strbuf_free_nobuf(buf);
+    char *str = sr_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
@@ -439,20 +439,20 @@ btp_py_gdb_stacktrace_str(PyObject *self)
 
 /* methods */
 PyObject *
-btp_py_gdb_stacktrace_dup(PyObject *self, PyObject *args)
+sr_py_gdb_stacktrace_dup(PyObject *self, PyObject *args)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace*)self;
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
     if (stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
-    struct btp_py_gdb_stacktrace *bo = (struct btp_py_gdb_stacktrace*)
-        PyObject_New(struct btp_py_gdb_stacktrace,
-                     &btp_py_gdb_stacktrace_type);
+    struct sr_py_gdb_stacktrace *bo = (struct sr_py_gdb_stacktrace*)
+        PyObject_New(struct sr_py_gdb_stacktrace,
+                     &sr_py_gdb_stacktrace_type);
 
     if (!bo)
         return PyErr_NoMemory();
 
-    bo->stacktrace = btp_gdb_stacktrace_dup(this->stacktrace);
+    bo->stacktrace = sr_gdb_stacktrace_dup(this->stacktrace);
     if (!bo->stacktrace)
         return NULL;
 
@@ -464,44 +464,44 @@ btp_py_gdb_stacktrace_dup(PyObject *self, PyObject *args)
     if (!bo->libs)
         return NULL;
 
-    if (PyObject_TypeCheck(this->crashthread, &btp_py_gdb_thread_type))
+    if (PyObject_TypeCheck(this->crashthread, &sr_py_gdb_thread_type))
     {
-        bo->crashthread = (struct btp_py_gdb_thread *)btp_py_gdb_thread_dup((PyObject*)this->crashthread, PyTuple_New(0));
+        bo->crashthread = (struct sr_py_gdb_thread *)sr_py_gdb_thread_dup((PyObject*)this->crashthread, PyTuple_New(0));
         if (!bo->crashthread)
             return NULL;
     }
     else
-        bo->crashthread = (struct btp_py_gdb_thread*)Py_None;
+        bo->crashthread = (struct sr_py_gdb_thread*)Py_None;
 
-    if (PyObject_TypeCheck(this->crashframe, &btp_py_gdb_frame_type))
+    if (PyObject_TypeCheck(this->crashframe, &sr_py_gdb_frame_type))
     {
-        bo->crashframe = (struct btp_py_gdb_frame*)btp_py_gdb_thread_dup((PyObject*)this->crashframe, PyTuple_New(0));
+        bo->crashframe = (struct sr_py_gdb_frame*)sr_py_gdb_thread_dup((PyObject*)this->crashframe, PyTuple_New(0));
         if (!bo->crashframe)
             return NULL;
     }
     else
-        bo->crashframe = (struct btp_py_gdb_frame*)Py_None;
+        bo->crashframe = (struct sr_py_gdb_frame*)Py_None;
 
     return (PyObject*)bo;
 }
 
 PyObject *
-btp_py_gdb_stacktrace_find_crash_frame(PyObject *self, PyObject *args)
+sr_py_gdb_stacktrace_find_crash_frame(PyObject *self, PyObject *args)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace *)self;
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace *)self;
     if (stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* destroys linked list - need to rebuild python list */
-    struct btp_gdb_frame *frame = btp_gdb_stacktrace_get_crash_frame(this->stacktrace);
+    struct sr_gdb_frame *frame = sr_gdb_stacktrace_get_crash_frame(this->stacktrace);
     if (!frame)
     {
         PyErr_SetString(PyExc_LookupError, "Crash frame not found");
         return NULL;
     }
 
-    struct btp_py_gdb_frame *result = (struct btp_py_gdb_frame*)
-        PyObject_New(struct btp_py_gdb_frame, &btp_py_gdb_frame_type);
+    struct sr_py_gdb_frame *result = (struct sr_py_gdb_frame*)
+        PyObject_New(struct sr_py_gdb_frame, &sr_py_gdb_frame_type);
 
     if (!result)
         return PyErr_NoMemory();
@@ -516,27 +516,27 @@ btp_py_gdb_stacktrace_find_crash_frame(PyObject *self, PyObject *args)
 }
 
 PyObject *
-btp_py_gdb_stacktrace_find_crash_thread(PyObject *self, PyObject *args)
+sr_py_gdb_stacktrace_find_crash_thread(PyObject *self, PyObject *args)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace*)self;
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
     if (stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* destroys linked list - need to rebuild python list */
-    struct btp_gdb_thread *thread = btp_gdb_stacktrace_find_crash_thread(this->stacktrace);
+    struct sr_gdb_thread *thread = sr_gdb_stacktrace_find_crash_thread(this->stacktrace);
     if (!thread)
     {
         PyErr_SetString(PyExc_LookupError, "Crash thread not found");
         return NULL;
     }
 
-    struct btp_py_gdb_thread *result = (struct btp_py_gdb_thread*)
-        PyObject_New(struct btp_py_gdb_thread, &btp_py_gdb_thread_type);
+    struct sr_py_gdb_thread *result = (struct sr_py_gdb_thread*)
+        PyObject_New(struct sr_py_gdb_thread, &sr_py_gdb_thread_type);
 
     if (!result)
         return PyErr_NoMemory();
 
-    result->thread = btp_gdb_thread_dup(thread, false);
+    result->thread = sr_gdb_thread_dup(thread, false);
     result->frames = frame_linked_list_to_python_list(result->thread);
     this->crashthread = result;
 
@@ -547,9 +547,9 @@ btp_py_gdb_stacktrace_find_crash_thread(PyObject *self, PyObject *args)
 }
 
 PyObject *
-btp_py_gdb_stacktrace_limit_frame_depth(PyObject *self, PyObject *args)
+sr_py_gdb_stacktrace_limit_frame_depth(PyObject *self, PyObject *args)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace*)self;
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
     if (stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
@@ -558,7 +558,7 @@ btp_py_gdb_stacktrace_limit_frame_depth(PyObject *self, PyObject *args)
         return NULL;
 
     /* destroys linked list - need to rebuild python list */
-    btp_gdb_stacktrace_limit_frame_depth(this->stacktrace, depth);
+    sr_gdb_stacktrace_limit_frame_depth(this->stacktrace, depth);
     if (stacktrace_rebuild_thread_python_list(this) < 0)
         return NULL;
 
@@ -566,38 +566,38 @@ btp_py_gdb_stacktrace_limit_frame_depth(PyObject *self, PyObject *args)
 }
 
 PyObject *
-btp_py_gdb_stacktrace_quality_simple(PyObject *self, PyObject *args)
+sr_py_gdb_stacktrace_quality_simple(PyObject *self, PyObject *args)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace*)self;
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
     if (stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* does not destroy the linked list */
-    float result = btp_gdb_stacktrace_quality_simple(this->stacktrace);
+    float result = sr_gdb_stacktrace_quality_simple(this->stacktrace);
     return Py_BuildValue("f", result);
 }
 
 PyObject *
-btp_py_gdb_stacktrace_quality_complex(PyObject *self, PyObject *args)
+sr_py_gdb_stacktrace_quality_complex(PyObject *self, PyObject *args)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace*)self;
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
     if (stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* does not destroy the linked list */
-    float result = btp_gdb_stacktrace_quality_complex(this->stacktrace);
+    float result = sr_gdb_stacktrace_quality_complex(this->stacktrace);
     return Py_BuildValue("f", result);
 }
 
 PyObject *
-btp_py_gdb_stacktrace_get_duplication_hash(PyObject *self, PyObject *args)
+sr_py_gdb_stacktrace_get_duplication_hash(PyObject *self, PyObject *args)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace*)self;
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
     if (stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* does not destroy the linked list */
-    char *duphash = btp_gdb_stacktrace_get_duplication_hash(this->stacktrace);
+    char *duphash = sr_gdb_stacktrace_get_duplication_hash(this->stacktrace);
     PyObject *result = Py_BuildValue("s", duphash);
     free(duphash);
 
@@ -605,9 +605,9 @@ btp_py_gdb_stacktrace_get_duplication_hash(PyObject *self, PyObject *args)
 }
 
 PyObject *
-btp_py_gdb_stacktrace_find_address(PyObject *self, PyObject *args)
+sr_py_gdb_stacktrace_find_address(PyObject *self, PyObject *args)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace*)self;
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
     if (stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
@@ -619,10 +619,10 @@ btp_py_gdb_stacktrace_find_address(PyObject *self, PyObject *args)
         Py_RETURN_NONE;
 
     int i;
-    struct btp_py_gdb_sharedlib *item;
+    struct sr_py_gdb_sharedlib *item;
     for (i = 0; i < PyList_Size(this->libs); ++i)
     {
-        item = (struct btp_py_gdb_sharedlib*)PyList_GetItem(this->libs, i);
+        item = (struct sr_py_gdb_sharedlib*)PyList_GetItem(this->libs, i);
         if (!item)
             return NULL;
 
@@ -638,14 +638,14 @@ btp_py_gdb_stacktrace_find_address(PyObject *self, PyObject *args)
 }
 
 PyObject *
-btp_py_gdb_stacktrace_set_libnames(PyObject *self, PyObject *args)
+sr_py_gdb_stacktrace_set_libnames(PyObject *self, PyObject *args)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace*)self;
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
     if (stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* does not destroy the linked list */
-    btp_gdb_stacktrace_set_libnames(this->stacktrace);
+    sr_gdb_stacktrace_set_libnames(this->stacktrace);
     if (stacktrace_rebuild_thread_python_list(this) < 0)
         return NULL;
 
@@ -653,25 +653,25 @@ btp_py_gdb_stacktrace_set_libnames(PyObject *self, PyObject *args)
 }
 
 PyObject *
-btp_py_gdb_stacktrace_normalize(PyObject *self, PyObject *args)
+sr_py_gdb_stacktrace_normalize(PyObject *self, PyObject *args)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace*)self;
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
     if (stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
     /* destroys the linked list and frees some parts */
     /* need to rebuild python list manually */
-    struct btp_gdb_stacktrace *tmp = btp_gdb_stacktrace_dup(this->stacktrace);
-    btp_normalize_gdb_stacktrace(tmp);
+    struct sr_gdb_stacktrace *tmp = sr_gdb_stacktrace_dup(this->stacktrace);
+    sr_normalize_gdb_stacktrace(tmp);
     if (stacktrace_free_thread_python_list(this) < 0)
     {
-        btp_gdb_stacktrace_free(tmp);
+        sr_gdb_stacktrace_free(tmp);
         return NULL;
     }
 
     this->stacktrace->threads = tmp->threads;
     tmp->threads = NULL;
-    btp_gdb_stacktrace_free(tmp);
+    sr_gdb_stacktrace_free(tmp);
 
     this->threads = thread_linked_list_to_python_list(this->stacktrace);
     if (!this->threads)
@@ -681,9 +681,9 @@ btp_py_gdb_stacktrace_normalize(PyObject *self, PyObject *args)
 }
 
 PyObject *
-btp_py_gdb_stacktrace_get_optimized_thread(PyObject *self, PyObject *args)
+sr_py_gdb_stacktrace_get_optimized_thread(PyObject *self, PyObject *args)
 {
-    struct btp_py_gdb_stacktrace *this = (struct btp_py_gdb_stacktrace*)self;
+    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
     if (stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
@@ -691,16 +691,16 @@ btp_py_gdb_stacktrace_get_optimized_thread(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "i", &max_frames))
         return NULL;
 
-    struct btp_gdb_thread *thread =
-        btp_gdb_stacktrace_get_optimized_thread(this->stacktrace, max_frames);
+    struct sr_gdb_thread *thread =
+        sr_gdb_stacktrace_get_optimized_thread(this->stacktrace, max_frames);
     if (!thread)
     {
         PyErr_SetString(PyExc_LookupError, "Crash thread not found");
         return NULL;
     }
 
-    struct btp_py_gdb_thread *result = (struct btp_py_gdb_thread*)
-        PyObject_New(struct btp_py_gdb_thread, &btp_py_gdb_thread_type);
+    struct sr_py_gdb_thread *result = (struct sr_py_gdb_thread*)
+        PyObject_New(struct sr_py_gdb_thread, &sr_py_gdb_thread_type);
 
     if (!result)
         return PyErr_NoMemory();

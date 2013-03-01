@@ -7,45 +7,45 @@
 #include "lib/location.h"
 #include "lib/normalize.h"
 
-#define stacktrace_doc "btparser.JavaStacktrace - class representing a java stacktrace\n" \
+#define stacktrace_doc "satyr.JavaStacktrace - class representing a java stacktrace\n" \
                       "Usage:\n" \
-                      "btparser.JavaStacktrace() - creates an empty stacktrace\n" \
-                      "btparser.JavaStacktrace(str) - parses str and fills the stacktrace object"
+                      "satyr.JavaStacktrace() - creates an empty stacktrace\n" \
+                      "satyr.JavaStacktrace(str) - parses str and fills the stacktrace object"
 
 #define b_dup_doc "Usage: stacktrace.dup()\n" \
-                  "Returns: btparser.JavaStacktrace - a new clone of java stacktrace\n" \
+                  "Returns: satyr.JavaStacktrace - a new clone of java stacktrace\n" \
                   "Clones the stacktrace object. All new structures are independent " \
                   "on the original object."
 
 #define b_normalize_doc "Usage: stacktrace.normalize()\n" \
                         "Normalizes all threads in the stacktrace."
 
-#define b_threads_doc (char *)"A list containing the btparser.JavaThread objects " \
+#define b_threads_doc (char *)"A list containing the satyr.JavaThread objects " \
                       "representing threads in the stacktrace."
 
 static PyMethodDef
 java_stacktrace_methods[] =
 {
     /* methods */
-    { "dup",                  btp_py_java_stacktrace_dup,                  METH_NOARGS,  b_dup_doc                  },
-//    { "normalize",            btp_py_java_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc            },
+    { "dup",                  sr_py_java_stacktrace_dup,                  METH_NOARGS,  b_dup_doc                  },
+//    { "normalize",            sr_py_java_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc            },
     { NULL },
 };
 
 static PyMemberDef
 java_stacktrace_members[] =
 {
-    { (char *)"threads",     T_OBJECT_EX, offsetof(struct btp_py_java_stacktrace, threads),     0,        b_threads_doc     },
+    { (char *)"threads",     T_OBJECT_EX, offsetof(struct sr_py_java_stacktrace, threads),     0,        b_threads_doc     },
     { NULL },
 };
 
-PyTypeObject btp_py_java_stacktrace_type = {
+PyTypeObject sr_py_java_stacktrace_type = {
     PyObject_HEAD_INIT(NULL)
     0,
-    "btparser.JavaStacktrace",           /* tp_name */
-    sizeof(struct btp_py_java_stacktrace),        /* tp_basicsize */
+    "satyr.JavaStacktrace",           /* tp_name */
+    sizeof(struct sr_py_java_stacktrace),        /* tp_basicsize */
     0,                              /* tp_itemsize */
-    btp_py_java_stacktrace_free,    /* tp_dealloc */
+    sr_py_java_stacktrace_free,    /* tp_dealloc */
     NULL,                           /* tp_print */
     NULL,                           /* tp_getattr */
     NULL,                           /* tp_setattr */
@@ -56,7 +56,7 @@ PyTypeObject btp_py_java_stacktrace_type = {
     NULL,                           /* tp_as_mapping */
     NULL,                           /* tp_hash */
     NULL,                           /* tp_call */
-    btp_py_java_stacktrace_str,     /* tp_str */
+    sr_py_java_stacktrace_str,     /* tp_str */
     NULL,                           /* tp_getattro */
     NULL,                           /* tp_setattro */
     NULL,                           /* tp_as_buffer */
@@ -78,7 +78,7 @@ PyTypeObject btp_py_java_stacktrace_type = {
     0,                              /* tp_dictoffset */
     NULL,                           /* tp_init */
     NULL,                           /* tp_alloc */
-    btp_py_java_stacktrace_new,     /* tp_new */
+    sr_py_java_stacktrace_new,     /* tp_new */
     NULL,                           /* tp_free */
     NULL,                           /* tp_is_gc */
     NULL,                           /* tp_bases */
@@ -90,13 +90,13 @@ PyTypeObject btp_py_java_stacktrace_type = {
 
 /* helpers */
 int
-java_stacktrace_prepare_linked_list(struct btp_py_java_stacktrace *stacktrace)
+java_stacktrace_prepare_linked_list(struct sr_py_java_stacktrace *stacktrace)
 {
     int i;
     PyObject *item;
 
     /* thread */
-    struct btp_py_java_thread *current = NULL, *prev = NULL;
+    struct sr_py_java_thread *current = NULL, *prev = NULL;
     for (i = 0; i < PyList_Size(stacktrace->threads); ++i)
     {
         item = PyList_GetItem(stacktrace->threads, i);
@@ -104,16 +104,16 @@ java_stacktrace_prepare_linked_list(struct btp_py_java_stacktrace *stacktrace)
             return -1;
 
         Py_INCREF(item);
-        if (!PyObject_TypeCheck(item, &btp_py_java_thread_type))
+        if (!PyObject_TypeCheck(item, &sr_py_java_thread_type))
         {
             Py_XDECREF(current);
             Py_XDECREF(prev);
             PyErr_SetString(PyExc_TypeError,
-                            "threads must be a list of btparser.JavaThread objects");
+                            "threads must be a list of satyr.JavaThread objects");
             return -1;
         }
 
-        current = (struct btp_py_java_thread*)item;
+        current = (struct sr_py_java_thread*)item;
         if (java_thread_prepare_linked_list(current) < 0)
             return -1;
 
@@ -136,7 +136,7 @@ java_stacktrace_prepare_linked_list(struct btp_py_java_stacktrace *stacktrace)
 }
 
 int
-java_stacktrace_free_thread_python_list(struct btp_py_java_stacktrace *stacktrace)
+java_stacktrace_free_thread_python_list(struct sr_py_java_stacktrace *stacktrace)
 {
     int i;
     PyObject *item;
@@ -153,18 +153,18 @@ java_stacktrace_free_thread_python_list(struct btp_py_java_stacktrace *stacktrac
 }
 
 PyObject *
-java_thread_linked_list_to_python_list(struct btp_java_stacktrace *stacktrace)
+java_thread_linked_list_to_python_list(struct sr_java_stacktrace *stacktrace)
 {
     PyObject *result = PyList_New(0);
     if (!result)
         return PyErr_NoMemory();
 
-    struct btp_java_thread *thread = stacktrace->threads;
-    struct btp_py_java_thread *item;
+    struct sr_java_thread *thread = stacktrace->threads;
+    struct sr_py_java_thread *item;
     while (thread)
     {
-        item = (struct btp_py_java_thread*)
-            PyObject_New(struct btp_py_java_thread, &btp_py_java_thread_type);
+        item = (struct sr_py_java_thread*)
+            PyObject_New(struct sr_py_java_thread, &sr_py_java_thread_type);
 
         item->thread = thread;
         item->frames = java_frame_linked_list_to_python_list(thread);
@@ -182,13 +182,13 @@ java_thread_linked_list_to_python_list(struct btp_java_stacktrace *stacktrace)
 
 /* constructor */
 PyObject *
-btp_py_java_stacktrace_new(PyTypeObject *object,
+sr_py_java_stacktrace_new(PyTypeObject *object,
                           PyObject *args,
                           PyObject *kwds)
 {
-    struct btp_py_java_stacktrace *bo = (struct btp_py_java_stacktrace*)
-        PyObject_New(struct btp_py_java_stacktrace,
-                     &btp_py_java_stacktrace_type);
+    struct sr_py_java_stacktrace *bo = (struct sr_py_java_stacktrace*)
+        PyObject_New(struct sr_py_java_stacktrace,
+                     &sr_py_java_stacktrace_type);
 
     if (!bo)
         return PyErr_NoMemory();
@@ -200,9 +200,9 @@ btp_py_java_stacktrace_new(PyTypeObject *object,
     if (str)
     {
         /* ToDo parse */
-        struct btp_location location;
-        btp_location_init(&location);
-        bo->stacktrace = btp_java_stacktrace_parse(&str, &location);
+        struct sr_location location;
+        sr_location_init(&location);
+        bo->stacktrace = sr_java_stacktrace_parse(&str, &location);
         if (!bo->stacktrace)
         {
             PyErr_SetString(PyExc_ValueError, location.message);
@@ -215,7 +215,7 @@ btp_py_java_stacktrace_new(PyTypeObject *object,
     else
     {
         bo->threads = PyList_New(0);
-        bo->stacktrace = btp_java_stacktrace_new();
+        bo->stacktrace = sr_java_stacktrace_new();
     }
 
     return (PyObject *)bo;
@@ -223,24 +223,24 @@ btp_py_java_stacktrace_new(PyTypeObject *object,
 
 /* destructor */
 void
-btp_py_java_stacktrace_free(PyObject *object)
+sr_py_java_stacktrace_free(PyObject *object)
 {
-    struct btp_py_java_stacktrace *this = (struct btp_py_java_stacktrace*)object;
+    struct sr_py_java_stacktrace *this = (struct sr_py_java_stacktrace*)object;
     java_stacktrace_free_thread_python_list(this);
     this->stacktrace->threads = NULL;
-    btp_java_stacktrace_free(this->stacktrace);
+    sr_java_stacktrace_free(this->stacktrace);
     PyObject_Del(object);
 }
 
 /* str */
 PyObject *
-btp_py_java_stacktrace_str(PyObject *self)
+sr_py_java_stacktrace_str(PyObject *self)
 {
-    struct btp_py_java_stacktrace *this = (struct btp_py_java_stacktrace *)self;
-    struct btp_strbuf *buf = btp_strbuf_new();
-    btp_strbuf_append_strf(buf, "Java stacktrace with %d threads",
+    struct sr_py_java_stacktrace *this = (struct sr_py_java_stacktrace *)self;
+    struct sr_strbuf *buf = sr_strbuf_new();
+    sr_strbuf_append_strf(buf, "Java stacktrace with %d threads",
                            PyList_Size(this->threads));
-    char *str = btp_strbuf_free_nobuf(buf);
+    char *str = sr_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
@@ -248,20 +248,20 @@ btp_py_java_stacktrace_str(PyObject *self)
 
 /* methods */
 PyObject *
-btp_py_java_stacktrace_dup(PyObject *self, PyObject *args)
+sr_py_java_stacktrace_dup(PyObject *self, PyObject *args)
 {
-    struct btp_py_java_stacktrace *this = (struct btp_py_java_stacktrace*)self;
+    struct sr_py_java_stacktrace *this = (struct sr_py_java_stacktrace*)self;
     if (java_stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
-    struct btp_py_java_stacktrace *bo = (struct btp_py_java_stacktrace*)
-        PyObject_New(struct btp_py_java_stacktrace,
-                     &btp_py_java_stacktrace_type);
+    struct sr_py_java_stacktrace *bo = (struct sr_py_java_stacktrace*)
+        PyObject_New(struct sr_py_java_stacktrace,
+                     &sr_py_java_stacktrace_type);
 
     if (!bo)
         return PyErr_NoMemory();
 
-    bo->stacktrace = btp_java_stacktrace_dup(this->stacktrace);
+    bo->stacktrace = sr_java_stacktrace_dup(this->stacktrace);
     if (!bo->stacktrace)
         return NULL;
 
@@ -276,23 +276,23 @@ btp_py_java_stacktrace_dup(PyObject *self, PyObject *args)
  * Normalization not yet implemente for java stacktraces
  *
 PyObject *
-btp_py_java_stacktrace_normalize(PyObject *self, PyObject *args)
+sr_py_java_stacktrace_normalize(PyObject *self, PyObject *args)
 {
-    struct btp_py_java_stacktrace *this = (struct btp_py_java_stacktrace*)self;
+    struct sr_py_java_stacktrace *this = (struct sr_py_java_stacktrace*)self;
     if (java_stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
-    struct btp_java_stacktrace *tmp = btp_java_stacktrace_dup(this->stacktrace);
-    btp_normalize_java_stacktrace(tmp);
+    struct sr_java_stacktrace *tmp = sr_java_stacktrace_dup(this->stacktrace);
+    sr_normalize_java_stacktrace(tmp);
     if (java_stacktrace_free_thread_python_list(this) < 0)
     {
-        btp_java_stacktrace_free(tmp);
+        sr_java_stacktrace_free(tmp);
         return NULL;
     }
 
     this->stacktrace->threads = tmp->threads;
     tmp->threads = NULL;
-    btp_java_stacktrace_free(tmp);
+    sr_java_stacktrace_free(tmp);
 
     this->threads = java_thread_linked_list_to_python_list(this->stacktrace);
     if (!this->threads)

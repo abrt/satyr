@@ -26,16 +26,16 @@
 #include <stddef.h>
 
 
-struct btp_operating_system *
-btp_operating_system_new()
+struct sr_operating_system *
+sr_operating_system_new()
 {
-    struct btp_operating_system *operating_system = btp_malloc(sizeof(struct btp_operating_system));
-    btp_operating_system_init(operating_system);
+    struct sr_operating_system *operating_system = sr_malloc(sizeof(struct sr_operating_system));
+    sr_operating_system_init(operating_system);
     return operating_system;
 }
 
 void
-btp_operating_system_init(struct btp_operating_system *operating_system)
+sr_operating_system_init(struct sr_operating_system *operating_system)
 {
     operating_system->name = NULL;
     operating_system->version = NULL;
@@ -44,7 +44,7 @@ btp_operating_system_init(struct btp_operating_system *operating_system)
 }
 
 void
-btp_operating_system_free(struct btp_operating_system *operating_system)
+sr_operating_system_free(struct sr_operating_system *operating_system)
 {
     if (!operating_system)
         return;
@@ -56,57 +56,57 @@ btp_operating_system_free(struct btp_operating_system *operating_system)
 }
 
 char *
-btp_operating_system_to_json(struct btp_operating_system *operating_system)
+sr_operating_system_to_json(struct sr_operating_system *operating_system)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
+    struct sr_strbuf *strbuf = sr_strbuf_new();
 
     if (operating_system->name)
     {
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"name\": \"%s\"\n",
-                               operating_system->name);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"name\": \"%s\"\n",
+                              operating_system->name);
     }
 
     if (operating_system->version)
     {
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"version\": \"%s\"\n",
-                               operating_system->version);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"version\": \"%s\"\n",
+                              operating_system->version);
     }
 
     if (operating_system->architecture)
     {
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"architecture\": \"%s\"\n",
-                               operating_system->architecture);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"architecture\": \"%s\"\n",
+                              operating_system->architecture);
     }
 
     if (operating_system->uptime > 0)
     {
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"uptime\": %"PRIu64"\n",
-                               operating_system->uptime);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"uptime\": %"PRIu64"\n",
+                              operating_system->uptime);
     }
 
     if (strbuf->len > 0)
         strbuf->buf[0] = '{';
     else
-        btp_strbuf_append_char(strbuf, '{');
+        sr_strbuf_append_char(strbuf, '{');
 
-    btp_strbuf_append_char(strbuf, '}');
-    return btp_strbuf_free_nobuf(strbuf);
+    sr_strbuf_append_char(strbuf, '}');
+    return sr_strbuf_free_nobuf(strbuf);
 }
 
 bool
-btp_operating_system_parse_etc_system_release(const char *etc_system_release,
-                                              char **name,
-                                              char **version)
+sr_operating_system_parse_etc_system_release(const char *etc_system_release,
+                                             char **name,
+                                             char **version)
 {
     const char *release = strstr(etc_system_release, " release ");
     if (!release)
         return false;
 
-    *name = btp_strndup(etc_system_release, release - etc_system_release);
+    *name = sr_strndup(etc_system_release, release - etc_system_release);
 
     if (0 == strlen(*name))
         return false;
@@ -121,6 +121,6 @@ btp_operating_system_parse_etc_system_release(const char *etc_system_release,
     if (0 == version_len)
         version_end = version_begin + strlen(version_begin);
 
-    *version = btp_strndup(version_begin, version_end - version_begin);
+    *version = sr_strndup(version_begin, version_end - version_begin);
     return true;
 }

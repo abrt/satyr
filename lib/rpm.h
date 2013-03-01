@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_RPM_H
-#define BTPARSER_RPM_H
+#ifndef SATYR_RPM_H
+#define SATYR_RPM_H
 
 /**
  * @file
@@ -32,7 +32,7 @@ extern "C" {
 #include <stdbool.h>
 #include <inttypes.h>
 
-struct btp_rpm_consistency
+struct sr_rpm_consistency
 {
     char *path;
     bool owner_changed;
@@ -44,10 +44,10 @@ struct btp_rpm_consistency
     bool minor_number_changed;
     bool symlink_changed;
     bool modification_time_changed;
-    struct btp_rpm_consistency *next;
+    struct sr_rpm_consistency *next;
 };
 
-struct btp_rpm_package
+struct sr_rpm_package
 {
     char *name;
     uint32_t epoch;
@@ -55,19 +55,19 @@ struct btp_rpm_package
     char *release;
     char *architecture;
     uint64_t install_time;
-    struct btp_rpm_consistency *consistency;
-    struct btp_rpm_package *next;
+    struct sr_rpm_consistency *consistency;
+    struct sr_rpm_package *next;
 };
 
-struct btp_rpm_package *
-btp_rpm_package_new();
+struct sr_rpm_package *
+sr_rpm_package_new();
 
 void
-btp_rpm_package_init(struct btp_rpm_package *package);
+sr_rpm_package_init(struct sr_rpm_package *package);
 
 void
-btp_rpm_package_free(struct btp_rpm_package *package,
-                     bool recursive);
+sr_rpm_package_free(struct sr_rpm_package *package,
+                    bool recursive);
 
 /**
  * Compares two packages.
@@ -83,8 +83,8 @@ btp_rpm_package_free(struct btp_rpm_package *package,
  * number if package1 is found to be 'greater' than package2.
  */
 int
-btp_rpm_package_cmp(struct btp_rpm_package *package1,
-                    struct btp_rpm_package *package2);
+sr_rpm_package_cmp(struct sr_rpm_package *package1,
+                   struct sr_rpm_package *package2);
 
 /**
  * Compares two packages by their name, version and release.
@@ -100,8 +100,8 @@ btp_rpm_package_cmp(struct btp_rpm_package *package1,
  * number if package1 is found to be 'greater' than package2.
  */
 int
-btp_rpm_package_cmp_nvr(struct btp_rpm_package *package1,
-                        struct btp_rpm_package *package2);
+sr_rpm_package_cmp_nvr(struct sr_rpm_package *package1,
+                       struct sr_rpm_package *package2);
 
 /**
  * Compares two packages by their name, epoch, version, release and
@@ -118,8 +118,8 @@ btp_rpm_package_cmp_nvr(struct btp_rpm_package *package1,
  * number if package1 is found to be 'greater' than package2.
  */
 int
-btp_rpm_package_cmp_nevra(struct btp_rpm_package *package1,
-                          struct btp_rpm_package *package2);
+sr_rpm_package_cmp_nevra(struct sr_rpm_package *package1,
+                         struct sr_rpm_package *package2);
 
 /**
  * Appends 'item' at the end of the list 'dest'.
@@ -127,65 +127,65 @@ btp_rpm_package_cmp_nevra(struct btp_rpm_package *package1,
  * This function returns the 'dest' package.  If 'dest' is NULL, it
  * returns the 'item' package.
  */
-struct btp_rpm_package *
-btp_rpm_package_append(struct btp_rpm_package *dest,
-                       struct btp_rpm_package *item);
+struct sr_rpm_package *
+sr_rpm_package_append(struct sr_rpm_package *dest,
+                      struct sr_rpm_package *item);
 
 /**
  * Returns the number of packages in the list.
  */
 int
-btp_rpm_package_count(struct btp_rpm_package *packages);
+sr_rpm_package_count(struct sr_rpm_package *packages);
 
-struct btp_rpm_package *
-btp_rpm_package_sort(struct btp_rpm_package *packages);
+struct sr_rpm_package *
+sr_rpm_package_sort(struct sr_rpm_package *packages);
 
-struct btp_rpm_package *
-btp_rpm_package_uniq(struct btp_rpm_package *packages);
+struct sr_rpm_package *
+sr_rpm_package_uniq(struct sr_rpm_package *packages);
 
-struct btp_rpm_package *
-btp_rpm_package_get_by_name(const char *name,
-                            char **error_message);
+struct sr_rpm_package *
+sr_rpm_package_get_by_name(const char *name,
+                           char **error_message);
 
-struct btp_rpm_package *
-btp_rpm_package_get_by_path(const char *path,
-                            char **error_message);
+struct sr_rpm_package *
+sr_rpm_package_get_by_path(const char *path,
+                           char **error_message);
 
 char *
-btp_rpm_package_to_json(struct btp_rpm_package *package,
+sr_rpm_package_to_json(struct sr_rpm_package *package,
+                       bool recursive);
+
+bool
+sr_rpm_package_parse_nvr(const char *text,
+                         char **name,
+                         char **version,
+                         char **release);
+
+bool
+sr_rpm_package_parse_nevra(const char *text,
+                           char **name,
+                           uint32_t *epoch,
+                           char **version,
+                           char **release,
+                           char **architecture);
+
+struct sr_rpm_consistency *
+sr_rpm_consistency_new();
+
+void
+sr_rpm_consistency_init(struct sr_rpm_consistency *consistency);
+
+void
+sr_rpm_consistency_free(struct sr_rpm_consistency *consistency,
                         bool recursive);
 
-bool
-btp_rpm_package_parse_nvr(const char *text,
-                          char **name,
-                          char **version,
-                          char **release);
-
-bool
-btp_rpm_package_parse_nevra(const char *text,
-                            char **name,
-                            uint32_t *epoch,
-                            char **version,
-                            char **release,
-                            char **architecture);
-
-struct btp_rpm_consistency *
-btp_rpm_consistency_new();
-
-void
-btp_rpm_consistency_init(struct btp_rpm_consistency *consistency);
-
-void
-btp_rpm_consistency_free(struct btp_rpm_consistency *consistency,
-                         bool recursive);
+int
+sr_rpm_consistency_cmp(struct sr_rpm_consistency *consistency1,
+                       struct sr_rpm_consistency *consistency2);
 
 int
-btp_rpm_consistency_cmp(struct btp_rpm_consistency *consistency1,
-                        struct btp_rpm_consistency *consistency2);
-
-int
-btp_rpm_consistency_cmp_recursive(struct btp_rpm_consistency *consistency1,
-                                  struct btp_rpm_consistency *consistency2);
+sr_rpm_consistency_cmp_recursive(struct sr_rpm_consistency *consistency1,
+                                 struct sr_rpm_consistency *consistency2);
 
 /**
  * Appends 'item' at the end of the list 'dest'.
@@ -193,9 +193,9 @@ btp_rpm_consistency_cmp_recursive(struct btp_rpm_consistency *consistency1,
  * This function returns the 'dest' consistency info.  If 'dest' is
  * NULL, it returns the 'item' consistency info.
  */
-struct btp_rpm_consistency *
-btp_rpm_consistency_append(struct btp_rpm_consistency *dest,
-                           struct btp_rpm_consistency *item);
+struct sr_rpm_consistency *
+sr_rpm_consistency_append(struct sr_rpm_consistency *dest,
+                          struct sr_rpm_consistency *item);
 
 #ifdef __cplusplus
 }

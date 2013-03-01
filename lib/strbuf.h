@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_STRBUF_H
-#define BTPARSER_STRBUF_H
+#ifndef SATYR_STRBUF_H
+#define SATYR_STRBUF_H
 
 /**
  * @file
@@ -34,7 +34,7 @@ extern "C" {
 /**
  * @brief A resizable string buffer.
  */
-struct btp_strbuf
+struct sr_strbuf
 {
     /**
      * Size of the allocated buffer. Always > 0.
@@ -51,10 +51,10 @@ struct btp_strbuf
  * Creates and initializes a new string buffer.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_strbuf_free().
+ * calling the function sr_strbuf_free().
  */
-struct btp_strbuf *
-btp_strbuf_new();
+struct sr_strbuf *
+sr_strbuf_new();
 
 /**
  * Initializes all members of the strbuf structure to their default
@@ -62,7 +62,7 @@ btp_strbuf_new();
  * is useful for initializing a strbuf structure placed on the stack.
  */
 void
-btp_strbuf_init(struct btp_strbuf *strbuf);
+sr_strbuf_init(struct sr_strbuf *strbuf);
 
 /**
  * Releases the memory held by the string buffer.
@@ -70,7 +70,7 @@ btp_strbuf_init(struct btp_strbuf *strbuf);
  * If the strbuf is NULL, no operation is performed.
  */
 void
-btp_strbuf_free(struct btp_strbuf *strbuf);
+sr_strbuf_free(struct sr_strbuf *strbuf);
 
 /**
  * Releases the strbuf, but not the internal buffer.  The internal
@@ -78,77 +78,77 @@ btp_strbuf_free(struct btp_strbuf *strbuf);
  * returned memory using free().
  */
 char *
-btp_strbuf_free_nobuf(struct btp_strbuf *strbuf);
+sr_strbuf_free_nobuf(struct sr_strbuf *strbuf);
 
 /**
  * The string content is set to an empty string, erasing any previous
  * content and leaving its length at 0 characters.
  */
 void
-btp_strbuf_clear(struct btp_strbuf *strbuf);
+sr_strbuf_clear(struct sr_strbuf *strbuf);
 
 /**
  * Ensures that the buffer can be extended by num characters
  * without dealing with malloc/realloc.
  */
 void
-btp_strbuf_grow(struct btp_strbuf *strbuf, int num);
+sr_strbuf_grow(struct sr_strbuf *strbuf, int num);
 
 /**
  * The current content of the string buffer is extended by adding a
  * character c at its end.
  */
-struct btp_strbuf *
-btp_strbuf_append_char(struct btp_strbuf *strbuf,
-                       char c);
+struct sr_strbuf *
+sr_strbuf_append_char(struct sr_strbuf *strbuf,
+                      char c);
 
 /**
  * The current content of the string buffer is extended by adding a
  * string str at its end.
  */
-struct btp_strbuf *
-btp_strbuf_append_str(struct btp_strbuf *strbuf,
-                      const char *str);
+struct sr_strbuf *
+sr_strbuf_append_str(struct sr_strbuf *strbuf,
+                     const char *str);
 
 /**
  * The current content of the string buffer is extended by inserting a
  * string str at its beginning.
  */
-struct btp_strbuf *
-btp_strbuf_prepend_str(struct btp_strbuf *strbuf,
-                       const char *str);
+struct sr_strbuf *
+sr_strbuf_prepend_str(struct sr_strbuf *strbuf,
+                      const char *str);
 
 /**
  * The current content of the string buffer is extended by adding a
  * sequence of data formatted as the format argument specifies.
  */
-struct btp_strbuf *
-btp_strbuf_append_strf(struct btp_strbuf *strbuf,
-                       const char *format, ...);
+struct sr_strbuf *
+sr_strbuf_append_strf(struct sr_strbuf *strbuf,
+                      const char *format, ...);
 
 /**
- * Same as btp_strbuf_append_strf except that va_list is used instead of
+ * Same as sr_strbuf_append_strf except that va_list is used instead of
  * variable number of arguments.
  */
-struct btp_strbuf *
-btp_strbuf_append_strfv(struct btp_strbuf *strbuf,
-                        const char *format, va_list p);
+struct sr_strbuf *
+sr_strbuf_append_strfv(struct sr_strbuf *strbuf,
+                       const char *format, va_list p);
 
 /**
  * The current content of the string buffer is extended by inserting a
  * sequence of data formatted as the format argument specifies at the
  * buffer beginning.
  */
-struct btp_strbuf *
-btp_strbuf_prepend_strf(struct btp_strbuf *strbuf,
-                        const char *format, ...);
+struct sr_strbuf *
+sr_strbuf_prepend_strf(struct sr_strbuf *strbuf,
+                       const char *format, ...);
 
 /**
- * Same as btp_strbuf_prepend_strf except that va_list is used instead of
+ * Same as sr_strbuf_prepend_strf except that va_list is used instead of
  * variable number of arguments.
  */
-struct btp_strbuf *
-btp_strbuf_prepend_strfv(struct btp_strbuf *strbuf,
+struct sr_strbuf *
+sr_strbuf_prepend_strfv(struct sr_strbuf *strbuf,
                         const char *format, va_list p);
 
 #ifdef __cplusplus

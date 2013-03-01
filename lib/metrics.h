@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_METRICS_H
-#define BTPARSER_METRICS_H
+#ifndef SATYR_METRICS_H
+#define SATYR_METRICS_H
 
 /**
  * @file
@@ -31,8 +31,8 @@ extern "C" {
 
 #include <stdbool.h>
 
-struct btp_gdb_frame;
-struct btp_gdb_thread;
+struct sr_gdb_frame;
+struct sr_gdb_thread;
 
 /* Jaro-Winkler distance:
  *
@@ -46,8 +46,8 @@ struct btp_gdb_thread;
  * threads
  */
 float
-btp_gdb_thread_jarowinkler_distance(struct btp_gdb_thread *thread1,
-                                    struct btp_gdb_thread *thread2);
+sr_gdb_thread_jarowinkler_distance(struct sr_gdb_thread *thread1,
+                                   struct sr_gdb_thread *thread2);
 
 
 /* Jaccard distance:
@@ -59,8 +59,8 @@ btp_gdb_thread_jarowinkler_distance(struct btp_gdb_thread *thread1,
  * = no similarity
  */
 float
-btp_gdb_thread_jaccard_distance(struct btp_gdb_thread *thread1,
-                                struct btp_gdb_thread *thread2);
+sr_gdb_thread_jaccard_distance(struct sr_gdb_thread *thread1,
+                               struct sr_gdb_thread *thread2);
 
 
 /* Levenshtein distance:
@@ -77,38 +77,38 @@ btp_gdb_thread_jaccard_distance(struct btp_gdb_thread *thread1,
  * threads, n = no similar function names
  */
 int
-btp_gdb_thread_levenshtein_distance(struct btp_gdb_thread *thread1,
-                                    struct btp_gdb_thread *thread2,
-                                    bool transposition);
+sr_gdb_thread_levenshtein_distance(struct sr_gdb_thread *thread1,
+                                   struct sr_gdb_thread *thread2,
+                                   bool transposition);
 
 /* Levenshtein distance returned with transpositions enabled and
  * returned in interval [0, 1].
  */
 float
-btp_gdb_thread_levenshtein_distance_f(struct btp_gdb_thread *thread1,
-                                      struct btp_gdb_thread *thread2);
+sr_gdb_thread_levenshtein_distance_f(struct sr_gdb_thread *thread1,
+                                     struct sr_gdb_thread *thread2);
 
-typedef int (*btp_gdb_frame_cmp_type)(struct btp_gdb_frame*,
-                                      struct btp_gdb_frame*);
+typedef int (*sr_gdb_frame_cmp_type)(struct sr_gdb_frame*,
+                                     struct sr_gdb_frame*);
 
 /* Following three functions are equivalent to the three above except
  * that they take frame comparison function as an argument argument
  */
 float
-btp_gdb_thread_jarowinkler_distance_custom(struct btp_gdb_thread *thread1,
-                                           struct btp_gdb_thread *thread2,
-                                           btp_gdb_frame_cmp_type compare_func);
+sr_gdb_thread_jarowinkler_distance_custom(struct sr_gdb_thread *thread1,
+                                          struct sr_gdb_thread *thread2,
+                                          sr_gdb_frame_cmp_type compare_func);
 
 float
-btp_gdb_thread_jaccard_distance_custom(struct btp_gdb_thread *thread1,
-                                       struct btp_gdb_thread *thread2,
-                                       btp_gdb_frame_cmp_type compare_func);
+sr_gdb_thread_jaccard_distance_custom(struct sr_gdb_thread *thread1,
+                                      struct sr_gdb_thread *thread2,
+                                      sr_gdb_frame_cmp_type compare_func);
 
 int
-btp_gdb_thread_levenshtein_distance_custom(struct btp_gdb_thread *thread1,
-                                           struct btp_gdb_thread *thread2,
-                                           bool transposition,
-                                           btp_gdb_frame_cmp_type compare_func);
+sr_gdb_thread_levenshtein_distance_custom(struct sr_gdb_thread *thread1,
+                                          struct sr_gdb_thread *thread2,
+                                          bool transposition,
+                                          sr_gdb_frame_cmp_type compare_func);
 
 /**
  * @brief A distance matrix of stack trace threads.
@@ -116,7 +116,7 @@ btp_gdb_thread_levenshtein_distance_custom(struct btp_gdb_thread *thread1,
  * The distances are stored in a m-by-n two-dimensional array, where
  * only entries (i, j) where i < j are actually stored.
  */
-struct btp_distances
+struct sr_distances
 {
     int m;
     int n;
@@ -131,10 +131,10 @@ struct btp_distances
  * Number of columns.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_distances_free().
+ * calling the function sr_distances_free().
  */
-struct btp_distances *
-btp_distances_new(int m, int n);
+struct sr_distances *
+sr_distances_new(int m, int n);
 
 /**
  * Creates a duplicate of the distances structure.
@@ -144,8 +144,8 @@ btp_distances_new(int m, int n);
  * @returns
  * This function never returns NULL.
  */
-struct btp_distances *
-btp_distances_dup(struct btp_distances *distances);
+struct sr_distances *
+sr_distances_dup(struct sr_distances *distances);
 
 /**
  * Releases the memory held by the distances structure.
@@ -153,7 +153,7 @@ btp_distances_dup(struct btp_distances *distances);
  * If the distances is NULL, no operation is performed.
  */
 void
-btp_distances_free(struct btp_distances *distances);
+sr_distances_free(struct sr_distances *distances);
 
 /**
  * Gets the entry (i, j) from the distance matrix.
@@ -168,7 +168,7 @@ btp_distances_free(struct btp_distances *distances);
  * entries (i, j) and (j, i) are the same.
  */
 float
-btp_distances_get_distance(struct btp_distances *distances, int i, int j);
+sr_distances_get_distance(struct sr_distances *distances, int i, int j);
 
 /**
  * Sets the entry (i, j) from the distance matrix.
@@ -182,16 +182,16 @@ btp_distances_get_distance(struct btp_distances *distances, int i, int j);
  * Distance.
  */
 void
-btp_distances_set_distance(struct btp_distances *distances,
-                           int i,
-                           int j,
-                           float d);
+sr_distances_set_distance(struct sr_distances *distances,
+                          int i,
+                          int j,
+                          float d);
 
 /**
  * A function which compares two threads.
  */
-typedef float (*btp_dist_thread_type)(struct btp_gdb_thread *,
-                                      struct btp_gdb_thread *);
+typedef float (*sr_dist_thread_type)(struct sr_gdb_thread *,
+                                     struct sr_gdb_thread *);
 
 /**
  * Creates a distances structure by comparing threads.
@@ -207,10 +207,10 @@ typedef float (*btp_dist_thread_type)(struct btp_gdb_thread *,
  * @returns
  * This function never returns NULL.
  */
-struct btp_distances *
-btp_gdb_threads_compare(struct btp_gdb_thread **threads,
-                        int m, int n,
-                        btp_dist_thread_type dist_func);
+struct sr_distances *
+sr_gdb_threads_compare(struct sr_gdb_thread **threads,
+                       int m, int n,
+                       sr_dist_thread_type dist_func);
 
 #ifdef __cplusplus
 }

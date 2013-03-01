@@ -23,10 +23,10 @@
 #include "lib/utils.h"
 #include "lib/koops_frame.h"
 
-#define frame_doc "btparser.KerneloopsFrame - class representing a frame in a kerneloops\n" \
+#define frame_doc "satyr.KerneloopsFrame - class representing a frame in a kerneloops\n" \
                   "Usage:\n" \
-                  "btparser.KerneloopsFrame() - creates an empty frame\n" \
-                  "btparser.KerneloopsFrame(str) - parses str and fills the frame object"
+                  "satyr.KerneloopsFrame() - creates an empty frame\n" \
+                  "satyr.KerneloopsFrame(str) - parses str and fills the frame object"
 
 #define f_get_reliable_doc "Usage: frame.get_reliable()\n" \
                           "Returns: boolean - is this entry reliable"
@@ -98,12 +98,12 @@
 
 
 #define f_dup_doc "Usage: frame.dup()\n" \
-                  "Returns: btparser.KerneloopsFrame - a new clone of frame\n" \
+                  "Returns: satyr.KerneloopsFrame - a new clone of frame\n" \
                   "Clones the frame object. All new structures are independent " \
                   "on the original object."
 
 #define f_cmp_doc "Usage: frame.cmp(frame2)\n" \
-                  "frame2: btparser.KerneloopsFrame - another frame to compare\n" \
+                  "frame2: satyr.KerneloopsFrame - another frame to compare\n" \
                   "Returns: integer - distance\n" \
                   "Compares frame to frame2. Returns 0 if frame = frame2, " \
                   "<0 if frame is 'less' than frame2, >0 if frame is 'more' " \
@@ -114,44 +114,44 @@ static PyMethodDef
 frame_methods[] =
 {
     /* getters & setters */
-    { "get_reliable",              btp_py_koops_frame_get_reliable,             METH_NOARGS,  f_get_reliable_doc               },
-    { "set_reliable",              btp_py_koops_frame_set_reliable,             METH_VARARGS, f_set_reliable_doc               },
-    { "get_address",               btp_py_koops_frame_get_address,              METH_NOARGS,  f_get_address_doc                },
-    { "set_address",               btp_py_koops_frame_set_address,              METH_VARARGS, f_set_address_doc                },
-    { "get_function_name",         btp_py_koops_frame_get_function_name,        METH_NOARGS,  f_get_function_name_doc          },
-    { "set_function_name",         btp_py_koops_frame_set_function_name,        METH_VARARGS, f_set_function_name_doc          },
-    { "get_function_offset",       btp_py_koops_frame_get_function_offset,      METH_NOARGS,  f_get_function_offset_doc        },
-    { "set_function_offset",       btp_py_koops_frame_set_function_offset,      METH_VARARGS, f_set_function_offset_doc        },
-    { "get_function_length",       btp_py_koops_frame_get_function_length,      METH_NOARGS,  f_get_function_length_doc        },
-    { "set_function_length",       btp_py_koops_frame_set_function_length,      METH_VARARGS, f_set_function_length_doc        },
-    { "get_module_name",           btp_py_koops_frame_get_module_name,          METH_NOARGS,  f_get_module_name_doc            },
-    { "set_module_name",           btp_py_koops_frame_set_module_name,          METH_VARARGS, f_set_module_name_doc            },
-    { "get_from_address",          btp_py_koops_frame_get_from_address,         METH_NOARGS,  f_get_from_address_doc           },
-    { "set_from_address",          btp_py_koops_frame_set_from_address,         METH_VARARGS, f_set_from_address_doc           },
-    { "get_from_function_name",    btp_py_koops_frame_get_from_function_name,   METH_NOARGS,  f_get_from_function_name_doc     },
-    { "set_from_function_name",    btp_py_koops_frame_set_from_function_name,   METH_VARARGS, f_set_from_function_name_doc     },
-    { "get_from_function_offset",  btp_py_koops_frame_get_from_function_offset, METH_NOARGS,  f_get_from_function_offset_doc   },
-    { "set_from_function_offset",  btp_py_koops_frame_set_from_function_offset, METH_VARARGS, f_set_from_function_offset_doc   },
-    { "get_from_function_length",  btp_py_koops_frame_get_from_function_length, METH_NOARGS,  f_get_from_function_length_doc   },
-    { "set_from_function_length",  btp_py_koops_frame_set_from_function_length, METH_VARARGS, f_set_from_function_length_doc   },
-    { "get_from_module_name",      btp_py_koops_frame_get_from_module_name,     METH_NOARGS,  f_get_from_module_name_doc       },
-    { "set_from_module_name",      btp_py_koops_frame_set_from_module_name,     METH_VARARGS, f_set_from_module_name_doc       },
+    { "get_reliable",              sr_py_koops_frame_get_reliable,             METH_NOARGS,  f_get_reliable_doc               },
+    { "set_reliable",              sr_py_koops_frame_set_reliable,             METH_VARARGS, f_set_reliable_doc               },
+    { "get_address",               sr_py_koops_frame_get_address,              METH_NOARGS,  f_get_address_doc                },
+    { "set_address",               sr_py_koops_frame_set_address,              METH_VARARGS, f_set_address_doc                },
+    { "get_function_name",         sr_py_koops_frame_get_function_name,        METH_NOARGS,  f_get_function_name_doc          },
+    { "set_function_name",         sr_py_koops_frame_set_function_name,        METH_VARARGS, f_set_function_name_doc          },
+    { "get_function_offset",       sr_py_koops_frame_get_function_offset,      METH_NOARGS,  f_get_function_offset_doc        },
+    { "set_function_offset",       sr_py_koops_frame_set_function_offset,      METH_VARARGS, f_set_function_offset_doc        },
+    { "get_function_length",       sr_py_koops_frame_get_function_length,      METH_NOARGS,  f_get_function_length_doc        },
+    { "set_function_length",       sr_py_koops_frame_set_function_length,      METH_VARARGS, f_set_function_length_doc        },
+    { "get_module_name",           sr_py_koops_frame_get_module_name,          METH_NOARGS,  f_get_module_name_doc            },
+    { "set_module_name",           sr_py_koops_frame_set_module_name,          METH_VARARGS, f_set_module_name_doc            },
+    { "get_from_address",          sr_py_koops_frame_get_from_address,         METH_NOARGS,  f_get_from_address_doc           },
+    { "set_from_address",          sr_py_koops_frame_set_from_address,         METH_VARARGS, f_set_from_address_doc           },
+    { "get_from_function_name",    sr_py_koops_frame_get_from_function_name,   METH_NOARGS,  f_get_from_function_name_doc     },
+    { "set_from_function_name",    sr_py_koops_frame_set_from_function_name,   METH_VARARGS, f_set_from_function_name_doc     },
+    { "get_from_function_offset",  sr_py_koops_frame_get_from_function_offset, METH_NOARGS,  f_get_from_function_offset_doc   },
+    { "set_from_function_offset",  sr_py_koops_frame_set_from_function_offset, METH_VARARGS, f_set_from_function_offset_doc   },
+    { "get_from_function_length",  sr_py_koops_frame_get_from_function_length, METH_NOARGS,  f_get_from_function_length_doc   },
+    { "set_from_function_length",  sr_py_koops_frame_set_from_function_length, METH_VARARGS, f_set_from_function_length_doc   },
+    { "get_from_module_name",      sr_py_koops_frame_get_from_module_name,     METH_NOARGS,  f_get_from_module_name_doc       },
+    { "set_from_module_name",      sr_py_koops_frame_set_from_module_name,     METH_VARARGS, f_set_from_module_name_doc       },
 
     /* methods */
-    { "dup",                       btp_py_koops_frame_dup,                      METH_NOARGS,  f_dup_doc                        },
-    { "cmp",                       btp_py_koops_frame_cmp,                      METH_VARARGS, f_cmp_doc                        },
+    { "dup",                       sr_py_koops_frame_dup,                      METH_NOARGS,  f_dup_doc                        },
+    { "cmp",                       sr_py_koops_frame_cmp,                      METH_VARARGS, f_cmp_doc                        },
     { NULL },
 };
 
 PyTypeObject
-btp_py_koops_frame_type =
+sr_py_koops_frame_type =
 {
     PyObject_HEAD_INIT(NULL)
     0,
-    "btparser.KerneloopsFrame",   /* tp_name */
-    sizeof(struct btp_py_koops_frame),        /* tp_basicsize */
+    "satyr.KerneloopsFrame",   /* tp_name */
+    sizeof(struct sr_py_koops_frame),        /* tp_basicsize */
     0,                          /* tp_itemsize */
-    btp_py_koops_frame_free,       /* tp_dealloc */
+    sr_py_koops_frame_free,     /* tp_dealloc */
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
@@ -162,7 +162,7 @@ btp_py_koops_frame_type =
     NULL,                       /* tp_as_mapping */
     NULL,                       /* tp_hash */
     NULL,                       /* tp_call */
-    btp_py_koops_frame_str,        /* tp_str */
+    sr_py_koops_frame_str,      /* tp_str */
     NULL,                       /* tp_getattro */
     NULL,                       /* tp_setattro */
     NULL,                       /* tp_as_buffer */
@@ -174,7 +174,7 @@ btp_py_koops_frame_type =
     0,                          /* tp_weaklistoffset */
     NULL,                       /* tp_iter */
     NULL,                       /* tp_iternext */
-    frame_methods,               /* tp_methods */
+    frame_methods,              /* tp_methods */
     NULL,                       /* tp_members */
     NULL,                       /* tp_getset */
     NULL,                       /* tp_base */
@@ -184,7 +184,7 @@ btp_py_koops_frame_type =
     0,                          /* tp_dictoffset */
     NULL,                       /* tp_init */
     NULL,                       /* tp_alloc */
-    btp_py_koops_frame_new,        /* tp_new */
+    sr_py_koops_frame_new,      /* tp_new */
     NULL,                       /* tp_free */
     NULL,                       /* tp_is_gc */
     NULL,                       /* tp_bases */
@@ -196,10 +196,10 @@ btp_py_koops_frame_type =
 
 /* constructor */
 PyObject *
-btp_py_koops_frame_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
+sr_py_koops_frame_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
-    struct btp_py_koops_frame *fo = (struct btp_py_koops_frame*)
-        PyObject_New(struct btp_py_koops_frame, &btp_py_koops_frame_type);
+    struct sr_py_koops_frame *fo = (struct sr_py_koops_frame*)
+        PyObject_New(struct sr_py_koops_frame, &sr_py_koops_frame_type);
 
     if (!fo)
         return PyErr_NoMemory();
@@ -210,66 +210,66 @@ btp_py_koops_frame_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 
     if (str)
     {
-        fo->frame = btp_koops_frame_parse(&str);
+        fo->frame = sr_koops_frame_parse(&str);
     }
     else
-        fo->frame = btp_koops_frame_new();
+        fo->frame = sr_koops_frame_new();
 
     return (PyObject*)fo;
 }
 
 /* destructor */
 void
-btp_py_koops_frame_free(PyObject *object)
+sr_py_koops_frame_free(PyObject *object)
 {
-    struct btp_py_koops_frame *this = (struct btp_py_koops_frame*)object;
-    btp_koops_frame_free(this->frame);
+    struct sr_py_koops_frame *this = (struct sr_py_koops_frame*)object;
+    sr_koops_frame_free(this->frame);
     PyObject_Del(object);
 }
 
 /* str */
 PyObject *
-btp_py_koops_frame_str(PyObject *self)
+sr_py_koops_frame_str(PyObject *self)
 {
-    struct btp_py_koops_frame *this = (struct btp_py_koops_frame*)self;
-    struct btp_strbuf *buf = btp_strbuf_new();
+    struct sr_py_koops_frame *this = (struct sr_py_koops_frame*)self;
+    struct sr_strbuf *buf = sr_strbuf_new();
     if (this->frame->address != 0)
-        btp_strbuf_append_strf(buf, "[0x%016lx] ", this->frame->address);
+        sr_strbuf_append_strf(buf, "[0x%016lx] ", this->frame->address);
 
     if (!this->frame->reliable)
-        btp_strbuf_append_str(buf, "? ");
+        sr_strbuf_append_str(buf, "? ");
 
     if (this->frame->function_name)
-        btp_strbuf_append_str(buf, this->frame->function_name);
+        sr_strbuf_append_str(buf, this->frame->function_name);
 
     if (this->frame->function_offset)
-        btp_strbuf_append_strf(buf, "+0x%lx", this->frame->function_offset);
+        sr_strbuf_append_strf(buf, "+0x%lx", this->frame->function_offset);
 
     if (this->frame->function_length)
-        btp_strbuf_append_strf(buf, "/0x%lx", this->frame->function_length);
+        sr_strbuf_append_strf(buf, "/0x%lx", this->frame->function_length);
 
     if (this->frame->module_name)
-        btp_strbuf_append_strf(buf, " [%s]", this->frame->module_name);
+        sr_strbuf_append_strf(buf, " [%s]", this->frame->module_name);
 
     if (this->frame->from_function_name || this->frame->from_address)
-        btp_strbuf_append_str(buf, " from ");
+        sr_strbuf_append_str(buf, " from ");
 
     if (this->frame->from_address != 0)
-        btp_strbuf_append_strf(buf, "[0x%016lx] ", this->frame->from_address);
+        sr_strbuf_append_strf(buf, "[0x%016lx] ", this->frame->from_address);
 
     if (this->frame->from_function_name)
-        btp_strbuf_append_str(buf, this->frame->from_function_name);
+        sr_strbuf_append_str(buf, this->frame->from_function_name);
 
     if (this->frame->from_function_offset)
-        btp_strbuf_append_strf(buf, "+0x%lx", this->frame->from_function_offset);
+        sr_strbuf_append_strf(buf, "+0x%lx", this->frame->from_function_offset);
 
     if (this->frame->from_function_length)
-        btp_strbuf_append_strf(buf, "/0x%lx", this->frame->from_function_length);
+        sr_strbuf_append_strf(buf, "/0x%lx", this->frame->from_function_length);
 
     if (this->frame->from_module_name)
-        btp_strbuf_append_strf(buf, " [%s]", this->frame->from_module_name);
+        sr_strbuf_append_strf(buf, " [%s]", this->frame->from_module_name);
 
-    char *str = btp_strbuf_free_nobuf(buf);
+    char *str = sr_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
@@ -279,60 +279,60 @@ btp_py_koops_frame_str(PyObject *self)
 
 /* reliable */
 PyObject *
-btp_py_koops_frame_get_reliable(PyObject *self, PyObject *args)
+sr_py_koops_frame_get_reliable(PyObject *self, PyObject *args)
 {
-    if (!((struct btp_py_koops_frame*)self)->frame->reliable)
+    if (!((struct sr_py_koops_frame*)self)->frame->reliable)
        Py_RETURN_FALSE;
 
     Py_RETURN_TRUE;
 }
 
 PyObject *
-btp_py_koops_frame_set_reliable(PyObject *self, PyObject *args)
+sr_py_koops_frame_set_reliable(PyObject *self, PyObject *args)
 {
     int boolvalue;
     if (!PyArg_ParseTuple(args, "i", &boolvalue))
         return NULL;
 
-    struct btp_koops_frame *frame = ((struct btp_py_koops_frame*)self)->frame;
+    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
     frame->reliable = boolvalue;
     Py_RETURN_NONE;
 }
 
 /* address */
 PyObject *
-btp_py_koops_frame_get_address(PyObject *self, PyObject *args)
+sr_py_koops_frame_get_address(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct btp_py_koops_frame*)self)->frame->address);
+    return Py_BuildValue("l", ((struct sr_py_koops_frame*)self)->frame->address);
 }
 
 PyObject *
-btp_py_koops_frame_set_address(PyObject *self, PyObject *args)
+sr_py_koops_frame_set_address(PyObject *self, PyObject *args)
 {
     uint64_t newvalue;
     if (!PyArg_ParseTuple(args, "l", &newvalue))
         return NULL;
 
-    struct btp_koops_frame *frame = ((struct btp_py_koops_frame*)self)->frame;
+    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
     frame->address = newvalue;
     Py_RETURN_NONE;
 }
 
 /* from_address */
 PyObject *
-btp_py_koops_frame_get_from_address(PyObject *self, PyObject *args)
+sr_py_koops_frame_get_from_address(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct btp_py_koops_frame*)self)->frame->from_address);
+    return Py_BuildValue("l", ((struct sr_py_koops_frame*)self)->frame->from_address);
 }
 
 PyObject *
-btp_py_koops_frame_set_from_address(PyObject *self, PyObject *args)
+sr_py_koops_frame_set_from_address(PyObject *self, PyObject *args)
 {
     uint64_t newvalue;
     if (!PyArg_ParseTuple(args, "l", &newvalue))
         return NULL;
 
-    struct btp_koops_frame *frame = ((struct btp_py_koops_frame*)self)->frame;
+    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
     frame->from_address = newvalue;
     Py_RETURN_NONE;
 }
@@ -340,189 +340,189 @@ btp_py_koops_frame_set_from_address(PyObject *self, PyObject *args)
 
 /* function_name */
 PyObject *
-btp_py_koops_frame_get_function_name(PyObject *self, PyObject *args)
+sr_py_koops_frame_get_function_name(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", ((struct btp_py_koops_frame*)self)->frame->function_name);
+    return Py_BuildValue("s", ((struct sr_py_koops_frame*)self)->frame->function_name);
 }
 
 PyObject *
-btp_py_koops_frame_set_function_name(PyObject *self, PyObject *args)
+sr_py_koops_frame_set_function_name(PyObject *self, PyObject *args)
 {
     char *newvalue;
     if (!PyArg_ParseTuple(args, "s", &newvalue))
         return NULL;
 
-    struct btp_koops_frame *frame = ((struct btp_py_koops_frame*)self)->frame;
+    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
     free(frame->function_name);
-    frame->function_name = btp_strdup(newvalue);
+    frame->function_name = sr_strdup(newvalue);
     Py_RETURN_NONE;
 }
 
 /* from_function_name */
 PyObject *
-btp_py_koops_frame_get_from_function_name(PyObject *self, PyObject *args)
+sr_py_koops_frame_get_from_function_name(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", ((struct btp_py_koops_frame*)self)->frame->from_function_name);
+    return Py_BuildValue("s", ((struct sr_py_koops_frame*)self)->frame->from_function_name);
 }
 
 PyObject *
-btp_py_koops_frame_set_from_function_name(PyObject *self, PyObject *args)
+sr_py_koops_frame_set_from_function_name(PyObject *self, PyObject *args)
 {
     char *newvalue;
     if (!PyArg_ParseTuple(args, "s", &newvalue))
         return NULL;
 
-    struct btp_koops_frame *frame = ((struct btp_py_koops_frame*)self)->frame;
+    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
     free(frame->function_name);
-    frame->from_function_name = btp_strdup(newvalue);
+    frame->from_function_name = sr_strdup(newvalue);
     Py_RETURN_NONE;
 }
 
 /* function_offset */
 PyObject *
-btp_py_koops_frame_get_function_offset(PyObject *self, PyObject *args)
+sr_py_koops_frame_get_function_offset(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct btp_py_koops_frame*)self)->frame->function_offset);
+    return Py_BuildValue("l", ((struct sr_py_koops_frame*)self)->frame->function_offset);
 }
 
 PyObject *
-btp_py_koops_frame_set_function_offset(PyObject *self, PyObject *args)
+sr_py_koops_frame_set_function_offset(PyObject *self, PyObject *args)
 {
     uint64_t newvalue;
     if (!PyArg_ParseTuple(args, "l", &newvalue))
         return NULL;
 
-    struct btp_koops_frame *frame = ((struct btp_py_koops_frame*)self)->frame;
+    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
     frame->function_offset = newvalue;
     Py_RETURN_NONE;
 }
 
 /* from_function_offset */
 PyObject *
-btp_py_koops_frame_get_from_function_offset(PyObject *self, PyObject *args)
+sr_py_koops_frame_get_from_function_offset(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct btp_py_koops_frame*)self)->frame->from_function_offset);
+    return Py_BuildValue("l", ((struct sr_py_koops_frame*)self)->frame->from_function_offset);
 }
 
 PyObject *
-btp_py_koops_frame_set_from_function_offset(PyObject *self, PyObject *args)
+sr_py_koops_frame_set_from_function_offset(PyObject *self, PyObject *args)
 {
     uint64_t newvalue;
     if (!PyArg_ParseTuple(args, "l", &newvalue))
         return NULL;
 
-    struct btp_koops_frame *frame = ((struct btp_py_koops_frame*)self)->frame;
+    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
     frame->from_function_offset = newvalue;
     Py_RETURN_NONE;
 }
 
 /* function_length */
 PyObject *
-btp_py_koops_frame_get_function_length(PyObject *self, PyObject *args)
+sr_py_koops_frame_get_function_length(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct btp_py_koops_frame*)self)->frame->function_length);
+    return Py_BuildValue("l", ((struct sr_py_koops_frame*)self)->frame->function_length);
 }
 
 PyObject *
-btp_py_koops_frame_set_function_length(PyObject *self, PyObject *args)
+sr_py_koops_frame_set_function_length(PyObject *self, PyObject *args)
 {
     uint64_t newvalue;
     if (!PyArg_ParseTuple(args, "l", &newvalue))
         return NULL;
 
-    struct btp_koops_frame *frame = ((struct btp_py_koops_frame*)self)->frame;
+    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
     frame->function_length = newvalue;
     Py_RETURN_NONE;
 }
 
 /* from_function_length */
 PyObject *
-btp_py_koops_frame_get_from_function_length(PyObject *self, PyObject *args)
+sr_py_koops_frame_get_from_function_length(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct btp_py_koops_frame*)self)->frame->from_function_length);
+    return Py_BuildValue("l", ((struct sr_py_koops_frame*)self)->frame->from_function_length);
 }
 
 PyObject *
-btp_py_koops_frame_set_from_function_length(PyObject *self, PyObject *args)
+sr_py_koops_frame_set_from_function_length(PyObject *self, PyObject *args)
 {
     uint64_t newvalue;
     if (!PyArg_ParseTuple(args, "l", &newvalue))
         return NULL;
 
-    struct btp_koops_frame *frame = ((struct btp_py_koops_frame*)self)->frame;
+    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
     frame->from_function_length = newvalue;
     Py_RETURN_NONE;
 }
 
 /* module_name */
 PyObject *
-btp_py_koops_frame_get_module_name(PyObject *self, PyObject *args)
+sr_py_koops_frame_get_module_name(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", ((struct btp_py_koops_frame*)self)->frame->module_name);
+    return Py_BuildValue("s", ((struct sr_py_koops_frame*)self)->frame->module_name);
 }
 
 PyObject *
-btp_py_koops_frame_set_module_name(PyObject *self, PyObject *args)
+sr_py_koops_frame_set_module_name(PyObject *self, PyObject *args)
 {
     char *newvalue;
     if (!PyArg_ParseTuple(args, "s", &newvalue))
         return NULL;
 
-    struct btp_koops_frame *frame = ((struct btp_py_koops_frame*)self)->frame;
+    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
     free(frame->module_name);
-    frame->module_name = btp_strdup(newvalue);
+    frame->module_name = sr_strdup(newvalue);
     Py_RETURN_NONE;
 }
 
 /* from_module_name */
 PyObject *
-btp_py_koops_frame_get_from_module_name(PyObject *self, PyObject *args)
+sr_py_koops_frame_get_from_module_name(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", ((struct btp_py_koops_frame*)self)->frame->from_module_name);
+    return Py_BuildValue("s", ((struct sr_py_koops_frame*)self)->frame->from_module_name);
 }
 
 PyObject *
-btp_py_koops_frame_set_from_module_name(PyObject *self, PyObject *args)
+sr_py_koops_frame_set_from_module_name(PyObject *self, PyObject *args)
 {
     char *newvalue;
     if (!PyArg_ParseTuple(args, "s", &newvalue))
         return NULL;
 
-    struct btp_koops_frame *frame = ((struct btp_py_koops_frame*)self)->frame;
+    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
     free(frame->module_name);
-    frame->from_module_name = btp_strdup(newvalue);
+    frame->from_module_name = sr_strdup(newvalue);
     Py_RETURN_NONE;
 }
 
 /* methods */
 PyObject *
-btp_py_koops_frame_dup(PyObject *self, PyObject *args)
+sr_py_koops_frame_dup(PyObject *self, PyObject *args)
 {
-    struct btp_py_koops_frame *this = (struct btp_py_koops_frame*)self;
-    struct btp_py_koops_frame *fo = (struct btp_py_koops_frame*)
-        PyObject_New(struct btp_py_koops_frame, &btp_py_koops_frame_type);
+    struct sr_py_koops_frame *this = (struct sr_py_koops_frame*)self;
+    struct sr_py_koops_frame *fo = (struct sr_py_koops_frame*)
+        PyObject_New(struct sr_py_koops_frame, &sr_py_koops_frame_type);
 
     if (!fo)
         return PyErr_NoMemory();
 
-    fo->frame = btp_koops_frame_dup(this->frame, false);
+    fo->frame = sr_koops_frame_dup(this->frame, false);
 
     return (PyObject*)fo;
 }
 
 PyObject *
-btp_py_koops_frame_cmp(PyObject *self, PyObject *args)
+sr_py_koops_frame_cmp(PyObject *self, PyObject *args)
 {
     PyObject *compare_to;
     if (!PyArg_ParseTuple(args,
                           "O!",
-                          &btp_py_koops_frame_type,
+                          &sr_py_koops_frame_type,
                           &compare_to))
     {
         return NULL;
     }
 
-    struct btp_koops_frame *f1 = ((struct btp_py_koops_frame*)self)->frame;
-    struct btp_koops_frame *f2 = ((struct btp_py_koops_frame*)compare_to)->frame;
-    return Py_BuildValue("i", btp_koops_frame_cmp(f1, f2));
+    struct sr_koops_frame *f1 = ((struct sr_py_koops_frame*)self)->frame;
+    struct sr_koops_frame *f2 = ((struct sr_py_koops_frame*)compare_to)->frame;
+    return Py_BuildValue("i", sr_koops_frame_cmp(f1, f2));
 }

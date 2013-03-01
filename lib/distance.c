@@ -268,20 +268,20 @@ distance_levenshtein(struct type_specific_functions functions,
 }
 
 static float
-distance(enum btp_distance_type distance_type,
+distance(enum sr_distance_type distance_type,
          struct type_specific_functions functions,
          void *thread1,
          void *thread2)
 {
     switch (distance_type)
     {
-    case BTP_DISTANCE_JARO_WINKLER:
+    case SR_DISTANCE_JARO_WINKLER:
         return distance_jaro_winkler(functions, thread1, thread2);
-    case BTP_DISTANCE_JACCARD:
+    case SR_DISTANCE_JACCARD:
         return distance_jaccard(functions, thread1, thread2);
-    case BTP_DISTANCE_LEVENSHTEIN:
+    case SR_DISTANCE_LEVENSHTEIN:
         return distance_levenshtein(functions, thread1, thread2, false);
-    case BTP_DISTANCE_DAMERAU_LEVENSHTEIN:
+    case SR_DISTANCE_DAMERAU_LEVENSHTEIN:
         return distance_levenshtein(functions, thread1, thread2, true);
     default:
         return 1.0f;
@@ -291,26 +291,26 @@ distance(enum btp_distance_type distance_type,
 static int
 frame_cmp_gdb(void *frame1, void *frame2)
 {
-    return btp_gdb_frame_cmp_distance((struct btp_gdb_frame*)frame1,
-                                      (struct btp_gdb_frame*)frame2);
+    return sr_gdb_frame_cmp_distance((struct sr_gdb_frame*)frame1,
+                                     (struct sr_gdb_frame*)frame2);
 }
 
 static void *
 frame_next_gdb(void *frame)
 {
-    return ((struct btp_gdb_frame*)frame)->next;
+    return ((struct sr_gdb_frame*)frame)->next;
 }
 
 static void *
 thread_first_frame_gdb(void *thread)
 {
-    return ((struct btp_gdb_thread*)thread)->frames;
+    return ((struct sr_gdb_thread*)thread)->frames;
 }
 
 static int
 thread_get_frame_count_gdb(void *thread)
 {
-    return btp_gdb_thread_get_frame_count((struct btp_gdb_thread*)thread);
+    return sr_gdb_thread_get_frame_count((struct sr_gdb_thread*)thread);
 }
 
 struct type_specific_functions gdb_specific_functions = {
@@ -321,9 +321,9 @@ struct type_specific_functions gdb_specific_functions = {
 };
 
 float
-btp_distance_gdb(enum btp_distance_type distance_type,
-                 struct btp_gdb_thread *thread1,
-                 struct btp_gdb_thread *thread2)
+sr_distance_gdb(enum sr_distance_type distance_type,
+                struct sr_gdb_thread *thread1,
+                struct sr_gdb_thread *thread2)
 {
     return distance(distance_type,
                     gdb_specific_functions,
@@ -334,26 +334,26 @@ btp_distance_gdb(enum btp_distance_type distance_type,
 static int
 frame_cmp_core(void *frame1, void *frame2)
 {
-    return btp_core_frame_cmp_distance((struct btp_core_frame*)frame1,
-                                       (struct btp_core_frame*)frame2);
+    return sr_core_frame_cmp_distance((struct sr_core_frame*)frame1,
+                                      (struct sr_core_frame*)frame2);
 }
 
 static void *
 frame_next_core(void *frame)
 {
-    return ((struct btp_core_frame*)frame)->next;
+    return ((struct sr_core_frame*)frame)->next;
 }
 
 static void *
 thread_first_frame_core(void *thread)
 {
-    return ((struct btp_core_thread*)thread)->frames;
+    return ((struct sr_core_thread*)thread)->frames;
 }
 
 static int
 thread_get_frame_count_core(void *thread)
 {
-    return btp_core_thread_get_frame_count((struct btp_core_thread*)thread);
+    return sr_core_thread_get_frame_count((struct sr_core_thread*)thread);
 }
 
 struct type_specific_functions core_specific_functions = {
@@ -364,9 +364,9 @@ struct type_specific_functions core_specific_functions = {
 };
 
 float
-btp_distance_core(enum btp_distance_type distance_type,
-                  struct btp_core_thread *thread1,
-                  struct btp_core_thread *thread2)
+sr_distance_core(enum sr_distance_type distance_type,
+                 struct sr_core_thread *thread1,
+                 struct sr_core_thread *thread2)
 {
     return distance(distance_type,
                     core_specific_functions,
@@ -377,26 +377,26 @@ btp_distance_core(enum btp_distance_type distance_type,
 static int
 frame_cmp_java(void *frame1, void *frame2)
 {
-    return btp_java_frame_cmp_distance((struct btp_java_frame*)frame1,
-                                       (struct btp_java_frame*)frame2);
+    return sr_java_frame_cmp_distance((struct sr_java_frame*)frame1,
+                                      (struct sr_java_frame*)frame2);
 }
 
 static void *
 frame_next_java(void *frame)
 {
-    return ((struct btp_java_frame*)frame)->next;
+    return ((struct sr_java_frame*)frame)->next;
 }
 
 static void *
 thread_first_frame_java(void *thread)
 {
-    return ((struct btp_java_thread*)thread)->frames;
+    return ((struct sr_java_thread*)thread)->frames;
 }
 
 static int
 thread_get_frame_count_java(void *thread)
 {
-    return btp_java_thread_get_frame_count((struct btp_java_thread*)thread);
+    return sr_java_thread_get_frame_count((struct sr_java_thread*)thread);
 }
 
 struct type_specific_functions java_specific_functions = {
@@ -407,9 +407,9 @@ struct type_specific_functions java_specific_functions = {
 };
 
 float
-btp_distance_java(enum btp_distance_type distance_type,
-                  struct btp_java_thread *thread1,
-                  struct btp_java_thread *thread2)
+sr_distance_java(enum sr_distance_type distance_type,
+                 struct sr_java_thread *thread1,
+                 struct sr_java_thread *thread2)
 {
     return distance(distance_type,
                     java_specific_functions,
@@ -420,26 +420,26 @@ btp_distance_java(enum btp_distance_type distance_type,
 static int
 frame_cmp_koops(void *frame1, void *frame2)
 {
-    return btp_koops_frame_cmp_distance((struct btp_koops_frame*)frame1,
-                                        (struct btp_koops_frame*)frame2);
+    return sr_koops_frame_cmp_distance((struct sr_koops_frame*)frame1,
+                                       (struct sr_koops_frame*)frame2);
 }
 
 static void *
 frame_next_koops(void *frame)
 {
-    return ((struct btp_koops_frame*)frame)->next;
+    return ((struct sr_koops_frame*)frame)->next;
 }
 
 static void *
 thread_first_frame_koops(void *stacktrace)
 {
-    return ((struct btp_koops_stacktrace*)stacktrace)->frames;
+    return ((struct sr_koops_stacktrace*)stacktrace)->frames;
 }
 
 static int
 thread_get_frame_count_koops(void *stacktrace)
 {
-    return btp_koops_stacktrace_get_frame_count((struct btp_koops_stacktrace*)stacktrace);
+    return sr_koops_stacktrace_get_frame_count((struct sr_koops_stacktrace*)stacktrace);
 }
 
 struct type_specific_functions koops_specific_functions = {
@@ -450,9 +450,9 @@ struct type_specific_functions koops_specific_functions = {
 };
 
 float
-btp_distance_koops(enum btp_distance_type distance_type,
-                   struct btp_koops_stacktrace *stacktrace1,
-                   struct btp_koops_stacktrace *stacktrace2)
+sr_distance_koops(enum sr_distance_type distance_type,
+                  struct sr_koops_stacktrace *stacktrace1,
+                  struct sr_koops_stacktrace *stacktrace2)
 {
     return distance(distance_type,
                     koops_specific_functions,
@@ -464,26 +464,26 @@ btp_distance_koops(enum btp_distance_type distance_type,
 static int
 frame_cmp_python(void *frame1, void *frame2)
 {
-    return btp_python_frame_cmp_distance((struct btp_python_frame*)frame1,
-                                         (struct btp_python_frame*)frame2);
+    return sr_python_frame_cmp_distance((struct sr_python_frame*)frame1,
+                                        (struct sr_python_frame*)frame2);
 }
 
 static void *
 frame_next_python(void *frame)
 {
-    return ((struct btp_python_frame*)frame)->next;
+    return ((struct sr_python_frame*)frame)->next;
 }
 
 static void *
 thread_first_frame_python(void *stacktrace)
 {
-    return ((struct btp_python_stacktrace*)stacktrace)->frames;
+    return ((struct sr_python_stacktrace*)stacktrace)->frames;
 }
 
 static int
 thread_get_frame_count_python(void *stacktrace)
 {
-    return btp_python_stacktrace_get_frame_count((struct btp_python_stacktrace*)stacktrace);
+    return sr_python_stacktrace_get_frame_count((struct sr_python_stacktrace*)stacktrace);
 }
 
 struct type_specific_functions python_specific_functions = {
@@ -494,9 +494,9 @@ struct type_specific_functions python_specific_functions = {
 };
 
 float
-btp_distance_python(enum btp_distance_type distance_type,
-                    struct btp_python_stacktrace *stacktrace1,
-                    struct btp_python_stacktrace *stacktrace2)
+sr_distance_python(enum sr_distance_type distance_type,
+                   struct sr_python_stacktrace *stacktrace1,
+                   struct sr_python_stacktrace *stacktrace2)
 {
     return distance(distance_type,
                     python_specific_functions,

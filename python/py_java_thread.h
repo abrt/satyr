@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_PY_JAVA_THREAD_H
-#define BTPARSER_PY_JAVA_THREAD_H
+#ifndef SATYR_PY_JAVA_THREAD_H
+#define SATYR_PY_JAVA_THREAD_H
 
 /**
  * @file
@@ -32,41 +32,41 @@ extern "C" {
 #include <Python.h>
 #include <structmember.h>
 
-PyTypeObject btp_py_java_thread_type;
+PyTypeObject sr_py_java_thread_type;
 
-struct btp_py_java_thread
+struct sr_py_java_thread
 {
     PyObject_HEAD
     PyObject *frames;
-    struct btp_java_thread *thread;
+    struct sr_java_thread *thread;
 };
 
 /* helpers */
-int java_thread_prepare_linked_list(struct btp_py_java_thread *thread);
-PyObject *java_frame_linked_list_to_python_list(struct btp_java_thread *thread);
-int java_thread_rebuild_python_list(struct btp_py_java_thread *thread);
+int java_thread_prepare_linked_list(struct sr_py_java_thread *thread);
+PyObject *java_frame_linked_list_to_python_list(struct sr_java_thread *thread);
+int java_thread_rebuild_python_list(struct sr_py_java_thread *thread);
 
 /* constructor */
-PyObject *btp_py_java_thread_new(PyTypeObject *object,
+PyObject *sr_py_java_thread_new(PyTypeObject *object,
                                 PyObject *args,
                                 PyObject *kwds);
 
 /* destructor */
-void btp_py_java_thread_free(PyObject *object);
+void sr_py_java_thread_free(PyObject *object);
 
 /* str */
-PyObject *btp_py_java_thread_str(PyObject *self);
+PyObject *sr_py_java_thread_str(PyObject *self);
 
 /* getters & setters */
-PyObject *btp_py_java_thread_get_name(PyObject *self, PyObject *args);
-PyObject *btp_py_java_thread_set_name(PyObject *self, PyObject *args);
+PyObject *sr_py_java_thread_get_name(PyObject *self, PyObject *args);
+PyObject *sr_py_java_thread_set_name(PyObject *self, PyObject *args);
 
 /* methods */
-PyObject *btp_py_java_thread_dup(PyObject *self, PyObject *args);
-PyObject *btp_py_java_thread_cmp(PyObject *self, PyObject *args);
-PyObject *btp_py_java_thread_quality_counts(PyObject *self, PyObject *args);
-PyObject *btp_py_java_thread_quality(PyObject *self, PyObject *args);
-PyObject *btp_py_java_thread_format_funs(PyObject *self, PyObject *args);
+PyObject *sr_py_java_thread_dup(PyObject *self, PyObject *args);
+PyObject *sr_py_java_thread_cmp(PyObject *self, PyObject *args);
+PyObject *sr_py_java_thread_quality_counts(PyObject *self, PyObject *args);
+PyObject *sr_py_java_thread_quality(PyObject *self, PyObject *args);
+PyObject *sr_py_java_thread_format_funs(PyObject *self, PyObject *args);
 
 #ifdef __cplusplus
 }

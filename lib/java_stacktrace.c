@@ -26,56 +26,56 @@
 #include <stdio.h>
 #include <string.h>
 
-struct btp_java_stacktrace *
-btp_java_stacktrace_new()
+struct sr_java_stacktrace *
+sr_java_stacktrace_new()
 {
-    struct btp_java_stacktrace *stacktrace =
-        btp_malloc(sizeof(*stacktrace));
+    struct sr_java_stacktrace *stacktrace =
+        sr_malloc(sizeof(*stacktrace));
 
-    btp_java_stacktrace_init(stacktrace);
+    sr_java_stacktrace_init(stacktrace);
     return stacktrace;
 }
 
 void
-btp_java_stacktrace_init(struct btp_java_stacktrace *stacktrace)
+sr_java_stacktrace_init(struct sr_java_stacktrace *stacktrace)
 {
     memset(stacktrace, 0, sizeof(*stacktrace));
 }
 
 void
-btp_java_stacktrace_free(struct btp_java_stacktrace *stacktrace)
+sr_java_stacktrace_free(struct sr_java_stacktrace *stacktrace)
 {
     if (!stacktrace)
         return;
 
     while (stacktrace->threads)
     {
-        struct btp_java_thread *thread = stacktrace->threads;
+        struct sr_java_thread *thread = stacktrace->threads;
         stacktrace->threads = thread->next;
-        btp_java_thread_free(thread);
+        sr_java_thread_free(thread);
     }
 
     free(stacktrace);
 }
 
-struct btp_java_stacktrace *
-btp_java_stacktrace_dup(struct btp_java_stacktrace *stacktrace)
+struct sr_java_stacktrace *
+sr_java_stacktrace_dup(struct sr_java_stacktrace *stacktrace)
 {
-    struct btp_java_stacktrace *result = btp_java_stacktrace_new();
+    struct sr_java_stacktrace *result = sr_java_stacktrace_new();
     memcpy(result, stacktrace, sizeof(*result));
 
     if (result->threads)
-        result->threads = btp_java_thread_dup(result->threads, true);
+        result->threads = sr_java_thread_dup(result->threads, true);
 
     return result;
 }
 
 int
-btp_java_stacktrace_cmp(struct btp_java_stacktrace *stacktrace1,
-                        struct btp_java_stacktrace *stacktrace2)
+sr_java_stacktrace_cmp(struct sr_java_stacktrace *stacktrace1,
+                       struct sr_java_stacktrace *stacktrace2)
 {
-    struct btp_java_thread *thread1 = stacktrace1->threads;
-    struct btp_java_thread *thread2 = stacktrace2->threads;
+    struct sr_java_thread *thread1 = stacktrace1->threads;
+    struct sr_java_thread *thread2 = stacktrace2->threads;
 
     do
     {
@@ -85,7 +85,7 @@ btp_java_stacktrace_cmp(struct btp_java_stacktrace *stacktrace1,
             return -1;
         if ( thread1 &&  thread2)
         {
-            int threads = btp_java_thread_cmp(thread1, thread2);
+            int threads = sr_java_thread_cmp(thread1, thread2);
             if (threads != 0)
                 return threads;
             thread1 = thread1->next;
@@ -109,49 +109,49 @@ Exception in thread "main" java.lang.NullPointerException
 relevant lines:
 */
 
-struct btp_java_stacktrace *
-btp_java_stacktrace_parse(const char **input, struct btp_location *location)
+struct sr_java_stacktrace *
+sr_java_stacktrace_parse(const char **input, struct sr_location *location)
 {
-    struct btp_java_thread *thread = btp_java_thread_parse(input, location);
+    struct sr_java_thread *thread = sr_java_thread_parse(input, location);
     if (thread == NULL)
         return NULL;
 
-    struct btp_java_stacktrace *stacktrace = btp_java_stacktrace_new();
+    struct sr_java_stacktrace *stacktrace = sr_java_stacktrace_new();
     stacktrace->threads = thread;
 
     return stacktrace;
 }
 
 char *
-btp_java_stacktrace_to_json(struct btp_java_stacktrace *stacktrace)
+sr_java_stacktrace_to_json(struct sr_java_stacktrace *stacktrace)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
+    struct sr_strbuf *strbuf = sr_strbuf_new();
 
-    btp_strbuf_append_str(strbuf, "{   \"threads\":");
+    sr_strbuf_append_str(strbuf, "{   \"threads\":");
     if (stacktrace->threads)
-        btp_strbuf_append_str(strbuf, "\n");
+        sr_strbuf_append_str(strbuf, "\n");
     else
-        btp_strbuf_append_str(strbuf, " [");
+        sr_strbuf_append_str(strbuf, " [");
 
-    struct btp_java_thread *thread = stacktrace->threads;
+    struct sr_java_thread *thread = stacktrace->threads;
     while (thread)
     {
         if (thread == stacktrace->threads)
-            btp_strbuf_append_str(strbuf, "      [ ");
+            sr_strbuf_append_str(strbuf, "      [ ");
         else
-            btp_strbuf_append_str(strbuf, "      , ");
+            sr_strbuf_append_str(strbuf, "      , ");
 
-        char *thread_json = btp_java_thread_to_json(thread);
-        char *indented_thread_json = btp_indent_except_first_line(thread_json, 8);
-        btp_strbuf_append_str(strbuf, indented_thread_json);
+        char *thread_json = sr_java_thread_to_json(thread);
+        char *indented_thread_json = sr_indent_except_first_line(thread_json, 8);
+        sr_strbuf_append_str(strbuf, indented_thread_json);
         free(indented_thread_json);
         free(thread_json);
         thread = thread->next;
         if (thread)
-            btp_strbuf_append_str(strbuf, "\n");
+            sr_strbuf_append_str(strbuf, "\n");
     }
 
-    btp_strbuf_append_str(strbuf, " ]\n");
-    btp_strbuf_append_char(strbuf, '}');
-    return btp_strbuf_free_nobuf(strbuf);
+    sr_strbuf_append_str(strbuf, " ]\n");
+    sr_strbuf_append_char(strbuf, '}');
+    return sr_strbuf_free_nobuf(strbuf);
 }

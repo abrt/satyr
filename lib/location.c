@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 void
-btp_location_init(struct btp_location *location)
+sr_location_init(struct sr_location *location)
 {
     location->line = 1;
     location->column = 0;
@@ -31,9 +31,9 @@ btp_location_init(struct btp_location *location)
 }
 
 int
-btp_location_cmp(struct btp_location *location1,
-                 struct btp_location *location2,
-                 bool compare_messages)
+sr_location_cmp(struct sr_location *location1,
+                struct sr_location *location2,
+                bool compare_messages)
 {
     int linediff = location1->line - location2->line;
     if (0 != linediff)
@@ -44,43 +44,43 @@ btp_location_cmp(struct btp_location *location1,
         return columndiff;
 
     if (compare_messages)
-        return btp_strcmp0(location1->message, location2->message);
+        return sr_strcmp0(location1->message, location2->message);
 
     return 0;
 }
 
 char *
-btp_location_to_string(struct btp_location *location)
+sr_location_to_string(struct sr_location *location)
 {
-    struct btp_strbuf strbuf;
-    btp_strbuf_init(&strbuf);
-    btp_strbuf_append_strf(&strbuf,
-                           "Line %d, column %d",
-                           location->line,
-                           location->column);
+    struct sr_strbuf strbuf;
+    sr_strbuf_init(&strbuf);
+    sr_strbuf_append_strf(&strbuf,
+                          "Line %d, column %d",
+                          location->line,
+                          location->column);
     if (location->message)
-        btp_strbuf_append_strf(&strbuf, ": %s", location->message);
+        sr_strbuf_append_strf(&strbuf, ": %s", location->message);
 
     return strbuf.buf;
 }
 
 
 void
-btp_location_add(struct btp_location *location,
-                 int add_line,
-                 int add_column)
+sr_location_add(struct sr_location *location,
+                int add_line,
+                int add_column)
 {
-    btp_location_add_ext(&location->line,
-                         &location->column,
-                         add_line,
-                         add_column);
+    sr_location_add_ext(&location->line,
+                        &location->column,
+                        add_line,
+                        add_column);
 }
 
 void
-btp_location_add_ext(int *line,
-                     int *column,
-                     int add_line,
-                     int add_column)
+sr_location_add_ext(int *line,
+                    int *column,
+                    int add_line,
+                    int add_column)
 {
     if (add_line > 1)
     {
@@ -92,18 +92,18 @@ btp_location_add_ext(int *line,
 }
 
 void
-btp_location_eat_char(struct btp_location *location,
-                      char c)
+sr_location_eat_char(struct sr_location *location,
+                     char c)
 {
-    btp_location_eat_char_ext(&location->line,
-                              &location->column,
-                              c);
+    sr_location_eat_char_ext(&location->line,
+                             &location->column,
+                             c);
 }
 
 void
-btp_location_eat_char_ext(int *line,
-                          int *column,
-                          char c)
+sr_location_eat_char_ext(int *line,
+                         int *column,
+                         char c)
 {
     if (c == '\n')
     {

@@ -1,11 +1,11 @@
-# Checking the btparser. -*- Autotest -*-
+# Checking the satyr. -*- Autotest -*-
 
 AT_BANNER([Java stacktrace])
 
-## ----------------------- ##
-## btp_java_stacktrace_cmp ##
-## ----------------------- ##
-AT_TESTFUN([btp_java_stacktrace_cmp],
+## ---------------------- ##
+## sr_java_stacktrace_cmp ##
+## ---------------------- ##
+AT_TESTFUN([sr_java_stacktrace_cmp],
 [[
 #include <lib/java_stacktrace.h>
 #include <lib/java_thread.h>
@@ -19,30 +19,30 @@ AT_TESTFUN([btp_java_stacktrace_cmp],
 int
 main(void)
 {
-  struct btp_java_stacktrace *stacktrace0 = btp_java_stacktrace_new();
+  struct sr_java_stacktrace *stacktrace0 = sr_java_stacktrace_new();
   stacktrace0->threads = create_real_main_thread_objects();
 
-  struct btp_java_stacktrace *stacktrace1 = btp_java_stacktrace_new();
+  struct sr_java_stacktrace *stacktrace1 = sr_java_stacktrace_new();
   stacktrace1->threads = create_real_main_thread_objects();
 
-  assert(0 == btp_java_stacktrace_cmp(stacktrace0, stacktrace1));
+  assert(0 == sr_java_stacktrace_cmp(stacktrace0, stacktrace1));
 
-  btp_java_thread_free(stacktrace1->threads);
+  sr_java_thread_free(stacktrace1->threads);
   stacktrace1->threads = NULL;
 
-  assert(0 != btp_java_stacktrace_cmp(stacktrace0, stacktrace1));
+  assert(0 != sr_java_stacktrace_cmp(stacktrace0, stacktrace1));
 
-  btp_java_stacktrace_free(stacktrace0);
-  btp_java_stacktrace_free(stacktrace1);
+  sr_java_stacktrace_free(stacktrace0);
+  sr_java_stacktrace_free(stacktrace1);
 
   return 0;
 }
 ]])
 
-## ----------------------- ##
-## btp_java_stacktrace_dup ##
-## ----------------------- ##
-AT_TESTFUN([btp_java_stacktrace_dup],
+## ---------------------- ##
+## sr_java_stacktrace_dup ##
+## ---------------------- ##
+AT_TESTFUN([sr_java_stacktrace_dup],
 [[
 #include <lib/java_stacktrace.h>
 #include <lib/java_thread.h>
@@ -57,24 +57,24 @@ AT_TESTFUN([btp_java_stacktrace_dup],
 int
 main(void)
 {
-  struct btp_java_stacktrace *stacktrace0 = create_real_main_thread_objects();
+  struct sr_java_stacktrace *stacktrace0 = create_real_main_thread_objects();
   stacktrace0->threads = create_real_main_thread_objects();
 
-  struct btp_java_stacktrace *stacktrace1 = btp_java_stacktrace_dup(stacktrace0);
+  struct sr_java_stacktrace *stacktrace1 = sr_java_stacktrace_dup(stacktrace0);
 
-  assert(0 == btp_java_stacktrace_cmp(stacktrace0, stacktrace1));
+  assert(0 == sr_java_stacktrace_cmp(stacktrace0, stacktrace1));
 
-  btp_java_stacktrace_free(stacktrace0);
-  btp_java_stacktrace_free(stacktrace1);
+  sr_java_stacktrace_free(stacktrace0);
+  sr_java_stacktrace_free(stacktrace1);
 
   return 0;
 }
 ]])
 
-## ------------------------- ##
-## btp_java_stacktrace_parse ##
-## ------------------------- ##
-AT_TESTFUN([btp_java_stacktrace_parse],
+## ------------------------ ##
+## sr_java_stacktrace_parse ##
+## ------------------------ ##
+AT_TESTFUN([sr_java_stacktrace_parse],
 [[
 #include <lib/java_stacktrace.h>
 #include <lib/java_thread.h>
@@ -88,21 +88,21 @@ AT_TESTFUN([btp_java_stacktrace_parse],
 
 static void
 check(char *input,
-      struct btp_java_stacktrace *expected_stacktrace)
+      struct sr_java_stacktrace *expected_stacktrace)
 {
   printf("===============================================\n"
          "Testing input:\n%s", input);
 
   char *old_input = input;
-  struct btp_location location;
-  btp_location_init(&location);
-  struct btp_java_stacktrace *stacktrace = btp_java_stacktrace_parse(&input, &location);
+  struct sr_location location;
+  sr_location_init(&location);
+  struct sr_java_stacktrace *stacktrace = sr_java_stacktrace_parse(&input, &location);
   assert(!expected_stacktrace || stacktrace);
   if (stacktrace)
   {
     assert(*input == '\0');
-    assert(0 == btp_java_stacktrace_cmp(stacktrace, expected_stacktrace));
-    btp_java_stacktrace_free(stacktrace);
+    assert(0 == sr_java_stacktrace_cmp(stacktrace, expected_stacktrace));
+    sr_java_stacktrace_free(stacktrace);
   }
   else
   {
@@ -115,7 +115,7 @@ check(char *input,
 int
 main(void)
 {
-  struct btp_java_stacktrace *stacktrace0 = create_real_main_thread_objects();
+  struct sr_java_stacktrace *stacktrace0 = create_real_main_thread_objects();
   stacktrace0->threads = create_real_main_thread_objects();
 
   check(get_real_thread_stacktrace(), stacktrace0);

@@ -1,4 +1,4 @@
-# Checking the btparser. -*- Autotest -*-
+# Checking the satyr. -*- Autotest -*-
 
 AT_BANNER([Normalization])
 
@@ -12,10 +12,10 @@ m4_define([UTILS],
 #include <stdlib.h>
 #include <assert.h>
 
-static struct btp_gdb_thread *
+static struct sr_gdb_thread *
 create_thread(int count, ...)
 {
-  struct btp_gdb_thread *thread = btp_gdb_thread_new();
+  struct sr_gdb_thread *thread = sr_gdb_thread_new();
   if (count == 0)
      return thread;
 
@@ -26,13 +26,13 @@ create_thread(int count, ...)
   for (i=0; i < count; i++)
   {
     const char *fname = va_arg(argp, const char*);
-    struct btp_gdb_frame *frame = btp_gdb_frame_new();
-    frame->function_name = btp_strdup(fname);
+    struct sr_gdb_frame *frame = sr_gdb_frame_new();
+    frame->function_name = sr_strdup(fname);
 
     if (!thread->frames)
       thread->frames = frame;
     else
-      btp_gdb_frame_append(thread->frames, frame);
+      sr_gdb_frame_append(thread->frames, frame);
   }
 
   va_end(argp);
@@ -40,12 +40,12 @@ create_thread(int count, ...)
 }
 ])
 
-## ---------------------------------------- ##
-## btp_normalize_gdb_thread_removes_zeroes  ##
-## ---------------------------------------- ##
-# Checks that btp_gdb_normalize_thread removes the first and the last
+## --------------------------------------- ##
+## sr_normalize_gdb_thread_removes_zeroes  ##
+## --------------------------------------- ##
+# Checks that sr_gdb_normalize_thread removes the first and the last
 # frame if they have address 0x0000 and function ??.
-AT_TESTFUN([btp_normalize_gdb_thread_removes_zeroes],
+AT_TESTFUN([sr_normalize_gdb_thread_removes_zeroes],
 [[
 #include <lib/normalize.h>
 #include <lib/gdb_frame.h>
@@ -57,103 +57,103 @@ AT_TESTFUN([btp_normalize_gdb_thread_removes_zeroes],
 int
 main(void)
 {
-  struct btp_gdb_frame *frame2 = btp_gdb_frame_new();
-  frame2->function_name = btp_strdup("??");
+  struct sr_gdb_frame *frame2 = sr_gdb_frame_new();
+  frame2->function_name = sr_strdup("??");
   frame2->number = 2;
   frame2->address = 0x0000;
 
-  struct btp_gdb_frame *frame1 = btp_gdb_frame_new();
-  frame1->function_name = btp_strdup("write_to_temp_file");
+  struct sr_gdb_frame *frame1 = sr_gdb_frame_new();
+  frame1->function_name = sr_strdup("write_to_temp_file");
   frame1->number = 1;
-  frame1->source_file = btp_strdup("gfileutils.c");
+  frame1->source_file = sr_strdup("gfileutils.c");
   frame1->source_line = 980;
   frame1->address = 0x322160e7fdULL;
   frame1->next = frame2;
 
-  struct btp_gdb_frame *frame0 = btp_gdb_frame_new();
-  frame0->function_name = btp_strdup("??");
+  struct sr_gdb_frame *frame0 = sr_gdb_frame_new();
+  frame0->function_name = sr_strdup("??");
   frame0->number = 0;
   frame0->address = 0x0000;
   frame0->next = frame1;
 
-  struct btp_gdb_thread thread;
-  btp_gdb_thread_init(&thread);
+  struct sr_gdb_thread thread;
+  sr_gdb_thread_init(&thread);
   thread.number = 0;
   thread.frames = frame0;
 
-  btp_normalize_gdb_thread(&thread);
+  sr_normalize_gdb_thread(&thread);
   assert(thread.frames == frame1);
   assert(thread.frames->next == NULL);
 
-  btp_gdb_frame_free(frame1);
+  sr_gdb_frame_free(frame1);
   return 0;
 }
 ]])
 
-AT_TESTFUN([btp_normalize_gdb_paired_unknown_function_names],
+AT_TESTFUN([sr_normalize_gdb_paired_unknown_function_names],
 [
 UTILS
 
 int
 main()
 {
-  struct btp_gdb_thread *threads[[6]];
-  struct btp_gdb_frame *frame;
+  struct sr_gdb_thread *threads[[6]];
+  struct sr_gdb_frame *frame;
   threads[[0]] = create_thread(5, "aa", "??", "??", "??", "??");
   threads[[1]] = create_thread(5, "bb", "aa", "??", "??", "??");
   threads[[2]] = create_thread(5, "aa", "??", "??", "??", "??");
   threads[[3]] = create_thread(5, "bb", "aa", "??", "??", "??");
 
-  threads[[4]] = btp_gdb_thread_dup(threads[[0]], false);
-  threads[[5]] = btp_gdb_thread_dup(threads[[1]], false);
-  btp_normalize_gdb_paired_unknown_function_names(threads[[4]], threads[[5]]);
-  assert(!btp_gdb_thread_cmp(threads[[2]], threads[[4]]));
-  assert(!btp_gdb_thread_cmp(threads[[3]], threads[[5]]));
+  threads[[4]] = sr_gdb_thread_dup(threads[[0]], false);
+  threads[[5]] = sr_gdb_thread_dup(threads[[1]], false);
+  sr_normalize_gdb_paired_unknown_function_names(threads[[4]], threads[[5]]);
+  assert(!sr_gdb_thread_cmp(threads[[2]], threads[[4]]));
+  assert(!sr_gdb_thread_cmp(threads[[3]], threads[[5]]));
 
-  threads[[4]] = btp_gdb_thread_dup(threads[[0]], false);
-  threads[[5]] = btp_gdb_thread_dup(threads[[1]], false);
-  btp_normalize_gdb_paired_unknown_function_names(threads[[5]], threads[[4]]);
-  assert(!btp_gdb_thread_cmp(threads[[2]], threads[[4]]));
-  assert(!btp_gdb_thread_cmp(threads[[3]], threads[[5]]));
+  threads[[4]] = sr_gdb_thread_dup(threads[[0]], false);
+  threads[[5]] = sr_gdb_thread_dup(threads[[1]], false);
+  sr_normalize_gdb_paired_unknown_function_names(threads[[5]], threads[[4]]);
+  assert(!sr_gdb_thread_cmp(threads[[2]], threads[[4]]));
+  assert(!sr_gdb_thread_cmp(threads[[3]], threads[[5]]));
 
   threads[[0]] = create_thread(5, "aa", "??", "cc", "cc", "??");
   threads[[1]] = create_thread(5, "bb", "aa", "??", "cc", "??");
   threads[[2]] = create_thread(5, "aa", "__unknown_function_0", "cc", "cc", "__unknown_function_1");
   threads[[3]] = create_thread(5, "bb", "aa","__unknown_function_0", "cc", "__unknown_function_1");
 
-  threads[[4]] = btp_gdb_thread_dup(threads[[0]], false);
-  threads[[5]] = btp_gdb_thread_dup(threads[[1]], false);
-  btp_normalize_gdb_paired_unknown_function_names(threads[[4]], threads[[5]]);
-  assert(!btp_gdb_thread_cmp(threads[[2]], threads[[4]]));
-  assert(!btp_gdb_thread_cmp(threads[[3]], threads[[5]]));
+  threads[[4]] = sr_gdb_thread_dup(threads[[0]], false);
+  threads[[5]] = sr_gdb_thread_dup(threads[[1]], false);
+  sr_normalize_gdb_paired_unknown_function_names(threads[[4]], threads[[5]]);
+  assert(!sr_gdb_thread_cmp(threads[[2]], threads[[4]]));
+  assert(!sr_gdb_thread_cmp(threads[[3]], threads[[5]]));
 
   threads[[0]] = create_thread(5, "aa", "??", "cc", "??", "dd");
   threads[[1]] = create_thread(5, "bb", "??", "cc", "??", "dd");
   threads[[2]] = create_thread(5, "aa", "??", "cc", "__unknown_function_0", "dd");
   threads[[3]] = create_thread(5, "bb", "??", "cc", "__unknown_function_0", "dd");
 
-  threads[[4]] = btp_gdb_thread_dup(threads[[0]], false);
-  threads[[5]] = btp_gdb_thread_dup(threads[[1]], false);
-  btp_normalize_gdb_paired_unknown_function_names(threads[[4]], threads[[5]]);
-  assert(!btp_gdb_thread_cmp(threads[[2]], threads[[4]]));
-  assert(!btp_gdb_thread_cmp(threads[[3]], threads[[5]]));
+  threads[[4]] = sr_gdb_thread_dup(threads[[0]], false);
+  threads[[5]] = sr_gdb_thread_dup(threads[[1]], false);
+  sr_normalize_gdb_paired_unknown_function_names(threads[[4]], threads[[5]]);
+  assert(!sr_gdb_thread_cmp(threads[[2]], threads[[4]]));
+  assert(!sr_gdb_thread_cmp(threads[[3]], threads[[5]]));
 
   threads[[0]] = create_thread(5, "aa", "cc", "??", "??", "??");
   threads[[1]] = create_thread(5, "bb", "??", "??", "??", "??");
   threads[[2]] = create_thread(5, "aa", "cc", "??", "??", "??");
   threads[[3]] = create_thread(5, "bb", "??", "??", "??", "??");
 
-  threads[[4]] = btp_gdb_thread_dup(threads[[0]], false);
-  threads[[5]] = btp_gdb_thread_dup(threads[[1]], false);
-  btp_normalize_gdb_paired_unknown_function_names(threads[[4]], threads[[5]]);
-  assert(!btp_gdb_thread_cmp(threads[[2]], threads[[4]]));
-  assert(!btp_gdb_thread_cmp(threads[[3]], threads[[5]]));
+  threads[[4]] = sr_gdb_thread_dup(threads[[0]], false);
+  threads[[5]] = sr_gdb_thread_dup(threads[[1]], false);
+  sr_normalize_gdb_paired_unknown_function_names(threads[[4]], threads[[5]]);
+  assert(!sr_gdb_thread_cmp(threads[[2]], threads[[4]]));
+  assert(!sr_gdb_thread_cmp(threads[[3]], threads[[5]]));
 
-  threads[[4]] = btp_gdb_thread_dup(threads[[0]], false);
-  threads[[5]] = btp_gdb_thread_dup(threads[[1]], false);
-  btp_normalize_gdb_paired_unknown_function_names(threads[[5]], threads[[4]]);
-  assert(!btp_gdb_thread_cmp(threads[[2]], threads[[4]]));
-  assert(!btp_gdb_thread_cmp(threads[[3]], threads[[5]]));
+  threads[[4]] = sr_gdb_thread_dup(threads[[0]], false);
+  threads[[5]] = sr_gdb_thread_dup(threads[[1]], false);
+  sr_normalize_gdb_paired_unknown_function_names(threads[[5]], threads[[4]]);
+  assert(!sr_gdb_thread_cmp(threads[[2]], threads[[4]]));
+  assert(!sr_gdb_thread_cmp(threads[[3]], threads[[5]]));
 
   return 0;
 }

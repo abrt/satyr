@@ -1,11 +1,11 @@
-# Checking the btparser. -*- Autotest -*-
+# Checking the satyr. -*- Autotest -*-
 
 AT_BANNER([Operating system])
 
-## --------------------------------------------- ##
-## btp_operating_system_parse_etc_system_release ##
-## --------------------------------------------- ##
-AT_TESTFUN([btp_operating_system_parse_etc_system_release],
+## -------------------------------------------- ##
+## sr_operating_system_parse_etc_system_release ##
+## -------------------------------------------- ##
+AT_TESTFUN([sr_operating_system_parse_etc_system_release],
 [[
 #include <lib/operating_system.h>
 #include <lib/utils.h>
@@ -17,7 +17,7 @@ void check(const char *etc_system_release,
 {
     printf("Testing %s.\n", etc_system_release);
     char *name, *version;
-    bool success = btp_operating_system_parse_etc_system_release(
+    bool success = sr_operating_system_parse_etc_system_release(
         etc_system_release,
 	&name,
 	&version);

@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_CORE_FRAME_H
-#define BTPARSER_CORE_FRAME_H
+#ifndef SATYR_CORE_FRAME_H
+#define SATYR_CORE_FRAME_H
 
 /**
  * @file
@@ -32,14 +32,14 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
-struct btp_strbuf;
-struct btp_location;
-struct btp_json_value;
+struct sr_strbuf;
+struct sr_location;
+struct sr_json_value;
 
 /**
  * @brief A function call on call stack of a core dump.
  */
-struct btp_core_frame
+struct sr_core_frame
 {
     /** Address of the machine code in memory.  This is useful only
      * when build_id is not present for some reason.  For example,
@@ -69,17 +69,17 @@ struct btp_core_frame
      * A sibling frame residing below this one, or NULL if this is the
      * last frame in the parent thread.
      */
-    struct btp_core_frame *next;
+    struct sr_core_frame *next;
 };
 
 /**
  * Creates and initializes a new frame structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_core_frame_free().
+ * calling the function sr_core_frame_free().
  */
-struct btp_core_frame *
-btp_core_frame_new();
+struct sr_core_frame *
+sr_core_frame_new();
 
 /**
  * Initializes all members of the frame structure to their default
@@ -88,7 +88,7 @@ btp_core_frame_new();
  * stack.
  */
 void
-btp_core_frame_init(struct btp_core_frame *frame);
+sr_core_frame_init(struct sr_core_frame *frame);
 
 /**
  * Releases the memory held by the frame. The frame siblings are not
@@ -97,7 +97,7 @@ btp_core_frame_init(struct btp_core_frame *frame);
  * If the frame is NULL, no operation is performed.
  */
 void
-btp_core_frame_free(struct btp_core_frame *frame);
+sr_core_frame_free(struct sr_core_frame *frame);
 
 /**
  * Creates a duplicate of the frame.
@@ -111,11 +111,11 @@ btp_core_frame_free(struct btp_core_frame *frame);
  * @returns
  * This function never returns NULL. If the returned duplicate is not
  * shallow, it must be released by calling the function
- * btp_gdb_frame_free().
+ * sr_gdb_frame_free().
  */
-struct btp_core_frame *
-btp_core_frame_dup(struct btp_core_frame *frame,
-                   bool siblings);
+struct sr_core_frame *
+sr_core_frame_dup(struct sr_core_frame *frame,
+                  bool siblings);
 
 /**
  * Checks whether the frame represents a call of function with certain
@@ -132,9 +132,9 @@ btp_core_frame_dup(struct btp_core_frame *frame,
  *   residing in a specified executable or shared binary.
  */
 bool
-btp_core_frame_calls_func(struct btp_core_frame *frame,
-                          const char *function_name,
-                          ...);
+sr_core_frame_calls_func(struct sr_core_frame *frame,
+                         const char *function_name,
+                         ...);
 
 /**
  * Compares two frames.
@@ -150,8 +150,8 @@ btp_core_frame_calls_func(struct btp_core_frame *frame,
  * if frame1 is found to be 'greater' than frame2.
  */
 int
-btp_core_frame_cmp(struct btp_core_frame *frame1,
-                   struct btp_core_frame *frame2);
+sr_core_frame_cmp(struct sr_core_frame *frame1,
+                  struct sr_core_frame *frame2);
 
 /**
  * Compares two frames for thread distance calculations.
@@ -167,8 +167,8 @@ btp_core_frame_cmp(struct btp_core_frame *frame1,
  * if frame1 is found to be 'greater' than frame2.
  */
 int
-btp_core_frame_cmp_distance(struct btp_core_frame *frame1,
-                            struct btp_core_frame *frame2);
+sr_core_frame_cmp_distance(struct sr_core_frame *frame1,
+                           struct sr_core_frame *frame2);
 
 /**
  * Appends 'item' at the end of the list 'dest'.
@@ -176,13 +176,13 @@ btp_core_frame_cmp_distance(struct btp_core_frame *frame1,
  * This function returns the 'dest' frame.  If 'dest' is NULL, it
  * returns the 'item' frame.
  */
-struct btp_core_frame *
-btp_core_frame_append(struct btp_core_frame *dest,
-                      struct btp_core_frame *item);
+struct sr_core_frame *
+sr_core_frame_append(struct sr_core_frame *dest,
+                     struct sr_core_frame *item);
 
-struct btp_core_frame *
-btp_core_frame_from_json(struct btp_json_value *root,
-                         char **error_message);
+struct sr_core_frame *
+sr_core_frame_from_json(struct sr_json_value *root,
+                        char **error_message);
 
 /**
  * Returns a textual representation of the frame.
@@ -191,7 +191,7 @@ btp_core_frame_from_json(struct btp_json_value *root,
  * function.
  */
 char *
-btp_core_frame_to_json(struct btp_core_frame *frame);
+sr_core_frame_to_json(struct sr_core_frame *frame);
 
 #ifdef __cplusplus
 }

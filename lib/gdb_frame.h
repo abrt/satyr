@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_GDB_FRAME_H
-#define BTPARSER_GDB_FRAME_H
+#ifndef SATYR_GDB_FRAME_H
+#define SATYR_GDB_FRAME_H
 
 /**
  * @file
@@ -32,8 +32,8 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
-struct btp_strbuf;
-struct btp_location;
+struct sr_strbuf;
+struct sr_location;
 
 /**
  * @brief A function call of a GDB-produced stack trace.
@@ -41,7 +41,7 @@ struct btp_location;
  * A frame representing a function call or a signal handler on a call
  * stack of a thread.
  */
-struct btp_gdb_frame
+struct sr_gdb_frame
 {
     /**
      * A function name or NULL. If it's NULL, signal_handler_called is
@@ -95,17 +95,17 @@ struct btp_gdb_frame
      * A sibling frame residing below this one, or NULL if this is the
      * last frame in the parent thread.
      */
-    struct btp_gdb_frame *next;
+    struct sr_gdb_frame *next;
 };
 
 /**
  * Creates and initializes a new frame structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_gdb_frame_free().
+ * calling the function sr_gdb_frame_free().
  */
-struct btp_gdb_frame *
-btp_gdb_frame_new();
+struct sr_gdb_frame *
+sr_gdb_frame_new();
 
 /**
  * Initializes all members of the frame structure to their default
@@ -114,7 +114,7 @@ btp_gdb_frame_new();
  * stack.
  */
 void
-btp_gdb_frame_init(struct btp_gdb_frame *frame);
+sr_gdb_frame_init(struct sr_gdb_frame *frame);
 
 /**
  * Releases the memory held by the frame. The frame siblings are not
@@ -123,7 +123,7 @@ btp_gdb_frame_init(struct btp_gdb_frame *frame);
  * If the frame is NULL, no operation is performed.
  */
 void
-btp_gdb_frame_free(struct btp_gdb_frame *frame);
+sr_gdb_frame_free(struct sr_gdb_frame *frame);
 
 /**
  * Creates a duplicate of the frame.
@@ -136,11 +136,11 @@ btp_gdb_frame_free(struct btp_gdb_frame *frame);
  * set to NULL.
  * @returns
  * This function never returns NULL. The returned duplicate frame must
- * be released by calling the function btp_gdb_frame_free().
+ * be released by calling the function sr_gdb_frame_free().
  */
-struct btp_gdb_frame *
-btp_gdb_frame_dup(struct btp_gdb_frame *frame,
-                  bool siblings);
+struct sr_gdb_frame *
+sr_gdb_frame_dup(struct sr_gdb_frame *frame,
+                 bool siblings);
 
 /**
  * Checks whether the frame represents a call of function with certain
@@ -158,9 +158,9 @@ btp_gdb_frame_dup(struct btp_gdb_frame *frame,
  *   residing in a source file.
  */
 bool
-btp_gdb_frame_calls_func(struct btp_gdb_frame *frame,
-                         const char *function_name,
-                         ...);
+sr_gdb_frame_calls_func(struct sr_gdb_frame *frame,
+                        const char *function_name,
+                        ...);
 
 /**
  * Compares two frames.
@@ -179,9 +179,9 @@ btp_gdb_frame_calls_func(struct btp_gdb_frame *frame,
  * if frame1 is found to be 'greater' than frame2.
  */
 int
-btp_gdb_frame_cmp(struct btp_gdb_frame *frame1,
-                  struct btp_gdb_frame *frame2,
-                  bool compare_number);
+sr_gdb_frame_cmp(struct sr_gdb_frame *frame1,
+                 struct sr_gdb_frame *frame2,
+                 bool compare_number);
 
 /**
  * Compares two frames, but only by their function and library names.
@@ -199,8 +199,8 @@ btp_gdb_frame_cmp(struct btp_gdb_frame *frame1,
  * if frame1 is found to be 'greater' than frame2.
  */
 int
-btp_gdb_frame_cmp_distance(struct btp_gdb_frame *frame1,
-                           struct btp_gdb_frame *frame2);
+sr_gdb_frame_cmp_distance(struct sr_gdb_frame *frame1,
+                          struct sr_gdb_frame *frame2);
 
 /**
  * Appends 'item' at the end of the list 'dest'.
@@ -208,9 +208,9 @@ btp_gdb_frame_cmp_distance(struct btp_gdb_frame *frame1,
  * This function returns the 'dest' frame.  If 'dest' is NULL, it
  * returns the 'item' frame.
  */
-struct btp_gdb_frame *
-btp_gdb_frame_append(struct btp_gdb_frame *dest,
-                     struct btp_gdb_frame *item);
+struct sr_gdb_frame *
+sr_gdb_frame_append(struct sr_gdb_frame *dest,
+                    struct sr_gdb_frame *item);
 
 /**
  * Appends the textual representation of the frame to the string
@@ -220,9 +220,9 @@ btp_gdb_frame_append(struct btp_gdb_frame *dest,
  * function.
  */
 void
-btp_gdb_frame_append_to_str(struct btp_gdb_frame *frame,
-                            struct btp_strbuf *dest,
-                            bool verbose);
+sr_gdb_frame_append_to_str(struct sr_gdb_frame *frame,
+                           struct sr_strbuf *dest,
+                           bool verbose);
 
 /**
  * If the input contains a complete frame, this function parses the
@@ -231,18 +231,18 @@ btp_gdb_frame_append_to_str(struct btp_gdb_frame *frame,
  * frame, the function does not modify input and returns NULL.
  * @returns
  * Allocated pointer with a frame structure. The pointer should be
- * released by btp_gdb_frame_free().
+ * released by sr_gdb_frame_free().
  * @param location
- * The caller must provide a pointer to an instance of btp_location
+ * The caller must provide a pointer to an instance of sr_location
  * here.  When this function returns NULL, the structure will contain
  * the error line, column, and message.  The line and column members
  * of the location are gradually increased as the parser handles the
  * input, so the location should be initialized before calling this
  * function to get reasonable values.
  */
-struct btp_gdb_frame *
-btp_gdb_frame_parse(const char **input,
-                    struct btp_location *location);
+struct sr_gdb_frame *
+sr_gdb_frame_parse(const char **input,
+                   struct sr_location *location);
 
 /**
  * If the input contains a proper frame start section, parse the frame
@@ -257,8 +257,8 @@ btp_gdb_frame_parse(const char **input,
  * @endcode
  */
 int
-btp_gdb_frame_parse_frame_start(const char **input,
-                                uint32_t *number);
+sr_gdb_frame_parse_frame_start(const char **input,
+                               uint32_t *number);
 
 /**
  * Parses C++ operator on input.  Supports even 'operator new[]' and
@@ -272,8 +272,8 @@ btp_gdb_frame_parse_frame_start(const char **input,
  * contain operator.
  */
 int
-btp_gdb_frame_parseadd_operator(const char **input,
-                                struct btp_strbuf *target);
+sr_gdb_frame_parseadd_operator(const char **input,
+                               struct sr_strbuf *target);
 
 /**
  * Parses a part of function name from the input.
@@ -286,9 +286,9 @@ btp_gdb_frame_parseadd_operator(const char **input,
  * contain a part of function name.
  */
 int
-btp_gdb_frame_parse_function_name_chunk(const char **input,
-                                        bool space_allowed,
-                                        char **target);
+sr_gdb_frame_parse_function_name_chunk(const char **input,
+                                       bool space_allowed,
+                                       char **target);
 
 /**
  * If the input buffer contains part of function name containing
@@ -300,8 +300,8 @@ btp_gdb_frame_parse_function_name_chunk(const char **input,
  * contain a braced part of function name.
  */
 int
-btp_gdb_frame_parse_function_name_braces(const char **input,
-                                         char **target);
+sr_gdb_frame_parse_function_name_braces(const char **input,
+                                        char **target);
 
 /**
  * @returns
@@ -309,8 +309,8 @@ btp_gdb_frame_parse_function_name_braces(const char **input,
  * contain a template part of function name.
  */
 int
-btp_gdb_frame_parse_function_name_template(const char **input,
-                                           char **target);
+sr_gdb_frame_parse_function_name_template(const char **input,
+                                          char **target);
 
 /**
  * Parses the function name, which is a part of the frame header, from
@@ -324,7 +324,7 @@ btp_gdb_frame_parse_function_name_template(const char **input,
  * If this function returns true, this pointer is guaranteed to be
  * non-NULL.
  * @param location
- * The caller must provide a pointer to an instance of btp_location
+ * The caller must provide a pointer to an instance of sr_location
  * here.  The line and column members of the location are gradually
  * increased as the parser handles the input, so the location should
  * be initialized before calling this function to get reasonable
@@ -335,16 +335,16 @@ btp_gdb_frame_parse_function_name_template(const char **input,
  * parsed. False otherwise.
  */
 bool
-btp_gdb_frame_parse_function_name(const char **input,
-                                  char **function_name,
-                                  char **function_type,
-                                  struct btp_location *location);
+sr_gdb_frame_parse_function_name(const char **input,
+                                 char **function_name,
+                                 char **function_type,
+                                 struct sr_location *location);
 
 /**
  * Skips function arguments which are a part of the frame header, in
  * the input stream.
  * @param location
- * The caller must provide a pointer to an instance of btp_location
+ * The caller must provide a pointer to an instance of sr_location
  * here.  The line and column members of the location are gradually
  * increased as the parser handles the input, so the location should
  * be initialized before calling this function to get reasonable
@@ -352,8 +352,8 @@ btp_gdb_frame_parse_function_name(const char **input,
  * structure will contain the error line, column, and message.
  */
 bool
-btp_gdb_frame_skip_function_args(const char **input,
-                                 struct btp_location *location);
+sr_gdb_frame_skip_function_args(const char **input,
+                                struct sr_location *location);
 
 /**
  * If the input contains proper function call, parse the function
@@ -364,7 +364,7 @@ btp_gdb_frame_skip_function_args(const char **input,
  * If this function returns true, the caller is responsible to free
  * the the function_name.
  * @param location
- * The caller must provide a pointer to an instance of btp_location
+ * The caller must provide a pointer to an instance of sr_location
  * here.  The line and column members of the location are gradually
  * increased as the parser handles the input, so the location should
  * be initialized before calling this function to get reasonable
@@ -372,10 +372,10 @@ btp_gdb_frame_skip_function_args(const char **input,
  * structure will contain the error line, column, and message.
  */
 bool
-btp_gdb_frame_parse_function_call(const char **input,
-                                  char **function_name,
-                                  char **function_type,
-                                  struct btp_location *location);
+sr_gdb_frame_parse_function_call(const char **input,
+                                 char **function_name,
+                                 char **function_type,
+                                 struct sr_location *location);
 
 /**
  * If the input contains address and function call, parse them, move
@@ -392,7 +392,7 @@ btp_gdb_frame_parse_function_call(const char **input,
  * contents=<value optimized out>, length=29917, error=0x7fff3cbe4110)
  * @endcode
  * @param location
- * The caller must provide a pointer to an instance of btp_location
+ * The caller must provide a pointer to an instance of sr_location
  * here.  The line and column members of the location are gradually
  * increased as the parser handles the input, so the location should
  * be initialized before calling this function to get reasonable
@@ -400,11 +400,11 @@ btp_gdb_frame_parse_function_call(const char **input,
  * structure will contain the error line, column, and message.
  */
 bool
-btp_gdb_frame_parse_address_in_function(const char **input,
-                                        uint64_t *address,
-                                        char **function_name,
-                                        char **function_type,
-                                        struct btp_location *location);
+sr_gdb_frame_parse_address_in_function(const char **input,
+                                       uint64_t *address,
+                                       char **function_name,
+                                       char **function_type,
+                                       struct sr_location *location);
 
 /**
  * If the input contains sequence "from path/to/file:fileline" or "at
@@ -415,7 +415,7 @@ btp_gdb_frame_parse_address_in_function(const char **input,
  * The ':' followed by line number is optional. If it is not present,
  * the fileline is set to -1.
  * @param location
- * The caller must provide a pointer to an instance of btp_location
+ * The caller must provide a pointer to an instance of sr_location
  * here.  The line and column members of the location are gradually
  * increased as the parser handles the input, so the location should
  * be initialized before calling this function to get reasonable
@@ -423,10 +423,10 @@ btp_gdb_frame_parse_address_in_function(const char **input,
  * structure will contain the error line, column, and message.
  */
 bool
-btp_gdb_frame_parse_file_location(const char **input,
-                                  char **file,
-                                  uint32_t *file_line,
-                                  struct btp_location *location);
+sr_gdb_frame_parse_file_location(const char **input,
+                                 char **file,
+                                 uint32_t *file_line,
+                                 struct sr_location *location);
 
 /**
  * If the input contains proper frame header, this function
@@ -435,7 +435,7 @@ btp_gdb_frame_parse_file_location(const char **input,
  * If the input does not contain proper frame header, this function
  * returns NULL and does not modify input.
  * @param location
- * The caller must provide a pointer to an instance of btp_location
+ * The caller must provide a pointer to an instance of sr_location
  * here.  The line and column members of the location are gradually
  * increased as the parser handles the input, so the location should
  * be initialized before calling this function to get reasonable
@@ -443,20 +443,20 @@ btp_gdb_frame_parse_file_location(const char **input,
  * structure will contain the error line, column, and message.
  * @returns
  * Newly created frame struct or NULL. The returned frame struct
- * should be released by btp_gdb_frame_free().
+ * should be released by sr_gdb_frame_free().
  */
-struct btp_gdb_frame *
-btp_gdb_frame_parse_header(const char **input,
-                           struct btp_location *location);
+struct sr_gdb_frame *
+sr_gdb_frame_parse_header(const char **input,
+                          struct sr_location *location);
 
 /**
  * Removes first num chars from function name in the frame if it begins
  * with the prefix.
  */
 void
-btp_gdb_frame_remove_func_prefix(struct btp_gdb_frame *frame,
-                                 const char *prefix,
-                                 int num);
+sr_gdb_frame_remove_func_prefix(struct sr_gdb_frame *frame,
+                                const char *prefix,
+                                int num);
 
 #ifdef __cplusplus
 }

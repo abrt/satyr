@@ -40,8 +40,8 @@
 
 typedef unsigned short json_uchar;
 
-const struct btp_json_value
-btp_json_value_none = { 0 };
+const struct sr_json_value
+sr_json_value_none = { 0 };
 
 static unsigned char
 hex_value(char c)
@@ -60,7 +60,7 @@ hex_value(char c)
 
 struct json_state
 {
-   struct btp_json_settings settings;
+   struct sr_json_settings settings;
    int first_pass;
 
    unsigned long used_memory;
@@ -90,12 +90,12 @@ json_alloc(struct json_state *state, unsigned long size, int zero)
 
 static int
 new_value(struct json_state *state,
-          struct btp_json_value **top,
-          struct btp_json_value **root,
-          struct btp_json_value **alloc,
-          enum btp_json_type type)
+          struct sr_json_value **top,
+          struct sr_json_value **root,
+          struct sr_json_value **alloc,
+          enum sr_json_type type)
 {
-    struct btp_json_value *value;
+    struct sr_json_value *value;
     int values_size;
 
     if (!state->first_pass)
@@ -108,15 +108,15 @@ new_value(struct json_state *state,
 
         switch (value->type)
         {
-        case BTP_JSON_ARRAY:
-            value->u.array.values = (struct btp_json_value **)json_alloc(
-                state, value->u.array.length * sizeof(struct btp_json_value *), 0);
+        case SR_JSON_ARRAY:
+            value->u.array.values = (struct sr_json_value **)json_alloc(
+                state, value->u.array.length * sizeof(struct sr_json_value *), 0);
 
             if (!value->u.array.values)
                 return 0;
 
             break;
-        case BTP_JSON_OBJECT:
+        case SR_JSON_OBJECT:
             values_size = sizeof(*value->u.object.values) * value->u.object.length;
             (*(void**)&value->u.object.values) =
                 json_alloc(state, values_size + ((unsigned long)value->u.object.values), 0);
@@ -126,7 +126,7 @@ new_value(struct json_state *state,
 
             value->_reserved.object_mem = (*(char**)&value->u.object.values) + values_size;
             break;
-        case BTP_JSON_STRING:
+        case SR_JSON_STRING:
             value->u.string.ptr = (char*)
                 json_alloc(state, (value->u.string.length + 1), 0);
 
@@ -144,7 +144,7 @@ new_value(struct json_state *state,
         return 1;
     }
 
-    value = (struct btp_json_value *)json_alloc(state, sizeof(struct btp_json_value), 1);
+    value = (struct sr_json_value *)json_alloc(state, sizeof(struct sr_json_value), 1);
 
     if (!value)
         return 0;
@@ -177,18 +177,18 @@ const static int
    flag_got_exponent_sign = 32, flag_escaped = 64, flag_string = 128, flag_need_colon = 256,
    flag_done = 512;
 
-struct btp_json_value *
-btp_json_parse_ex(struct btp_json_settings *settings,
+struct sr_json_value *
+sr_json_parse_ex(struct sr_json_settings *settings,
                   const char *json,
-                  struct btp_location *location)
+                  struct sr_location *location)
 {
     const char *cur_line_begin, *i;
-    struct btp_json_value *top, *root, *alloc = 0;
+    struct sr_json_value *top, *root, *alloc = 0;
     struct json_state state;
     int flags;
 
     memset(&state, 0, sizeof(struct json_state));
-    memcpy(&state.settings, settings, sizeof(struct btp_json_settings));
+    memcpy(&state.settings, settings, sizeof(struct sr_json_settings));
     memset(&state.uint_max, 0xFF, sizeof(state.uint_max));
     memset(&state.ulong_max, 0xFF, sizeof(state.ulong_max));
     state.uint_max -= 8; /* limit of how much can be added before next check */
@@ -223,7 +223,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
 
                 default:
                     location->column = e_off;
-                    location->message = btp_asprintf("Trailing garbage: `%c`", b);
+                    location->message = sr_asprintf("Trailing garbage: `%c`", b);
                     goto e_failed;
                 };
             }
@@ -233,7 +233,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                 if (!b)
                 {
                     location->column = e_off;
-                    location->message = btp_strdup("Unexpected EOF in string");
+                    location->message = sr_strdup("Unexpected EOF in string");
                     goto e_failed;
                 }
 
@@ -257,7 +257,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                             || (uc_b3 = hex_value(*++i)) == 0xFF || (uc_b4 = hex_value(*++i)) == 0xFF)
                         {
                             location->column = e_off;
-                            location->message = btp_asprintf("Invalid character value `%c`", b);
+                            location->message = sr_asprintf("Invalid character value `%c`", b);
                             goto e_failed;
                         }
 
@@ -319,11 +319,11 @@ btp_json_parse_ex(struct btp_json_settings *settings,
 
                     switch (top->type)
                     {
-                    case BTP_JSON_STRING:
+                    case SR_JSON_STRING:
                         top->u.string.length = string_length;
                         flags |= flag_next;
                         break;
-                    case BTP_JSON_OBJECT:
+                    case SR_JSON_OBJECT:
                         if (state.first_pass)
                             (*(char**) &top->u.object.values) += string_length + 1;
                         else
@@ -355,12 +355,12 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                     continue;
 
                 case ']':
-                    if (top->type == BTP_JSON_ARRAY)
+                    if (top->type == SR_JSON_ARRAY)
                         flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
-                    else if (!state.settings.settings & BTP_JSON_RELAXED_COMMAS)
+                    else if (!state.settings.settings & SR_JSON_RELAXED_COMMAS)
                     {
                         location->column = e_off;
-                        location->message = btp_strdup("Unexpected ]");
+                        location->message = sr_strdup("Unexpected ]");
                         goto e_failed;
                     }
 
@@ -377,7 +377,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                         else
                         {
                             location->column = e_off;
-                            location->message = btp_asprintf("Expected , before %c", b);
+                            location->message = sr_asprintf("Expected , before %c", b);
                             goto e_failed;
                         }
                     }
@@ -391,7 +391,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                         else
                         {
                             location->column = e_off;
-                            location->message = btp_asprintf("Expected : before %c", b);
+                            location->message = sr_asprintf("Expected : before %c", b);
                             goto e_failed;
                         }
                     }
@@ -401,18 +401,18 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                     switch (b)
                     {
                     case '{':
-                        if (!new_value(&state, &top, &root, &alloc, BTP_JSON_OBJECT))
+                        if (!new_value(&state, &top, &root, &alloc, SR_JSON_OBJECT))
                             goto e_alloc_failure;
 
                         continue;
                     case '[':
-                        if (!new_value(&state, &top, &root, &alloc, BTP_JSON_ARRAY))
+                        if (!new_value(&state, &top, &root, &alloc, SR_JSON_ARRAY))
                             goto e_alloc_failure;
 
                         flags |= flag_seek_value;
                         continue;
                     case '"':
-                        if (!new_value(&state, &top, &root, &alloc, BTP_JSON_STRING))
+                        if (!new_value(&state, &top, &root, &alloc, SR_JSON_STRING))
                             goto e_alloc_failure;
 
                         flags |= flag_string;
@@ -423,7 +423,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                         if (*(++ i) != 'r' || *(++ i) != 'u' || *(++ i) != 'e')
                             goto e_unknown_value;
 
-                        if (!new_value(&state, &top, &root, &alloc, BTP_JSON_BOOLEAN))
+                        if (!new_value(&state, &top, &root, &alloc, SR_JSON_BOOLEAN))
                             goto e_alloc_failure;
 
                         top->u.boolean = 1;
@@ -433,7 +433,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                         if (*(++ i) != 'a' || *(++ i) != 'l' || *(++ i) != 's' || *(++ i) != 'e')
                             goto e_unknown_value;
 
-                        if (!new_value(&state, &top, &root, &alloc, BTP_JSON_BOOLEAN))
+                        if (!new_value(&state, &top, &root, &alloc, SR_JSON_BOOLEAN))
                             goto e_alloc_failure;
 
                         flags |= flag_next;
@@ -442,7 +442,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                         if (*(++ i) != 'u' || *(++ i) != 'l' || *(++ i) != 'l')
                             goto e_unknown_value;
 
-                        if (!new_value(&state, &top, &root, &alloc, BTP_JSON_NULL))
+                        if (!new_value(&state, &top, &root, &alloc, SR_JSON_NULL))
                             goto e_alloc_failure;
 
                         flags |= flag_next;
@@ -450,14 +450,14 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                     default:
                         if (isdigit (b) || b == '-')
                         {
-                            if (!new_value(&state, &top, &root, &alloc, BTP_JSON_INTEGER))
+                            if (!new_value(&state, &top, &root, &alloc, SR_JSON_INTEGER))
                                 goto e_alloc_failure;
 
                             flags &= ~ (flag_exponent | flag_got_exponent_sign);
                             if (state.first_pass)
                                 continue;
 
-                            if (top->type == BTP_JSON_DOUBLE)
+                            if (top->type == SR_JSON_DOUBLE)
                                 top->u.dbl = strtod(i, (char**)&i);
                             else
                                 top->u.integer = strtol(i, (char**)&i, 10);
@@ -467,7 +467,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                         else
                         {
                             location->column = e_off;
-                            location->message = btp_asprintf("Unexpected %c when seeking value", b);
+                            location->message = sr_asprintf("Unexpected %c when seeking value", b);
                             goto e_failed;
                         }
                     }
@@ -477,17 +477,17 @@ btp_json_parse_ex(struct btp_json_settings *settings,
             {
                 switch (top->type)
                 {
-                case BTP_JSON_OBJECT:
+                case SR_JSON_OBJECT:
                     switch (b)
                     {
                     whitespace:
                         continue;
 
                     case '"':
-                        if (flags & flag_need_comma && (!state.settings.settings & BTP_JSON_RELAXED_COMMAS))
+                        if (flags & flag_need_comma && (!state.settings.settings & SR_JSON_RELAXED_COMMAS))
                         {
                             location->column = e_off;
-                            location->message = btp_strdup("Expected , before \"");
+                            location->message = sr_strdup("Expected , before \"");
                             goto e_failed;
                         }
 
@@ -506,13 +506,13 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                         }
                     default:
                         location->column = e_off;
-                        location->message = btp_asprintf("Unexpected `%c` in object", b);
+                        location->message = sr_asprintf("Unexpected `%c` in object", b);
                         goto e_failed;
                     }
 
                     break;
-                case BTP_JSON_INTEGER:
-                case BTP_JSON_DOUBLE:
+                case SR_JSON_INTEGER:
+                case SR_JSON_DOUBLE:
                     if (isdigit (b))
                         continue;
 
@@ -521,7 +521,7 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                         if (!(flags & flag_exponent))
                         {
                             flags |= flag_exponent;
-                            top->type = BTP_JSON_DOUBLE;
+                            top->type = SR_JSON_DOUBLE;
 
                             continue;
                         }
@@ -534,9 +534,9 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                             continue;
                         }
                     }
-                    else if (b == '.' && top->type == BTP_JSON_INTEGER)
+                    else if (b == '.' && top->type == SR_JSON_INTEGER)
                     {
-                        top->type = BTP_JSON_DOUBLE;
+                        top->type = SR_JSON_DOUBLE;
                         continue;
                     }
 
@@ -565,21 +565,21 @@ btp_json_parse_ex(struct btp_json_settings *settings,
                     continue;
                 }
 
-                if (top->parent->type == BTP_JSON_ARRAY)
+                if (top->parent->type == SR_JSON_ARRAY)
                     flags |= flag_seek_value;
 
                 if (!state.first_pass)
                 {
-                    struct btp_json_value *parent = top->parent;
+                    struct sr_json_value *parent = top->parent;
 
                     switch (parent->type)
                     {
-                    case BTP_JSON_OBJECT:
+                    case SR_JSON_OBJECT:
                         parent->u.object.values
                             [parent->u.object.length].value = top;
 
                         break;
-                    case BTP_JSON_ARRAY:
+                    case SR_JSON_ARRAY:
                         parent->u.array.values
                             [parent->u.array.length] = top;
 
@@ -604,17 +604,17 @@ btp_json_parse_ex(struct btp_json_settings *settings,
 
  e_unknown_value:
     location->column = e_off;
-    location->message = btp_strdup("Unknown value");
+    location->message = sr_strdup("Unknown value");
     goto e_failed;
 
  e_alloc_failure:
     location->column = e_off;
-    location->message = btp_strdup("Memory allocation failure");
+    location->message = sr_strdup("Memory allocation failure");
     goto e_failed;
 
  e_overflow:
     location->column = e_off;
-    location->message = btp_strdup("Too long (caught overflow)");
+    location->message = sr_strdup("Too long (caught overflow)");
     goto e_failed;
 
  e_failed:
@@ -629,25 +629,25 @@ btp_json_parse_ex(struct btp_json_settings *settings,
     }
 
     if (!state.first_pass)
-        btp_json_value_free(root);
+        sr_json_value_free(root);
 
     return NULL;
 }
 
-struct btp_json_value *
-btp_json_parse(const char *json)
+struct sr_json_value *
+sr_json_parse(const char *json)
 {
-    struct btp_json_settings settings;
-    memset(&settings, 0, sizeof(struct btp_json_settings));
-    struct btp_location location;
-    btp_location_init(&location);
-    return btp_json_parse_ex(&settings, json, &location);
+    struct sr_json_settings settings;
+    memset(&settings, 0, sizeof(struct sr_json_settings));
+    struct sr_location location;
+    sr_location_init(&location);
+    return sr_json_parse_ex(&settings, json, &location);
 }
 
 void
-btp_json_value_free(struct btp_json_value *value)
+sr_json_value_free(struct sr_json_value *value)
 {
-    struct btp_json_value *cur_value;
+    struct sr_json_value *cur_value;
 
     if (!value)
         return;
@@ -658,7 +658,7 @@ btp_json_value_free(struct btp_json_value *value)
     {
         switch (value->type)
         {
-        case BTP_JSON_ARRAY:
+        case SR_JSON_ARRAY:
             if (!value->u.array.length)
             {
                 free(value->u.array.values);
@@ -667,7 +667,7 @@ btp_json_value_free(struct btp_json_value *value)
 
             value = value->u.array.values[--value->u.array.length];
             continue;
-        case BTP_JSON_OBJECT:
+        case SR_JSON_OBJECT:
             if (!value->u.object.length)
             {
                 free(value->u.object.values);
@@ -676,7 +676,7 @@ btp_json_value_free(struct btp_json_value *value)
 
             value = value->u.object.values[--value->u.object.length].value;
             continue;
-        case BTP_JSON_STRING:
+        case SR_JSON_STRING:
             free(value->u.string.ptr);
             break;
         default:
@@ -690,41 +690,41 @@ btp_json_value_free(struct btp_json_value *value)
 }
 
 char *
-btp_json_escape(const char *text)
+sr_json_escape(const char *text)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
+    struct sr_strbuf *strbuf = sr_strbuf_new();
     const char *c = text;
     while (*c != '\0')
     {
         switch (*c)
         {
         case '"':
-            btp_strbuf_append_str(strbuf, "\\\"");
+            sr_strbuf_append_str(strbuf, "\\\"");
             break;
         case '\n':
-            btp_strbuf_append_str(strbuf, "\\n");
+            sr_strbuf_append_str(strbuf, "\\n");
             break;
         case '\\':
-            btp_strbuf_append_str(strbuf, "\\\\");
+            sr_strbuf_append_str(strbuf, "\\\\");
             break;
         case '\r':
-            btp_strbuf_append_str(strbuf, "\\r");
+            sr_strbuf_append_str(strbuf, "\\r");
             break;
         case '\f':
-            btp_strbuf_append_str(strbuf, "\\f");
+            sr_strbuf_append_str(strbuf, "\\f");
             break;
         case '\b':
-            btp_strbuf_append_str(strbuf, "\\b");
+            sr_strbuf_append_str(strbuf, "\\b");
             break;
         case '\t':
-            btp_strbuf_append_str(strbuf, "\\t");
+            sr_strbuf_append_str(strbuf, "\\t");
             break;
         default:
-            btp_strbuf_append_char(strbuf, *c);
+            sr_strbuf_append_char(strbuf, *c);
         }
 
         ++c;
     }
 
-    return btp_strbuf_free_nobuf(strbuf);
+    return sr_strbuf_free_nobuf(strbuf);
 }

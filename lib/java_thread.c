@@ -27,17 +27,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct btp_java_thread *
-btp_java_thread_new()
+struct sr_java_thread *
+sr_java_thread_new()
 {
-    struct btp_java_thread *thread =
-        btp_malloc(sizeof(*thread));
-    btp_java_thread_init(thread);
+    struct sr_java_thread *thread =
+        sr_malloc(sizeof(*thread));
+    sr_java_thread_init(thread);
     return thread;
 }
 
 void
-btp_java_thread_init(struct btp_java_thread *thread)
+sr_java_thread_init(struct sr_java_thread *thread)
 {
     thread->name = NULL;
     thread->frames = NULL;
@@ -45,70 +45,70 @@ btp_java_thread_init(struct btp_java_thread *thread)
 }
 
 void
-btp_java_thread_free(struct btp_java_thread *thread)
+sr_java_thread_free(struct sr_java_thread *thread)
 {
     if (!thread)
         return;
 
-    btp_java_frame_free_full(thread->frames);
+    sr_java_frame_free_full(thread->frames);
 
     free(thread->name);
     free(thread);
 }
 
-struct btp_java_thread *
-btp_java_thread_dup(struct btp_java_thread *thread, bool siblings)
+struct sr_java_thread *
+sr_java_thread_dup(struct sr_java_thread *thread, bool siblings)
 {
-    struct btp_java_thread *result = btp_java_thread_new();
+    struct sr_java_thread *result = sr_java_thread_new();
     memcpy(result, thread, sizeof(*result));
 
     /* Handle siblings. */
     if (siblings)
     {
         if (result->next)
-            result->next = btp_java_thread_dup(result->next, true);
+            result->next = sr_java_thread_dup(result->next, true);
     }
     else
         result->next = NULL; /* Do not copy that. */
 
     if (result->frames)
-        result->frames = btp_java_frame_dup(result->frames, true);
+        result->frames = sr_java_frame_dup(result->frames, true);
 
     if (result->name)
-        result->name = btp_strdup(result->name);
+        result->name = sr_strdup(result->name);
 
     return result;
 }
 
 int
-btp_java_thread_cmp(struct btp_java_thread *thread1,
-                   struct btp_java_thread *thread2)
+sr_java_thread_cmp(struct sr_java_thread *thread1,
+                   struct sr_java_thread *thread2)
 {
-    int res = btp_strcmp0(thread1->name, thread2->name);
+    int res = sr_strcmp0(thread1->name, thread2->name);
     if (res)
         return res;
 
-    struct btp_java_frame *frame1 = thread1->frames;
-    struct btp_java_frame *frame2 = thread2->frames;
+    struct sr_java_frame *frame1 = thread1->frames;
+    struct sr_java_frame *frame2 = thread2->frames;
 
     if (frame1 && !frame2)
         return 1;
     else if (frame2 && !frame1)
         return -1;
     else if (frame1 && frame2)
-        return btp_java_frame_cmp(frame1, frame2);
+        return sr_java_frame_cmp(frame1, frame2);
 
     return 0;
 }
 
-struct btp_java_thread *
-btp_java_thread_append(struct btp_java_thread *dest,
-                       struct btp_java_thread *item)
+struct sr_java_thread *
+sr_java_thread_append(struct sr_java_thread *dest,
+                      struct sr_java_thread *item)
 {
     if (!dest)
         return item;
 
-    struct btp_java_thread *dest_loop = dest;
+    struct sr_java_thread *dest_loop = dest;
     while (dest_loop->next)
         dest_loop = dest_loop->next;
 
@@ -117,9 +117,9 @@ btp_java_thread_append(struct btp_java_thread *dest,
 }
 
 int
-btp_java_thread_get_frame_count(struct btp_java_thread *thread)
+sr_java_thread_get_frame_count(struct sr_java_thread *thread)
 {
-    struct btp_java_frame *frame = thread->frames;
+    struct sr_java_frame *frame = thread->frames;
     int count = 0;
     while (frame)
     {
@@ -131,11 +131,11 @@ btp_java_thread_get_frame_count(struct btp_java_thread *thread)
 }
 
 void
-btp_java_thread_quality_counts(struct btp_java_thread *thread,
-                               int *ok_count,
-                               int *all_count)
+sr_java_thread_quality_counts(struct sr_java_thread *thread,
+                              int *ok_count,
+                              int *all_count)
 {
-    struct btp_java_frame *frame = thread->frames;
+    struct sr_java_frame *frame = thread->frames;
     while (frame)
     {
         ++(*all_count);
@@ -149,10 +149,10 @@ btp_java_thread_quality_counts(struct btp_java_thread *thread,
 }
 
 float
-btp_java_thread_quality(struct btp_java_thread *thread)
+sr_java_thread_quality(struct sr_java_thread *thread)
 {
     int ok_count = 0, all_count = 0;
-    btp_java_thread_quality_counts(thread, &ok_count, &all_count);
+    sr_java_thread_quality_counts(thread, &ok_count, &all_count);
     if (0 == all_count)
         return 1;
 
@@ -160,10 +160,10 @@ btp_java_thread_quality(struct btp_java_thread *thread)
 }
 
 bool
-btp_java_thread_remove_frame(struct btp_java_thread *thread,
-                             struct btp_java_frame *frame)
+sr_java_thread_remove_frame(struct sr_java_thread *thread,
+                            struct sr_java_frame *frame)
 {
-    struct btp_java_frame *loop_frame = thread->frames,
+    struct sr_java_frame *loop_frame = thread->frames,
         *prev_frame = NULL;
 
     while (loop_frame)
@@ -175,7 +175,7 @@ btp_java_thread_remove_frame(struct btp_java_thread *thread,
             else
                 thread->frames = loop_frame->next;
 
-            btp_java_frame_free(loop_frame);
+            sr_java_frame_free(loop_frame);
             return true;
         }
 
@@ -187,11 +187,11 @@ btp_java_thread_remove_frame(struct btp_java_thread *thread,
 }
 
 bool
-btp_java_thread_remove_frames_above(struct btp_java_thread *thread,
-                                    struct btp_java_frame *frame)
+sr_java_thread_remove_frames_above(struct sr_java_thread *thread,
+                                   struct sr_java_frame *frame)
 {
     /* Check that the frame is present in the thread. */
-    struct btp_java_frame *loop_frame = thread->frames;
+    struct sr_java_frame *loop_frame = thread->frames;
     while (loop_frame)
     {
         if (loop_frame == frame)
@@ -207,7 +207,7 @@ btp_java_thread_remove_frames_above(struct btp_java_thread *thread,
     while (thread->frames != frame)
     {
         loop_frame = thread->frames->next;
-        btp_java_frame_free(thread->frames);
+        sr_java_frame_free(thread->frames);
         thread->frames = loop_frame;
     }
 
@@ -215,14 +215,14 @@ btp_java_thread_remove_frames_above(struct btp_java_thread *thread,
 }
 
 void
-btp_java_thread_remove_frames_below_n(struct btp_java_thread *thread,
-                                      int n)
+sr_java_thread_remove_frames_below_n(struct sr_java_thread *thread,
+                                     int n)
 {
     assert(n >= 0);
 
     /* Skip some frames to get the required stack depth. */
     int i = n;
-    struct btp_java_frame *frame = thread->frames,
+    struct sr_java_frame *frame = thread->frames,
         *last_frame = NULL;
 
     while (frame && i)
@@ -240,75 +240,75 @@ btp_java_thread_remove_frames_below_n(struct btp_java_thread *thread,
 
     while (frame)
     {
-        struct btp_java_frame *delete_frame = frame;
+        struct sr_java_frame *delete_frame = frame;
         frame = frame->next;
-        btp_java_frame_free(delete_frame);
+        sr_java_frame_free(delete_frame);
     }
 }
 
 void
-btp_java_thread_append_to_str(struct btp_java_thread *thread,
-                              struct btp_strbuf *dest)
+sr_java_thread_append_to_str(struct sr_java_thread *thread,
+                             struct sr_strbuf *dest)
 {
-    struct btp_strbuf *exception = btp_strbuf_new();
-    struct btp_java_frame *frame = thread->frames;
+    struct sr_strbuf *exception = sr_strbuf_new();
+    struct sr_java_frame *frame = thread->frames;
     while (frame)
     {
         if (frame->is_exception && exception->len > 0)
         {
-            btp_strbuf_prepend_strf(dest, "Caused by: %s\t...\n",
-                                    exception->buf);
-            btp_strbuf_clear(exception);
+            sr_strbuf_prepend_strf(dest, "Caused by: %s\t...\n",
+                                   exception->buf);
+            sr_strbuf_clear(exception);
         }
 
-        btp_java_frame_append_to_str(frame, exception);
-        btp_strbuf_append_char(exception, '\n');
+        sr_java_frame_append_to_str(frame, exception);
+        sr_strbuf_append_char(exception, '\n');
 
         frame = frame->next;
     }
 
     if (exception->len > 0)
-        btp_strbuf_prepend_str(dest, exception->buf);
+        sr_strbuf_prepend_str(dest, exception->buf);
 
-    btp_strbuf_prepend_strf(dest, "Exception in thread \"%s\" ",
+    sr_strbuf_prepend_strf(dest, "Exception in thread \"%s\" ",
                             thread->name ? thread->name : "");
 
-    btp_strbuf_free(exception);
+    sr_strbuf_free(exception);
 }
 
-struct btp_java_thread *
-btp_java_thread_parse(const char **input,
-                      struct btp_location *location)
+struct sr_java_thread *
+sr_java_thread_parse(const char **input,
+                     struct sr_location *location)
 {
     const char *cursor = *input;
     /* Exception in thread "main" java.lang.NullPointerException: foo */
-    int chars = btp_skip_string(&cursor, "Exception in thread \"");
-    btp_location_add(location, 0, chars);
+    int chars = sr_skip_string(&cursor, "Exception in thread \"");
+    sr_location_add(location, 0, chars);
 
-    struct btp_java_thread *thread = btp_java_thread_new();
+    struct sr_java_thread *thread = sr_java_thread_new();
     if (chars)
     {
         const char *mark = cursor;
         /* main" java.lang.NullPointerException: foo */
-        btp_location_add(location, 0, btp_skip_char_cspan(&cursor, "\"\n"));
+        sr_location_add(location, 0, sr_skip_char_cspan(&cursor, "\"\n"));
 
         /* " java.lang.NullPointerException: foo */
         if (*cursor != '"')
         {
             location->message = "\"Thread\" name end expected";
-            btp_java_thread_free(thread);
+            sr_java_thread_free(thread);
             return NULL;
         }
 
-        thread->name = btp_strndup(mark, cursor - mark);
+        thread->name = sr_strndup(mark, cursor - mark);
 
-        btp_location_eat_char(location, *(++cursor));
+        sr_location_eat_char(location, *(++cursor));
     }
 
     /* java.lang.NullPointerException: foo */
-    if (!(thread->frames = btp_java_frame_parse_exception(&cursor, location)))
+    if (!(thread->frames = sr_java_frame_parse_exception(&cursor, location)))
     {
-        btp_java_thread_free(thread);
+        sr_java_thread_free(thread);
         return NULL;
     }
 
@@ -318,70 +318,70 @@ btp_java_thread_parse(const char **input,
 }
 
 char *
-btp_java_thread_format_funs(struct btp_java_thread *thread)
+sr_java_thread_format_funs(struct sr_java_thread *thread)
 {
-    struct btp_java_frame *frame = thread->frames;
-    struct btp_strbuf *buf = btp_strbuf_new();
+    struct sr_java_frame *frame = thread->frames;
+    struct sr_strbuf *buf = sr_strbuf_new();
 
     while (frame)
     {
         if (frame->name)
         {
-            btp_strbuf_append_str(buf, frame->name);
-            btp_strbuf_append_char(buf, '\n');
+            sr_strbuf_append_str(buf, frame->name);
+            sr_strbuf_append_char(buf, '\n');
         }
 
         frame = frame->next;
     }
 
-    return btp_strbuf_free_nobuf(buf);
+    return sr_strbuf_free_nobuf(buf);
 }
 
 char *
-btp_java_thread_to_json(struct btp_java_thread *thread)
+sr_java_thread_to_json(struct sr_java_thread *thread)
 {
-    struct btp_strbuf *strbuf = btp_strbuf_new();
+    struct sr_strbuf *strbuf = sr_strbuf_new();
 
     if (thread->name)
     {
-        btp_strbuf_append_strf(strbuf,
-                               ",   \"name\": \"%s\"\n",
-                               thread->name);
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"name\": \"%s\"\n",
+                              thread->name);
     }
 
     if (thread->frames)
     {
-        btp_strbuf_append_str(strbuf, ",   \"frames\":\n");
-        struct btp_java_frame *frame = thread->frames;
+        sr_strbuf_append_str(strbuf, ",   \"frames\":\n");
+        struct sr_java_frame *frame = thread->frames;
         while (frame)
         {
             if (frame == thread->frames)
-                btp_strbuf_append_str(strbuf, "      [ ");
+                sr_strbuf_append_str(strbuf, "      [ ");
             else
-                btp_strbuf_append_str(strbuf, "      , ");
+                sr_strbuf_append_str(strbuf, "      , ");
 
-            char *frame_json = btp_java_frame_to_json(frame);
-            char *indented_frame_json = btp_indent_except_first_line(frame_json, 8);
-            btp_strbuf_append_str(strbuf, indented_frame_json);
+            char *frame_json = sr_java_frame_to_json(frame);
+            char *indented_frame_json = sr_indent_except_first_line(frame_json, 8);
+            sr_strbuf_append_str(strbuf, indented_frame_json);
             free(indented_frame_json);
             free(frame_json);
             frame = frame->next;
             if (frame)
-                btp_strbuf_append_str(strbuf, "\n");
+                sr_strbuf_append_str(strbuf, "\n");
         }
 
-        btp_strbuf_append_str(strbuf, " ]\n");
-        btp_strbuf_append_str(strbuf, "}");
+        sr_strbuf_append_str(strbuf, " ]\n");
+        sr_strbuf_append_str(strbuf, "}");
     }
     else
-        btp_strbuf_append_str(strbuf, "{}");
+        sr_strbuf_append_str(strbuf, "{}");
 
     if (strbuf->len > 0)
         strbuf->buf[0] = '{';
     else
-        btp_strbuf_append_char(strbuf, '{');
+        sr_strbuf_append_char(strbuf, '{');
 
-    btp_strbuf_append_char(strbuf, '}');
-    return btp_strbuf_free_nobuf(strbuf);
+    sr_strbuf_append_char(strbuf, '}');
+    return sr_strbuf_free_nobuf(strbuf);
 }
 

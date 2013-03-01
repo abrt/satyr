@@ -1,23 +1,22 @@
-# Checking the btparser. -*- Autotest -*-
+# Checking the satyr. -*- Autotest -*-
 
 AT_BANNER([Kerneloops frames])
 
-## ------------------------ ##
-## btp_koops_skip_timestamp ##
-## ------------------------ ##
+## ----------------------- ##
+## sr_koops_skip_timestamp ##
+## ----------------------- ##
 
-AT_TESTFUN([btp_koops_skip_timestamp],
+AT_TESTFUN([sr_koops_skip_timestamp],
 [[
 #include <lib/koops_frame.h>
 #include <assert.h>
 #include <stdlib.h>
 
 static void
-check(bool success,
-      char *input)
+check(bool success, char *input)
 {
   char *old_input = input;
-  assert(success == btp_koops_skip_timestamp(&input));
+  assert(success == sr_koops_skip_timestamp(&input));
 
   if (success)
     assert(*input == '\0');
@@ -39,24 +38,22 @@ main(void)
 }
 ]])
 
-## ----------------------- ##
-## btp_koops_parse_address ##
-## ----------------------- ##
+## ---------------------- ##
+## sr_koops_parse_address ##
+## ---------------------- ##
 
-AT_TESTFUN([btp_koops_parse_address],
+AT_TESTFUN([sr_koops_parse_address],
 [[
 #include <lib/koops_frame.h>
 #include <assert.h>
 #include <stdlib.h>
 
 static void
-check(bool success,
-      char *input,
-      uint64_t expected_address)
+check(bool success, char *input, uint64_t expected_address)
 {
   char *old_input = input;
   uint64_t address;
-  assert(success == btp_koops_parse_address(&input, &address));
+  assert(success == sr_koops_parse_address(&input, &address));
 
   if (success)
   {
@@ -78,11 +75,11 @@ main(void)
 }
 ]])
 
-## --------------------------- ##
-## btp_koops_parse_module_name ##
-## --------------------------- ##
+## -------------------------- ##
+## sr_koops_parse_module_name ##
+## -------------------------- ##
 
-AT_TESTFUN([btp_koops_parse_module_name],
+AT_TESTFUN([sr_koops_parse_module_name],
 [[
 #include <lib/koops_frame.h>
 #include <assert.h>
@@ -95,8 +92,8 @@ check(bool success,
 {
   char *old_input = input;
   char *module_name;
-  assert(success == btp_koops_parse_module_name(&input,
-				                &module_name));
+  assert(success == sr_koops_parse_module_name(&input,
+                                               &module_name));
 
   if (success)
   {
@@ -121,10 +118,10 @@ main(void)
 ]])
 
 ## ------------------------ ##
-## btp_koops_parse_function ##
+## sr_koops_parse_function ##
 ## ------------------------ ##
 
-AT_TESTFUN([btp_koops_parse_function],
+AT_TESTFUN([sr_koops_parse_function],
 [[
 #include <lib/koops_frame.h>
 #include <assert.h>
@@ -142,18 +139,18 @@ check(bool success,
   char *old_input = input;
   char *function_name = NULL, *module_name = NULL;
   uint64_t function_offset, function_length;
-  assert(success == btp_koops_parse_function(&input,
-				             &function_name,
-					     &function_offset,
-					     &function_length,
-					     &module_name));
+  assert(success == sr_koops_parse_function(&input,
+                                            &function_name,
+                                            &function_offset,
+                                            &function_length,
+                                            &module_name));
 
   if (success)
   {
     assert(strcmp(function_name, expected_function_name) == 0);
     assert(function_offset == expected_function_offset);
     assert(function_length == expected_function_length);
-    assert(btp_strcmp0(module_name, expected_module_name) == 0);
+    assert(sr_strcmp0(module_name, expected_module_name) == 0);
     assert(*input == '\0');
     free(function_name);
     free(module_name);
@@ -174,11 +171,11 @@ main(void)
 }
 ]])
 
-## --------------------- ##
-## btp_koops_frame_parse ##
-## --------------------- ##
+## -------------------- ##
+## sr_koops_frame_parse ##
+## -------------------- ##
 
-AT_TESTFUN([btp_koops_frame_parse],
+AT_TESTFUN([sr_koops_frame_parse],
 [[
 #include <lib/koops_frame.h>
 #include <assert.h>
@@ -188,18 +185,18 @@ AT_TESTFUN([btp_koops_frame_parse],
 static void
 check(bool success,
       char *input,
-      struct btp_koops_frame *expected_frame)
+      struct sr_koops_frame *expected_frame)
 {
   char *old_input = input;
 
-  struct btp_koops_frame *frame = btp_koops_frame_parse(&input);
+  struct sr_koops_frame *frame = sr_koops_frame_parse(&input);
   assert(!!frame == success);
 
   if (success)
   {
-    assert(0 == btp_koops_frame_cmp(frame, expected_frame));
+    assert(0 == sr_koops_frame_cmp(frame, expected_frame));
     assert(*input == '\0');
-    btp_koops_frame_free(frame);
+    sr_koops_frame_free(frame);
   }
   else
   {
@@ -211,8 +208,8 @@ check(bool success,
 int
 main(void)
 {
-  struct btp_koops_frame frame;
-  btp_koops_frame_init(&frame);
+  struct sr_koops_frame frame;
+  sr_koops_frame_init(&frame);
   frame.address = 0xffffffff8151f860;
   frame.reliable = false;
   frame.function_name = "ip_forward_options";
@@ -221,7 +218,7 @@ main(void)
 
   check(true, "[110417.280555]  [<ffffffff8151f860>] ? ip_forward_options+0x1f0/0x1f0", &frame);
 
-  btp_koops_frame_init(&frame);
+  sr_koops_frame_init(&frame);
   frame.address = 0xc02f671c;
   frame.reliable = true;
   frame.function_name = "_raw_spin_lock_irqsave";
@@ -235,7 +232,7 @@ main(void)
 
   check(true, "[   65.470000] [<c02f671c>] (_raw_spin_lock_irqsave+0x48/0x5c) from [<bf054120>] (mxs_mmc_enable_sdio_irq+0x18/0xdc [mxs_mmc])", &frame);
 
-  btp_koops_frame_init(&frame);
+  sr_koops_frame_init(&frame);
   frame.reliable = true;
   frame.function_name = "sys_delete_module";
   frame.function_offset = 0x11f;
@@ -246,11 +243,11 @@ main(void)
 }
 ]])
 
-## ----------------------- ##
-## btp_koops_frame_to_json ##
-## ----------------------- ##
+## ---------------------- ##
+## sr_koops_frame_to_json ##
+## ---------------------- ##
 
-AT_TESTFUN([btp_koops_frame_to_json],
+AT_TESTFUN([sr_koops_frame_to_json],
 [[
 #include <lib/koops_frame.h>
 #include <assert.h>
@@ -259,8 +256,8 @@ AT_TESTFUN([btp_koops_frame_to_json],
 int
 main(void)
 {
-  struct btp_koops_frame frame;
-  btp_koops_frame_init(&frame);
+  struct sr_koops_frame frame;
+  sr_koops_frame_init(&frame);
   frame.address = 0xc02f671c;
   frame.reliable = true;
   frame.function_name = "_raw_spin_lock_irqsave";
@@ -272,7 +269,7 @@ main(void)
   frame.from_function_length = 0xdc;
   frame.from_module_name = "mxs_mmc";
 
-  char *json = btp_koops_frame_to_json(&frame);
+  char *json = sr_koops_frame_to_json(&frame);
   puts(json);
   assert(0 == strcmp(json,
             "{   \"address\": 3224332060\n"

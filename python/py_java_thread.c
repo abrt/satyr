@@ -6,11 +6,11 @@
 #include "lib/location.h"
 #include "lib/utils.h"
 
-#define thread_doc "btparser.JavaThread - class representing a thread in a stacktrace\n" \
+#define thread_doc "satyr.JavaThread - class representing a thread in a stacktrace\n" \
                    "Usage:\n" \
-                   "btparser.JavaThread() - creates an empty thread\n" \
-                   "btparser.JavaThread(str) - parses str and fills the thread object\n" \
-                   "btparser.JavaThread(str, only_funs=True) - parses list of function names"
+                   "satyr.JavaThread() - creates an empty thread\n" \
+                   "satyr.JavaThread(str) - parses str and fills the thread object\n" \
+                   "satyr.JavaThread(str, only_funs=True) - parses list of function names"
 
 #define t_get_name_doc "Usage: thread.get_name()\n" \
                          "Returns: string - thread name"
@@ -19,12 +19,12 @@
                          "newname: string - new thread name"
 
 #define t_dup_doc "Usage: thread.dup()\n" \
-                  "Returns: btparser.JavaThread - a new clone of thread\n" \
+                  "Returns: satyr.JavaThread - a new clone of thread\n" \
                   "Clones the thread object. All new structures are independent " \
                   "on the original object."
 
 #define t_cmp_doc "Usage: thread.cmp(thread2)\n" \
-                  "thread2: btparser.JavaThread - another thread to compare" \
+                  "thread2: satyr.JavaThread - another thread to compare" \
                   "Returns: integer - distance" \
                   "Compares thread to thread2. Returns 0 if thread = thread2, " \
                   "<0 if thread is 'less' than thread2, >0 if thread is 'more' " \
@@ -43,39 +43,39 @@
 #define t_format_funs_doc "Usage: thread.format_funs()\n" \
                       "Returns: string"
 
-#define t_frames_doc (char *)"A list containing btparser.JavaFrame objects representing " \
+#define t_frames_doc (char *)"A list containing satyr.JavaFrame objects representing " \
                      "frames in a thread."
 
 static PyMethodDef
 java_thread_methods[] =
 {
     /* getters & setters */
-    { "get_number",     btp_py_java_thread_get_name,       METH_NOARGS,  t_get_name_doc       },
-    { "set_number",     btp_py_java_thread_set_name,       METH_VARARGS, t_set_name_doc       },
+    { "get_number",     sr_py_java_thread_get_name,       METH_NOARGS,  t_get_name_doc       },
+    { "set_number",     sr_py_java_thread_set_name,       METH_VARARGS, t_set_name_doc       },
     /* methods */
-    { "cmp",            btp_py_java_thread_cmp,            METH_VARARGS, t_cmp_doc            },
-    { "dup",            btp_py_java_thread_dup,            METH_NOARGS,  t_dup_doc            },
-    { "quality_counts", btp_py_java_thread_quality_counts, METH_NOARGS,  t_quality_counts_doc },
-    { "quality",        btp_py_java_thread_quality,        METH_NOARGS,  t_quality_doc        },
-    { "format_funs",    btp_py_java_thread_format_funs,    METH_NOARGS,  t_format_funs_doc    },
+    { "cmp",            sr_py_java_thread_cmp,            METH_VARARGS, t_cmp_doc            },
+    { "dup",            sr_py_java_thread_dup,            METH_NOARGS,  t_dup_doc            },
+    { "quality_counts", sr_py_java_thread_quality_counts, METH_NOARGS,  t_quality_counts_doc },
+    { "quality",        sr_py_java_thread_quality,        METH_NOARGS,  t_quality_doc        },
+    { "format_funs",    sr_py_java_thread_format_funs,    METH_NOARGS,  t_format_funs_doc    },
     { NULL },
 };
 
 static PyMemberDef
 java_thread_members[] =
 {
-    { (char *)"frames", T_OBJECT_EX, offsetof(struct btp_py_java_thread, frames), 0, t_frames_doc },
+    { (char *)"frames", T_OBJECT_EX, offsetof(struct sr_py_java_thread, frames), 0, t_frames_doc },
     { NULL },
 };
 
-PyTypeObject btp_py_java_thread_type =
+PyTypeObject sr_py_java_thread_type =
 {
     PyObject_HEAD_INIT(NULL)
     0,
-    "btparser.JavaThread",      /* tp_name */
-    sizeof(struct btp_py_java_thread),   /* tp_basicsize */
+    "satyr.JavaThread",      /* tp_name */
+    sizeof(struct sr_py_java_thread),   /* tp_basicsize */
     0,                          /* tp_itemsize */
-    btp_py_java_thread_free,    /* tp_dealloc */
+    sr_py_java_thread_free,     /* tp_dealloc */
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
@@ -86,7 +86,7 @@ PyTypeObject btp_py_java_thread_type =
     NULL,                       /* tp_as_mapping */
     NULL,                       /* tp_hash */
     NULL,                       /* tp_call */
-    btp_py_java_thread_str,     /* tp_str */
+    sr_py_java_thread_str,      /* tp_str */
     NULL,                       /* tp_getattro */
     NULL,                       /* tp_setattro */
     NULL,                       /* tp_as_buffer */
@@ -108,7 +108,7 @@ PyTypeObject btp_py_java_thread_type =
     0,                          /* tp_dictoffset */
     NULL,                       /* tp_init */
     NULL,                       /* tp_alloc */
-    btp_py_java_thread_new,     /* tp_new */
+    sr_py_java_thread_new,      /* tp_new */
     NULL,                       /* tp_free */
     NULL,                       /* tp_is_gc */
     NULL,                       /* tp_bases */
@@ -120,11 +120,11 @@ PyTypeObject btp_py_java_thread_type =
 
 /* helpers */
 int
-java_thread_prepare_linked_list(struct btp_py_java_thread *thread)
+java_thread_prepare_linked_list(struct sr_py_java_thread *thread)
 {
     int i;
     PyObject *item;
-    struct btp_py_java_frame *current = NULL, *prev = NULL;
+    struct sr_py_java_frame *current = NULL, *prev = NULL;
 
     for (i = 0; i < PyList_Size(thread->frames); ++i)
     {
@@ -134,15 +134,15 @@ java_thread_prepare_linked_list(struct btp_py_java_thread *thread)
 
         Py_INCREF(item);
 
-        if (!PyObject_TypeCheck(item, &btp_py_java_frame_type))
+        if (!PyObject_TypeCheck(item, &sr_py_java_frame_type))
         {
             Py_XDECREF(item);
             Py_XDECREF(prev);
-            PyErr_SetString(PyExc_TypeError, "frames must be a list of btparser.JavaFrame objects");
+            PyErr_SetString(PyExc_TypeError, "frames must be a list of satyr.JavaFrame objects");
             return -1;
         }
 
-        current = (struct btp_py_java_frame*)item;
+        current = (struct sr_py_java_frame*)item;
         if (i == 0)
             thread->thread->frames = current->frame;
         else
@@ -162,7 +162,7 @@ java_thread_prepare_linked_list(struct btp_py_java_thread *thread)
 }
 
 int
-java_thread_free_frame_python_list(struct btp_py_java_thread *thread)
+java_thread_free_frame_python_list(struct sr_py_java_thread *thread)
 {
     int i;
     PyObject *item;
@@ -180,18 +180,18 @@ java_thread_free_frame_python_list(struct btp_py_java_thread *thread)
 }
 
 PyObject *
-java_frame_linked_list_to_python_list(struct btp_java_thread *thread)
+java_frame_linked_list_to_python_list(struct sr_java_thread *thread)
 {
     PyObject *result = PyList_New(0);
     if (!result)
         return NULL;
 
-    struct btp_java_frame *frame = thread->frames;
-    struct btp_py_java_frame *item;
+    struct sr_java_frame *frame = thread->frames;
+    struct sr_py_java_frame *item;
     while (frame)
     {
-        item = (struct btp_py_java_frame*)
-            PyObject_New(struct btp_py_java_frame, &btp_py_java_frame_type);
+        item = (struct sr_py_java_frame*)
+            PyObject_New(struct sr_py_java_frame, &sr_py_java_frame_type);
 
         if (!item)
             return PyErr_NoMemory();
@@ -208,11 +208,11 @@ java_frame_linked_list_to_python_list(struct btp_java_thread *thread)
 
 /* constructor */
 PyObject *
-btp_py_java_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
+sr_py_java_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
-    struct btp_py_java_thread *to = (struct btp_py_java_thread*)
-        PyObject_New(struct btp_py_java_thread,
-                     &btp_py_java_thread_type);
+    struct sr_py_java_thread *to = (struct sr_py_java_thread*)
+        PyObject_New(struct sr_py_java_thread,
+                     &sr_py_java_thread_type);
 
     if (!to)
         return PyErr_NoMemory();
@@ -223,9 +223,9 @@ btp_py_java_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 
     if (str)
     {
-        struct btp_location location;
-        btp_location_init(&location);
-        to->thread = btp_java_thread_parse(&str, &location);
+        struct sr_location location;
+        sr_location_init(&location);
+        to->thread = sr_java_thread_parse(&str, &location);
         if (!to->thread)
         {
             PyErr_SetString(PyExc_ValueError, location.message);
@@ -238,7 +238,7 @@ btp_py_java_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
     else
     {
         to->frames = PyList_New(0);
-        to->thread = btp_java_thread_new();
+        to->thread = sr_java_thread_new();
     }
 
     return (PyObject *)to;
@@ -246,26 +246,26 @@ btp_py_java_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 
 /* destructor */
 void
-btp_py_java_thread_free(PyObject *object)
+sr_py_java_thread_free(PyObject *object)
 {
-    struct btp_py_java_thread *this = (struct btp_py_java_thread *)object;
+    struct sr_py_java_thread *this = (struct sr_py_java_thread *)object;
     java_thread_free_frame_python_list(this);
     this->thread->frames = NULL;
-    btp_java_thread_free(this->thread);
+    sr_java_thread_free(this->thread);
     PyObject_Del(object);
 }
 
 PyObject *
-btp_py_java_thread_str(PyObject *self)
+sr_py_java_thread_str(PyObject *self)
 {
-    struct btp_py_java_thread *this = (struct btp_py_java_thread *)self;
-    struct btp_strbuf *buf = btp_strbuf_new();
-    btp_strbuf_append_str(buf, "Thread");
+    struct sr_py_java_thread *this = (struct sr_py_java_thread *)self;
+    struct sr_strbuf *buf = sr_strbuf_new();
+    sr_strbuf_append_str(buf, "Thread");
     if (this->thread->name)
-        btp_strbuf_append_strf(buf, " %s", this->thread->name);
+        sr_strbuf_append_strf(buf, " %s", this->thread->name);
 
-    btp_strbuf_append_strf(buf, " with %d frames", PyList_Size(this->frames));
-    char *str = btp_strbuf_free_nobuf(buf);
+    sr_strbuf_append_strf(buf, " with %d frames", PyList_Size(this->frames));
+    char *str = sr_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
@@ -275,40 +275,40 @@ btp_py_java_thread_str(PyObject *self)
 
 /* name */
 PyObject *
-btp_py_java_thread_get_name(PyObject *self, PyObject *args)
+sr_py_java_thread_get_name(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", ((struct btp_py_java_thread*)self)->thread->name);
+    return Py_BuildValue("s", ((struct sr_py_java_thread*)self)->thread->name);
 }
 
 PyObject *
-btp_py_java_thread_set_name(PyObject *self, PyObject *args)
+sr_py_java_thread_set_name(PyObject *self, PyObject *args)
 {
     char *newvalue;
     if (!PyArg_ParseTuple(args, "s", &newvalue))
         return NULL;
 
-    struct btp_java_thread *thread = ((struct btp_py_java_thread*)self)->thread;
+    struct sr_java_thread *thread = ((struct sr_py_java_thread*)self)->thread;
     free(thread->name);
-    thread->name = btp_strdup(newvalue);
+    thread->name = sr_strdup(newvalue);
     Py_RETURN_NONE;
 }
 
 
 /* methods */
 PyObject *
-btp_py_java_thread_dup(PyObject *self, PyObject *args)
+sr_py_java_thread_dup(PyObject *self, PyObject *args)
 {
-    struct btp_py_java_thread *this = (struct btp_py_java_thread *)self;
+    struct sr_py_java_thread *this = (struct sr_py_java_thread *)self;
     if (java_thread_prepare_linked_list(this) < 0)
         return NULL;
 
-    struct btp_py_java_thread *to = (struct btp_py_java_thread*)
-        PyObject_New(struct btp_py_java_thread, &btp_py_java_thread_type);
+    struct sr_py_java_thread *to = (struct sr_py_java_thread*)
+        PyObject_New(struct sr_py_java_thread, &sr_py_java_thread_type);
 
     if (!to)
         return PyErr_NoMemory();
 
-    to->thread = btp_java_thread_dup(this->thread, false);
+    to->thread = sr_java_thread_dup(this->thread, false);
     if (!to->thread)
         return NULL;
 
@@ -318,47 +318,47 @@ btp_py_java_thread_dup(PyObject *self, PyObject *args)
 }
 
 PyObject *
-btp_py_java_thread_cmp(PyObject *self, PyObject *args)
+sr_py_java_thread_cmp(PyObject *self, PyObject *args)
 {
-    struct btp_py_java_thread *this = (struct btp_py_java_thread *)self;
+    struct sr_py_java_thread *this = (struct sr_py_java_thread *)self;
     PyObject *compare_to;
-    if (!PyArg_ParseTuple(args, "O!", &btp_py_java_thread_type, &compare_to))
+    if (!PyArg_ParseTuple(args, "O!", &sr_py_java_thread_type, &compare_to))
         return NULL;
 
-    struct btp_py_java_thread *cmp_to = (struct btp_py_java_thread *)compare_to;
+    struct sr_py_java_thread *cmp_to = (struct sr_py_java_thread *)compare_to;
 
     if (java_thread_prepare_linked_list(this) < 0)
         return NULL;
     if (java_thread_prepare_linked_list(cmp_to) < 0)
         return NULL;
 
-    return Py_BuildValue("i", btp_java_thread_cmp(this->thread, cmp_to->thread));
+    return Py_BuildValue("i", sr_java_thread_cmp(this->thread, cmp_to->thread));
 }
 
 PyObject *
-btp_py_java_thread_quality_counts(PyObject *self, PyObject *args)
+sr_py_java_thread_quality_counts(PyObject *self, PyObject *args)
 {
-    struct btp_py_java_thread *this = (struct btp_py_java_thread *)self;
+    struct sr_py_java_thread *this = (struct sr_py_java_thread *)self;
     if (java_thread_prepare_linked_list(this) < 0)
         return NULL;
 
     int ok = 0, all = 0;
-    btp_java_thread_quality_counts(this->thread, &ok, &all);
+    sr_java_thread_quality_counts(this->thread, &ok, &all);
     return Py_BuildValue("(ii)", ok, all);
 }
 
 PyObject *
-btp_py_java_thread_quality(PyObject *self, PyObject *args)
+sr_py_java_thread_quality(PyObject *self, PyObject *args)
 {
-    struct btp_py_java_thread *this = (struct btp_py_java_thread *)self;
+    struct sr_py_java_thread *this = (struct sr_py_java_thread *)self;
     if (java_thread_prepare_linked_list(this) < 0)
         return NULL;
 
-    return Py_BuildValue("f", btp_java_thread_quality(this->thread));
+    return Py_BuildValue("f", sr_java_thread_quality(this->thread));
 }
 
 PyObject *
-btp_py_java_thread_format_funs(PyObject *self, PyObject *args)
+sr_py_java_thread_format_funs(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("s", btp_java_thread_format_funs(((struct btp_py_java_thread *)self)->thread));
+    return Py_BuildValue("s", sr_java_thread_format_funs(((struct sr_py_java_thread *)self)->thread));
 }

@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_PY_PYTHON_STACKTRACE_H
-#define BTPARSER_PY_PYTHON_STACKTRACE_H
+#ifndef SATYR_PY_PYTHON_STACKTRACE_H
+#define SATYR_PY_PYTHON_STACKTRACE_H
 
 /**
  * @file
@@ -32,38 +32,38 @@ extern "C" {
 #include <Python.h>
 #include <structmember.h>
 
-PyTypeObject btp_py_python_stacktrace_type;
+PyTypeObject sr_py_python_stacktrace_type;
 
-struct btp_py_python_stacktrace
+struct sr_py_python_stacktrace
 {
     PyObject_HEAD
     PyObject *frames;
-    struct btp_python_stacktrace *stacktrace;
+    struct sr_python_stacktrace *stacktrace;
 };
 
 /* constructor */
-PyObject *btp_py_python_stacktrace_new(PyTypeObject *object,
+PyObject *sr_py_python_stacktrace_new(PyTypeObject *object,
                                       PyObject *args,
                                       PyObject *kwds);
 
 /* destructor */
-void btp_py_python_stacktrace_free(PyObject *object);
+void sr_py_python_stacktrace_free(PyObject *object);
 
 /* str */
-PyObject *btp_py_python_stacktrace_str(PyObject *self);
+PyObject *sr_py_python_stacktrace_str(PyObject *self);
 
 /* getters & setters */
-PyObject *btp_py_python_stacktrace_get_file_name(PyObject *self, PyObject *args);
-PyObject *btp_py_python_stacktrace_set_file_name(PyObject *self, PyObject *args);
-PyObject *btp_py_python_stacktrace_get_file_line(PyObject *self, PyObject *args);
-PyObject *btp_py_python_stacktrace_set_file_line(PyObject *self, PyObject *args);
-PyObject *btp_py_python_stacktrace_get_exception_name(PyObject *self, PyObject *args);
-PyObject *btp_py_python_stacktrace_set_exception_name(PyObject *self, PyObject *args);
+PyObject *sr_py_python_stacktrace_get_file_name(PyObject *self, PyObject *args);
+PyObject *sr_py_python_stacktrace_set_file_name(PyObject *self, PyObject *args);
+PyObject *sr_py_python_stacktrace_get_file_line(PyObject *self, PyObject *args);
+PyObject *sr_py_python_stacktrace_set_file_line(PyObject *self, PyObject *args);
+PyObject *sr_py_python_stacktrace_get_exception_name(PyObject *self, PyObject *args);
+PyObject *sr_py_python_stacktrace_set_exception_name(PyObject *self, PyObject *args);
 
 
 /* methods */
-PyObject *btp_py_python_stacktrace_dup(PyObject *self, PyObject *args);
-PyObject *btp_py_python_stacktrace_normalize(PyObject *self, PyObject *args);
+PyObject *sr_py_python_stacktrace_dup(PyObject *self, PyObject *args);
+PyObject *sr_py_python_stacktrace_normalize(PyObject *self, PyObject *args);
 
 
 #ifdef __cplusplus

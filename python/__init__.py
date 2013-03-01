@@ -1,2 +1,2 @@
-"""btparser - python bindings for btparser library"""
+"""satyr - python bindings for satyr library"""
 from _satyr import *

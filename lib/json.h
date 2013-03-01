@@ -29,42 +29,42 @@
     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef BTPARSER_JSON_H
-#define BTPARSER_JSON_H
+#ifndef SATYR_JSON_H
+#define SATYR_JSON_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct btp_location;
+struct sr_location;
 
-struct btp_json_settings
+struct sr_json_settings
 {
    unsigned long max_memory;
    int settings;
 };
 
-#define BTP_JSON_RELAXED_COMMAS 1
+#define SR_JSON_RELAXED_COMMAS 1
 
-enum btp_json_type
+enum sr_json_type
 {
-   BTP_JSON_NONE,
-   BTP_JSON_OBJECT,
-   BTP_JSON_ARRAY,
-   BTP_JSON_INTEGER,
-   BTP_JSON_DOUBLE,
-   BTP_JSON_STRING,
-   BTP_JSON_BOOLEAN,
-   BTP_JSON_NULL
+   SR_JSON_NONE,
+   SR_JSON_OBJECT,
+   SR_JSON_ARRAY,
+   SR_JSON_INTEGER,
+   SR_JSON_DOUBLE,
+   SR_JSON_STRING,
+   SR_JSON_BOOLEAN,
+   SR_JSON_NULL
 };
 
-extern const struct btp_json_value
-btp_json_value_none;
+extern const struct sr_json_value
+sr_json_value_none;
 
-struct btp_json_value
+struct sr_json_value
 {
-   struct btp_json_value *parent;
-   enum btp_json_type type;
+   struct sr_json_value *parent;
+   enum sr_json_type type;
 
    union
    {
@@ -87,7 +87,7 @@ struct btp_json_value
          struct
          {
             char *name;
-            struct btp_json_value *value;
+            struct sr_json_value *value;
          } *values;
 
       } object;
@@ -95,30 +95,30 @@ struct btp_json_value
       struct
       {
          unsigned length;
-         struct btp_json_value **values;
+         struct sr_json_value **values;
       } array;
    } u;
 
    union
    {
-      struct btp_json_value *next_alloc;
+      struct sr_json_value *next_alloc;
       void *object_mem;
    } _reserved;
 };
 
-struct btp_json_value *
-btp_json_parse(const char *json);
+struct sr_json_value *
+sr_json_parse(const char *json);
 
-struct btp_json_value *
-btp_json_parse_ex(struct btp_json_settings *settings,
-                  const char *json,
-                  struct btp_location *location);
+struct sr_json_value *
+sr_json_parse_ex(struct sr_json_settings *settings,
+                 const char *json,
+                 struct sr_location *location);
 
 void
-btp_json_value_free(struct btp_json_value *value);
+sr_json_value_free(struct sr_json_value *value);
 
 char *
-btp_json_escape(const char *text);
+sr_json_escape(const char *text);
 
 #ifdef __cplusplus
 } /* extern "C" */

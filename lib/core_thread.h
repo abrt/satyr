@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_CORE_THREAD_H
-#define BTPARSER_CORE_THREAD_H
+#ifndef SATYR_CORE_THREAD_H
+#define SATYR_CORE_THREAD_H
 
 /**
  * @file
@@ -32,15 +32,15 @@ extern "C" {
 #include <stdbool.h>
 #include <inttypes.h>
 
-struct btp_core_frame;
-struct btp_strbuf;
-struct btp_location;
-struct btp_json_value;
+struct sr_core_frame;
+struct sr_strbuf;
+struct sr_location;
+struct sr_json_value;
 
 /**
  * @brief A thread of execution on call stack of a core dump.
  */
-struct btp_core_thread
+struct sr_core_thread
 {
     /** Thread id. */
     int64_t id;
@@ -48,23 +48,23 @@ struct btp_core_thread
     /**
      * Thread's frames, starting from the top of the stack.
      */
-    struct btp_core_frame *frames;
+    struct sr_core_frame *frames;
 
     /**
      * A sibling thread, or NULL if this is the last thread in a
      * stacktrace.
      */
-    struct btp_core_thread *next;
+    struct sr_core_thread *next;
 };
 
 /**
  * Creates and initializes a new frame structure.
  * @returns
  * It never returns NULL. The returned pointer must be released by
- * calling the function btp_core_thread_free().
+ * calling the function sr_core_thread_free().
  */
-struct btp_core_thread *
-btp_core_thread_new();
+struct sr_core_thread *
+sr_core_thread_new();
 
 /**
  * Initializes all members of the thread to default values.
@@ -73,7 +73,7 @@ btp_core_thread_new();
  * stack.
  */
 void
-btp_core_thread_init(struct btp_core_thread *thread);
+sr_core_thread_init(struct sr_core_thread *thread);
 
 /**
  * Releases the memory held by the thread. The thread siblings are not
@@ -82,7 +82,7 @@ btp_core_thread_init(struct btp_core_thread *thread);
  * If thread is NULL, no operation is performed.
  */
 void
-btp_core_thread_free(struct btp_core_thread *thread);
+sr_core_thread_free(struct sr_core_thread *thread);
 
 /**
  * Creates a duplicate of the thread.
@@ -94,9 +94,9 @@ btp_core_thread_free(struct btp_core_thread *thread);
  * false, thread->next is not duplicated for the new frame, but it is
  * set to NULL.
  */
-struct btp_core_thread *
-btp_core_thread_dup(struct btp_core_thread *thread,
-                    bool siblings);
+struct sr_core_thread *
+sr_core_thread_dup(struct sr_core_thread *thread,
+                   bool siblings);
 
 /**
  * Compares two threads. When comparing the threads, it compares also
@@ -107,8 +107,8 @@ btp_core_thread_dup(struct btp_core_thread *thread,
  * found to be 'greater' than t2.
  */
 int
-btp_core_thread_cmp(struct btp_core_thread *thread1,
-                    struct btp_core_thread *thread2);
+sr_core_thread_cmp(struct sr_core_thread *thread1,
+                   struct sr_core_thread *thread2);
 
 /**
  * Appends 'item' at the end of the list 'dest'.
@@ -116,25 +116,25 @@ btp_core_thread_cmp(struct btp_core_thread *thread1,
  * This function returns the 'dest' thread.  If 'dest' is NULL, it
  * returns the 'item' frame.
  */
-struct btp_core_thread *
-btp_core_thread_append(struct btp_core_thread *dest,
-                       struct btp_core_thread *item);
+struct sr_core_thread *
+sr_core_thread_append(struct sr_core_thread *dest,
+                      struct sr_core_thread *item);
 
 /**
  * Returns the number of frames in the thread.
  */
 int
-btp_core_thread_get_frame_count(struct btp_core_thread *thread);
+sr_core_thread_get_frame_count(struct sr_core_thread *thread);
 
-struct btp_core_frame *
-btp_core_thread_find_exit_frame(struct btp_core_thread *thread);
+struct sr_core_frame *
+sr_core_thread_find_exit_frame(struct sr_core_thread *thread);
 
-struct btp_core_thread *
-btp_core_thread_from_json(struct btp_json_value *root,
-                          char **error_message);
+struct sr_core_thread *
+sr_core_thread_from_json(struct sr_json_value *root,
+                         char **error_message);
 
 char *
-btp_core_thread_to_json(struct btp_core_thread *thread);
+sr_core_thread_to_json(struct sr_core_thread *thread);
 
 #ifdef __cplusplus
 }

@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef BTPARSER_REPORT_H
-#define BTPARSER_REPORT_H
+#ifndef SATYR_REPORT_H
+#define SATYR_REPORT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,19 +27,19 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
-enum btp_report_type
+enum sr_report_type
 {
-    BTP_REPORT_INVALID = 0,
-    BTP_REPORT_CORE,
-    BTP_REPORT_PYTHON,
-    BTP_REPORT_KERNELOOPS,
-    BTP_REPORT_JAVA
+    SR_REPORT_INVALID = 0,
+    SR_REPORT_CORE,
+    SR_REPORT_PYTHON,
+    SR_REPORT_KERNELOOPS,
+    SR_REPORT_JAVA
 };
 
-struct btp_report
+struct sr_report
 {
     uint32_t report_version;
-    enum btp_report_type report_type;
+    enum sr_report_type report_type;
 
     char *reporter_name;
     char *reporter_version;
@@ -48,28 +48,28 @@ struct btp_report
     bool user_root;
     bool user_local;
 
-    struct btp_operating_system *operating_system;
+    struct sr_operating_system *operating_system;
 
     char *component_name;
-    struct btp_rpm_package *rpm_packages;
+    struct sr_rpm_package *rpm_packages;
 
-    struct btp_python_stacktrace *python_stacktrace;
-    struct btp_koops_stacktrace *koops_stacktrace;
-    struct btp_core_stacktrace *core_stacktrace;
-    struct btp_java_stacktrace *java_stacktrace;
+    struct sr_python_stacktrace *python_stacktrace;
+    struct sr_koops_stacktrace *koops_stacktrace;
+    struct sr_core_stacktrace *core_stacktrace;
+    struct sr_java_stacktrace *java_stacktrace;
 };
 
-struct btp_report *
-btp_report_new();
+struct sr_report *
+sr_report_new();
 
 void
-btp_report_init(struct btp_report *report);
+sr_report_init(struct sr_report *report);
 
 void
-btp_report_free(struct btp_report *report);
+sr_report_free(struct sr_report *report);
 
 char *
-btp_report_to_json(struct btp_report *report);
+sr_report_to_json(struct sr_report *report);
 
 #ifdef __cplusplus
 }
