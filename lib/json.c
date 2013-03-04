@@ -728,3 +728,15 @@ sr_json_escape(const char *text)
 
     return sr_strbuf_free_nobuf(strbuf);
 }
+
+struct sr_strbuf *
+sr_json_append_escaped(struct sr_strbuf *strbuf, const char *str)
+{
+    char *escaped_str = sr_json_escape(str);
+    sr_strbuf_append_char(strbuf, '\"');
+    sr_strbuf_append_str(strbuf, escaped_str);
+    sr_strbuf_append_char(strbuf, '\"');
+    free(escaped_str);
+
+    return strbuf;
+}

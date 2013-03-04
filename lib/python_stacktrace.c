@@ -155,9 +155,9 @@ sr_python_stacktrace_to_json(struct sr_python_stacktrace *stacktrace)
     /* Exception file name. */
     if (stacktrace->file_name)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"file_name\": \"%s\"\n",
-                              stacktrace->file_name);
+        sr_strbuf_append_str(strbuf, ",   \"file_name\": ");
+        sr_json_append_escaped(strbuf, stacktrace->file_name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     /* Exception file line. */
@@ -171,9 +171,9 @@ sr_python_stacktrace_to_json(struct sr_python_stacktrace *stacktrace)
     /* Exception class name. */
     if (stacktrace->exception_name)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"exception_name\": \"%s\"\n",
-                              stacktrace->exception_name);
+        sr_strbuf_append_str(strbuf, ",   \"exception_name\": ");
+        sr_json_append_escaped(strbuf, stacktrace->exception_name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     /* Frames. */

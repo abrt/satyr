@@ -419,12 +419,9 @@ sr_koops_frame_to_json(struct sr_koops_frame *frame)
 
     if (frame->function_name)
     {
-        char *escaped = sr_json_escape(frame->function_name);
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"function_name\": \"%s\"\n",
-                              escaped);
-
-        free(escaped);
+        sr_strbuf_append_str(strbuf, ",   \"function_name\": ");
+        sr_json_append_escaped(strbuf, frame->function_name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     sr_strbuf_append_strf(strbuf,
@@ -437,12 +434,9 @@ sr_koops_frame_to_json(struct sr_koops_frame *frame)
 
     if (frame->module_name)
     {
-        char *escaped = sr_json_escape(frame->module_name);
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"module_name\": \"%s\"\n",
-                              escaped);
-
-        free(escaped);
+        sr_strbuf_append_str(strbuf, ",   \"module_name\": ");
+        sr_json_append_escaped(strbuf, frame->module_name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     if (frame->from_address != 0)
@@ -454,12 +448,9 @@ sr_koops_frame_to_json(struct sr_koops_frame *frame)
 
     if (frame->from_function_name)
     {
-        char *escaped = sr_json_escape(frame->from_function_name);
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"from_function_name\": \"%s\"\n",
-                              escaped);
-
-        free(escaped);
+        sr_strbuf_append_str(strbuf, ",   \"from_function_name\": ");
+        sr_json_append_escaped(strbuf, frame->from_function_name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     sr_strbuf_append_strf(strbuf,
@@ -472,12 +463,9 @@ sr_koops_frame_to_json(struct sr_koops_frame *frame)
 
     if (frame->from_module_name)
     {
-        char *escaped = sr_json_escape(frame->from_module_name);
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"from_module_name\": \"%s\"\n",
-                              escaped);
-
-        free(escaped);
+        sr_strbuf_append_str(strbuf, ",   \"from_module_name\": ");
+        sr_json_append_escaped(strbuf, frame->from_module_name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     sr_strbuf_append_str(strbuf, "}");

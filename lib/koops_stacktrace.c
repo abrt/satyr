@@ -191,9 +191,9 @@ sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace)
     /* Kernel version. */
     if (stacktrace->version)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"version\": \"%s\"\n",
-                              stacktrace->version);
+        sr_strbuf_append_str(strbuf, ",   \"version\": ");
+        sr_json_append_escaped(strbuf, stacktrace->version);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     /* Kernel taint flags. */
@@ -269,7 +269,7 @@ sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace)
             else
                 sr_strbuf_append_str(strbuf, "      , ");
 
-            sr_strbuf_append_strf(strbuf, "\"%s\"", *module);
+            sr_json_append_escaped(strbuf, *module);
             ++module;
             if (*module)
                 sr_strbuf_append_str(strbuf, "\n");

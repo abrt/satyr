@@ -102,9 +102,9 @@ sr_report_to_json(struct sr_report *report)
         break;
     }
 
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"report_type\": \"%s\"\n",
-                          report_type);
+    sr_strbuf_append_str(strbuf, ",   \"report_type\": ");
+    sr_json_append_escaped(strbuf, report_type);
+    sr_strbuf_append_str(strbuf, "\n");
 
     /* Reporter name and version. */
     assert(report->reporter_name);
@@ -143,9 +143,9 @@ sr_report_to_json(struct sr_report *report)
     /* Component name. */
     if (report->component_name)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"component\": \"%s\"\n",
-                              report->component_name);
+        sr_strbuf_append_str(strbuf, ",   \"component\": ");
+        sr_json_append_escaped(strbuf, report->component_name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     /* RPM packages. */

@@ -62,23 +62,23 @@ sr_operating_system_to_json(struct sr_operating_system *operating_system)
 
     if (operating_system->name)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"name\": \"%s\"\n",
-                              operating_system->name);
+        sr_strbuf_append_str(strbuf, ",   \"name\": ");
+        sr_json_append_escaped(strbuf, operating_system->name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     if (operating_system->version)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"version\": \"%s\"\n",
-                              operating_system->version);
+        sr_strbuf_append_str(strbuf, ",   \"version\": ");
+        sr_json_append_escaped(strbuf, operating_system->version);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     if (operating_system->architecture)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"architecture\": \"%s\"\n",
-                              operating_system->architecture);
+        sr_strbuf_append_str(strbuf, ",   \"architecture\": ");
+        sr_json_append_escaped(strbuf, operating_system->architecture);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     if (operating_system->uptime > 0)

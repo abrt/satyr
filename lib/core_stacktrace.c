@@ -292,9 +292,9 @@ sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
 
     if (stacktrace->executable)
     {
-        char *escaped_executable = sr_json_escape(stacktrace->executable);
-        sr_strbuf_append_strf(strbuf, ",   \"executable\": \"%s\"\n", escaped_executable);
-        free(escaped_executable);
+        sr_strbuf_append_str(strbuf, ",   \"executable\": ");
+        sr_json_append_escaped(strbuf, stacktrace->executable);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     sr_strbuf_append_str(strbuf, ",   \"threads\":\n");

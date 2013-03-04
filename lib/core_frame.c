@@ -317,12 +317,9 @@ sr_core_frame_to_json(struct sr_core_frame *frame)
 
     if (frame->build_id)
     {
-        char *escaped = sr_json_escape(frame->build_id);
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"build_id\": \"%s\"\n",
-                              escaped);
-
-        free(escaped);
+        sr_strbuf_append_str(strbuf, ",   \"build_id\": ");
+        sr_json_append_escaped(strbuf, frame->build_id);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     sr_strbuf_append_strf(strbuf,
@@ -331,32 +328,23 @@ sr_core_frame_to_json(struct sr_core_frame *frame)
 
     if (frame->function_name)
     {
-        char *escaped = sr_json_escape(frame->function_name);
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"function_name\": \"%s\"\n",
-                              escaped);
-
-        free(escaped);
+        sr_strbuf_append_str(strbuf, ",   \"function_name\": ");
+        sr_json_append_escaped(strbuf, frame->function_name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     if (frame->file_name)
     {
-        char *escaped = sr_json_escape(frame->file_name);
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"file_name\": \"%s\"\n",
-                              escaped);
-
-        free(escaped);
+        sr_strbuf_append_str(strbuf, ",   \"file_name\": ");
+        sr_json_append_escaped(strbuf, frame->file_name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     if (frame->fingerprint)
     {
-        char *escaped = sr_json_escape(frame->fingerprint);
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"fingerprint\": \"%s\"\n",
-                              escaped);
-
-        free(escaped);
+        sr_strbuf_append_str(strbuf, ",   \"fingerprint\": ");
+        sr_json_append_escaped(strbuf, frame->fingerprint);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     sr_strbuf_append_char(strbuf, '}');

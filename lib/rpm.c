@@ -465,9 +465,9 @@ sr_rpm_package_to_json(struct sr_rpm_package *package,
         /* Name. */
         if (package->name)
         {
-            sr_strbuf_append_strf(strbuf,
-                                  ",   \"name\": \"%s\"\n",
-                                  package->name);
+            sr_strbuf_append_str(strbuf, ",   \"name\": ");
+            sr_json_append_escaped(strbuf, package->name);
+            sr_strbuf_append_str(strbuf, "\n");
         }
 
         /* Epoch. */
@@ -478,25 +478,25 @@ sr_rpm_package_to_json(struct sr_rpm_package *package,
         /* Version. */
         if (package->version)
         {
-            sr_strbuf_append_strf(strbuf,
-                                  ",   \"version\": \"%s\"\n",
-                                  package->version);
+            sr_strbuf_append_str(strbuf, ",   \"version\": ");
+            sr_json_append_escaped(strbuf, package->version);
+            sr_strbuf_append_str(strbuf, "\n");
         }
 
         /* Release. */
         if (package->release)
         {
-            sr_strbuf_append_strf(strbuf,
-                                  ",   \"release\": \"%s\"\n",
-                                  package->release);
+            sr_strbuf_append_str(strbuf, ",   \"release\": ");
+            sr_json_append_escaped(strbuf, package->release);
+            sr_strbuf_append_str(strbuf, "\n");
         }
 
         /* Architecture. */
         if (package->architecture)
         {
-            sr_strbuf_append_strf(strbuf,
-                                  ",   \"architecture\": \"%s\"\n",
-                                  package->architecture);
+            sr_strbuf_append_str(strbuf, ",   \"architecture\": ");
+            sr_json_append_escaped(strbuf, package->architecture);
+            sr_strbuf_append_str(strbuf, "\n");
         }
 
         /* Install time. */

@@ -426,17 +426,17 @@ sr_java_frame_to_json(struct sr_java_frame *frame)
     /* Name. */
     if (frame->name)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"name\": \"%s\"\n",
-                              frame->name);
+        sr_strbuf_append_str(strbuf, ",   \"name\": ");
+        sr_json_append_escaped(strbuf, frame->name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     /* File name. */
     if (frame->file_name)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"file_name\": \"%s\"\n",
-                              frame->file_name);
+        sr_strbuf_append_str(strbuf, ",   \"file_name\": ");
+        sr_json_append_escaped(strbuf, frame->file_name);
+        sr_strbuf_append_str(strbuf, "\n");
 
         /* File line. */
         sr_strbuf_append_strf(strbuf,
@@ -447,9 +447,9 @@ sr_java_frame_to_json(struct sr_java_frame *frame)
     /* Class path. */
     if (frame->class_path)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"class_path\": \"%s\"\n",
-                              frame->class_path);
+        sr_strbuf_append_str(strbuf, ",   \"class_path\": ");
+        sr_json_append_escaped(strbuf, frame->class_path);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     /* Is native? */
@@ -465,9 +465,9 @@ sr_java_frame_to_json(struct sr_java_frame *frame)
     /* Message. */
     if (frame->message)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"message\": \"%s\"\n",
-                              frame->message);
+        sr_strbuf_append_str(strbuf, ",   \"message\": ");
+        sr_json_append_escaped(strbuf, frame->message);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     strbuf->buf[0] = '{';

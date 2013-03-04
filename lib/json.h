@@ -37,6 +37,7 @@ extern "C" {
 #endif
 
 struct sr_location;
+struct sr_strbuf;
 
 struct sr_json_settings
 {
@@ -119,6 +120,9 @@ sr_json_value_free(struct sr_json_value *value);
 
 char *
 sr_json_escape(const char *text);
+
+struct sr_strbuf*
+sr_json_append_escaped(struct sr_strbuf *strbuf, const char *str);
 
 #ifdef __cplusplus
 } /* extern "C" */
