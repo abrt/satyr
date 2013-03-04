@@ -490,6 +490,12 @@ sr_parse_coredump(const char *core_file,
         }
     }
 
+    stacktrace->executable = realpath(exe_file, NULL);
+    /* FIXME: determine signal */
+    stacktrace->signal = 0;
+    /* FIXME: is this the best we can do? */
+    stacktrace->crash_thread = stacktrace->threads;
+
 fail_destroy_ui:
     _UCD_destroy(ui);
 fail_destroy_as:

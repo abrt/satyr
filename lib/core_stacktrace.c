@@ -290,6 +290,13 @@ sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
         sr_strbuf_append_strf(strbuf, ",   \"crash_thread\": %"PRIu32"\n", offset);
     }
 
+    if (stacktrace->executable)
+    {
+        char *escaped_executable = sr_json_escape(stacktrace->executable);
+        sr_strbuf_append_strf(strbuf, ",   \"executable\": \"%s\"\n", escaped_executable);
+        free(escaped_executable);
+    }
+
     sr_strbuf_append_str(strbuf, ",   \"threads\":\n");
 
     struct sr_core_thread *thread = stacktrace->threads;

@@ -118,7 +118,7 @@ sr_core_stacktrace_from_json_text(const char *text,
 
 /**
  * Serializes stacktrace to string.
- * @returnes
+ * @returns
  * Newly allocated memory containing the textual representation of the
  * provided stacktrace.  Caller should free the memory when it's no
  * longer needed.
