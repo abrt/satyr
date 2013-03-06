@@ -52,8 +52,12 @@ extern "C" {
  */
 struct sr_sha1_state
 {
-    /* always correctly aligned for uint64_t */
-    uint8_t wbuffer[64];
+    /* usage of a union avoids aliasing compiler warnings */
+    union {
+        uint8_t u1[64];
+        uint32_t u4[16];
+        uint64_t u8[8];
+    } wbuffer;
     /* for sha256: void (*process_block)(struct md5_state_t*); */
     /* must be directly before hash[] */
     uint64_t total64;

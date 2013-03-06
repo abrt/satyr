@@ -501,3 +501,53 @@ int main(void)
   return 0;
 }
 ]])
+
+## ------------ ##
+## sr_sha1_hash ##
+## ------------ ##
+
+AT_TESTFUN([sr_sha1_hash],
+[[
+#include <lib/sha1.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <string.h>
+
+char *in[] = {
+  "",
+  "foo",
+  "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" /* no comma = concat */
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "Thread\n"
+  "   mail_shell_view_execute_search\n"
+  "   gtk_combo_box_set_active_internal\n"
+  "   gtk_combo_box_set_active_iter\n"
+};
+
+char *out[] = {
+  "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+  "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
+  "d5d08faa5a1d41faecae99f6a3052458a17e5091",
+  "4bf106d7a9cfc2c40200a8c778882c4ea28c11e5"
+};
+
+char result_bytes[SR_SHA1_RESULT_BIN_LEN];
+char result[SR_SHA1_RESULT_LEN];
+struct sr_sha1_state sha1ctx;
+int i;
+
+int main(void)
+{
+  for (i = 0; i < sizeof(in)/sizeof(in[0]); i++)
+  {
+    sr_sha1_begin(&sha1ctx);
+    sr_sha1_hash(&sha1ctx, in[i], strlen(in[i]));
+    sr_sha1_end(&sha1ctx, result_bytes);
+    sr_bin2hex(result, result_bytes, SR_SHA1_RESULT_BIN_LEN)[0] = '\0';
+
+    assert(0 == strcmp(result, out[i]));
+  }
+
+  return 0;
+}
+]])
