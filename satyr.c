@@ -114,8 +114,19 @@ abrt_create_core_stacktrace(int argc, char **argv)
         short_usage_and_exit();
     }
 
+    bool hash_fingerprints = true;
+    if (argc > 1 &&
+        0 == strcmp(argv[0], "-r"))
+    {
+        hash_fingerprints = false;
+        argc--;
+        argv++;
+    }
+
+
     char *error_message;
     bool success = sr_abrt_create_core_stacktrace(argv[0],
+                                                  hash_fingerprints,
                                                   &error_message);
 
     if (!success)

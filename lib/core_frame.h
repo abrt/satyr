@@ -62,8 +62,11 @@ struct sr_core_frame
     char *function_name;
     // so or executable
     char *file_name;
-    /** Hash of the function contents. */
+    /** Fingerprint of the function contents, optionally hashed */
     char *fingerprint;
+
+    /** Is the fingerprint hashed or raw? */
+    bool fingerprint_hashed;
 
     /**
      * A sibling frame residing below this one, or NULL if this is the

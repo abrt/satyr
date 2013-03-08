@@ -40,6 +40,7 @@ sr_core_frame_init(struct sr_core_frame *frame)
     frame->function_name = NULL;
     frame->file_name = NULL;
     frame->fingerprint = NULL;
+    frame->fingerprint_hashed = false;
     frame->next = NULL;
 }
 

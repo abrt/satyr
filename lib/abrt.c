@@ -53,7 +53,8 @@ sr_abrt_print_report_from_dir(const char *directory,
 
 bool
 sr_abrt_create_core_stacktrace(const char *directory,
-                                char **error_message)
+                               bool hash_fingerprints,
+                               char **error_message)
 {
     char *executable_filename = sr_build_path(directory, "executable", NULL);
     char *executable_contents = sr_file_to_string(executable_filename,
@@ -77,6 +78,9 @@ sr_abrt_create_core_stacktrace(const char *directory,
 
     if (!success)
         return false;
+
+    if (hash_fingerprints)
+        sr_core_fingerprint_hash(core_stacktrace);
 
     char *json = sr_core_stacktrace_to_json(core_stacktrace);
 

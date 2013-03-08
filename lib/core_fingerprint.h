@@ -45,6 +45,9 @@ sr_core_fingerprint_generate_for_binary(struct sr_core_thread *thread,
                                         const char *binary_path,
                                         char **error_message);
 
+void
+sr_core_fingerprint_hash(struct sr_core_stacktrace *stacktrace);
+
 #ifdef __cplusplus
 }
 #endif

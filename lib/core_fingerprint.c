@@ -26,6 +26,7 @@
 #include "elves.h"
 #include "disasm.h"
 #include "callgraph.h"
+#include "sha1.h"
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
@@ -35,7 +36,7 @@ fingerprint_add_bool(struct sr_strbuf *buffer,
                      const char *name,
                      bool value)
 {
-    sr_strbuf_append_strf(buffer, "%s:%d", name, value ? 1 : 0);
+    sr_strbuf_append_strf(buffer, ";%s:%d", name, value ? 1 : 0);
 }
 
 static void
@@ -44,7 +45,7 @@ fingerprint_add_list(struct sr_strbuf *buffer,
                      char **list,
                      size_t count)
 {
-    sr_strbuf_append_strf(buffer, "%s:", name);
+    sr_strbuf_append_strf(buffer, ";%s:", name);
 
     bool first = true;
     for (size_t loop = 0; loop < count; ++loop)
@@ -277,6 +278,12 @@ get_libcalls(char ***symbol_list,
     return true;
 }
 
+static int
+strcmp_reverse(const char *s1, const char *s2)
+{
+    return -strcmp(s1, s2);
+}
+
 static bool
 fp_libcalls(struct sr_strbuf *fingerprint,
             uint64_t function_start_address,
@@ -301,7 +308,7 @@ fp_libcalls(struct sr_strbuf *fingerprint,
         return false;
 
     qsort(symbol_list, symbol_list_size,
-          sizeof(char*), (comparison_fn_t)strcmp);
+          sizeof(char*), (comparison_fn_t)strcmp_reverse);
 
     /* Make it unique. */
     sr_struniq(symbol_list, &symbol_list_size);
@@ -340,7 +347,7 @@ fp_calltree_leaves(struct sr_strbuf *fingerprint,
         return false;
 
     qsort(symbol_list, symbol_list_size,
-          sizeof(char*), (comparison_fn_t)strcmp);
+          sizeof(char*), (comparison_fn_t)strcmp_reverse);
 
     /* Make it unique. */
     sr_struniq(symbol_list, &symbol_list_size);
@@ -357,7 +364,7 @@ fp_calltree_leaves(struct sr_strbuf *fingerprint,
 
 bool
 sr_core_fingerprint_generate(struct sr_core_stacktrace *stacktrace,
-                              char **error_message)
+                             char **error_message)
 {
     struct sr_core_thread *thread = stacktrace->threads;
     while (thread)
@@ -425,6 +432,7 @@ compute_fingerprint(struct sr_core_frame *frame,
            binary);
 */
     struct sr_strbuf *fingerprint = sr_strbuf_new();
+    sr_strbuf_append_strf(fingerprint, "v1");
 
     fp_jump_equality(fingerprint, instructions);
     fp_jump_signed(fingerprint, instructions);
@@ -532,3 +540,40 @@ sr_core_fingerprint_generate_for_binary(struct sr_core_thread *thread,
     return true;
 }
 
+static void
+hash_frame (struct sr_core_frame *frame)
+{
+    if (!frame->fingerprint)
+        return;
+
+    struct sr_sha1_state ctx;
+    char bin_hash[SR_SHA1_RESULT_BIN_LEN];
+    char *hash = sr_malloc(SR_SHA1_RESULT_LEN);
+
+    sr_sha1_begin(&ctx);
+    sr_sha1_hash(&ctx, frame->fingerprint, strlen(frame->fingerprint));
+    sr_sha1_end(&ctx, bin_hash);
+    sr_bin2hex(hash, bin_hash, sizeof(bin_hash))[0] = '\0';
+
+    free(frame->fingerprint);
+    frame->fingerprint = hash;
+    frame->fingerprint_hashed = true;
+}
+
+void
+sr_core_fingerprint_hash(struct sr_core_stacktrace *stacktrace)
+{
+    struct sr_core_thread *thread = stacktrace->threads;
+    while (thread)
+    {
+        struct sr_core_frame *frame = thread->frames;
+        while (frame)
+        {
+            hash_frame(frame);
+
+            frame = frame->next;
+        }
+
+        thread = thread->next;
+    }
+}

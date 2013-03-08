@@ -32,6 +32,7 @@ sr_abrt_print_report_from_dir(const char *directory,
 
 bool
 sr_abrt_create_core_stacktrace(const char *directory,
+                               bool hash_fingerprints,
                                char **error_message);
 
 struct sr_rpm_package *
