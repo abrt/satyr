@@ -237,7 +237,7 @@ sr_py_gdb_frame_str(PyObject *self)
     else
         sr_strbuf_append_strf(buf, "function %s", this->frame->function_name);
     if (this->frame->address != -1)
-        sr_strbuf_append_strf(buf, " @ 0x%016lx", this->frame->address);
+        sr_strbuf_append_strf(buf, " @ 0x%016"PRIx64, this->frame->address);
     if (this->frame->library_name)
         sr_strbuf_append_strf(buf, " (%s)", this->frame->library_name);
     char *str = sr_strbuf_free_nobuf(buf);
@@ -381,14 +381,15 @@ sr_py_gdb_frame_set_signal_handler_called(PyObject *self, PyObject *args)
 PyObject *
 sr_py_gdb_frame_get_address(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct sr_py_gdb_frame*)self)->frame->address);
+    return Py_BuildValue("K",
+        (unsigned long long)(((struct sr_py_gdb_frame*)self)->frame->address));
 }
 
 PyObject *
 sr_py_gdb_frame_set_address(PyObject *self, PyObject *args)
 {
-    uint64_t newvalue;
-    if (!PyArg_ParseTuple(args, "l", &newvalue))
+    unsigned long long newvalue;
+    if (!PyArg_ParseTuple(args, "K", &newvalue))
         return NULL;
 
     struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;

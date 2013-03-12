@@ -234,7 +234,7 @@ sr_py_koops_frame_str(PyObject *self)
     struct sr_py_koops_frame *this = (struct sr_py_koops_frame*)self;
     struct sr_strbuf *buf = sr_strbuf_new();
     if (this->frame->address != 0)
-        sr_strbuf_append_strf(buf, "[0x%016lx] ", this->frame->address);
+        sr_strbuf_append_strf(buf, "[0x%016"PRIx64"] ", this->frame->address);
 
     if (!this->frame->reliable)
         sr_strbuf_append_str(buf, "? ");
@@ -243,10 +243,10 @@ sr_py_koops_frame_str(PyObject *self)
         sr_strbuf_append_str(buf, this->frame->function_name);
 
     if (this->frame->function_offset)
-        sr_strbuf_append_strf(buf, "+0x%lx", this->frame->function_offset);
+        sr_strbuf_append_strf(buf, "+0x%"PRIx64, this->frame->function_offset);
 
     if (this->frame->function_length)
-        sr_strbuf_append_strf(buf, "/0x%lx", this->frame->function_length);
+        sr_strbuf_append_strf(buf, "/0x%"PRIx64, this->frame->function_length);
 
     if (this->frame->module_name)
         sr_strbuf_append_strf(buf, " [%s]", this->frame->module_name);
@@ -255,16 +255,16 @@ sr_py_koops_frame_str(PyObject *self)
         sr_strbuf_append_str(buf, " from ");
 
     if (this->frame->from_address != 0)
-        sr_strbuf_append_strf(buf, "[0x%016lx] ", this->frame->from_address);
+        sr_strbuf_append_strf(buf, "[0x%016]"PRIx64" ", this->frame->from_address);
 
     if (this->frame->from_function_name)
         sr_strbuf_append_str(buf, this->frame->from_function_name);
 
     if (this->frame->from_function_offset)
-        sr_strbuf_append_strf(buf, "+0x%lx", this->frame->from_function_offset);
+        sr_strbuf_append_strf(buf, "+0x%"PRIx64, this->frame->from_function_offset);
 
     if (this->frame->from_function_length)
-        sr_strbuf_append_strf(buf, "/0x%lx", this->frame->from_function_length);
+        sr_strbuf_append_strf(buf, "/0x%"PRIx64, this->frame->from_function_length);
 
     if (this->frame->from_module_name)
         sr_strbuf_append_strf(buf, " [%s]", this->frame->from_module_name);
@@ -303,14 +303,15 @@ sr_py_koops_frame_set_reliable(PyObject *self, PyObject *args)
 PyObject *
 sr_py_koops_frame_get_address(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct sr_py_koops_frame*)self)->frame->address);
+    return Py_BuildValue("K",
+        (unsigned long long)(((struct sr_py_koops_frame*)self)->frame->address));
 }
 
 PyObject *
 sr_py_koops_frame_set_address(PyObject *self, PyObject *args)
 {
-    uint64_t newvalue;
-    if (!PyArg_ParseTuple(args, "l", &newvalue))
+    unsigned long long newvalue;
+    if (!PyArg_ParseTuple(args, "K", &newvalue))
         return NULL;
 
     struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
@@ -322,14 +323,15 @@ sr_py_koops_frame_set_address(PyObject *self, PyObject *args)
 PyObject *
 sr_py_koops_frame_get_from_address(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct sr_py_koops_frame*)self)->frame->from_address);
+    return Py_BuildValue("K",
+        (unsigned long long)(((struct sr_py_koops_frame*)self)->frame->from_address));
 }
 
 PyObject *
 sr_py_koops_frame_set_from_address(PyObject *self, PyObject *args)
 {
-    uint64_t newvalue;
-    if (!PyArg_ParseTuple(args, "l", &newvalue))
+    unsigned long long newvalue;
+    if (!PyArg_ParseTuple(args, "K", &newvalue))
         return NULL;
 
     struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
@@ -382,14 +384,15 @@ sr_py_koops_frame_set_from_function_name(PyObject *self, PyObject *args)
 PyObject *
 sr_py_koops_frame_get_function_offset(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct sr_py_koops_frame*)self)->frame->function_offset);
+    return Py_BuildValue("K",
+        (unsigned long long)(((struct sr_py_koops_frame*)self)->frame->function_offset));
 }
 
 PyObject *
 sr_py_koops_frame_set_function_offset(PyObject *self, PyObject *args)
 {
-    uint64_t newvalue;
-    if (!PyArg_ParseTuple(args, "l", &newvalue))
+    unsigned long long newvalue;
+    if (!PyArg_ParseTuple(args, "K", &newvalue))
         return NULL;
 
     struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
@@ -401,14 +404,15 @@ sr_py_koops_frame_set_function_offset(PyObject *self, PyObject *args)
 PyObject *
 sr_py_koops_frame_get_from_function_offset(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct sr_py_koops_frame*)self)->frame->from_function_offset);
+    return Py_BuildValue("K",
+        (unsigned long long)(((struct sr_py_koops_frame*)self)->frame->from_function_offset));
 }
 
 PyObject *
 sr_py_koops_frame_set_from_function_offset(PyObject *self, PyObject *args)
 {
-    uint64_t newvalue;
-    if (!PyArg_ParseTuple(args, "l", &newvalue))
+    unsigned long long newvalue;
+    if (!PyArg_ParseTuple(args, "K", &newvalue))
         return NULL;
 
     struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
@@ -420,14 +424,15 @@ sr_py_koops_frame_set_from_function_offset(PyObject *self, PyObject *args)
 PyObject *
 sr_py_koops_frame_get_function_length(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct sr_py_koops_frame*)self)->frame->function_length);
+    return Py_BuildValue("K",
+        (unsigned long long)(((struct sr_py_koops_frame*)self)->frame->function_length));
 }
 
 PyObject *
 sr_py_koops_frame_set_function_length(PyObject *self, PyObject *args)
 {
-    uint64_t newvalue;
-    if (!PyArg_ParseTuple(args, "l", &newvalue))
+    unsigned long long newvalue;
+    if (!PyArg_ParseTuple(args, "K", &newvalue))
         return NULL;
 
     struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
@@ -439,14 +444,15 @@ sr_py_koops_frame_set_function_length(PyObject *self, PyObject *args)
 PyObject *
 sr_py_koops_frame_get_from_function_length(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("l", ((struct sr_py_koops_frame*)self)->frame->from_function_length);
+    return Py_BuildValue("K",
+        (unsigned long long)(((struct sr_py_koops_frame*)self)->frame->from_function_length));
 }
 
 PyObject *
 sr_py_koops_frame_set_from_function_length(PyObject *self, PyObject *args)
 {
-    uint64_t newvalue;
-    if (!PyArg_ParseTuple(args, "l", &newvalue))
+    unsigned long long newvalue;
+    if (!PyArg_ParseTuple(args, "K", &newvalue))
         return NULL;
 
     struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
