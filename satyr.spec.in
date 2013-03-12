@@ -6,12 +6,15 @@ Release: 1%{?dist}
 Summary: Automatic problem management with anonymous reports
 Group: Development/Libraries
 License: GPLv2+
-URL: https://github.com/karelklic/satyr
+URL: https://github.com/abrt/satyr
+# Replace with full URL once we start doing actual releases
 Source0: satyr-%{version}.tar.xz
 BuildRequires: python2-devel
-BuildRequires: glib2-devel >= 2.21
 BuildRequires: elfutils-devel, elfutils-libelf-devel, binutils-devel
+# We're going to switch to elfutils unwinder once it's available
+BuildRequires: libunwind-devel >= 1.1
 Requires: elfutils-libelf, elfutils-libs, binutils
+Requires: libunwind >= 1.1
 
 %description
 Satyr is a backtrace parser and analyzer, which works with
