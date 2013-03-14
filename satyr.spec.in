@@ -3,12 +3,11 @@
 Name: satyr
 Version: @PACKAGE_VERSION@
 Release: 1%{?dist}
-Summary: Automatic problem management with anonymous reports
+Summary: A set of tools to create anonymous, machine-friendly problem reports
 Group: Development/Libraries
 License: GPLv2+
 URL: https://github.com/abrt/satyr
-# Replace with full URL once we start doing actual releases
-Source0: satyr-%{version}.tar.xz
+Source0: https://fedorahosted.org/released/abrt/satyr-%{version}.tar.xz
 BuildRequires: python2-devel
 BuildRequires: elfutils-devel, elfutils-libelf-devel, binutils-devel
 # We're going to switch to elfutils unwinder once it's available
@@ -17,22 +16,13 @@ Requires: elfutils-libelf, elfutils-libs, binutils
 Requires: libunwind >= 1.1
 
 %description
-Satyr is a backtrace parser and analyzer, which works with
-backtraces produced by the GNU Project Debugger. It can parse a text
-file with a backtrace to a tree of C structures, allowing to analyze
-the threads and frames of the backtrace and work with them.
-
-Satyr also contains some backtrace manipulation and extraction
-routines:
-- it can find a frame in the crash-time backtrace where the program
-  most likely crashed (a chance is that the function described in that
-  frame is buggy)
-- it can produce a duplication hash of the backtrace, which helps to
-  discover that two crash-time backtraces are duplicates, triggered by
-  the same flaw of the code
-- it can "rate" the backtrace quality, which depends on the number of
-  frames with and without the function name known (missing function
-  name is caused by missing debugging symbols)
+Satyr is a library that can be used to create and process microreports.
+Microreports consist of structured data suitable to be analyzed in a fully
+automated manner, though they do not necessarily contain sufficient information
+to fix the underlying problem. The reports are designed not to contain any
+potentially sensitive data to eliminate the need for review before submission.
+Included is a tool that can create microreports and perform some basic
+operations on them.
 
 %package devel
 Summary: Development libraries for %{name}
