@@ -32,8 +32,6 @@
  * Call graph is used by fingerprinting algorithms.
  */
 
-#include "config.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -2,7 +2,6 @@ pkginclude_HEADERS = \
 	abrt.h \
 	callgraph.h \
 	cluster.h \
-	config.h \
 	core_fingerprint.h \
 	core_frame.h \
 	core_stacktrace.h \

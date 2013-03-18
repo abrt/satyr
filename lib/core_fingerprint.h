@@ -25,8 +25,6 @@
  * @brief Fingerprint algorithm for core stack traces.
  */
 
-#include "config.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

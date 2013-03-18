@@ -25,8 +25,6 @@
  * @brief BFD-based function disassembler.
  */
 
-#include "config.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
