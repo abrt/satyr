@@ -58,7 +58,7 @@ make check
 %postun -p /sbin/ldconfig
 
 %files
-%doc README NEWS COPYING TODO ChangeLog
+%doc README NEWS COPYING
 %{_bindir}/satyr
 %{_mandir}/man1/%{name}.1*
 %{_libdir}/lib*.so.*
