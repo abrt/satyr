@@ -92,47 +92,12 @@ AC_CHECK_LIB([unwind-coredump], [main])
 # rpm
 AC_CHECK_LIB([rpm], [main])
 
-# pdflatex
-AC_PATH_PROG([PDFLATEX], [pdflatex], [no])
-AM_CONDITIONAL([HAVE_PDFLATEX], test "$PDFLATEX" != "no")
-[if test "$PDFLATEX" = "no"; then]
-    [echo "The pdflatex program was not found in the search path. The documentation"]
-    [echo "will not be built.  If you want to build the documentation, please ensure"]
-    [echo "that pdflatex is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Satyr."]
-[fi]
-
-# doxygen
-AC_PATH_PROG([DOXYGEN], [doxygen], [no])
-AM_CONDITIONAL([HAVE_DOXYGEN], test "$DOXYGEN" != "no")
-[if test "$DOXYGEN" = "no"; then]
-    [echo "The doxygen program was not found in the search path. The documentation"]
-    [echo "will not be built.  If you want to build the documentation, please ensure"]
-    [echo "that doxygen is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Satyr."]
-[fi]
-
-# dot (part of graphviz)
-AC_PATH_PROG([DOT], [dot], [no])
-AM_CONDITIONAL([HAVE_DOT], test "$DOT" != "no")
-[if test "DOT" = "no"; then]
-    [echo "The dot program was not found in the search path. The documentation"]
-    [echo "will not be built.  If you want to build the documentation, please ensure"]
-    [echo "that dot is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Satyr."]
-[fi]
-
-AM_CONDITIONAL([BUILD_DOCUMENTATION], test \( "$DOXYGEN" != "no" \) \
-				      	-a \( "$DOT" != "no" \) \
-					-a \( "$PDFLATEX" != "no" \))
-
 AC_CONFIG_FILES([
 	satyr.spec
 	satyr.pc
 	Makefile
 	lib/Makefile
 	python/Makefile
-	docs/Makefile
 	tests/Makefile
 	tests/atlocal
 ])
