@@ -1,57 +1,29 @@
-.TH satyr "1" "24 May 2010" ""
+.TH SATYR "1" "2013-03-18" ""
 .SH NAME
-satyr \- a backtrace analyzer
+satyr \- create and manipulate problem reports
 .SH SYNOPSIS
 .B satyr
-[option]... [FILE]...
+<command> [option...]
 .SH DESCRIPTION
 .I satyr
-is a command line tool that analyzes backtraces produced by
-GDB and provides their textual representation useful for
-crash duplication detection.
+is a command line tool that creates anonymous reports of software problems that
+are suitable for automated processing.
 
-By default, satyr prints the backtrace tree created by
-parsing the input file.
-
-THIS MANPAGE IS NOT OUT OF DATE AND THEREFORE USELESS.
+The tool has to be invoked with a
+.I <command>
+that specifies the action to be performed. The available commands are
+documented below.
 
 .SH OPTIONS
-.B Basic startup options
-.IP "\-V, \-\-version"
-Displays version of satyr.
-.IP "\-?, \-\-help"
-Print a help message describing all of satyr’s command-line options.
+.B Commands
+.IP "abrt\-print\-report\-from\-dir <directory>"
 
-.PP
-.B Actions
-.IP "\-r, \-\-rate"
-Print a float number between 0 and 1, representing the quality of the
-backtrace.
-.IP "\-c, \-\-crash\-function"
-Print the name of the function where the program crashed, if it's
-successfully detected.
-.IP "\-h, \-\-duplicate\-hash"
-Print a short, textual representation of the backtrace, useful for
-detecting the backtrace duplicates.
-.IP "\-s, \-\-distances"
-Print Damerau–Levenshtein distances between the backtraces specified on the command
-line.
-.IP "\-g, \-\-dendrogram"
-Cluster backtraces by their distance and print an ASCII representation of the
-dendrogram.
-.IP "\-l, \-\-clusters=LEVEL"
-Print clusters cut from the dendrogram at the specified level.
+Creates report from ABRT problem directory
+.I directory
+and prints it to standard output.
 
-.PP
-.B Additional options
-.IP "\-i, \-\-stdin"
-Read input from the standard input rather than file.
-.IP "\-m, \-\-max\-frames=FRAMES"
-When creating optimized backtrace or preparing backtrace for comparison, limit
-the number of frames to FRAMES. (default 8)
-.IP "\-z, \-\-min\-cluster\-size=SIZE"
-When printing clusters, ignore clusters that contain fewer than SIZE objects. (default 2)
-.IP "\-d, \-\-debug"
-Prints debug information when scanning/parsing the backtrace.
-.IP "\-v, \-\-verbose"
-Print more output than usual.
+.IP "abrt\-create\-core\-stacktrace <directory>"
+
+Creates stacktrace from ABRT problem directory
+.I directory
+that contains a core dump.
