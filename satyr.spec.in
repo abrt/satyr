@@ -12,6 +12,7 @@ BuildRequires: python2-devel
 BuildRequires: elfutils-devel, elfutils-libelf-devel, binutils-devel
 # We're going to switch to elfutils unwinder once it's available
 BuildRequires: libunwind-devel >= 1.1
+BuildRequires: rpm-devel
 
 %description
 Satyr is a library that can be used to create and process microreports.
