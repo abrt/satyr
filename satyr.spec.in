@@ -74,5 +74,9 @@ make check
 %{python_sitearch}/%{name}/*
 
 %changelog
-* Mon Aug 30 2010 Karel Klic <kklic@redhat.com> @PACKAGE_VERSION@-1
+* Mon Mar 18 2012 Martin Milata <mmilata@redhat.com> 0.2-1
+- Documentation and spec cleanup
+- Build fixes (build against RPM)
+
+* Mon Aug 30 2010 Karel Klic <kklic@redhat.com> 0.1-1
 - Upstream package spec file
