@@ -422,7 +422,7 @@ sr_gdb_thread_skip_lwp(const char **input)
 struct sr_gdb_thread *
 sr_gdb_thread_parse_funs(const char *input)
 {
-    const char *next, *libname;
+    const char *next, *libname, *c;
     struct sr_gdb_thread *thread = sr_gdb_thread_new();
     struct sr_gdb_frame *frame, **pframe = &thread->frames;
     int number = 0;
@@ -433,9 +433,12 @@ sr_gdb_thread_parse_funs(const char *input)
         if (!next)
             break;
 
-        libname = strchr(input + 1, ' ');
-        if (!libname || libname > next)
-            libname = next;
+        /* Search for last space before newline. */
+        for (c = input, libname = next; ; libname = c) {
+            c = strchr(c + 1, ' ');
+            if (!c || c > next)
+                break;
+        }
 
         frame = sr_gdb_frame_new();
         frame->function_name = sr_strndup(input, libname - input);
