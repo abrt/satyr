@@ -461,7 +461,7 @@ sr_py_gdb_frame_calls_func(PyObject *self, PyObject *args)
         return NULL;
 
     struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
-    return Py_BuildValue("i", sr_gdb_frame_calls_func(frame, func_name));
+    return Py_BuildValue("i", sr_gdb_frame_calls_func(frame, func_name, NULL));
 }
 
 PyObject *
