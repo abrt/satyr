@@ -18,6 +18,9 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "py_koops_frame.h"
+
+#include <inttypes.h>
+
 #include "lib/location.h"
 #include "lib/strbuf.h"
 #include "lib/utils.h"
