@@ -21,6 +21,7 @@
 #include "report.h"
 #include "config.h"
 #include "utils.h"
+#include "json.h"
 #include "koops_stacktrace.h"
 #include "core_stacktrace.h"
 #include "python_stacktrace.h"

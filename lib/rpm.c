@@ -19,6 +19,7 @@
 */
 #include "rpm.h"
 #include "utils.h"
+#include "json.h"
 #include "strbuf.h"
 #include "config.h"
 #include <errno.h>

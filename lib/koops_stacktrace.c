@@ -20,6 +20,7 @@
 #include "koops_stacktrace.h"
 #include "koops_frame.h"
 #include "utils.h"
+#include "json.h"
 #include "strbuf.h"
 #include <string.h>
 

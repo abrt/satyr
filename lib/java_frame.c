@@ -22,6 +22,7 @@
 #include "strbuf.h"
 #include "location.h"
 #include "utils.h"
+#include "json.h"
 #include <string.h>
 #include <inttypes.h>
 

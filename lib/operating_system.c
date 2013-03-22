@@ -20,6 +20,7 @@
 */
 #include "operating_system.h"
 #include "utils.h"
+#include "json.h"
 #include "strbuf.h"
 #include <string.h>
 #include <ctype.h>

@@ -21,6 +21,7 @@
 #include "python_frame.h"
 #include "location.h"
 #include "utils.h"
+#include "json.h"
 #include "sha1.h"
 #include "strbuf.h"
 #include <stdio.h>

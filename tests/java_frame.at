@@ -187,6 +187,7 @@ AT_TESTFUN([sr_java_frame_append_to_str],
 [[
 #include <lib/java_frame.h>
 #include <lib/strbuf.h>
+#include <lib/utils.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
