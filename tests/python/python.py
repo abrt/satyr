@@ -43,7 +43,7 @@ class TestPythonStacktrace(unittest.TestCase):
 
     def test_str(self):
         out = str(self.trace)
-        self.assertIn('Python stacktrace with %d frames' % frames_expected, out)
+        self.assertTrue(('Python stacktrace with %d frames' % frames_expected) in out)
 
 class TestPythonFrame(unittest.TestCase):
     def setUp(self):
@@ -51,9 +51,9 @@ class TestPythonFrame(unittest.TestCase):
 
     def test_str(self):
         out = str(self.frame)
-        self.assertIn('yumBackend.py', out)
-        self.assertIn('1830', out)
-        self.assertIn('_runYumTransaction', out)
+        self.assertTrue('yumBackend.py' in out)
+        self.assertTrue('1830' in out)
+        self.assertTrue('_runYumTransaction' in out)
 
     def test_dup(self):
         dup = self.frame.dup()

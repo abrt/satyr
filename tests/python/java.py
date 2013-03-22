@@ -47,7 +47,7 @@ class TestJavaStacktrace(unittest.TestCase):
 
     def test_str(self):
         out = str(self.trace)
-        self.assertIn('Java stacktrace with %d threads' % threads_expected, out)
+        self.assertTrue(('Java stacktrace with %d threads' % threads_expected) in out)
 
 class TestJavaThread(unittest.TestCase):
     def setUp(self):
@@ -63,9 +63,9 @@ class TestJavaFrame(unittest.TestCase):
 
     def test_str(self):
         out = str(self.frame)
-        self.assertIn('org.hibernate.exception.ConstraintViolationException', out)
-        self.assertIn('could not insert', out)
-        self.assertIn('com.example.myproject', out)
+        self.assertTrue('org.hibernate.exception.ConstraintViolationException' in out)
+        self.assertTrue('could not insert' in out)
+        self.assertTrue('com.example.myproject' in out)
 
     def test_dup(self):
         dup = self.frame.dup()

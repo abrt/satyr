@@ -53,7 +53,7 @@ class TestGdbStacktrace(unittest.TestCase):
 
     def test_str(self):
         out = str(self.trace)
-        self.assertIn('Stacktrace with %d threads' % threads_expected, out)
+        self.assertTrue(('Stacktrace with %d threads' % threads_expected) in out)
 
 class TestGdbThread(unittest.TestCase):
     def setUp(self):
@@ -69,9 +69,9 @@ class TestGdbFrame(unittest.TestCase):
 
     def test_str(self):
         out = str(self.frame)
-        self.assertIn('0x0000003ec220e48d', out)
-        self.assertIn('write', out)
-        self.assertIn('Frame #0', out)
+        self.assertTrue('0x0000003ec220e48d' in out)
+        self.assertTrue('write' in out)
+        self.assertTrue('Frame #0' in out)
 
     def test_dup(self):
         dup = self.frame.dup()

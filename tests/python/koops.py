@@ -44,7 +44,7 @@ class TestKerneloops(unittest.TestCase):
 
     def test_str(self):
         out = str(self.koops)
-        self.assertIn('Kerneloops with %d frames' % frames_expected, out)
+        self.assertTrue(('Kerneloops with %d frames' % frames_expected) in out)
 
 class TestKoopsFrame(unittest.TestCase):
     def setUp(self):
@@ -52,10 +52,10 @@ class TestKoopsFrame(unittest.TestCase):
 
     def test_str(self):
         out = str(self.frame)
-        self.assertIn('0xffffffff81057adf', out)
-        self.assertIn('warn_slowpath_common', out)
-        self.assertIn('0x7f', out)
-        self.assertIn('0xc0', out)
+        self.assertTrue('0xffffffff81057adf' in out)
+        self.assertTrue('warn_slowpath_common' in out)
+        self.assertTrue('0x7f' in out)
+        self.assertTrue('0xc0' in out)
 
     def test_dup(self):
         dup = self.frame.dup()
