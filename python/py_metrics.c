@@ -113,7 +113,13 @@ sr_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
                 PyErr_SetString(PyExc_TypeError, "Must be a list of satyr.Thread objects");
                 return NULL;
             }
-            threads[i] = ((struct sr_py_gdb_thread*)obj)->thread;
+
+            struct sr_py_gdb_thread *to = obj;
+            if (thread_prepare_linked_list(to) < 0)
+            {
+                return NULL;
+            }
+            threads[i] = to->thread;
         }
         if (m < 1 || n < 2)
         {
