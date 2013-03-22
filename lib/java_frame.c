@@ -72,11 +72,11 @@ sr_java_frame_free(struct sr_java_frame *frame)
 void
 sr_java_frame_free_full(struct sr_java_frame *frame)
 {
-    while(frame && frame->next)
+    while(frame)
     {
         struct sr_java_frame *tmp = frame;
         frame = frame->next;
-        sr_java_frame_free(frame);
+        sr_java_frame_free(tmp);
     }
 }
 
