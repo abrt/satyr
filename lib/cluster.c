@@ -76,7 +76,7 @@ cluster_add_index(struct cluster *cluster, int index)
     if (cluster->size >= cluster->alloced)
     {
         cluster->alloced = cluster->alloced >= 1 ? cluster->alloced * 2 : 1;
-        cluster->objects = realloc(cluster->objects, sizeof (*cluster->objects)
+        cluster->objects = sr_realloc(cluster->objects, sizeof (*cluster->objects)
                 * cluster->alloced);
     }
     cluster->objects[cluster->size++] = index;

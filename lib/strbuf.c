@@ -80,12 +80,7 @@ sr_strbuf_grow(struct sr_strbuf *strbuf, int num)
         while (strbuf->len + num + 1 > strbuf->alloc)
             strbuf->alloc *= 2; /* huge grow = infinite loop */
 
-        strbuf->buf = realloc(strbuf->buf, strbuf->alloc);
-        if (!strbuf->buf)
-        {
-            puts("Error while allocating memory for string buffer.");
-            exit(5);
-        }
+        strbuf->buf = sr_realloc(strbuf->buf, strbuf->alloc);
     }
 }
 
