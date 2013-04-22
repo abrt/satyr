@@ -429,6 +429,23 @@ unwind_thread(struct UCD_info *ui,
     return thread;
 }
 
+static int
+get_signal_number(struct UCD_info *ui)
+{
+    int tnum, nthreads = _UCD_get_num_threads(ui);
+    for (tnum = 0; tnum < nthreads; ++tnum)
+    {
+        _UCD_select_thread(ui, tnum);
+        int signo = _UCD_get_cursig(ui);
+
+        /* Return first nonzero signal, gdb/bfd seem to work this way. */
+        if (signo)
+            return signo;
+    }
+
+    return 0;
+}
+
 struct sr_core_stacktrace *
 sr_parse_coredump(const char *core_file,
                    const char *exe_file,
@@ -491,8 +508,7 @@ sr_parse_coredump(const char *core_file,
     }
 
     stacktrace->executable = realpath(exe_file, NULL);
-    /* FIXME: determine signal */
-    stacktrace->signal = 0;
+    stacktrace->signal = get_signal_number(ui);
     /* FIXME: is this the best we can do? */
     stacktrace->crash_thread = stacktrace->threads;
 

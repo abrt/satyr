@@ -41,7 +41,7 @@ struct sr_json_value;
 struct sr_core_stacktrace
 {
     /** Signal number. */
-    uint8_t signal;
+    uint16_t signal;
 
     char *executable;
 
