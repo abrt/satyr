@@ -3,6 +3,12 @@ AC_CONFIG_HEADERS([lib/config.h])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AM_MAINTAINER_MODE
 
+# Support silent build rules. Disable by either passing --disable-silent-rules
+# to ./configure or passing V=1 to make
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
+# The 'yes' argument is undocumented but it is common knowledge that it works.
+AM_SILENT_RULES([yes])
+
 AM_PROG_AR
 AC_PROG_CC
 AC_DISABLE_STATIC
