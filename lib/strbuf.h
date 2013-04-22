@@ -30,6 +30,7 @@ extern "C" {
 #endif
 
 #include <stdarg.h>
+#include "utils.h"
 
 /**
  * @brief A resizable string buffer.
@@ -124,7 +125,7 @@ sr_strbuf_prepend_str(struct sr_strbuf *strbuf,
  */
 struct sr_strbuf *
 sr_strbuf_append_strf(struct sr_strbuf *strbuf,
-                      const char *format, ...);
+                      const char *format, ...) __sr_printf(2, 3);
 
 /**
  * Same as sr_strbuf_append_strf except that va_list is used instead of
@@ -141,7 +142,7 @@ sr_strbuf_append_strfv(struct sr_strbuf *strbuf,
  */
 struct sr_strbuf *
 sr_strbuf_prepend_strf(struct sr_strbuf *strbuf,
-                       const char *format, ...);
+                       const char *format, ...) __sr_printf(2, 3);
 
 /**
  * Same as sr_strbuf_prepend_strf except that va_list is used instead of

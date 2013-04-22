@@ -43,6 +43,8 @@ extern "C" {
 #define SR_digit "0123456789"
 #define SR_alnum SR_alpha SR_digit
 
+#define __sr_printf(x, y) __attribute__((format(printf, (x), (y))))
+
 /**
  * Debugging output to stdout while parsing.
  * Default value is false.
@@ -78,7 +80,7 @@ sr_vasprintf(const char *format, va_list p);
  * Never returns NULL.
  */
 char *
-sr_asprintf(const char *format, ...);
+sr_asprintf(const char *format, ...) __sr_printf(1, 2);
 
 /**
  * Never returns NULL.
