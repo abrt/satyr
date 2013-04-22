@@ -38,7 +38,7 @@ koops_stacktrace_methods[] =
 static PyMemberDef
 koops_stacktrace_members[] =
 {
-    { (char *)"frames",       T_OBJECT_EX, offsetof(struct sr_py_koops_stacktrace, frames),     0,    b_frames_doc     },
+    { (char *)"frames", T_OBJECT_EX, offsetof(struct sr_py_koops_stacktrace, frames), 0, (char *) b_frames_doc },
     { NULL },
 };
 
@@ -254,8 +254,8 @@ sr_py_koops_stacktrace_str(PyObject *self)
 {
     struct sr_py_koops_stacktrace *this = (struct sr_py_koops_stacktrace *)self;
     struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_strf(buf, "Kerneloops with %d frames",
-                           PyList_Size(this->frames));
+    sr_strbuf_append_strf(buf, "Kerneloops with %zd frames",
+                           (ssize_t)(PyList_Size(this->frames)));
     char *str = sr_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);

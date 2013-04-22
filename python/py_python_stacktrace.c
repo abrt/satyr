@@ -62,7 +62,7 @@ python_stacktrace_methods[] =
 static PyMemberDef
 python_stacktrace_members[] =
 {
-    { (char *)"frames",       T_OBJECT_EX, offsetof(struct sr_py_python_stacktrace, frames),     0,  f_frames_doc     },
+    { (char *)"frames", T_OBJECT_EX, offsetof(struct sr_py_python_stacktrace, frames), 0, (char *)f_frames_doc },
     { NULL },
 };
 
@@ -260,8 +260,8 @@ sr_py_python_stacktrace_str(PyObject *self)
 {
     struct sr_py_python_stacktrace *this = (struct sr_py_python_stacktrace *)self;
     struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_strf(buf, "Python stacktrace with %d frames",
-                           PyList_Size(this->frames));
+    sr_strbuf_append_strf(buf, "Python stacktrace with %zd frames",
+                           (ssize_t)(PyList_Size(this->frames)));
     char *str = sr_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);

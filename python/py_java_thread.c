@@ -264,7 +264,7 @@ sr_py_java_thread_str(PyObject *self)
     if (this->thread->name)
         sr_strbuf_append_strf(buf, " %s", this->thread->name);
 
-    sr_strbuf_append_strf(buf, " with %d frames", PyList_Size(this->frames));
+    sr_strbuf_append_strf(buf, " with %zd frames", (ssize_t)(PyList_Size(this->frames)));
     char *str = sr_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);

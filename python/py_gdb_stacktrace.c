@@ -429,8 +429,8 @@ sr_py_gdb_stacktrace_str(PyObject *self)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace *)self;
     struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_strf(buf, "Stacktrace with %d threads",
-                           PyList_Size(this->threads));
+    sr_strbuf_append_strf(buf, "Stacktrace with %zd threads",
+                           (ssize_t)(PyList_Size(this->threads)));
     char *str = sr_strbuf_free_nobuf(buf);
     PyObject *result = Py_BuildValue("s", str);
     free(str);

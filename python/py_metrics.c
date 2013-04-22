@@ -114,7 +114,7 @@ sr_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
                 return NULL;
             }
 
-            struct sr_py_gdb_thread *to = obj;
+            struct sr_py_gdb_thread *to = (struct sr_py_gdb_thread*)obj;
             if (thread_prepare_linked_list(to) < 0)
             {
                 return NULL;

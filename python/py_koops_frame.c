@@ -258,7 +258,7 @@ sr_py_koops_frame_str(PyObject *self)
         sr_strbuf_append_str(buf, " from ");
 
     if (this->frame->from_address != 0)
-        sr_strbuf_append_strf(buf, "[0x%016]"PRIx64" ", this->frame->from_address);
+        sr_strbuf_append_strf(buf, "[0x%016"PRIx64"] ", this->frame->from_address);
 
     if (this->frame->from_function_name)
         sr_strbuf_append_str(buf, this->frame->from_function_name);
