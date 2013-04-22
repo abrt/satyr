@@ -158,7 +158,7 @@ sr_py_dendrogram_get_merge_level(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "i", &i))
         return NULL;
 
-    if (i < 0 || i + 1 >= this->dendrogram->size)
+    if (i < 0 || i > this->dendrogram->size)
     {
         PyErr_SetString(PyExc_ValueError, "Merge level position out of range");
         return NULL;
