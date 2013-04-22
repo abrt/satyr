@@ -434,7 +434,7 @@ sr_parse_coredump(const char *core_file,
                    const char *exe_file,
                    char **error_msg)
 {
-    struct sr_core_thread *trace = NULL;
+    struct sr_core_stacktrace *stacktrace = NULL;
 
     /* Initialize error_msg to 'no error'. */
     if (error_msg)
@@ -472,12 +472,12 @@ sr_parse_coredump(const char *core_file,
         }
     }
 
-    struct sr_core_stacktrace *stacktrace = sr_core_stacktrace_new();
+    stacktrace = sr_core_stacktrace_new();
 
     int tnum, nthreads = _UCD_get_num_threads(ui);
     for (tnum = 0; tnum < nthreads; ++tnum)
     {
-        trace = unwind_thread(ui, as, ch->dwfl, tnum, error_msg);
+        struct sr_core_thread *trace = unwind_thread(ui, as, ch->dwfl, tnum, error_msg);
         if (trace)
         {
             stacktrace->threads = sr_core_thread_append(stacktrace->threads, trace);
