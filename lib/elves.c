@@ -35,6 +35,7 @@
 #include <libelf.h>
 #include <string.h>
 #include <unistd.h>
+#include <inttypes.h>
 
 /**
  * Finds a section by its name in an ELF file.
@@ -166,7 +167,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
     /* Find the relocation section for .plt (typically .rela.plt), together
      * with its symbol and string table
      */
-    uintptr_t plt_base = shdr.sh_addr;
+    uint64_t plt_base = shdr.sh_addr;
     Elf_Data *rela_plt_data = NULL;
     Elf_Data *plt_symbols = NULL;
     size_t stringtable = 0;
@@ -477,7 +478,7 @@ read_cie(Dwarf_CFI_Entry *cfi,
  * Assumption: we'll always run on architecture the ELF is run on,
  * therefore we don't consider byte order.
  */
-static uintptr_t
+static uint64_t
 fde_read_address(const uint8_t *p, unsigned len)
 {
     int i;
@@ -491,7 +492,7 @@ fde_read_address(const uint8_t *p, unsigned len)
     for (i = 0; i < len; i++)
         u.b[i] = *p++;
 
-    return (len == 4 ? (uintptr_t)u.n4 : (uintptr_t)u.n8);
+    return (len == 4 ? (uint64_t)u.n4 : u.n8);
 }
 #endif /* WITH_ELFUTILS */
 

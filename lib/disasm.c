@@ -24,6 +24,7 @@
 #include "strbuf.h"
 #include <string.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #if HAVE_LIBOPCODES
 #include <bfd.h>
@@ -269,8 +270,8 @@ sr_disasm_instruction_parse_single_address_operand(char *instruction,
 
     /* Parse the address. */
     int chars_read;
-    uintptr_t addr;
-    int ret = sscanf(p, "%jx %n", &addr, &chars_read);
+    uint64_t addr;
+    int ret = sscanf(p, "%"SCNx64" %n", &addr, &chars_read);
     if (ret < 1)
         return false;
 
