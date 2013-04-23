@@ -1,4 +1,4 @@
-.TH SATYR "1" "2013-03-18" ""
+.TH SATYR "1" "2013-03-18" "@PACKAGE_STRING@"
 .SH NAME
 satyr \- create and manipulate problem reports
 .SH SYNOPSIS

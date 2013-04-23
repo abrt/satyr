@@ -10,7 +10,10 @@ satyr_SOURCES = satyr.c
 satyr_LDADD = lib/libsatyr.la
 
 man_MANS = satyr.1
-EXTRA_DIST = $(man_MANS)
+EXTRA_DIST = satyr.1.in
+
+satyr.1: satyr.1.in
+	sed -e "s,\@PACKAGE_STRING\@,$(PACKAGE_STRING),g" $< > $@
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = satyr.pc

@@ -6,6 +6,7 @@ Makefile
 Makefile.in
 ar-lib
 compile
+satyr.1
 
 /autom4te.cache
 /satyr
