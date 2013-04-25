@@ -192,6 +192,18 @@ sr_java_frame_append_to_str(struct sr_java_frame *frame,
             sr_strbuf_append_strf(dest, ":%d", frame->file_line);
 
         sr_strbuf_append_str(dest, ")");
+
+        if (!frame->class_path)
+            sr_strbuf_append_str(dest, " [unknown]");
+        else
+        {
+            sr_strbuf_append_str(dest, " [");
+
+            if (strchrnul(frame->class_path,':') > strchrnul(frame->class_path, '/'))
+                sr_strbuf_append_str(dest, "file:");
+
+            sr_strbuf_append_strf(dest, "%s]", frame->class_path);
+        }
     }
 }
 
