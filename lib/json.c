@@ -198,8 +198,8 @@ sr_json_parse_ex(struct sr_json_settings *settings,
     {
         json_uchar uchar;
         unsigned char uc_b1, uc_b2, uc_b3, uc_b4;
-        char *string;
-        unsigned string_length;
+        char *string = NULL;
+        unsigned string_length = 0;
 
         top = root = 0;
         flags = flag_seek_value;
