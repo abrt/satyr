@@ -340,13 +340,77 @@ exception_parsing_successful:
     return exception;
 }
 
+
+/* [file:/usr/lib/java/Foo.class] */
+/* [http://usr/lib/java/Foo.class] */
+/* [jar:file:/usr/lib/java/foo.jar!/Foo.class] */
+/* [jar:http://locahost/usr/lib/java/foo.jar!/Foo.class] */
+static
+const char *sr_java_frame_parse_frame_url(struct sr_java_frame *frame, const char *mark,
+                                            struct sr_location *location)
+{
+    const char *cursor = mark;
+
+    sr_location_add(location, 0, sr_skip_char_cspan(&cursor, "[\n"));
+
+    if (*cursor != '[')
+        return cursor;
+
+    ++cursor;
+    sr_location_add(location, 0, 1);
+    mark = cursor;
+
+    sr_location_add(location, 0, sr_skip_char_cspan(&cursor, ":\n"));
+
+    if (*cursor == ':')
+    {
+        const char *path_stop = "]\n";
+        if (strncmp("jar:", mark, strlen("jar:")) == 0)
+        {   /* From jar:file:/usr/lib/java/foo.jar!/Foo.class] */
+            /*                                               ^ */
+            ++cursor;
+            sr_location_add(location, 0, 1);
+            mark = cursor;
+            sr_location_add(location, 0, sr_skip_char_cspan(&cursor, ":\n"));
+            path_stop = "!\n";
+            /* To   file:/usr/lib/java/foo.jar!/Foo.class] */
+            /*                                ^            */
+
+            if (*cursor != ':')
+                return cursor;
+        }
+
+        if (strncmp("file:", mark, strlen("file:")) != 0)
+        {   /* move cursor back in case of http: ... */
+            sr_location_add(location, 0, -(cursor - mark));
+            cursor = mark;
+        }
+        else
+        {
+            ++cursor;
+            sr_location_add(location, 0, 1);
+            mark = cursor;
+        }
+
+        sr_location_add(location, 0, sr_skip_char_cspan(&cursor, path_stop));
+
+        if (mark != cursor)
+            frame->class_path = sr_strndup(mark, cursor - mark);
+    }
+
+    if (*cursor != ']' && *cursor != '\n')
+        sr_location_add(location, 0, sr_skip_char_cspan(&cursor, "]\n"));
+
+    return cursor;
+}
+
 struct sr_java_frame *
 sr_java_frame_parse(const char **input,
                      struct sr_location *location)
 {
     const char *mark = *input;
     int lines, columns;
-    /*      at SimpleTest.throwNullPointerException(SimpleTest.java:36) */
+    /*      at SimpleTest.throwNullPointerException(SimpleTest.java:36) [file:/usr/lib/java/foo.class] */
     const char *cursor = sr_strstr_location(mark, "at", &lines, &columns);
 
     if (!cursor)
@@ -355,11 +419,11 @@ sr_java_frame_parse(const char **input,
         return NULL;
     }
 
-    /*  SimpleTest.throwNullPointerException(SimpleTest.java:36) */
+    /*  SimpleTest.throwNullPointerException(SimpleTest.java:36) [file:/usr/lib/java/foo.class] */
     cursor = mark = cursor + 2;
     sr_location_add(location, lines, columns + 2);
 
-    /* SimpleTest.throwNullPointerException(SimpleTest.java:36) */
+    /* SimpleTest.throwNullPointerException(SimpleTest.java:36) [file:/usr/lib/java/foo.class] */
     cursor = sr_skip_whitespace(cursor);
     sr_location_add(location, 0, cursor - mark);
     mark = cursor;
@@ -371,7 +435,7 @@ sr_java_frame_parse(const char **input,
     if (cursor != mark)
         frame->name = sr_strndup(mark, cursor - mark);
 
-    /* (SimpleTest.java:36) */
+    /* (SimpleTest.java:36) [file:/usr/lib/java/foo.class] */
     if (*cursor == '(')
     {
         ++cursor;
@@ -401,8 +465,9 @@ sr_java_frame_parse(const char **input,
         }
     }
 
-    mark = cursor;
-    cursor = strchrnul(cursor, '\n');
+    /* [file:/usr/lib/java/foo.class] */
+    mark = sr_java_frame_parse_frame_url(frame, cursor, location);
+    cursor = strchrnul(mark, '\n');
 
     if (*cursor == '\n')
     {
