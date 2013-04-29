@@ -125,3 +125,14 @@ sr_py_setter_uint64(PyObject *self, PyObject *rhs, void *data)
     MEMB_T(uint64_t, MEMB(self, gsoff->c_struct_offset), gsoff->member_offset) = newvalue;
     return 0;
 }
+
+int
+normalize_cmp(int n)
+{
+    if (n > 0)
+        return 1;
+    else if (n < 0)
+        return -1;
+
+    return 0;
+}

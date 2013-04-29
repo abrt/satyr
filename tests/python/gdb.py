@@ -35,11 +35,13 @@ class TestGdbStacktrace(BindingsTestCase):
 
     def test_dup(self):
         dup = self.trace.dup()
-        self.assertNotEqual(dup.threads, self.trace.threads)
+        self.assertNotEqual(id(dup.threads), id(self.trace.threads))
+        self.assertEqual(dup.threads, self.trace.threads)
 
         dup.threads = dup.threads[:5]
         dup2 = dup.dup()
-        self.assertEqual(len(dup.threads), len(dup2.threads))
+        self.assertNotEqual(id(dup.threads), id(dup2.threads))
+        self.assertEqual(dup.threads, dup2.threads)
 
     def test_prepare_linked_list(self):
         dup = self.trace.dup()
@@ -62,6 +64,13 @@ class TestGdbThread(BindingsTestCase):
 
     def test_getset(self):
         self.assertGetSetCorrect(self.thread, 'number', 2, 9000)
+
+    def test_cmp(self):
+        self.assertEqual(self.thread, self.thread)
+        dup = self.thread.dup()
+        self.assertEqual(self.thread, dup)
+        dup.number = 9000
+        self.assertNotEqual(self.thread, dup)
 
 class TestGdbSharedlib(BindingsTestCase):
     def setUp(self):
@@ -94,11 +103,10 @@ class TestGdbFrame(BindingsTestCase):
 
     def test_cmp(self):
         dup = self.frame.dup()
-        self.assertEqual(dup.cmp(dup, 0), 0)
-        self.assertEqual(dup.cmp(self.frame, 0), 0)
-        self.assertEqual(dup.cmp(self.frame, 0), 0)
+        self.assertEqual(dup, dup)
+        self.assertEqual(dup, self.frame)
         dup.function_name = 'another'
-        self.assertNotEqual(dup.cmp(self.frame, 0), 0)
+        self.assertNotEqual(dup, self.frame)
 
     def test_getset(self):
         self.assertGetSetCorrect(self.frame, 'function_name', 'write', 'foo bar')

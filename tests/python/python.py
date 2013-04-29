@@ -31,11 +31,13 @@ class TestPythonStacktrace(BindingsTestCase):
 
     def test_dup(self):
         dup = self.trace.dup()
-        self.assertNotEqual(dup.frames, self.trace.frames)
+        self.assertNotEqual(id(dup.frames), id(self.trace.frames))
+        self.assertEqual(dup.frames, self.trace.frames)
 
         dup.frames = dup.frames[:5]
         dup2 = dup.dup()
         self.assertEqual(len(dup.frames), len(dup2.frames))
+        self.assertNotEqual(id(dup.frames), id(dup2.frames))
 
     def test_prepare_linked_list(self):
         dup = self.trace.dup()
@@ -73,11 +75,13 @@ class TestPythonFrame(BindingsTestCase):
 
     def test_cmp(self):
         dup = self.frame.dup()
-        self.assertEqual(dup.cmp(dup), 0)
-        self.assertEqual(dup.cmp(self.frame), 0)
-        self.assertEqual(dup.cmp(self.frame), 0)
+        self.assertEqual(dup, dup)
+        self.assertEqual(dup, self.frame)
+        self.assertEqual(dup, self.frame)
+        self.assertNotEqual(id(dup), id(self.frame))
         dup.function_name = 'another'
-        self.assertNotEqual(dup.cmp(self.frame), 0)
+        self.assertNotEqual(dup, self.frame)
+        self.assertTrue(dup > self.frame)
 
     def test_getset(self):
         self.assertGetSetCorrect(self.frame, 'file_name', '/usr/share/PackageKit/helpers/yum/yumBackend.py', 'java.py')

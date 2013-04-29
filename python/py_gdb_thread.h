@@ -57,9 +57,11 @@ void sr_py_gdb_thread_free(PyObject *object);
 /* str */
 PyObject *sr_py_gdb_thread_str(PyObject *self);
 
+/* cmp */
+int sr_py_gdb_thread_cmp(struct sr_py_gdb_thread *self, struct sr_py_gdb_thread *other);
+
 /* methods */
 PyObject *sr_py_gdb_thread_dup(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_thread_cmp(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_thread_quality_counts(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_thread_quality(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_thread_format_funs(PyObject *self, PyObject *args);

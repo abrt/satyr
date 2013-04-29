@@ -37,20 +37,12 @@
                   "Clones the frame object. All new structures are independent " \
                   "on the original object."
 
-#define f_cmp_doc "Usage: frame.cmp(frame2)\n" \
-                  "frame2: satyr.KerneloopsFrame - another frame to compare\n" \
-                  "Returns: integer - distance\n" \
-                  "Compares frame to frame2. Returns 0 if frame = frame2, " \
-                  "<0 if frame is 'less' than frame2, >0 if frame is 'more' " \
-                  "than frame2."
-
 
 static PyMethodDef
 frame_methods[] =
 {
     /* methods */
     { "dup",                       sr_py_koops_frame_dup,                      METH_NOARGS,  f_dup_doc                        },
-    { "cmp",                       sr_py_koops_frame_cmp,                      METH_VARARGS, f_cmp_doc                        },
     { NULL },
 };
 
@@ -101,7 +93,7 @@ sr_py_koops_frame_type =
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
-    NULL,                       /* tp_compare */
+    sr_py_koops_frame_cmp,      /* tp_compare */
     NULL,                       /* tp_repr */
     NULL,                       /* tp_as_number */
     NULL,                       /* tp_as_sequence */
@@ -237,19 +229,11 @@ sr_py_koops_frame_dup(PyObject *self, PyObject *args)
     return (PyObject*)fo;
 }
 
-PyObject *
-sr_py_koops_frame_cmp(PyObject *self, PyObject *args)
+int
+sr_py_koops_frame_cmp(PyObject *self, PyObject *other)
 {
-    PyObject *compare_to;
-    if (!PyArg_ParseTuple(args,
-                          "O!",
-                          &sr_py_koops_frame_type,
-                          &compare_to))
-    {
-        return NULL;
-    }
-
     struct sr_koops_frame *f1 = ((struct sr_py_koops_frame*)self)->frame;
-    struct sr_koops_frame *f2 = ((struct sr_py_koops_frame*)compare_to)->frame;
-    return Py_BuildValue("i", sr_koops_frame_cmp(f1, f2));
+    struct sr_koops_frame *f2 = ((struct sr_py_koops_frame*)other)->frame;
+
+    return normalize_cmp(sr_koops_frame_cmp(f1, f2));
 }

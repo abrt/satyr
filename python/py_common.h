@@ -119,6 +119,12 @@ int sr_py_setter_bool(PyObject *self, PyObject *rhs, void *data);
 PyObject *sr_py_getter_uint64(PyObject *self, void *data);
 int sr_py_setter_uint64(PyObject *self, PyObject *rhs, void *data);
 
+/*
+ * Satyr's comparison functions return arbitrary numbers, while python
+ * requires the result to be in {-1, 0, 1}.
+ */
+int normalize_cmp(int n);
+
 #ifdef __cplusplus
 }
 #endif

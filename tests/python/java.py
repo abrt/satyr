@@ -34,11 +34,13 @@ class TestJavaStacktrace(BindingsTestCase):
 
     def test_dup(self):
         dup = self.trace.dup()
-        self.assertNotEqual(dup.threads, self.trace.threads)
+        self.assertNotEqual(id(dup.threads), id(self.trace.threads))
+        self.assertEqual(dup.threads, self.trace.threads)
 
         dup.threads = dup.threads[:5]
         dup2 = dup.dup()
         self.assertEqual(len(dup.threads), len(dup2.threads))
+        self.assertNotEqual(id(dup.threads), id(dup2.threads))
 
     def test_prepare_linked_list(self):
         dup = self.trace.dup()
@@ -56,6 +58,13 @@ class TestJavaThread(BindingsTestCase):
 
     def test_getset(self):
         self.assertGetSetCorrect(self.thread, 'name', None, 'elvis')
+
+    def test_cmp(self):
+        self.assertEqual(self.thread, self.thread)
+        dup = self.thread.dup()
+        self.assertEqual(self.thread, dup)
+        dup.name = ' 45678987\n\n\n\n'
+        self.assertNotEqual(self.thread, dup)
 
 class TestJavaSharedlib(BindingsTestCase):
     def setUp(self):
@@ -82,11 +91,14 @@ class TestJavaFrame(BindingsTestCase):
 
     def test_cmp(self):
         dup = self.frame.dup()
-        self.assertEqual(dup.cmp(dup), 0)
-        self.assertEqual(dup.cmp(self.frame), 0)
-        self.assertEqual(dup.cmp(self.frame), 0)
+        self.assertEqual(dup, dup)
+        self.assertEqual(dup, self.frame)
+        self.assertEqual(dup, self.frame)
+        self.assertNotEqual(id(dup), id(self.frame))
         dup.name = 'another'
-        self.assertNotEqual(dup.cmp(self.frame), 0)
+        self.assertNotEqual(dup, self.frame)
+        self.assertFalse(dup > self.frame)
+        self.assertTrue(dup < self.frame)
 
     def test_getset(self):
         self.assertGetSetCorrect(self.frame, 'name', 'org.hibernate.exception.ConstraintViolationException', 'long.name.is.Long')

@@ -34,11 +34,13 @@ class TestKerneloops(BindingsTestCase):
 
     def test_dup(self):
         dup = self.koops.dup()
-        self.assertNotEqual(dup.frames, self.koops.frames)
+        self.assertNotEqual(id(dup.frames), id(self.koops.frames))
+        self.assertEqual(dup.frames, self.koops.frames)
 
         dup.frames = dup.frames[:5]
         dup2 = dup.dup()
         self.assertEqual(len(dup.frames), len(dup2.frames))
+        self.assertNotEqual(id(dup.frames), id(dup2.frames))
 
     def test_normalize(self):
         dup = self.koops.dup()
@@ -72,11 +74,15 @@ class TestKoopsFrame(BindingsTestCase):
 
     def test_cmp(self):
         dup = self.frame.dup()
-        self.assertEqual(dup.cmp(dup), 0)
-        self.assertEqual(dup.cmp(self.frame), 0)
-        self.assertEqual(dup.cmp(self.frame), 0)
+        self.assertEqual(dup, dup)
+        self.assertEqual(dup, self.frame)
+        self.assertEqual(dup, self.frame)
+        self.assertNotEqual(id(dup), id(self.frame))
+
         dup.reliable = False
-        self.assertNotEqual(dup.cmp(self.frame), 0)
+        self.assertNotEqual(dup, self.frame)
+        self.assertTrue(dup > self.frame)
+        self.assertFalse(dup < self.frame)
 
     def test_getset(self):
         self.assertGetSetCorrect(self.frame, 'reliable', True, False)

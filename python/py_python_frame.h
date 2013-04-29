@@ -56,9 +56,13 @@ void sr_py_python_frame_free(PyObject *object);
  */
 PyObject *sr_py_python_frame_str(PyObject *self);
 
+/**
+ * cmp
+ */
+int sr_py_python_frame_cmp(PyObject *self, PyObject *other);
+
 /* methods */
 PyObject *sr_py_python_frame_dup(PyObject *self, PyObject *args);
-PyObject *sr_py_python_frame_cmp(PyObject *self, PyObject *args);
 
 #ifdef __cplusplus
 }

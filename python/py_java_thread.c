@@ -18,13 +18,6 @@
                   "Clones the thread object. All new structures are independent " \
                   "on the original object."
 
-#define t_cmp_doc "Usage: thread.cmp(thread2)\n" \
-                  "thread2: satyr.JavaThread - another thread to compare" \
-                  "Returns: integer - distance" \
-                  "Compares thread to thread2. Returns 0 if thread = thread2, " \
-                  "<0 if thread is 'less' than thread2, >0 if thread is 'more' " \
-                  "than thread2."
-
 #define t_quality_counts_doc "Usage: thread.quality_counts()\n" \
                              "Returns: tuple (ok, all) - ok representing number of " \
                              "'good' frames, all representing total number of frames\n" \
@@ -45,7 +38,6 @@ static PyMethodDef
 java_thread_methods[] =
 {
     /* methods */
-    { "cmp",            sr_py_java_thread_cmp,            METH_VARARGS, t_cmp_doc            },
     { "dup",            sr_py_java_thread_dup,            METH_NOARGS,  t_dup_doc            },
     { "quality_counts", sr_py_java_thread_quality_counts, METH_NOARGS,  t_quality_counts_doc },
     { "quality",        sr_py_java_thread_quality,        METH_NOARGS,  t_quality_doc        },
@@ -86,7 +78,7 @@ PyTypeObject sr_py_java_thread_type =
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
-    NULL,                       /* tp_compare */
+    (cmpfunc)sr_py_java_thread_cmp, /* tp_compare */
     NULL,                       /* tp_repr */
     NULL,                       /* tp_as_number */
     NULL,                       /* tp_as_sequence */
@@ -301,22 +293,17 @@ sr_py_java_thread_dup(PyObject *self, PyObject *args)
     return (PyObject *)to;
 }
 
-PyObject *
-sr_py_java_thread_cmp(PyObject *self, PyObject *args)
+int
+sr_py_java_thread_cmp(struct sr_py_java_thread *self, struct sr_py_java_thread *other)
 {
-    struct sr_py_java_thread *this = (struct sr_py_java_thread *)self;
-    PyObject *compare_to;
-    if (!PyArg_ParseTuple(args, "O!", &sr_py_java_thread_type, &compare_to))
-        return NULL;
+    if (java_thread_prepare_linked_list(self) < 0
+        || java_thread_prepare_linked_list(other) < 0)
+    {
+        /* exception is already set */
+        return -1;
+    }
 
-    struct sr_py_java_thread *cmp_to = (struct sr_py_java_thread *)compare_to;
-
-    if (java_thread_prepare_linked_list(this) < 0)
-        return NULL;
-    if (java_thread_prepare_linked_list(cmp_to) < 0)
-        return NULL;
-
-    return Py_BuildValue("i", sr_java_thread_cmp(this->thread, cmp_to->thread));
+    return normalize_cmp(sr_java_thread_cmp(self->thread, other->thread));
 }
 
 PyObject *

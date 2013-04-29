@@ -50,21 +50,12 @@
                                  "Checks whether the frame represents a call to " \
                                  "a function with given name from a given file."
 
-#define f_cmp_doc "Usage: frame.cmp(frame2, compare_number)\n" \
-                  "frame2: satyr.Frame - another frame to compare\n" \
-                  "compare_number: boolean - whether to compare also thread numbers\n" \
-                  "Returns: integer - distance\n" \
-                  "Compares frame to frame2. Returns 0 if frame = frame2, " \
-                  "<0 if frame is 'less' than frame2, >0 if frame is 'more' " \
-                  "than frame2."
-
 
 static PyMethodDef
 frame_methods[] =
 {
     /* methods */
     { "dup",                sr_py_gdb_frame_dup,                METH_NOARGS,  f_dup_doc                },
-    { "cmp",                sr_py_gdb_frame_cmp,                METH_VARARGS, f_cmp_doc                },
     { "calls_func",         sr_py_gdb_frame_calls_func,         METH_VARARGS, f_calls_func_doc         },
     { "calls_func_in_file", sr_py_gdb_frame_calls_func_in_file, METH_VARARGS, f_calls_func_in_file_doc },
     { NULL },
@@ -143,7 +134,7 @@ sr_py_gdb_frame_type =
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
-    NULL,                       /* tp_compare */
+    sr_py_gdb_frame_cmp,        /* tp_compare */
     NULL,                       /* tp_repr */
     NULL,                       /* tp_as_number */
     NULL,                       /* tp_as_sequence */
@@ -262,23 +253,13 @@ sr_py_gdb_frame_dup(PyObject *self, PyObject *args)
     return (PyObject*)fo;
 }
 
-PyObject *
-sr_py_gdb_frame_cmp(PyObject *self, PyObject *args)
+int
+sr_py_gdb_frame_cmp(PyObject *self, PyObject *other)
 {
-    PyObject *compare_to;
-    int compare_number;
-    if (!PyArg_ParseTuple(args,
-                          "O!i",
-                          &sr_py_gdb_frame_type,
-                          &compare_to,
-                          &compare_number))
-    {
-        return NULL;
-    }
-
     struct sr_gdb_frame *f1 = ((struct sr_py_gdb_frame*)self)->frame;
-    struct sr_gdb_frame *f2 = ((struct sr_py_gdb_frame*)compare_to)->frame;
-    return Py_BuildValue("i", sr_gdb_frame_cmp(f1, f2, compare_number));
+    struct sr_gdb_frame *f2 = ((struct sr_py_gdb_frame*)other)->frame;
+
+    return normalize_cmp(sr_gdb_frame_cmp(f1, f2, true));
 }
 
 PyObject *
