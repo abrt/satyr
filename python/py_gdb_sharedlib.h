@@ -38,9 +38,6 @@ struct sr_py_gdb_sharedlib
 {
     PyObject_HEAD
     struct sr_gdb_sharedlib *sharedlib;
-    int syms_ok;
-    int syms_wrong;
-    int syms_not_found;
 };
 
 /* constructor */
@@ -55,14 +52,8 @@ void sr_py_gdb_sharedlib_free(PyObject *object);
 PyObject *sr_py_gdb_sharedlib_str(PyObject *self);
 
 /* getters & setters */
-PyObject *sr_py_gdb_sharedlib_get_from(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_sharedlib_set_from(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_sharedlib_get_to(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_sharedlib_set_to(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_sharedlib_get_soname(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_sharedlib_set_soname(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_sharedlib_get_symbols(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_sharedlib_set_symbols(PyObject *self, PyObject *args);
+PyObject *sr_py_gdb_sharedlib_get_symbols(PyObject *self, void *data);
+int sr_py_gdb_sharedlib_set_symbols(PyObject *self, PyObject *rhs, void *data);
 
 #ifdef __cplusplus
 }

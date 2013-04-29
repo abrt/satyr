@@ -1,3 +1,4 @@
+#include "py_common.h"
 #include "py_python_frame.h"
 #include "py_python_stacktrace.h"
 #include "lib/utils.h"
@@ -11,24 +12,6 @@
                       "Usage:\n" \
                       "satyr.PythonStacktrace() - creates an empty python stacktrace\n" \
                       "satyr.PythonStacktrace(str) - parses str and fills the python stacktrace object"
-
-#define f_get_file_name_doc "Usage: frame.get_file_name()\n" \
-                                "Returns: string - file name"
-
-#define f_set_file_name_doc "Usage: frame.set_file_name(newname)\n" \
-                                "newname: string - new file name"
-
-#define f_get_file_line_doc "Usage: frame.get_file_line()\n" \
-                                "Returns: unsigned int - file line"
-
-#define f_set_file_line_doc "Usage: frame.set_file_line(newline)\n" \
-                                "newline: unsigned int - new file line"
-
-#define f_get_exception_name_doc "Usage: frame.get_exception_name()\n" \
-                                "Returns: string - function name"
-
-#define f_set_exception_name_doc "Usage: frame.set_exception_name(newname)\n" \
-                                "newname: string - new function name"
 
 #define f_dup_doc "Usage: stacktrace.dup()\n" \
                   "Returns: satyr.PythonStacktrace - a new clone of python stacktrace\n" \
@@ -46,16 +29,9 @@
 static PyMethodDef
 python_stacktrace_methods[] =
 {
-    /* getters & setters */
-    { "get_file_name",             sr_py_python_stacktrace_get_file_name,         METH_NOARGS,      f_get_file_name_doc             },
-    { "set_file_name",             sr_py_python_stacktrace_set_file_name,         METH_VARARGS,     f_set_file_name_doc             },
-    { "get_file_line",             sr_py_python_stacktrace_get_file_line,         METH_NOARGS,      f_get_file_line_doc             },
-    { "set_file_line",             sr_py_python_stacktrace_set_file_line,         METH_VARARGS,     f_set_file_line_doc             },
-    { "get_exception_name",        sr_py_python_stacktrace_get_exception_name,    METH_NOARGS,      f_get_exception_name_doc        },
-    { "set_exception_name",        sr_py_python_stacktrace_set_exception_name,    METH_VARARGS,     f_set_exception_name_doc        },
     /* methods */
-    { "dup",                       sr_py_python_stacktrace_dup,                  METH_NOARGS,       f_dup_doc                       },
-//    { "normalize",                 sr_py_python_stacktrace_normalize,            METH_NOARGS,       f_normalize_doc                 },
+    { "dup", sr_py_python_stacktrace_dup, METH_NOARGS, f_dup_doc },
+//    { "normalize", sr_py_python_stacktrace_normalize, METH_NOARGS, f_normalize_doc },
     { NULL },
 };
 
@@ -63,6 +39,25 @@ static PyMemberDef
 python_stacktrace_members[] =
 {
     { (char *)"frames", T_OBJECT_EX, offsetof(struct sr_py_python_stacktrace, frames), 0, (char *)f_frames_doc },
+    { NULL },
+};
+
+/* See python/py_common.h and python/py_gdb_frame.c for generic getters/setters documentation. */
+#define GSOFF_PY_STRUCT sr_py_python_stacktrace
+#define GSOFF_PY_MEMBER stacktrace
+#define GSOFF_C_STRUCT sr_python_stacktrace
+GSOFF_START
+GSOFF_MEMBER(file_name),
+GSOFF_MEMBER(file_line),
+GSOFF_MEMBER(exception_name)
+GSOFF_END
+
+static PyGetSetDef
+python_stacktrace_getset[] =
+{
+    SR_ATTRIBUTE_STRING(file_name,      "Source file name (string)"            ),
+    SR_ATTRIBUTE_UINT32(file_line,      "Source line number (positive integer)"),
+    SR_ATTRIBUTE_STRING(exception_name, "Exception type (string)"              ),
     { NULL },
 };
 
@@ -97,7 +92,7 @@ PyTypeObject sr_py_python_stacktrace_type = {
     NULL,                           /* tp_iternext */
     python_stacktrace_methods,      /* tp_methods */
     python_stacktrace_members,      /* tp_members */
-    NULL,                           /* tp_getset */
+    python_stacktrace_getset,       /* tp_getset */
     NULL,                           /* tp_base */
     NULL,                           /* tp_dict */
     NULL,                           /* tp_descr_get */
@@ -266,73 +261,6 @@ sr_py_python_stacktrace_str(PyObject *self)
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
-}
-
-/* getters & setters */
-
-/* file_name */
-PyObject *
-sr_py_python_stacktrace_get_file_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_python_stacktrace*)self)->stacktrace->file_name);
-}
-
-PyObject *
-sr_py_python_stacktrace_set_file_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_python_stacktrace *stacktrace = ((struct sr_py_python_stacktrace*)self)->stacktrace;
-    free(stacktrace->file_name);
-    stacktrace->file_name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
-/* file_line */
-PyObject *
-sr_py_python_stacktrace_get_file_line(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("i", ((struct sr_py_python_stacktrace*)self)->stacktrace->file_line);
-}
-
-PyObject *
-sr_py_python_stacktrace_set_file_line(PyObject *self, PyObject *args)
-{
-    int newvalue;
-    if (!PyArg_ParseTuple(args, "i", &newvalue))
-        return NULL;
-
-    if (newvalue < 0)
-    {
-        PyErr_SetString(PyExc_ValueError, "File line must not be negative.");
-        return NULL;
-    }
-
-    struct sr_python_stacktrace *stacktrace = ((struct sr_py_python_stacktrace*)self)->stacktrace;
-    stacktrace->file_line = newvalue;
-    Py_RETURN_NONE;
-}
-
-/* exception_name */
-PyObject *
-sr_py_python_stacktrace_get_exception_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_python_stacktrace*)self)->stacktrace->exception_name);
-}
-
-PyObject *
-sr_py_python_stacktrace_set_exception_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_python_stacktrace *stacktrace = ((struct sr_py_python_stacktrace*)self)->stacktrace;
-    free(stacktrace->file_name);
-    stacktrace->file_name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
 }
 
 /* methods */

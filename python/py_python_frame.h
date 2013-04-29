@@ -56,18 +56,6 @@ void sr_py_python_frame_free(PyObject *object);
  */
 PyObject *sr_py_python_frame_str(PyObject *self);
 
-/* getters & setters */
-PyObject *sr_py_python_frame_get_file_name(PyObject *self, PyObject *args);
-PyObject *sr_py_python_frame_set_file_name(PyObject *self, PyObject *args);
-PyObject *sr_py_python_frame_get_file_line(PyObject *self, PyObject *args);
-PyObject *sr_py_python_frame_set_file_line(PyObject *self, PyObject *args);
-PyObject *sr_py_python_frame_is_module(PyObject *self, PyObject *args);
-PyObject *sr_py_python_frame_set_is_module(PyObject *self, PyObject *args);
-PyObject *sr_py_python_frame_get_function_name(PyObject *self, PyObject *args);
-PyObject *sr_py_python_frame_set_function_name(PyObject *self, PyObject *args);
-PyObject *sr_py_python_frame_get_line_contents(PyObject *self, PyObject *args);
-PyObject *sr_py_python_frame_set_line_contents(PyObject *self, PyObject *args);
-
 /* methods */
 PyObject *sr_py_python_frame_dup(PyObject *self, PyObject *args);
 PyObject *sr_py_python_frame_cmp(PyObject *self, PyObject *args);

@@ -1,61 +1,32 @@
+#include "py_common.h"
 #include "py_gdb_sharedlib.h"
 #include "lib/gdb_sharedlib.h"
 #include "lib/utils.h"
 
 #define sharedlib_doc "satyr.GdbSharedlib - class representing a shared library loaded at the moment of crash"
 
-#define s_get_from_doc "Usage: sharedlib.get_from()\n" \
-                       "Returns: long - address where lib's memory begins"
+#define s_symbols_doc "Symbol state (satyr.SYMS_OK / satyr.SYMS_NOT_FOUND / satyr.SYMS_WRONG)\n"         \
+                      "SYMS_OK:        Debug symbols for the library were loaded successfully.\n"        \
+                      "SYMS_WRONG:     Debug symbols for the library were present, but did not match.\n" \
+                      "SYMS_NOT_FOUND: Debug symbols for the library were not found."
 
-#define s_set_from_doc "Usage: sharedlib.set_from(newvalue)\n" \
-                       "Newvalue: long - address where lib's memory begins"
+/* See python/py_common.h and python/py_gdb_frame.c for generic getters/setters documentation. */
+#define GSOFF_PY_STRUCT sr_py_gdb_sharedlib
+#define GSOFF_PY_MEMBER sharedlib
+#define GSOFF_C_STRUCT sr_gdb_sharedlib
+GSOFF_START
+GSOFF_MEMBER(from),
+GSOFF_MEMBER(to),
+GSOFF_MEMBER(soname)
+GSOFF_END
 
-#define s_get_to_doc "Usage: sharedlib.get_to()\n" \
-                     "Returns: long - address where lib's memory ends"
-
-#define s_set_to_doc "Usage: sharedlib.set_to(newvalue)\n" \
-                     "Newvalue: long - address where lib's memory ends"
-
-#define s_get_symbols_doc "Usage: sharedlib.get_symbols()\n" \
-                          "Returns: SYMS_OK / SYMS_NOT_FOUND / SYMS_WRONG"
-
-#define s_set_symbols_doc "Usage: sharedlib.set_symbols(newvalue)\n" \
-                          "Newvalue: SYMS_OK / SYMS_NOT_FOUND / SYMS_WRONG"
-
-#define s_get_soname_doc "Usage: sharedlib.get_soname()\n" \
-                         "Returns: string - library filename"
-
-#define s_set_soname_doc "Usage: sharedlib.set_soname(newvalue)\n" \
-                         "Newvalue: string - library filename"
-
-#define s_syms_ok_doc (char *)"Constant. Debug symbols for the library were loaded successfully."
-
-#define s_syms_wrong_doc (char *)"Constant. Debug symbols for the library were present, but did not match."
-
-#define s_syms_not_found_doc (char *)"Constant. Debug symbols for the library were not found."
-
-static PyMethodDef
-gdb_sharedlib_methods[] =
+static PyGetSetDef
+gdb_sharedlib_getset[] =
 {
-    /* getters & setters */
-    { "get_from",    sr_py_gdb_sharedlib_get_from,    METH_NOARGS,  s_get_from_doc    },
-    { "set_from",    sr_py_gdb_sharedlib_set_from,    METH_VARARGS, s_set_from_doc    },
-    { "get_to",      sr_py_gdb_sharedlib_get_to,      METH_NOARGS,  s_get_to_doc      },
-    { "set_to",      sr_py_gdb_sharedlib_set_to,      METH_VARARGS, s_set_to_doc      },
-    { "get_symbols", sr_py_gdb_sharedlib_get_symbols, METH_NOARGS,  s_get_symbols_doc },
-    { "set_symbols", sr_py_gdb_sharedlib_set_symbols, METH_VARARGS, s_set_symbols_doc },
-    { "get_soname",  sr_py_gdb_sharedlib_get_soname,  METH_NOARGS,  s_get_soname_doc  },
-    { "set_soname",  sr_py_gdb_sharedlib_set_soname,  METH_VARARGS, s_set_soname_doc  },
-    /* methods */
-    { NULL },
-};
-
-static PyMemberDef
-gdb_sharedlib_members[] =
-{
-    { (char *)"SYMS_OK",        T_INT, offsetof(struct sr_py_gdb_sharedlib, syms_ok),        READONLY, s_syms_ok_doc        },
-    { (char *)"SYMS_WRONG",     T_INT, offsetof(struct sr_py_gdb_sharedlib, syms_wrong),     READONLY, s_syms_wrong_doc     },
-    { (char *)"SYMS_NOT_FOUND", T_INT, offsetof(struct sr_py_gdb_sharedlib, syms_not_found), READONLY, s_syms_not_found_doc },
+    SR_ATTRIBUTE_UINT64_R("start_address", from, "Address where lib's memory begins (long)"),
+    SR_ATTRIBUTE_UINT64_R("end_address",   to,   "Address where lib's memory ends (long)"  ),
+    SR_ATTRIBUTE_STRING(soname, "Library file name (string)"),
+    { (char*)"symbols", sr_py_gdb_sharedlib_get_symbols, sr_py_gdb_sharedlib_set_symbols, (char*)s_symbols_doc, NULL },
     { NULL },
 };
 
@@ -90,9 +61,9 @@ sr_py_gdb_sharedlib_type =
     0,                          /* tp_weaklistoffset */
     NULL,                       /* tp_iter */
     NULL,                       /* tp_iternext */
-    gdb_sharedlib_methods,      /* tp_methods */
-    gdb_sharedlib_members,      /* tp_members */
-    NULL,                       /* tp_getset */
+    NULL,                       /* tp_methods */
+    NULL,                       /* tp_members */
+    gdb_sharedlib_getset,       /* tp_getset */
     NULL,                       /* tp_base */
     NULL,                       /* tp_dict */
     NULL,                       /* tp_descr_get */
@@ -122,9 +93,6 @@ sr_py_gdb_sharedlib_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
         return PyErr_NoMemory();
 
     so->sharedlib = sr_gdb_sharedlib_new();
-    so->syms_ok = SYMS_OK;
-    so->syms_wrong = SYMS_WRONG;
-    so->syms_not_found = SYMS_NOT_FOUND;
 
     return (PyObject *)so;
 }
@@ -147,80 +115,26 @@ sr_py_gdb_sharedlib_str(PyObject *self)
 
 /* getters & setters */
 
-/* function_name */
 PyObject *
-sr_py_gdb_sharedlib_get_from(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("l", ((struct sr_py_gdb_sharedlib*)self)->sharedlib->from);
-}
-
-PyObject *
-sr_py_gdb_sharedlib_set_from(PyObject *self, PyObject *args)
-{
-    unsigned long long newvalue;
-    if (!PyArg_ParseTuple(args, "l", &newvalue))
-        return NULL;
-
-    ((struct sr_py_gdb_sharedlib *)self)->sharedlib->from = newvalue;
-    Py_RETURN_NONE;
-}
-
-PyObject *
-sr_py_gdb_sharedlib_get_to(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("l", ((struct sr_py_gdb_sharedlib*)self)->sharedlib->to);
-}
-
-PyObject *
-sr_py_gdb_sharedlib_set_to(PyObject *self, PyObject *args)
-{
-    unsigned long long newvalue;
-    if (!PyArg_ParseTuple(args, "l", &newvalue))
-        return NULL;
-
-    ((struct sr_py_gdb_sharedlib *)self)->sharedlib->to = newvalue;
-    Py_RETURN_NONE;
-}
-
-PyObject *
-sr_py_gdb_sharedlib_get_symbols(PyObject *self, PyObject *args)
+sr_py_gdb_sharedlib_get_symbols(PyObject *self, void *data)
 {
     return Py_BuildValue("i", ((struct sr_py_gdb_sharedlib*)self)->sharedlib->symbols);
 }
 
-PyObject *
-sr_py_gdb_sharedlib_set_symbols(PyObject *self, PyObject *args)
+int
+sr_py_gdb_sharedlib_set_symbols(PyObject *self, PyObject *rhs, void *data)
 {
-    int newvalue;
-    if (!PyArg_ParseTuple(args, "i", &newvalue))
-        return NULL;
+    long newvalue = PyInt_AsLong(rhs);
+    if (PyErr_Occurred())
+        return -1;
 
     if (newvalue != SYMS_OK && newvalue != SYMS_WRONG && newvalue != SYMS_NOT_FOUND)
     {
         PyErr_SetString(PyExc_ValueError, "Symbols must be either SYMS_OK, "
                                           "SYMS_WRONG or SYMS_NOT_FOUND.");
-        return NULL;
+        return -1;
     }
 
     ((struct sr_py_gdb_sharedlib *)self)->sharedlib->symbols = newvalue;
-    Py_RETURN_NONE;
-}
-
-PyObject *
-sr_py_gdb_sharedlib_get_soname(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_gdb_sharedlib*)self)->sharedlib->soname);
-}
-
-PyObject *
-sr_py_gdb_sharedlib_set_soname(PyObject *self, PyObject *args)
-{
-    char *soname;
-    if (!PyArg_ParseTuple(args, "s", &soname))
-        return NULL;
-
-    struct sr_py_gdb_sharedlib *this = (struct sr_py_gdb_sharedlib*)self;
-    free(this->sharedlib->soname);
-    this->sharedlib->soname = sr_strdup(soname);
-    Py_RETURN_NONE;
+    return 0;
 }

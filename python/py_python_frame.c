@@ -17,6 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+#include "py_common.h"
 #include "py_python_frame.h"
 #include "lib/location.h"
 #include "lib/strbuf.h"
@@ -27,36 +28,6 @@
                   "Usage:\n" \
                   "satyr.PythonFrame() - creates an empty frame\n" \
                   "satyr.PythonFrame(str) - parses str and fills the frame object"
-
-#define f_get_file_name_doc "Usage: frame.get_file_name()\n" \
-                                "Returns: string - file name"
-
-#define f_set_file_name_doc "Usage: frame.set_file_name(newname)\n" \
-                                "newname: string - new file name"
-
-#define f_get_file_line_doc "Usage: frame.get_file_line()\n" \
-                                "Returns: unsigned int - file line"
-
-#define f_set_file_line_doc "Usage: frame.set_file_line(newline)\n" \
-                                "newline: unsigned int - new file line"
-
-#define f_is_module_doc "Usage: frame.is_module()\n" \
-                          "Returns: boolean - is this entry from main module"
-
-#define f_set_is_module_doc "Usage: frame.is_modules(state)\n" \
-                          "state: boolean - set is_module to state"
-
-#define f_get_function_name_doc "Usage: frame.get_function_name()\n" \
-                                "Returns: string - function name"
-
-#define f_set_function_name_doc "Usage: frame.set_function_name(newname)\n" \
-                                "newname: string - new function name"
-
-#define f_get_line_contents_doc "Usage: frame.get_line_contents()\n" \
-                                "Returns: string - remaining line contents"
-
-#define f_set_line_contents_doc "Usage: frame.set_line_contents(newname)\n" \
-                                "newname: string - new line contents"
 
 #define f_dup_doc "Usage: frame.dup()\n" \
                   "Returns: satyr.PythonFrame - a new clone of frame\n" \
@@ -74,20 +45,32 @@
 static PyMethodDef
 frame_methods[] =
 {
-    /* getters & setters */
-    { "get_file_name",             sr_py_python_frame_get_file_name,         METH_NOARGS,      f_get_file_name_doc             },
-    { "set_file_name",             sr_py_python_frame_set_file_name,         METH_VARARGS,     f_set_file_name_doc             },
-    { "get_file_line",             sr_py_python_frame_get_file_line,         METH_NOARGS,      f_get_file_line_doc             },
-    { "set_file_line",             sr_py_python_frame_set_file_line,         METH_VARARGS,     f_set_file_line_doc             },
-    { "is_module",                 sr_py_python_frame_is_module,             METH_NOARGS,      f_is_module_doc                 },
-    { "set_is_module",             sr_py_python_frame_set_is_module,         METH_VARARGS,     f_set_is_module_doc             },
-    { "get_function_name",         sr_py_python_frame_get_function_name,     METH_NOARGS,      f_get_function_name_doc         },
-    { "set_function_name",         sr_py_python_frame_set_function_name,     METH_VARARGS,     f_set_function_name_doc         },
-    { "get_line_contents",         sr_py_python_frame_get_line_contents,     METH_NOARGS,      f_get_line_contents_doc         },
-    { "set_line_contents",         sr_py_python_frame_set_line_contents,     METH_VARARGS,     f_set_line_contents_doc         },
     /* methods */
-    { "dup",                       sr_py_python_frame_dup,                   METH_NOARGS,      f_dup_doc                       },
-    { "cmp",                       sr_py_python_frame_cmp,                   METH_VARARGS,     f_cmp_doc                       },
+    { "dup", sr_py_python_frame_dup, METH_NOARGS,  f_dup_doc },
+    { "cmp", sr_py_python_frame_cmp, METH_VARARGS, f_cmp_doc },
+    { NULL },
+};
+
+/* See python/py_common.h and python/py_gdb_frame.c for generic getters/setters documentation. */
+#define GSOFF_PY_STRUCT sr_py_python_frame
+#define GSOFF_PY_MEMBER frame
+#define GSOFF_C_STRUCT sr_python_frame
+GSOFF_START
+GSOFF_MEMBER(file_name),
+GSOFF_MEMBER(file_line),
+GSOFF_MEMBER(is_module),
+GSOFF_MEMBER(function_name),
+GSOFF_MEMBER(line_contents)
+GSOFF_END
+
+static PyGetSetDef
+frame_getset[] =
+{
+    SR_ATTRIBUTE_STRING(file_name,     "Source file name (string)"                       ),
+    SR_ATTRIBUTE_UINT32(file_line,     "Source line number (positive integer)"           ),
+    SR_ATTRIBUTE_BOOL  (is_module,     "True if the frame is from the main module (bool)"),
+    SR_ATTRIBUTE_STRING(function_name, "Function name (string)"                          ),
+    SR_ATTRIBUTE_STRING(line_contents, "Remaining line contents (string)"                ),
     { NULL },
 };
 
@@ -124,7 +107,7 @@ sr_py_python_frame_type =
     NULL,                       /* tp_iternext */
     frame_methods,              /* tp_methods */
     NULL,                       /* tp_members */
-    NULL,                       /* tp_getset */
+    frame_getset,               /* tp_getset */
     NULL,                       /* tp_base */
     NULL,                       /* tp_dict */
     NULL,                       /* tp_descr_get */
@@ -210,115 +193,6 @@ sr_py_python_frame_str(PyObject *self)
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
-}
-
-/* getters & setters */
-
-/* file_name */
-PyObject *
-sr_py_python_frame_get_file_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_python_frame*)self)->frame->file_name);
-}
-
-PyObject *
-sr_py_python_frame_set_file_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_python_frame *frame = ((struct sr_py_python_frame*)self)->frame;
-    free(frame->file_name);
-    frame->file_name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
-/* file_line */
-PyObject *
-sr_py_python_frame_get_file_line(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("i", ((struct sr_py_python_frame*)self)->frame->file_line);
-}
-
-PyObject *
-sr_py_python_frame_set_file_line(PyObject *self, PyObject *args)
-{
-    int newvalue;
-    if (!PyArg_ParseTuple(args, "i", &newvalue))
-        return NULL;
-
-    if (newvalue < 0)
-    {
-        PyErr_SetString(PyExc_ValueError, "File line must not be negative.");
-        return NULL;
-    }
-
-    struct sr_python_frame *frame = ((struct sr_py_python_frame*)self)->frame;
-    frame->file_line = newvalue;
-    Py_RETURN_NONE;
-}
-
-/* reliable */
-PyObject *
-sr_py_python_frame_is_module(PyObject *self, PyObject *args)
-{
-    if (!((struct sr_py_python_frame*)self)->frame->is_module)
-       Py_RETURN_FALSE;
-
-    Py_RETURN_TRUE;
-}
-
-PyObject *
-sr_py_python_frame_set_is_module(PyObject *self, PyObject *args)
-{
-    int boolvalue;
-    if (!PyArg_ParseTuple(args, "i", &boolvalue))
-        return NULL;
-
-    struct sr_python_frame *frame = ((struct sr_py_python_frame*)self)->frame;
-    frame->is_module = boolvalue;
-    Py_RETURN_NONE;
-}
-
-/* function_name */
-PyObject *
-sr_py_python_frame_get_function_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_python_frame*)self)->frame->function_name);
-}
-
-PyObject *
-sr_py_python_frame_set_function_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_python_frame *frame = ((struct sr_py_python_frame*)self)->frame;
-    free(frame->function_name);
-    frame->function_name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
-/* line_contents */
-PyObject *
-sr_py_python_frame_get_line_contents(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_python_frame*)self)->frame->line_contents);
-}
-
-PyObject *
-sr_py_python_frame_set_line_contents(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_python_frame *frame = ((struct sr_py_python_frame*)self)->frame;
-    free(frame->line_contents);
-    frame->line_contents = sr_strdup(newvalue);
-    Py_RETURN_NONE;
 }
 
 /* methods */

@@ -1,3 +1,4 @@
+#include "py_common.h"
 #include "py_java_thread.h"
 #include "py_java_frame.h"
 #include "lib/strbuf.h"
@@ -11,12 +12,6 @@
                    "satyr.JavaThread() - creates an empty thread\n" \
                    "satyr.JavaThread(str) - parses str and fills the thread object\n" \
                    "satyr.JavaThread(str, only_funs=True) - parses list of function names"
-
-#define t_get_name_doc "Usage: thread.get_name()\n" \
-                         "Returns: string - thread name"
-
-#define t_set_name_doc "Usage: thread.set_number(newname)\n" \
-                         "newname: string - new thread name"
 
 #define t_dup_doc "Usage: thread.dup()\n" \
                   "Returns: satyr.JavaThread - a new clone of thread\n" \
@@ -49,9 +44,6 @@
 static PyMethodDef
 java_thread_methods[] =
 {
-    /* getters & setters */
-    { "get_number",     sr_py_java_thread_get_name,       METH_NOARGS,  t_get_name_doc       },
-    { "set_number",     sr_py_java_thread_set_name,       METH_VARARGS, t_set_name_doc       },
     /* methods */
     { "cmp",            sr_py_java_thread_cmp,            METH_VARARGS, t_cmp_doc            },
     { "dup",            sr_py_java_thread_dup,            METH_NOARGS,  t_dup_doc            },
@@ -65,6 +57,21 @@ static PyMemberDef
 java_thread_members[] =
 {
     { (char *)"frames", T_OBJECT_EX, offsetof(struct sr_py_java_thread, frames), 0, t_frames_doc },
+    { NULL },
+};
+
+/* See python/py_common.h and python/py_gdb_frame.c for generic getters/setters documentation. */
+#define GSOFF_PY_STRUCT sr_py_java_thread
+#define GSOFF_PY_MEMBER thread
+#define GSOFF_C_STRUCT sr_java_thread
+GSOFF_START
+GSOFF_MEMBER(name)
+GSOFF_END
+
+static PyGetSetDef
+java_thread_getset[] =
+{
+    SR_ATTRIBUTE_STRING(name, "Thread name (string)"),
     { NULL },
 };
 
@@ -100,7 +107,7 @@ PyTypeObject sr_py_java_thread_type =
     NULL,                       /* tp_iternext */
     java_thread_methods,        /* tp_methods */
     java_thread_members,        /* tp_members */
-    NULL,                       /* tp_getset */
+    java_thread_getset,         /* tp_getset */
     NULL,                       /* tp_base */
     NULL,                       /* tp_dict */
     NULL,                       /* tp_descr_get */
@@ -270,29 +277,6 @@ sr_py_java_thread_str(PyObject *self)
     free(str);
     return result;
 }
-
-/* getters & setters */
-
-/* name */
-PyObject *
-sr_py_java_thread_get_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_java_thread*)self)->thread->name);
-}
-
-PyObject *
-sr_py_java_thread_set_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_java_thread *thread = ((struct sr_py_java_thread*)self)->thread;
-    free(thread->name);
-    thread->name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
 
 /* methods */
 PyObject *

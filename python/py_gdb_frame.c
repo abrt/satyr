@@ -17,6 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+#include "py_common.h"
 #include "py_gdb_frame.h"
 
 #include <inttypes.h>
@@ -30,54 +31,6 @@
                   "Usage:\n" \
                   "satyr.GdbFrame() - creates an empty frame\n" \
                   "satyr.GdbFrame(str) - parses str and fills the frame object"
-
-#define f_get_function_name_doc "Usage: frame.get_function_name()\n" \
-                                "Returns: string - function name"
-
-#define f_set_function_name_doc "Usage: frame.set_function_name(newname)\n" \
-                                "newname: string - new function name"
-
-#define f_get_function_type_doc "Usage: frame.get_function_type()\n" \
-                                "Returns: string - function type"
-
-#define f_set_function_type_doc "Usage: frame.set_function_type(newtype)\n" \
-                                "newtype: string - new function type"
-
-#define f_get_number_doc "Usage: frame.get_number()\n" \
-                         "Returns: positive integer - frame number"
-
-#define f_set_number_doc "Usage: frame.set_number(N)\n" \
-                         "N: positive integer - new frame number"
-
-#define f_get_source_line_doc "Usage: frame.get_source_line()\n" \
-                              "Returns: positive integer - source line number"
-
-#define f_set_source_line_doc "Usage: frame.set_source_line(N)\n" \
-                              "N: positive integer - new source line number"
-
-#define f_get_source_file_doc "Usage: frame.get_source_file()\n" \
-                              "Returns: string - source file name"
-
-#define f_set_source_file_doc "Usage: frame.set_source_file(newname)\n" \
-                              "newname: string - new source file name"
-
-#define f_get_signal_handler_called_doc "Usage: frame.get_signal_handler_called()\n" \
-                                        "Returns: integer - 0 = False, 1 = True"
-
-#define f_set_signal_handler_called_doc "Usage: frame.set_signal_handler_called(N)\n" \
-                                        "N: integer - 0 = False, anything else = True"
-
-#define f_get_address_doc "Usage: frame.get_address()\n" \
-                          "Returns: positive long integer - address"
-
-#define f_set_address_doc "Usage: frame.set_address(N)\n" \
-                          "N: positive long integer - new address"
-
-#define f_get_library_name_doc "Usage: frame.get_library_name()\n" \
-                              "Returns: string - library name"
-
-#define f_set_library_name_doc "Usage: frame.set_library_name(newname)\n" \
-                              "newname: string - new library name"
 
 #define f_dup_doc "Usage: frame.dup()\n" \
                   "Returns: satyr.GdbFrame - a new clone of frame\n" \
@@ -109,28 +62,72 @@
 static PyMethodDef
 frame_methods[] =
 {
-    /* getters & setters */
-    { "get_function_name",         sr_py_gdb_frame_get_function_name,         METH_NOARGS,  f_get_function_name_doc         },
-    { "set_function_name",         sr_py_gdb_frame_set_function_name,         METH_VARARGS, f_set_function_name_doc         },
-    { "get_function_type",         sr_py_gdb_frame_get_function_type,         METH_NOARGS,  f_get_function_type_doc         },
-    { "set_function_type",         sr_py_gdb_frame_set_function_type,         METH_VARARGS, f_set_function_type_doc         },
-    { "get_number",                sr_py_gdb_frame_get_number,                METH_NOARGS,  f_get_number_doc                },
-    { "set_number",                sr_py_gdb_frame_set_number,                METH_VARARGS, f_set_number_doc                },
-    { "get_source_file",           sr_py_gdb_frame_get_source_file,           METH_NOARGS,  f_get_source_file_doc           },
-    { "set_source_file",           sr_py_gdb_frame_set_source_file,           METH_VARARGS, f_set_source_file_doc           },
-    { "get_source_line",           sr_py_gdb_frame_get_source_line,           METH_NOARGS,  f_get_source_line_doc           },
-    { "set_source_line",           sr_py_gdb_frame_set_source_line,           METH_VARARGS, f_set_source_line_doc           },
-    { "get_signal_handler_called", sr_py_gdb_frame_get_signal_handler_called, METH_NOARGS,  f_get_signal_handler_called_doc },
-    { "set_signal_handler_called", sr_py_gdb_frame_set_signal_handler_called, METH_VARARGS, f_set_signal_handler_called_doc },
-    { "get_address",               sr_py_gdb_frame_get_address,               METH_NOARGS,  f_get_address_doc               },
-    { "set_address",               sr_py_gdb_frame_set_address,               METH_VARARGS, f_set_address_doc               },
-    { "get_library_name",          sr_py_gdb_frame_get_library_name,          METH_NOARGS,  f_get_library_name_doc          },
-    { "set_library_name",          sr_py_gdb_frame_set_library_name,          METH_VARARGS, f_set_library_name_doc          },
     /* methods */
-    { "dup",                       sr_py_gdb_frame_dup,                       METH_NOARGS,  f_dup_doc                       },
-    { "cmp",                       sr_py_gdb_frame_cmp,                       METH_VARARGS, f_cmp_doc                       },
-    { "calls_func",                sr_py_gdb_frame_calls_func,                METH_VARARGS, f_calls_func_doc                },
-    { "calls_func_in_file",        sr_py_gdb_frame_calls_func_in_file,        METH_VARARGS, f_calls_func_in_file_doc        },
+    { "dup",                sr_py_gdb_frame_dup,                METH_NOARGS,  f_dup_doc                },
+    { "cmp",                sr_py_gdb_frame_cmp,                METH_VARARGS, f_cmp_doc                },
+    { "calls_func",         sr_py_gdb_frame_calls_func,         METH_VARARGS, f_calls_func_doc         },
+    { "calls_func_in_file", sr_py_gdb_frame_calls_func_in_file, METH_VARARGS, f_calls_func_in_file_doc },
+    { NULL },
+};
+
+/*
+ * This sequence of #defines and macros expands to definition of struct
+ * getset_offsets, one for each member to be accessed with the generic
+ * getters/setters.
+ *
+ * Python objects for GDB frames store data in struct sr_py_gdb_frame, which
+ * contains pointer named frame that points to the GDB frame C structure named
+ * struct sr_gdb_frame. Most of the satyr python object follow similar scheme,
+ * which allows us to use generic getters/setters that only need to know two
+ * offsets.
+ */
+
+/* GSOFF_PY_STRUCT must be defined to the type of the python object structure (without the struct keyword). */
+#define GSOFF_PY_STRUCT sr_py_gdb_frame
+
+/* GSOFF_PY_MEMBER must be defined to name of GSOFF_PY_STRUCT's member that points to the satyr C structure. */
+#define GSOFF_PY_MEMBER frame
+
+/* GSOFF_C_STRUCT must be defined to the type of the C structure (without the struct keyword) */
+#define GSOFF_C_STRUCT sr_gdb_frame
+
+/*
+ * Individual GSOFF_MEMBER invocations need to be surrounded by GSOFF_START and
+ * GSOFF_END and need to be separated by commas (which must not be after the
+ * last invocation). The order does not matter.
+ *
+ * E.g. the GSOFF_MEMBER(function_name) expands to definition of global
+ * variable gsoff_function_name containing the right offsets, which is then
+ * used int the frame_getset[] definition below.
+ */
+GSOFF_START
+GSOFF_MEMBER(function_name),
+GSOFF_MEMBER(function_type),
+GSOFF_MEMBER(source_file),
+GSOFF_MEMBER(number),
+GSOFF_MEMBER(source_line),
+GSOFF_MEMBER(signal_handler_called),
+GSOFF_MEMBER(address),
+GSOFF_MEMBER(library_name)
+GSOFF_END
+
+/*
+ * With the GSOFF_ declarations above, we can use SR_ATTRIBUTE_ macros that
+ * expand to PyGetSetDef literals with the right values. There is also
+ * SR_ATTRIBUTE_type_R variant that allows you to name the attribute different
+ * than the C struct member.
+ */
+static PyGetSetDef
+frame_getset[] =
+{
+    SR_ATTRIBUTE_STRING(function_name,         "Function name (string)"                    ),
+    SR_ATTRIBUTE_STRING(function_type,         "Function type (string)"                    ),
+    SR_ATTRIBUTE_UINT32(number,                "Frame number (positive integer)"           ),
+    SR_ATTRIBUTE_STRING(source_file,           "Source file name (string)"                 ),
+    SR_ATTRIBUTE_UINT32(source_line,           "Source line number (positive integer)"     ),
+    SR_ATTRIBUTE_BOOL  (signal_handler_called, "True if the frame is signal handler (bool)"),
+    SR_ATTRIBUTE_UINT64(address,               "Address of the current instruction (long)" ),
+    SR_ATTRIBUTE_STRING(library_name,          "Executable file name (string)"             ),
     { NULL },
 };
 
@@ -165,9 +162,9 @@ sr_py_gdb_frame_type =
     0,                          /* tp_weaklistoffset */
     NULL,                       /* tp_iter */
     NULL,                       /* tp_iternext */
-    frame_methods,               /* tp_methods */
+    frame_methods,              /* tp_methods */
     NULL,                       /* tp_members */
-    NULL,                       /* tp_getset */
+    frame_getset,               /* tp_getset */
     NULL,                       /* tp_base */
     NULL,                       /* tp_dict */
     NULL,                       /* tp_descr_get */
@@ -248,178 +245,6 @@ sr_py_gdb_frame_str(PyObject *self)
     free(str);
     return result;
 }
-
-/* getters & setters */
-
-/* function_name */
-PyObject *
-sr_py_gdb_frame_get_function_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_gdb_frame*)self)->frame->function_name);
-}
-
-PyObject *
-sr_py_gdb_frame_set_function_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
-    free(frame->function_name);
-    frame->function_name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
-/* function_type */
-PyObject *
-sr_py_gdb_frame_get_function_type(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_gdb_frame*)self)->frame->function_type);
-}
-
-PyObject *
-sr_py_gdb_frame_set_function_type(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
-    free(frame->function_type);
-    frame->function_type = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
-/* number */
-PyObject *
-sr_py_gdb_frame_get_number(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("i", ((struct sr_py_gdb_frame*)self)->frame->number);
-}
-
-PyObject *
-sr_py_gdb_frame_set_number(PyObject *self, PyObject *args)
-{
-    int newvalue;
-    if (!PyArg_ParseTuple(args, "i", &newvalue))
-        return NULL;
-
-    if (newvalue < 0)
-    {
-        PyErr_SetString(PyExc_ValueError, "Frame number must not be negative.");
-        return NULL;
-    }
-
-    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
-    frame->number = newvalue;
-    Py_RETURN_NONE;
-}
-
-/* source_file */
-PyObject *
-sr_py_gdb_frame_get_source_file(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_gdb_frame*)self)->frame->source_file);
-}
-
-PyObject *
-sr_py_gdb_frame_set_source_file(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
-    free(frame->source_file);
-    frame->source_file = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
-/* source_line */
-PyObject *
-sr_py_gdb_frame_get_source_line(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("i", ((struct sr_py_gdb_frame*)self)->frame->source_line);
-}
-
-PyObject *
-sr_py_gdb_frame_set_source_line(PyObject *self, PyObject *args)
-{
-    int newvalue;
-    if (!PyArg_ParseTuple(args, "i", &newvalue))
-        return NULL;
-
-    if (newvalue < 0)
-    {
-        PyErr_SetString(PyExc_ValueError, "Source line must not be negative.");
-        return NULL;
-    }
-
-    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
-    frame->source_line = newvalue;
-    Py_RETURN_NONE;
-}
-
-/* signal_handler_called */
-PyObject *
-sr_py_gdb_frame_get_signal_handler_called(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("i", ((struct sr_py_gdb_frame*)self)->frame->signal_handler_called);
-}
-
-PyObject *
-sr_py_gdb_frame_set_signal_handler_called(PyObject *self, PyObject *args)
-{
-    int newvalue;
-    if (!PyArg_ParseTuple(args, "i", &newvalue))
-        return NULL;
-
-    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
-    frame->signal_handler_called = newvalue ? 1 : 0;
-    Py_RETURN_NONE;
-}
-
-/* address */
-PyObject *
-sr_py_gdb_frame_get_address(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("K",
-        (unsigned long long)(((struct sr_py_gdb_frame*)self)->frame->address));
-}
-
-PyObject *
-sr_py_gdb_frame_set_address(PyObject *self, PyObject *args)
-{
-    unsigned long long newvalue;
-    if (!PyArg_ParseTuple(args, "K", &newvalue))
-        return NULL;
-
-    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
-    frame->address = newvalue;
-    Py_RETURN_NONE;
-}
-
-/* library_name */
-PyObject *
-sr_py_gdb_frame_get_library_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_gdb_frame*)self)->frame->library_name);
-}
-
-PyObject *
-sr_py_gdb_frame_set_library_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_gdb_frame *frame = ((struct sr_py_gdb_frame*)self)->frame;
-    free(frame->library_name);
-    frame->library_name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
 
 /* methods */
 PyObject *

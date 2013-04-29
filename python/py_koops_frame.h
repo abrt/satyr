@@ -56,31 +56,6 @@ void sr_py_koops_frame_free(PyObject *object);
  */
 PyObject *sr_py_koops_frame_str(PyObject *self);
 
-/* getters & setters */
-PyObject *sr_py_koops_frame_get_reliable(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_set_reliable(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_get_address(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_set_address(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_get_function_name(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_set_function_name(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_get_function_offset(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_set_function_offset(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_get_function_length(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_set_function_length(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_get_module_name(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_set_module_name(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_get_from_address(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_set_from_address(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_get_from_function_name(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_set_from_function_name(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_get_from_function_offset(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_set_from_function_offset(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_get_from_function_length(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_set_from_function_length(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_get_from_module_name(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_frame_set_from_module_name(PyObject *self, PyObject *args);
-
-
 /* methods */
 PyObject *sr_py_koops_frame_dup(PyObject *self, PyObject *args);
 PyObject *sr_py_koops_frame_cmp(PyObject *self, PyObject *args);

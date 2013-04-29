@@ -1,3 +1,4 @@
+#include "py_common.h"
 #include "py_gdb_thread.h"
 #include "py_gdb_frame.h"
 #include "lib/strbuf.h"
@@ -10,12 +11,6 @@
                    "satyr.GdbThread() - creates an empty thread\n" \
                    "satyr.GdbThread(str) - parses str and fills the thread object\n" \
                    "satyr.GdbThread(str, only_funs=True) - parses list of function names"
-
-#define t_get_number_doc "Usage: thread.get_number()\n" \
-                         "Returns: positive integer - thread number"
-
-#define t_set_number_doc "Usage: thread.set_number(N)\n" \
-                         "N: positive integer - new thread number"
 
 #define t_dup_doc "Usage: thread.dup()\n" \
                   "Returns: satyr.GdbThread - a new clone of thread\n" \
@@ -48,9 +43,6 @@
 static PyMethodDef
 gdb_thread_methods[] =
 {
-    /* getters & setters */
-    { "get_number",     sr_py_gdb_thread_get_number,     METH_NOARGS,  t_get_number_doc     },
-    { "set_number",     sr_py_gdb_thread_set_number,     METH_VARARGS, t_set_number_doc     },
     /* methods */
     { "cmp",            sr_py_gdb_thread_cmp,            METH_VARARGS, t_cmp_doc            },
     { "dup",            sr_py_gdb_thread_dup,            METH_NOARGS,  t_dup_doc            },
@@ -64,6 +56,21 @@ static PyMemberDef
 gdb_thread_members[] =
 {
     { (char *)"frames", T_OBJECT_EX, offsetof(struct sr_py_gdb_thread, frames), 0, t_frames_doc },
+    { NULL },
+};
+
+/* See python/py_common.h and python/py_gdb_frame.c for generic getters/setters documentation. */
+#define GSOFF_PY_STRUCT sr_py_gdb_thread
+#define GSOFF_PY_MEMBER thread
+#define GSOFF_C_STRUCT sr_gdb_thread
+GSOFF_START
+GSOFF_MEMBER(number)
+GSOFF_END
+
+static PyGetSetDef
+gdb_thread_getset[] =
+{
+    SR_ATTRIBUTE_UINT32(number, "Thread number (positive integer)"),
     { NULL },
 };
 
@@ -97,9 +104,9 @@ PyTypeObject sr_py_gdb_thread_type =
     0,                          /* tp_weaklistoffset */
     NULL,                       /* tp_iter */
     NULL,                       /* tp_iternext */
-    gdb_thread_methods,              /* tp_methods */
-    gdb_thread_members,              /* tp_members */
-    NULL,                       /* tp_getset */
+    gdb_thread_methods,         /* tp_methods */
+    gdb_thread_members,         /* tp_members */
+    gdb_thread_getset,          /* tp_getset */
     NULL,                       /* tp_base */
     NULL,                       /* tp_dict */
     NULL,                       /* tp_descr_get */
@@ -299,32 +306,6 @@ sr_py_gdb_thread_str(PyObject *self)
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
-}
-
-/* getters & setters */
-PyObject *
-sr_py_gdb_thread_get_number(PyObject *self, PyObject *args)
-{
-    struct sr_py_gdb_thread *this = (struct sr_py_gdb_thread *)self;
-    return Py_BuildValue("i", this->thread->number);
-}
-
-PyObject *
-sr_py_gdb_thread_set_number(PyObject *self, PyObject *args)
-{
-    struct sr_py_gdb_thread *this = (struct sr_py_gdb_thread *)self;
-    int newvalue;
-    if (!PyArg_ParseTuple(args, "i", &newvalue))
-        return NULL;
-
-    if (newvalue < 0)
-    {
-        PyErr_SetString(PyExc_ValueError, "Thread number must not be negative.");
-        return NULL;
-    }
-
-    this->thread->number = newvalue;
-    Py_RETURN_NONE;
 }
 
 /* methods */

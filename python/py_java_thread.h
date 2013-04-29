@@ -57,10 +57,6 @@ void sr_py_java_thread_free(PyObject *object);
 /* str */
 PyObject *sr_py_java_thread_str(PyObject *self);
 
-/* getters & setters */
-PyObject *sr_py_java_thread_get_name(PyObject *self, PyObject *args);
-PyObject *sr_py_java_thread_set_name(PyObject *self, PyObject *args);
-
 /* methods */
 PyObject *sr_py_java_thread_dup(PyObject *self, PyObject *args);
 PyObject *sr_py_java_thread_cmp(PyObject *self, PyObject *args);

@@ -17,6 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+#include "py_common.h"
 #include "py_java_frame.h"
 #include "lib/location.h"
 #include "lib/strbuf.h"
@@ -27,48 +28,6 @@
                   "Usage:\n" \
                   "satyr.JavaFrame() - creates an empty frame\n" \
                   "satyr.JavaFrame(str) - parses str and fills the frame object"
-
-#define f_get_name_doc "Usage: frame.get_name()\n" \
-                                "Returns: string - fully qualified domain name"
-
-#define f_set_name_doc "Usage: frame.set_name(newname)\n" \
-                                "newname: string - new name"
-
-#define f_get_file_name_doc "Usage: frame.get_file_name()\n" \
-                                "Returns: string - file name"
-
-#define f_set_file_name_doc "Usage: frame.set_file_name(newname)\n" \
-                                "newname: string - new file name"
-
-#define f_get_file_line_doc "Usage: frame.get_file_line()\n" \
-                                "Returns: unsigned int - file line"
-
-#define f_set_file_line_doc "Usage: frame.set_file_line(newline)\n" \
-                                "newline: unsigned int - new file line"
-
-#define f_get_class_path_doc "Usage: frame.get_class_path()\n" \
-                                "Returns: string - class path"
-
-#define f_set_class_path_doc "Usage: frame.set_class_path(newcp)\n" \
-                                "newcp: string - new class path"
-
-#define f_is_native_doc "Usage: frame.is_native()\n" \
-                          "Returns: boolean - true if method is native, always false if frame is exception"
-
-#define f_set_is_native_doc "Usage: frame.is_natives(state)\n" \
-                          "state: boolean - set is_native to state"
-
-#define f_is_exception_doc "Usage: frame.is_exception()\n" \
-                          "Returns: boolean - true if frame is an exception"
-
-#define f_set_is_exception_doc "Usage: frame.is_exceptions(state)\n" \
-                          "state: boolean - set is_exception to state"
-
-#define f_get_message_doc "Usage: frame.get_message()\n" \
-                                "Returns: string - exception message"
-
-#define f_set_message_doc "Usage: frame.set_message(newexc)\n" \
-                                "newexc: string - new exception message"
 
 #define f_dup_doc "Usage: frame.dup()\n" \
                   "Returns: satyr.JavaFrame - a new clone of frame\n" \
@@ -86,25 +45,37 @@
 static PyMethodDef
 frame_methods[] =
 {
-    /* getters & setters */
-    { "get_name",                  sr_py_java_frame_get_name,              METH_NOARGS,      f_get_name_doc                  },
-    { "set_name",                  sr_py_java_frame_set_name,              METH_VARARGS,     f_set_name_doc                  },
-    { "get_file_name",             sr_py_java_frame_get_file_name,         METH_NOARGS,      f_get_file_name_doc             },
-    { "set_file_name",             sr_py_java_frame_set_file_name,         METH_VARARGS,     f_set_file_name_doc             },
-    { "get_file_line",             sr_py_java_frame_get_file_line,         METH_NOARGS,      f_get_file_line_doc             },
-    { "set_file_line",             sr_py_java_frame_set_file_line,         METH_VARARGS,     f_set_file_line_doc             },
-    { "get_class_path",            sr_py_java_frame_get_class_path,        METH_NOARGS,      f_get_class_path_doc            },
-    { "set_class_path",            sr_py_java_frame_set_class_path,        METH_VARARGS,     f_set_class_path_doc            },
-    { "is_native",                 sr_py_java_frame_is_native,             METH_NOARGS,      f_is_native_doc                 },
-    { "set_is_native",             sr_py_java_frame_set_is_native,         METH_VARARGS,     f_set_is_native_doc             },
-    { "is_exception",              sr_py_java_frame_is_exception,          METH_NOARGS,      f_is_exception_doc              },
-    { "set_is_exception",          sr_py_java_frame_set_is_exception,      METH_VARARGS,     f_set_is_exception_doc          },
-    { "get_message",               sr_py_java_frame_get_message,           METH_NOARGS,      f_get_message_doc               },
-    { "set_message",               sr_py_java_frame_set_message,           METH_VARARGS,     f_set_message_doc               },
     /* methods */
-    { "dup",                       sr_py_java_frame_dup,                   METH_NOARGS,      f_dup_doc                       },
-    { "cmp",                       sr_py_java_frame_cmp,                   METH_VARARGS,     f_cmp_doc                       },
+    { "dup", sr_py_java_frame_dup, METH_NOARGS,  f_dup_doc },
+    { "cmp", sr_py_java_frame_cmp, METH_VARARGS, f_cmp_doc },
     { NULL },
+};
+
+/* See python/py_common.h and python/py_gdb_frame.c for generic getters/setters documentation. */
+#define GSOFF_PY_STRUCT sr_py_java_frame
+#define GSOFF_PY_MEMBER frame
+#define GSOFF_C_STRUCT sr_java_frame
+GSOFF_START
+GSOFF_MEMBER(name),
+GSOFF_MEMBER(file_name),
+GSOFF_MEMBER(file_line),
+GSOFF_MEMBER(class_path),
+GSOFF_MEMBER(is_native),
+GSOFF_MEMBER(is_exception),
+GSOFF_MEMBER(message)
+GSOFF_END
+
+static PyGetSetDef
+frame_getset[] =
+{
+    SR_ATTRIBUTE_STRING(name,         "Fully qualified domain name (string)"                                  ),
+    SR_ATTRIBUTE_STRING(file_name,    "File name (string)"                                                    ),
+    SR_ATTRIBUTE_UINT32(file_line,    "File line (positive integer)"                                          ),
+    SR_ATTRIBUTE_STRING(class_path,   "Class path (string)"                                                   ),
+    SR_ATTRIBUTE_BOOL  (is_native,    "True if method is native, always false if frame is an exception (bool)"),
+    SR_ATTRIBUTE_BOOL  (is_exception, "True if frame is an exception frame (bool)"                            ),
+    SR_ATTRIBUTE_STRING(message,      "Exception message (string)"                                            ),
+    { NULL }
 };
 
 PyTypeObject
@@ -140,7 +111,7 @@ sr_py_java_frame_type =
     NULL,                       /* tp_iternext */
     frame_methods,              /* tp_methods */
     NULL,                       /* tp_members */
-    NULL,                       /* tp_getset */
+    frame_getset,               /* tp_getset */
     NULL,                       /* tp_base */
     NULL,                       /* tp_dict */
     NULL,                       /* tp_descr_get */
@@ -240,157 +211,6 @@ sr_py_java_frame_str(PyObject *self)
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
-}
-
-/* getters & setters */
-
-/* name */
-PyObject *
-sr_py_java_frame_get_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_java_frame*)self)->frame->name);
-}
-
-PyObject *
-sr_py_java_frame_set_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_java_frame *frame = ((struct sr_py_java_frame*)self)->frame;
-    free(frame->name);
-    frame->name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
-/* file_name */
-PyObject *
-sr_py_java_frame_get_file_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_java_frame*)self)->frame->file_name);
-}
-
-PyObject *
-sr_py_java_frame_set_file_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_java_frame *frame = ((struct sr_py_java_frame*)self)->frame;
-    free(frame->file_name);
-    frame->file_name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
-/* file_line */
-PyObject *
-sr_py_java_frame_get_file_line(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("i", ((struct sr_py_java_frame*)self)->frame->file_line);
-}
-
-PyObject *
-sr_py_java_frame_set_file_line(PyObject *self, PyObject *args)
-{
-    int newvalue;
-    if (!PyArg_ParseTuple(args, "i", &newvalue))
-        return NULL;
-
-    if (newvalue < 0)
-    {
-        PyErr_SetString(PyExc_ValueError, "File line must not be negative.");
-        return NULL;
-    }
-
-    struct sr_java_frame *frame = ((struct sr_py_java_frame*)self)->frame;
-    frame->file_line = newvalue;
-    Py_RETURN_NONE;
-}
-
-/* class_path */
-PyObject *
-sr_py_java_frame_get_class_path(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_java_frame*)self)->frame->class_path);
-}
-
-PyObject *
-sr_py_java_frame_set_class_path(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_java_frame *frame = ((struct sr_py_java_frame*)self)->frame;
-    free(frame->class_path);
-    frame->class_path = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
-/* native */
-PyObject *
-sr_py_java_frame_is_native(PyObject *self, PyObject *args)
-{
-    if (!((struct sr_py_java_frame*)self)->frame->is_native)
-       Py_RETURN_FALSE;
-
-    Py_RETURN_TRUE;
-}
-
-PyObject *
-sr_py_java_frame_set_is_native(PyObject *self, PyObject *args)
-{
-    int boolvalue;
-    if (!PyArg_ParseTuple(args, "i", &boolvalue))
-        return NULL;
-
-    struct sr_java_frame *frame = ((struct sr_py_java_frame*)self)->frame;
-    frame->is_native = boolvalue;
-    Py_RETURN_NONE;
-}
-
-/* exception */
-PyObject *
-sr_py_java_frame_is_exception(PyObject *self, PyObject *args)
-{
-    if (!((struct sr_py_java_frame*)self)->frame->is_exception)
-       Py_RETURN_FALSE;
-
-    Py_RETURN_TRUE;
-}
-
-PyObject *
-sr_py_java_frame_set_is_exception(PyObject *self, PyObject *args)
-{
-    int boolvalue;
-    if (!PyArg_ParseTuple(args, "i", &boolvalue))
-        return NULL;
-
-    struct sr_java_frame *frame = ((struct sr_py_java_frame*)self)->frame;
-    frame->is_exception = boolvalue;
-    Py_RETURN_NONE;
-}
-
-/* message */
-PyObject *
-sr_py_java_frame_get_message(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_java_frame*)self)->frame->message);
-}
-
-PyObject *
-sr_py_java_frame_set_message(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_java_frame *frame = ((struct sr_py_java_frame*)self)->frame;
-    free(frame->message);
-    frame->message = sr_strdup(newvalue);
-    Py_RETURN_NONE;
 }
 
 /* methods */

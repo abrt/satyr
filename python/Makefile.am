@@ -32,6 +32,8 @@ _satyr_la_SOURCES = \
     py_java_stacktrace.c \
     py_metrics.h \
     py_metrics.c \
+    py_common.h \
+    py_common.c \
     py_module.c
 
 _satyr_la_CPPFLAGS = \

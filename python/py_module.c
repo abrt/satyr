@@ -13,6 +13,8 @@
 #include "py_java_stacktrace.h"
 #include "py_metrics.h"
 
+#include "lib/gdb_sharedlib.h"
+
 static PyMethodDef
 module_methods[]=
 {
@@ -135,6 +137,10 @@ init_satyr()
     Py_INCREF(&sr_py_gdb_sharedlib_type);
     PyModule_AddObject(module, "GdbSharedlib",
                        (PyObject *)&sr_py_gdb_sharedlib_type);
+
+    PyModule_AddIntMacro(module, SYMS_OK);
+    PyModule_AddIntMacro(module, SYMS_NOT_FOUND);
+    PyModule_AddIntMacro(module, SYMS_WRONG);
 
     Py_INCREF(&sr_py_koops_frame_type);
     PyModule_AddObject(module, "KerneloopsFrame",

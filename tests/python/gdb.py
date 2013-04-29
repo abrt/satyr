@@ -2,6 +2,7 @@
 
 import os
 import unittest
+from test_helpers import BindingsTestCase
 
 try:
     import _satyr as satyr
@@ -19,7 +20,7 @@ if not os.path.isfile(path):
 with file(path) as f:
     contents = f.read()
 
-class TestGdbStacktrace(unittest.TestCase):
+class TestGdbStacktrace(BindingsTestCase):
     def setUp(self):
         self.trace = satyr.GdbStacktrace(contents)
 
@@ -55,15 +56,24 @@ class TestGdbStacktrace(unittest.TestCase):
         out = str(self.trace)
         self.assertTrue(('Stacktrace with %d threads' % threads_expected) in out)
 
-class TestGdbThread(unittest.TestCase):
+class TestGdbThread(BindingsTestCase):
     def setUp(self):
         self.thread = satyr.GdbStacktrace(contents).threads[0]
 
-class TestGdbSharedlib(unittest.TestCase):
+    def test_getset(self):
+        self.assertGetSetCorrect(self.thread, 'number', 2, 9000)
+
+class TestGdbSharedlib(BindingsTestCase):
     def setUp(self):
         self.shlib = satyr.GdbStacktrace(contents).libs[0]
 
-class TestGdbFrame(unittest.TestCase):
+    def test_getset(self):
+        self.assertGetSetCorrect(self.shlib, 'start_address', 0x3ecd63c680, 10)
+        self.assertGetSetCorrect(self.shlib, 'end_address', 0x3ecd71f0f8, 20)
+        self.assertGetSetCorrect(self.shlib, 'symbols', satyr.SYMS_OK, satyr.SYMS_WRONG)
+        self.assertGetSetCorrect(self.shlib, 'soname', '/usr/lib64/libpython2.6.so.1.0', '/dev/null')
+
+class TestGdbFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.GdbStacktrace(contents).threads[0].frames[0]
 
@@ -75,20 +85,33 @@ class TestGdbFrame(unittest.TestCase):
 
     def test_dup(self):
         dup = self.frame.dup()
-        self.assertEqual(dup.get_function_name(),
-            self.frame.get_function_name())
+        self.assertEqual(dup.function_name,
+            self.frame.function_name)
 
-        dup.set_function_name('other')
-        self.assertNotEqual(dup.get_function_name(),
-            self.frame.get_function_name())
+        dup.function_name = 'other'
+        self.assertNotEqual(dup.function_name,
+            self.frame.function_name)
 
     def test_cmp(self):
         dup = self.frame.dup()
         self.assertEqual(dup.cmp(dup, 0), 0)
         self.assertEqual(dup.cmp(self.frame, 0), 0)
         self.assertEqual(dup.cmp(self.frame, 0), 0)
-        dup.set_function_name('another')
+        dup.function_name = 'another'
         self.assertNotEqual(dup.cmp(self.frame, 0), 0)
+
+    def test_getset(self):
+        self.assertGetSetCorrect(self.frame, 'function_name', 'write', 'foo bar')
+        self.assertGetSetCorrect(self.frame, 'function_type', None, 'Maybe Integer')
+        self.assertGetSetCorrect(self.frame, 'number', 0, 42)
+        self.assertGetSetCorrect(self.frame, 'source_file', '../sysdeps/unix/syscall-template.S', 'ok.c')
+        self.assertGetSetCorrect(self.frame, 'source_line', 82, 1337)
+        self.assertGetSetCorrect(self.frame, 'signal_handler_called', False, True)
+        self.assertGetSetCorrect(self.frame, 'address', 0x3ec220e48d, 0x666)
+        self.assertGetSetCorrect(self.frame, 'address', 0x666, 4398046511104L)
+        ## 2^66, this is expected to fail
+        #self.assertGetSetCorrect(self.frame, 'address', 4398046511104L, 73786976294838206464L)
+        self.assertGetSetCorrect(self.frame, 'library_name', None, 'sowhat.so')
 
 if __name__ == '__main__':
     unittest.main()

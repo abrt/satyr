@@ -2,6 +2,7 @@
 
 import os
 import unittest
+from test_helpers import BindingsTestCase
 
 try:
     import _satyr as satyr
@@ -18,7 +19,7 @@ if not os.path.isfile(path):
 with file(path) as f:
     contents = f.read()
 
-class TestJavaStacktrace(unittest.TestCase):
+class TestJavaStacktrace(BindingsTestCase):
     def setUp(self):
         self.trace = satyr.JavaStacktrace(contents)
 
@@ -49,15 +50,18 @@ class TestJavaStacktrace(unittest.TestCase):
         out = str(self.trace)
         self.assertTrue(('Java stacktrace with %d threads' % threads_expected) in out)
 
-class TestJavaThread(unittest.TestCase):
+class TestJavaThread(BindingsTestCase):
     def setUp(self):
         self.thread = satyr.JavaStacktrace(contents).threads[0]
 
-class TestJavaSharedlib(unittest.TestCase):
+    def test_getset(self):
+        self.assertGetSetCorrect(self.thread, 'name', None, 'elvis')
+
+class TestJavaSharedlib(BindingsTestCase):
     def setUp(self):
         self.shlib = satyr.JavaStacktrace(contents).libs[0]
 
-class TestJavaFrame(unittest.TestCase):
+class TestJavaFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.JavaStacktrace(contents).threads[0].frames[0]
 
@@ -69,20 +73,31 @@ class TestJavaFrame(unittest.TestCase):
 
     def test_dup(self):
         dup = self.frame.dup()
-        self.assertEqual(dup.get_name(),
-            self.frame.get_name())
+        self.assertEqual(dup.name,
+            self.frame.name)
 
-        dup.set_name('other')
-        self.assertNotEqual(dup.get_name(),
-            self.frame.get_name())
+        dup.name = 'other'
+        self.assertNotEqual(dup.name,
+            self.frame.name)
 
     def test_cmp(self):
         dup = self.frame.dup()
         self.assertEqual(dup.cmp(dup), 0)
         self.assertEqual(dup.cmp(self.frame), 0)
         self.assertEqual(dup.cmp(self.frame), 0)
-        dup.set_name('another')
+        dup.name = 'another'
         self.assertNotEqual(dup.cmp(self.frame), 0)
+
+    def test_getset(self):
+        self.assertGetSetCorrect(self.frame, 'name', 'org.hibernate.exception.ConstraintViolationException', 'long.name.is.Long')
+        self.assertGetSetCorrect(self.frame, 'file_name', None, 'java.java')
+        self.assertGetSetCorrect(self.frame, 'file_line', 0, 1234)
+        self.assertGetSetCorrect(self.frame, 'class_path', None, '/path/to/class')
+        self.assertGetSetCorrect(self.frame, 'is_exception', True, False)
+        self.assertGetSetCorrect(self.frame, 'is_exception', False, 1)
+        self.assertGetSetCorrect(self.frame, 'is_native', False, True)
+        self.assertGetSetCorrect(self.frame, 'message', 'could not insert: [com.example.myproject.MyEntity]', 'printer on fire')
+
 
 if __name__ == '__main__':
     unittest.main()

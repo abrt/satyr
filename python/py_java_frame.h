@@ -56,22 +56,6 @@ void sr_py_java_frame_free(PyObject *object);
  */
 PyObject *sr_py_java_frame_str(PyObject *self);
 
-/* getters & setters */
-PyObject *sr_py_java_frame_get_name(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_set_name(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_get_file_name(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_set_file_name(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_get_file_line(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_set_file_line(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_get_class_path(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_set_class_path(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_is_native(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_set_is_native(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_is_exception(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_set_is_exception(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_get_message(PyObject *self, PyObject *args);
-PyObject *sr_py_java_frame_set_message(PyObject *self, PyObject *args);
-
 /* methods */
 PyObject *sr_py_java_frame_dup(PyObject *self, PyObject *args);
 PyObject *sr_py_java_frame_cmp(PyObject *self, PyObject *args);

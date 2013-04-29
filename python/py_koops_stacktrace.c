@@ -20,15 +20,12 @@
                         "Normalizes the stacktrace."
 
 #define b_frames_doc "A list containing frames"
-#define b_get_modules_doc "Usage: stacktrace.get_modules()\n" \
-                        "Returns: list of strings - loaded modules at time of the event"
+#define b_modules_doc "Modules loaded at the time of the event (list of strings)"
 
 
 static PyMethodDef
 koops_stacktrace_methods[] =
 {
-    /* getters & setters */
-    { "get_modules",          sr_py_koops_stacktrace_get_modules,          METH_NOARGS,  b_get_modules_doc           },
     /* methods */
     { "dup",                  sr_py_koops_stacktrace_dup,                  METH_NOARGS,  b_dup_doc                   },
     { "normalize",            sr_py_koops_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc             },
@@ -39,6 +36,13 @@ static PyMemberDef
 koops_stacktrace_members[] =
 {
     { (char *)"frames", T_OBJECT_EX, offsetof(struct sr_py_koops_stacktrace, frames), 0, (char *) b_frames_doc },
+    { NULL },
+};
+
+static PyGetSetDef
+koops_stacktrace_getset[] =
+{
+    { (char*)"modules", sr_py_koops_stacktrace_get_modules, sr_py_koops_stacktrace_set_modules, (char*)b_modules_doc, NULL },
     { NULL },
 };
 
@@ -73,7 +77,7 @@ PyTypeObject sr_py_koops_stacktrace_type = {
     NULL,                           /* tp_iternext */
     koops_stacktrace_methods,       /* tp_methods */
     koops_stacktrace_members,       /* tp_members */
-    NULL,                           /* tp_getset */
+    koops_stacktrace_getset,        /* tp_getset */
     NULL,                           /* tp_base */
     NULL,                           /* tp_dict */
     NULL,                           /* tp_descr_get */
@@ -135,7 +139,7 @@ koops_stacktrace_prepare_linked_list(struct sr_py_koops_stacktrace *stacktrace)
 }
 
 PyObject *
-sr_py_koops_stacktrace_get_modules(PyObject *self, PyObject *args) 
+sr_py_koops_stacktrace_get_modules(PyObject *self, void *data)
 {
     struct sr_koops_stacktrace *st = ((struct sr_py_koops_stacktrace*)self)->stacktrace;
     char **iter = st->modules;
@@ -150,6 +154,13 @@ sr_py_koops_stacktrace_get_modules(PyObject *self, PyObject *args)
     }
 
     return result;
+}
+
+int
+sr_py_koops_stacktrace_set_modules(PyObject *self, PyObject *rhs, void *data)
+{
+    PyErr_SetString(PyExc_NotImplementedError, "Setting module list is not implemented.");
+    return -1;
 }
 
 PyObject *

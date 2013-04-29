@@ -56,24 +56,6 @@ void sr_py_gdb_frame_free(PyObject *object);
  */
 PyObject *sr_py_gdb_frame_str(PyObject *self);
 
-/* getters & setters */
-PyObject *sr_py_gdb_frame_get_function_name(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_set_function_name(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_get_function_type(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_set_function_type(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_get_number(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_set_number(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_get_source_file(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_set_source_file(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_get_source_line(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_set_source_line(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_get_signal_handler_called(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_set_signal_handler_called(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_get_address(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_set_address(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_get_library_name(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_frame_set_library_name(PyObject *self, PyObject *args);
-
 /* methods */
 PyObject *sr_py_gdb_frame_dup(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_frame_cmp(PyObject *self, PyObject *args);

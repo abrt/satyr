@@ -53,7 +53,8 @@ void sr_py_koops_stacktrace_free(PyObject *object);
 PyObject *sr_py_koops_stacktrace_str(PyObject *self);
 
 /* getters & setters */
-PyObject *sr_py_koops_stacktrace_get_modules(PyObject *self, PyObject *args);
+PyObject *sr_py_koops_stacktrace_get_modules(PyObject *self, void *data);
+int sr_py_koops_stacktrace_set_modules(PyObject *self, PyObject *rhs, void *data);
 
 /* methods */
 PyObject *sr_py_koops_stacktrace_dup(PyObject *self, PyObject *args);

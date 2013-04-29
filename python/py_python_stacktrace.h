@@ -52,15 +52,6 @@ void sr_py_python_stacktrace_free(PyObject *object);
 /* str */
 PyObject *sr_py_python_stacktrace_str(PyObject *self);
 
-/* getters & setters */
-PyObject *sr_py_python_stacktrace_get_file_name(PyObject *self, PyObject *args);
-PyObject *sr_py_python_stacktrace_set_file_name(PyObject *self, PyObject *args);
-PyObject *sr_py_python_stacktrace_get_file_line(PyObject *self, PyObject *args);
-PyObject *sr_py_python_stacktrace_set_file_line(PyObject *self, PyObject *args);
-PyObject *sr_py_python_stacktrace_get_exception_name(PyObject *self, PyObject *args);
-PyObject *sr_py_python_stacktrace_set_exception_name(PyObject *self, PyObject *args);
-
-
 /* methods */
 PyObject *sr_py_python_stacktrace_dup(PyObject *self, PyObject *args);
 PyObject *sr_py_python_stacktrace_normalize(PyObject *self, PyObject *args);

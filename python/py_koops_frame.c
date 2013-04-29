@@ -17,6 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+#include "py_common.h"
 #include "py_koops_frame.h"
 
 #include <inttypes.h>
@@ -30,75 +31,6 @@
                   "Usage:\n" \
                   "satyr.KerneloopsFrame() - creates an empty frame\n" \
                   "satyr.KerneloopsFrame(str) - parses str and fills the frame object"
-
-#define f_get_reliable_doc "Usage: frame.get_reliable()\n" \
-                          "Returns: boolean - is this entry reliable"
-
-#define f_set_reliable_doc "Usage: frame.set_address(state)\n" \
-                          "state: boolean - set reliability to state"
-
-#define f_get_address_doc "Usage: frame.get_address()\n" \
-                          "Returns: positive long integer - address"
-
-#define f_set_address_doc "Usage: frame.set_address(N)\n" \
-                          "N: positive long integer - new address"
-
-#define f_get_function_name_doc "Usage: frame.get_function_name()\n" \
-                                "Returns: string - function name"
-
-#define f_set_function_name_doc "Usage: frame.set_function_name(newname)\n" \
-                                "newname: string - new function name"
-
-#define f_get_function_offset_doc "Usage: frame.get_function_offset()\n" \
-                                "Returns: positive long integer - function offset"
-
-#define f_set_function_offset_doc "Usage: frame.set_function_offset(newoffset)\n" \
-                                "newoffset: positive long integer - new function offset"
-
-#define f_get_function_length_doc "Usage: frame.get_function_length()\n" \
-                                "Returns: positive long integer - function length"
-
-#define f_set_function_length_doc "Usage: frame.set_function_length(newlength)\n" \
-                                "newlength: positive long integer - new function length"
-
-#define f_get_module_name_doc "Usage: frame.get_module_name()\n" \
-                                "Returns: string - module name"
-
-#define f_set_module_name_doc "Usage: frame.set_module_name(newname)\n" \
-                                "newname: string - new module name"
-
-
-
-#define f_get_from_address_doc "Usage: frame.get_from_address()\n" \
-                          "Returns: positive long integer - from address"
-
-#define f_set_from_address_doc "Usage: frame.set_from_address(N)\n" \
-                          "N: positive long integer - new from address"
-
-#define f_get_from_function_name_doc "Usage: frame.get_from_function_name()\n" \
-                                "Returns: string - from function name"
-
-#define f_set_from_function_name_doc "Usage: frame.set_from_function_name(newname)\n" \
-                                "newname: string - new from function name"
-
-#define f_get_from_function_offset_doc "Usage: frame.get_from_function_offset()\n" \
-                                "Returns: positive long integer - from function offset"
-
-#define f_set_from_function_offset_doc "Usage: frame.set_from_function_offset(newoffset)\n" \
-                                "newoffset: positive long integer - new from function offset"
-
-#define f_get_from_function_length_doc "Usage: frame.get_from_function_length()\n" \
-                                "Returns: positive long integer - from function length"
-
-#define f_set_from_function_length_doc "Usage: frame.set_from_function_length(newlength)\n" \
-                                "newlength: positive long integer - new from function length"
-
-#define f_get_from_module_name_doc "Usage: frame.get_from_module_name()\n" \
-                                "Returns: string - from module name"
-
-#define f_set_from_module_name_doc "Usage: frame.set_from_module_name(newname)\n" \
-                                "newname: string - new from module name"
-
 
 #define f_dup_doc "Usage: frame.dup()\n" \
                   "Returns: satyr.KerneloopsFrame - a new clone of frame\n" \
@@ -116,33 +48,44 @@
 static PyMethodDef
 frame_methods[] =
 {
-    /* getters & setters */
-    { "get_reliable",              sr_py_koops_frame_get_reliable,             METH_NOARGS,  f_get_reliable_doc               },
-    { "set_reliable",              sr_py_koops_frame_set_reliable,             METH_VARARGS, f_set_reliable_doc               },
-    { "get_address",               sr_py_koops_frame_get_address,              METH_NOARGS,  f_get_address_doc                },
-    { "set_address",               sr_py_koops_frame_set_address,              METH_VARARGS, f_set_address_doc                },
-    { "get_function_name",         sr_py_koops_frame_get_function_name,        METH_NOARGS,  f_get_function_name_doc          },
-    { "set_function_name",         sr_py_koops_frame_set_function_name,        METH_VARARGS, f_set_function_name_doc          },
-    { "get_function_offset",       sr_py_koops_frame_get_function_offset,      METH_NOARGS,  f_get_function_offset_doc        },
-    { "set_function_offset",       sr_py_koops_frame_set_function_offset,      METH_VARARGS, f_set_function_offset_doc        },
-    { "get_function_length",       sr_py_koops_frame_get_function_length,      METH_NOARGS,  f_get_function_length_doc        },
-    { "set_function_length",       sr_py_koops_frame_set_function_length,      METH_VARARGS, f_set_function_length_doc        },
-    { "get_module_name",           sr_py_koops_frame_get_module_name,          METH_NOARGS,  f_get_module_name_doc            },
-    { "set_module_name",           sr_py_koops_frame_set_module_name,          METH_VARARGS, f_set_module_name_doc            },
-    { "get_from_address",          sr_py_koops_frame_get_from_address,         METH_NOARGS,  f_get_from_address_doc           },
-    { "set_from_address",          sr_py_koops_frame_set_from_address,         METH_VARARGS, f_set_from_address_doc           },
-    { "get_from_function_name",    sr_py_koops_frame_get_from_function_name,   METH_NOARGS,  f_get_from_function_name_doc     },
-    { "set_from_function_name",    sr_py_koops_frame_set_from_function_name,   METH_VARARGS, f_set_from_function_name_doc     },
-    { "get_from_function_offset",  sr_py_koops_frame_get_from_function_offset, METH_NOARGS,  f_get_from_function_offset_doc   },
-    { "set_from_function_offset",  sr_py_koops_frame_set_from_function_offset, METH_VARARGS, f_set_from_function_offset_doc   },
-    { "get_from_function_length",  sr_py_koops_frame_get_from_function_length, METH_NOARGS,  f_get_from_function_length_doc   },
-    { "set_from_function_length",  sr_py_koops_frame_set_from_function_length, METH_VARARGS, f_set_from_function_length_doc   },
-    { "get_from_module_name",      sr_py_koops_frame_get_from_module_name,     METH_NOARGS,  f_get_from_module_name_doc       },
-    { "set_from_module_name",      sr_py_koops_frame_set_from_module_name,     METH_VARARGS, f_set_from_module_name_doc       },
-
     /* methods */
     { "dup",                       sr_py_koops_frame_dup,                      METH_NOARGS,  f_dup_doc                        },
     { "cmp",                       sr_py_koops_frame_cmp,                      METH_VARARGS, f_cmp_doc                        },
+    { NULL },
+};
+
+/* See python/py_common.h and python/py_gdb_frame.c for generic getters/setters documentation. */
+#define GSOFF_PY_STRUCT sr_py_koops_frame
+#define GSOFF_PY_MEMBER frame
+#define GSOFF_C_STRUCT sr_koops_frame
+GSOFF_START
+GSOFF_MEMBER(address),
+GSOFF_MEMBER(reliable),
+GSOFF_MEMBER(function_name),
+GSOFF_MEMBER(function_offset),
+GSOFF_MEMBER(function_length),
+GSOFF_MEMBER(module_name),
+GSOFF_MEMBER(from_address),
+GSOFF_MEMBER(from_function_name),
+GSOFF_MEMBER(from_function_offset),
+GSOFF_MEMBER(from_function_length),
+GSOFF_MEMBER(from_module_name)
+GSOFF_END
+
+static PyGetSetDef
+frame_getset[] =
+{
+    SR_ATTRIBUTE_BOOL  (reliable,             "True if the the frame is guaranteed to be real (bool)"),
+    SR_ATTRIBUTE_UINT64(address,              "Address of the current instruction (long)"            ),
+    SR_ATTRIBUTE_STRING(function_name,        "Function name (string)"                               ),
+    SR_ATTRIBUTE_UINT64(function_offset,      "Function offset (long)"                               ),
+    SR_ATTRIBUTE_UINT64(function_length,      "Function length (long)"                               ),
+    SR_ATTRIBUTE_STRING(module_name,          "Module owning the function (string)"                  ),
+    SR_ATTRIBUTE_UINT64(from_address,         "Address of the caller's instruction (long)"           ),
+    SR_ATTRIBUTE_STRING(from_function_name,   "Caller function name (string)"                        ),
+    SR_ATTRIBUTE_UINT64(from_function_offset, "Caller function offset (long)"                        ),
+    SR_ATTRIBUTE_UINT64(from_function_length, "Caller function length (long)"                        ),
+    SR_ATTRIBUTE_STRING(from_module_name,     "Module owning the caller function (string)"           ),
     { NULL },
 };
 
@@ -179,7 +122,7 @@ sr_py_koops_frame_type =
     NULL,                       /* tp_iternext */
     frame_methods,              /* tp_methods */
     NULL,                       /* tp_members */
-    NULL,                       /* tp_getset */
+    frame_getset,               /* tp_getset */
     NULL,                       /* tp_base */
     NULL,                       /* tp_dict */
     NULL,                       /* tp_descr_get */
@@ -276,231 +219,6 @@ sr_py_koops_frame_str(PyObject *self)
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;
-}
-
-/* getters & setters */
-
-/* reliable */
-PyObject *
-sr_py_koops_frame_get_reliable(PyObject *self, PyObject *args)
-{
-    if (!((struct sr_py_koops_frame*)self)->frame->reliable)
-       Py_RETURN_FALSE;
-
-    Py_RETURN_TRUE;
-}
-
-PyObject *
-sr_py_koops_frame_set_reliable(PyObject *self, PyObject *args)
-{
-    int boolvalue;
-    if (!PyArg_ParseTuple(args, "i", &boolvalue))
-        return NULL;
-
-    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
-    frame->reliable = boolvalue;
-    Py_RETURN_NONE;
-}
-
-/* address */
-PyObject *
-sr_py_koops_frame_get_address(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("K",
-        (unsigned long long)(((struct sr_py_koops_frame*)self)->frame->address));
-}
-
-PyObject *
-sr_py_koops_frame_set_address(PyObject *self, PyObject *args)
-{
-    unsigned long long newvalue;
-    if (!PyArg_ParseTuple(args, "K", &newvalue))
-        return NULL;
-
-    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
-    frame->address = newvalue;
-    Py_RETURN_NONE;
-}
-
-/* from_address */
-PyObject *
-sr_py_koops_frame_get_from_address(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("K",
-        (unsigned long long)(((struct sr_py_koops_frame*)self)->frame->from_address));
-}
-
-PyObject *
-sr_py_koops_frame_set_from_address(PyObject *self, PyObject *args)
-{
-    unsigned long long newvalue;
-    if (!PyArg_ParseTuple(args, "K", &newvalue))
-        return NULL;
-
-    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
-    frame->from_address = newvalue;
-    Py_RETURN_NONE;
-}
-
-
-/* function_name */
-PyObject *
-sr_py_koops_frame_get_function_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_koops_frame*)self)->frame->function_name);
-}
-
-PyObject *
-sr_py_koops_frame_set_function_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
-    free(frame->function_name);
-    frame->function_name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
-/* from_function_name */
-PyObject *
-sr_py_koops_frame_get_from_function_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_koops_frame*)self)->frame->from_function_name);
-}
-
-PyObject *
-sr_py_koops_frame_set_from_function_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
-    free(frame->function_name);
-    frame->from_function_name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
-/* function_offset */
-PyObject *
-sr_py_koops_frame_get_function_offset(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("K",
-        (unsigned long long)(((struct sr_py_koops_frame*)self)->frame->function_offset));
-}
-
-PyObject *
-sr_py_koops_frame_set_function_offset(PyObject *self, PyObject *args)
-{
-    unsigned long long newvalue;
-    if (!PyArg_ParseTuple(args, "K", &newvalue))
-        return NULL;
-
-    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
-    frame->function_offset = newvalue;
-    Py_RETURN_NONE;
-}
-
-/* from_function_offset */
-PyObject *
-sr_py_koops_frame_get_from_function_offset(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("K",
-        (unsigned long long)(((struct sr_py_koops_frame*)self)->frame->from_function_offset));
-}
-
-PyObject *
-sr_py_koops_frame_set_from_function_offset(PyObject *self, PyObject *args)
-{
-    unsigned long long newvalue;
-    if (!PyArg_ParseTuple(args, "K", &newvalue))
-        return NULL;
-
-    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
-    frame->from_function_offset = newvalue;
-    Py_RETURN_NONE;
-}
-
-/* function_length */
-PyObject *
-sr_py_koops_frame_get_function_length(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("K",
-        (unsigned long long)(((struct sr_py_koops_frame*)self)->frame->function_length));
-}
-
-PyObject *
-sr_py_koops_frame_set_function_length(PyObject *self, PyObject *args)
-{
-    unsigned long long newvalue;
-    if (!PyArg_ParseTuple(args, "K", &newvalue))
-        return NULL;
-
-    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
-    frame->function_length = newvalue;
-    Py_RETURN_NONE;
-}
-
-/* from_function_length */
-PyObject *
-sr_py_koops_frame_get_from_function_length(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("K",
-        (unsigned long long)(((struct sr_py_koops_frame*)self)->frame->from_function_length));
-}
-
-PyObject *
-sr_py_koops_frame_set_from_function_length(PyObject *self, PyObject *args)
-{
-    unsigned long long newvalue;
-    if (!PyArg_ParseTuple(args, "K", &newvalue))
-        return NULL;
-
-    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
-    frame->from_function_length = newvalue;
-    Py_RETURN_NONE;
-}
-
-/* module_name */
-PyObject *
-sr_py_koops_frame_get_module_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_koops_frame*)self)->frame->module_name);
-}
-
-PyObject *
-sr_py_koops_frame_set_module_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
-    free(frame->module_name);
-    frame->module_name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
-}
-
-/* from_module_name */
-PyObject *
-sr_py_koops_frame_get_from_module_name(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("s", ((struct sr_py_koops_frame*)self)->frame->from_module_name);
-}
-
-PyObject *
-sr_py_koops_frame_set_from_module_name(PyObject *self, PyObject *args)
-{
-    char *newvalue;
-    if (!PyArg_ParseTuple(args, "s", &newvalue))
-        return NULL;
-
-    struct sr_koops_frame *frame = ((struct sr_py_koops_frame*)self)->frame;
-    free(frame->module_name);
-    frame->from_module_name = sr_strdup(newvalue);
-    Py_RETURN_NONE;
 }
 
 /* methods */

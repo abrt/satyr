@@ -3,6 +3,8 @@
 import os
 import unittest
 
+from test_helpers import BindingsTestCase
+
 try:
     import _satyr as satyr
 except ImportError:
@@ -17,7 +19,7 @@ if not os.path.isfile(path):
 with file(path) as f:
     contents = f.read()
 
-class TestPythonStacktrace(unittest.TestCase):
+class TestPythonStacktrace(BindingsTestCase):
     def setUp(self):
         self.trace = satyr.PythonStacktrace(contents)
 
@@ -45,7 +47,12 @@ class TestPythonStacktrace(unittest.TestCase):
         out = str(self.trace)
         self.assertTrue(('Python stacktrace with %d frames' % frames_expected) in out)
 
-class TestPythonFrame(unittest.TestCase):
+    def test_getset(self):
+        self.assertGetSetCorrect(self.trace, 'file_name', None, 'moo.py')
+        self.assertGetSetCorrect(self.trace, 'file_line', 0, 42)
+        self.assertGetSetCorrect(self.trace, 'exception_name', 'AttributeError', 'WhateverException')
+
+class TestPythonFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.PythonStacktrace(contents).frames[0]
 
@@ -57,20 +64,27 @@ class TestPythonFrame(unittest.TestCase):
 
     def test_dup(self):
         dup = self.frame.dup()
-        self.assertEqual(dup.get_function_name(),
-            self.frame.get_function_name())
+        self.assertEqual(dup.function_name,
+            self.frame.function_name)
 
-        dup.set_function_name('other')
-        self.assertNotEqual(dup.get_function_name(),
-            self.frame.get_function_name())
+        dup.function_name = 'other'
+        self.assertNotEqual(dup.function_name,
+            self.frame.function_name)
 
     def test_cmp(self):
         dup = self.frame.dup()
         self.assertEqual(dup.cmp(dup), 0)
         self.assertEqual(dup.cmp(self.frame), 0)
         self.assertEqual(dup.cmp(self.frame), 0)
-        dup.set_function_name('another')
+        dup.function_name = 'another'
         self.assertNotEqual(dup.cmp(self.frame), 0)
+
+    def test_getset(self):
+        self.assertGetSetCorrect(self.frame, 'file_name', '/usr/share/PackageKit/helpers/yum/yumBackend.py', 'java.py')
+        self.assertGetSetCorrect(self.frame, 'file_line', 1830, 6667)
+        self.assertGetSetCorrect(self.frame, 'is_module', False, True)
+        self.assertGetSetCorrect(self.frame, 'function_name', '_runYumTransaction', 'iiiiii')
+        self.assertGetSetCorrect(self.frame, 'line_contents', 'rpmDisplay=rpmDisplay)', 'abcde')
 
 if __name__ == '__main__':
     unittest.main()
