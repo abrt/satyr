@@ -124,6 +124,12 @@ sr_py_gdb_sharedlib_get_symbols(PyObject *self, void *data)
 int
 sr_py_gdb_sharedlib_set_symbols(PyObject *self, PyObject *rhs, void *data)
 {
+    if (rhs == NULL)
+    {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete this attribute.");
+        return -1;
+    }
+
     long newvalue = PyInt_AsLong(rhs);
     if (PyErr_Occurred())
         return -1;

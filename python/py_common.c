@@ -42,6 +42,12 @@ sr_py_getter_string(PyObject *self, void *data)
 int
 sr_py_setter_string(PyObject *self, PyObject *rhs, void *data)
 {
+    if (rhs == NULL)
+    {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete this attribute.");
+        return -1;
+    }
+
     struct getset_offsets *gsoff = data;
 
     char *newvalue = PyString_AsString(rhs);
@@ -66,6 +72,12 @@ sr_py_getter_uint32(PyObject *self, void *data)
 int
 sr_py_setter_uint32(PyObject *self, PyObject *rhs, void *data)
 {
+    if (rhs == NULL)
+    {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete this attribute.");
+        return -1;
+    }
+
     struct getset_offsets *gsoff = data;
 
     long newvalue = PyInt_AsLong(rhs);
@@ -95,6 +107,12 @@ sr_py_getter_bool(PyObject *self, void *data)
 int
 sr_py_setter_bool(PyObject *self, PyObject *rhs, void *data)
 {
+    if (rhs == NULL)
+    {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete this attribute.");
+        return -1;
+    }
+
     struct getset_offsets *gsoff = data;
 
     bool newvalue = PyObject_IsTrue(rhs);
@@ -116,6 +134,12 @@ sr_py_getter_uint64(PyObject *self, void *data)
 int
 sr_py_setter_uint64(PyObject *self, PyObject *rhs, void *data)
 {
+    if (rhs == NULL)
+    {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete this attribute.");
+        return -1;
+    }
+
     struct getset_offsets *gsoff = data;
 
     unsigned long long newvalue = PyInt_AsUnsignedLongLongMask(rhs);

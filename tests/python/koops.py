@@ -31,6 +31,7 @@ class TestKerneloops(BindingsTestCase):
         ## not implemented, expected to fail
         #self.koops.modules = ['foo', 'bar']
         #self.assertEqual(len(self.koops.modules), 2)
+        self.assertRaises(NotImplementedError, self.koops.__delattr__, 'modules')
 
     def test_dup(self):
         dup = self.koops.dup()

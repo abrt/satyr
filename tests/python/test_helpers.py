@@ -8,6 +8,7 @@ class BindingsTestCase(unittest.TestCase):
         self.assertEqual(obj.__getattribute__(attr), orig_val)
         obj.__setattr__(attr, new_val)
         self.assertEqual(obj.__getattribute__(attr), new_val)
+        self.assertRaises(TypeError, obj.__delattr__, attr)
 
 if __name__ == '__main__':
     import sys
