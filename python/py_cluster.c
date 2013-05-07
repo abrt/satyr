@@ -3,7 +3,7 @@
 #include "lib/strbuf.h"
 #include "lib/cluster.h"
 
-#define dendrogram_doc "satyr.Distances - class representing distances between a set of objects\n"
+#define dendrogram_doc "satyr.Dendrogram - a dendrogram created by clustering algorithm\n"
 
 #define de_get_size_doc "Usage: dendrogram.get_size()\n" \
                         "Returns: integer - number of objects in the dendrogram"
