@@ -205,12 +205,20 @@ sr_core_thread_from_json(struct sr_json_value *root,
 }
 
 char *
-sr_core_thread_to_json(struct sr_core_thread *thread)
+sr_core_thread_to_json(struct sr_core_thread *thread, bool is_crash_thread)
 {
     struct sr_strbuf *strbuf = sr_strbuf_new();
     if (thread->frames)
     {
-        sr_strbuf_append_str(strbuf, "{   \"frames\":\n");
+        if (is_crash_thread)
+        {
+            sr_strbuf_append_str(strbuf, "{   \"crash_thread\": true\n");
+            sr_strbuf_append_str(strbuf, ",");
+        }
+        else
+            sr_strbuf_append_str(strbuf, "{");
+        sr_strbuf_append_str(strbuf, "   \"frames\":\n");
+
         struct sr_core_frame *frame = thread->frames;
         while (frame)
         {

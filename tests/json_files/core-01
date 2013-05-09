@@ -1,0 +1,49 @@
+{   "signal": 6
+,   "executable": "/usr/bin/will_abort"
+,   "extra_keys": "shall be ignored"
+,   "stacktrace":
+      [ {   "frames":
+              [ {   "address": 87654
+                ,   "build_id": "92ebaf825e4f492952c45189cb9ffc6541f8599b"
+                ,   "build_id_offset": 42
+                ,   "function_name": "fake_frame_for_the_sake_of_multiple_threads"
+                ,   "file_name": "/usr/bin/will_abort"
+                }
+              , {   "address": 98346
+                ,   "build_id": "92ebaf825e4f492952c45189cb9ffc6541f8599b"
+                ,   "build_id_offset": 10734
+                ,   "function_name": "fake_function"
+                ,   "file_name": "/usr/bin/will_abort"
+                } ]
+        }
+      , {   "crash_thread": true
+        ,   "frames":
+              [ {   "address": 237190207797
+                ,   "build_id": "cc10c72da62c93033e227ffbe2670f2c4fbbde1a"
+                ,   "build_id_offset": 219445
+                ,   "function_name": "raise"
+                ,   "file_name": "/usr/lib64/libc-2.15.so"
+                ,   "an_unknown_key": "fromTHEfuture"
+                ,   "fingerprint": "f33186a4c862fb0751bca60701f553b829210477"
+                }
+              , {   "address": 237190213864
+                ,   "build_id": "cc10c72da62c93033e227ffbe2670f2c4fbbde1a"
+                ,   "build_id_offset": 225512
+                ,   "function_name": "abort"
+                ,   "file_name": "/usr/lib64/libc-2.15.so"
+                ,   "fingerprint": "352bc5cf09233cea84fd089527a146cfb5b7d8dc"
+                }
+              , {   "address": 4195427
+                ,   "build_id": "92ebaf825e4f492952c45189cb9ffc6541f8599b"
+                ,   "build_id_offset": 1123
+                ,   "file_name": "/usr/bin/will_abort"
+                }
+              , {   "address": 237190125365
+                ,   "build_id": "cc10c72da62c93033e227ffbe2670f2c4fbbde1a"
+                ,   "build_id_offset": 137013
+                ,   "function_name": "__libc_start_main"
+                ,   "file_name": "/usr/lib64/libc-2.15.so"
+                ,   "fingerprint": "5ff4a3d3743fdde711c49033d1e01784477e57fb"
+                } ]
+        } ]
+}

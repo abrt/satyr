@@ -134,7 +134,8 @@ sr_core_thread_from_json(struct sr_json_value *root,
                          char **error_message);
 
 char *
-sr_core_thread_to_json(struct sr_core_thread *thread);
+sr_core_thread_to_json(struct sr_core_thread *thread,
+                       bool is_crash_thread);
 
 #ifdef __cplusplus
 }

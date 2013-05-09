@@ -35,7 +35,7 @@ main(void)
   struct sr_core_thread *thread = sr_core_thread_new();
   thread->frames = frame0;
 
-  char *json = sr_core_thread_to_json(thread);
+  char *json = sr_core_thread_to_json(thread, false);
   puts(json);
   assert(0 == strcmp(json,
            "{   \"frames\":\n"

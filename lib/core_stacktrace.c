@@ -169,21 +169,23 @@ sr_core_stacktrace_from_json(struct sr_json_value *root,
     /* Read threads. */
     for (unsigned i = 0; i < root->u.object.length; ++i)
     {
-        if (0 != strcmp("threads", root->u.object.values[i].name))
+        if (0 != strcmp("stacktrace", root->u.object.values[i].name))
             continue;
 
         if (root->u.object.values[i].value->type != SR_JSON_ARRAY)
         {
-            *error_message = sr_strdup("Invalid type of \"threads\"; array expected.");
+            *error_message = sr_strdup("Invalid type of \"stacktrace\"; array expected.");
             sr_core_stacktrace_free(result);
             return NULL;
         }
 
         for (unsigned j = 0; j < root->u.object.values[i].value->u.array.length; ++j)
         {
-            struct sr_core_thread *thread = sr_core_thread_from_json(
-                root->u.object.values[i].value->u.array.values[j],
-                error_message);
+            struct sr_json_value *json_thread
+                = root->u.object.values[i].value->u.array.values[j];
+
+            struct sr_core_thread *thread = sr_core_thread_from_json(json_thread,
+                    error_message);
 
             if (!thread)
             {
@@ -191,51 +193,24 @@ sr_core_stacktrace_from_json(struct sr_json_value *root,
                 return NULL;
             }
 
-            result->threads = sr_core_thread_append(result->threads, thread);
-        }
-
-        break;
-    }
-
-    /* Read crash thread. */
-    for (unsigned i = 0; i < root->u.object.length; ++i)
-    {
-        if (0 != strcmp("crash_thread", root->u.object.values[i].name))
-            continue;
-
-        if (root->u.object.values[i].value->type != SR_JSON_INTEGER)
-        {
-            *error_message = sr_strdup("Invalid type of \"crash_thread\"; integer expected.");
-            sr_core_stacktrace_free(result);
-            return NULL;
-        }
-
-        long crash_thread = root->u.object.values[i].value->u.integer;
-        if (crash_thread < 0)
-        {
-            *error_message = sr_strdup("Invalid index in \"crash_thread\".");
-            sr_core_stacktrace_free(result);
-            return NULL;
-        }
-
-        result->crash_thread = result->threads;
-        for (long j = 0; j < crash_thread; ++j)
-        {
-            if (!result->crash_thread)
+            for (unsigned k = 0; k < json_thread->u.object.length; ++k)
             {
-                *error_message = sr_strdup("Invalid index in \"crash_thread\".");
-                sr_core_stacktrace_free(result);
-                return NULL;
+                if (0 != strcmp("crash_thread", json_thread->u.object.values[k].name))
+                    continue;
+
+                if (json_thread->u.object.values[k].value->type != SR_JSON_BOOLEAN)
+                {
+                    *error_message = sr_strdup(
+                            "Invalid type of \"crash_thread\"; boolean expected.");
+                    sr_core_stacktrace_free(result);
+                    return NULL;
+                }
+
+                if (json_thread->u.object.values[k].value->u.boolean)
+                    result->crash_thread = thread;
             }
 
-            result->crash_thread = result->crash_thread->next;
-        }
-
-        if (!result->crash_thread)
-        {
-            *error_message = sr_strdup("Invalid index in \"crash_thread\".");
-            sr_core_stacktrace_free(result);
-            return NULL;
+            result->threads = sr_core_thread_append(result->threads, thread);
         }
 
         break;
@@ -274,22 +249,6 @@ sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
                           "{   \"signal\": %"PRIu8"\n",
                           stacktrace->signal);
 
-    /* Crash thread offset. */
-    if (stacktrace->crash_thread)
-    {
-        /* Calculate the offset of the crash thread. */
-        uint32_t offset = 0;
-        struct sr_core_thread *thread = stacktrace->threads;
-        while (thread && thread != stacktrace->crash_thread)
-        {
-            thread = thread->next;
-            ++offset;
-        }
-
-        assert(thread);
-        sr_strbuf_append_strf(strbuf, ",   \"crash_thread\": %"PRIu32"\n", offset);
-    }
-
     if (stacktrace->executable)
     {
         sr_strbuf_append_str(strbuf, ",   \"executable\": ");
@@ -297,7 +256,7 @@ sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
         sr_strbuf_append_str(strbuf, "\n");
     }
 
-    sr_strbuf_append_str(strbuf, ",   \"threads\":\n");
+    sr_strbuf_append_str(strbuf, ",   \"stacktrace\":\n");
 
     struct sr_core_thread *thread = stacktrace->threads;
     while (thread)
@@ -307,8 +266,10 @@ sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
         else
             sr_strbuf_append_str(strbuf, "      , ");
 
-        char *thread_json = sr_core_thread_to_json(thread);
+        bool crash_thread = (thread == stacktrace->crash_thread);
+        char *thread_json = sr_core_thread_to_json(thread, crash_thread);
         char *indented_thread_json = sr_indent_except_first_line(thread_json, 8);
+
         sr_strbuf_append_str(strbuf, indented_thread_json);
         free(indented_thread_json);
         free(thread_json);
