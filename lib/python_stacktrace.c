@@ -111,18 +111,18 @@ sr_python_stacktrace_parse(const char **input,
     struct sr_python_stacktrace *stacktrace = sr_python_stacktrace_new();
 
     /* Read the frames. */
-    struct sr_python_frame *frame, *prevframe = NULL;
+    struct sr_python_frame *frame;
     struct sr_location frame_location;
     sr_location_init(&frame_location);
     while ((frame = sr_python_frame_parse(&local_input, &frame_location)))
     {
-        if (prevframe)
-        {
-            sr_python_frame_append(prevframe, frame);
-            prevframe = frame;
-        }
-        else
-            stacktrace->frames = prevframe = frame;
+        /*
+         * Python stacktraces are in reverse order than other types - we
+         * reverse it here by prepending each frame to the list instead of
+         * appending it.
+         */
+        frame->next = stacktrace->frames;
+        stacktrace->frames = frame;
 
         sr_location_add(location,
                         frame_location.line,

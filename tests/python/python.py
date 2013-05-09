@@ -54,7 +54,7 @@ class TestPythonStacktrace(BindingsTestCase):
 
 class TestPythonFrame(BindingsTestCase):
     def setUp(self):
-        self.frame = satyr.PythonStacktrace(contents).frames[0]
+        self.frame = satyr.PythonStacktrace(contents).frames[-1]
 
     def test_str(self):
         out = str(self.frame)
