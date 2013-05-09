@@ -395,9 +395,12 @@ sr_normalize_koops_stacktrace(struct sr_koops_stacktrace *stacktrace)
     struct sr_koops_frame *frame = stacktrace->frames;
     while (frame)
     {
-        char *dot = strchr(frame->function_name, '.');
-        if (dot)
-            *dot = '\0';
+        if (frame->function_name)
+        {
+            char *dot = strchr(frame->function_name, '.');
+            if (dot)
+                *dot = '\0';
+        }
 
         frame = frame->next;
     }
