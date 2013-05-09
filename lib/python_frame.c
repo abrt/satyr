@@ -21,6 +21,7 @@
 #include "utils.h"
 #include "location.h"
 #include "strbuf.h"
+#include "json.h"
 #include <string.h>
 #include <inttypes.h>
 
@@ -239,9 +240,9 @@ sr_python_frame_to_json(struct sr_python_frame *frame)
     /* Source file name. */
     if (frame->file_name)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"file_name\": \"%s\"\n",
-                              frame->file_name);
+        sr_strbuf_append_str(strbuf, ",   \"file_name\": ");
+        sr_json_append_escaped(strbuf, frame->file_name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     /* Source file line. */
@@ -260,17 +261,17 @@ sr_python_frame_to_json(struct sr_python_frame *frame)
     /* Function name. */
     if (frame->function_name)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"function_name\": \"%s\"\n",
-                              frame->function_name);
+        sr_strbuf_append_str(strbuf, ",   \"function_name\": ");
+        sr_json_append_escaped(strbuf, frame->function_name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     /* Line contents. */
     if (frame->line_contents)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"line_contents\": \"%s\"\n",
-                              frame->line_contents);
+        sr_strbuf_append_str(strbuf, ",   \"line_contents\": ");
+        sr_json_append_escaped(strbuf, frame->line_contents);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     strbuf->buf[0] = '{';

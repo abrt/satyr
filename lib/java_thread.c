@@ -23,6 +23,7 @@
 #include "location.h"
 #include "utils.h"
 #include "strbuf.h"
+#include "json.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -344,9 +345,9 @@ sr_java_thread_to_json(struct sr_java_thread *thread)
 
     if (thread->name)
     {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"name\": \"%s\"\n",
-                              thread->name);
+        sr_strbuf_append_str(strbuf, ",   \"name\": ");
+        sr_json_append_escaped(strbuf, thread->name);
+        sr_strbuf_append_str(strbuf, "\n");
     }
 
     if (thread->frames)
