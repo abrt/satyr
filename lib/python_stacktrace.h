@@ -100,6 +100,12 @@ sr_python_stacktrace_parse(const char **input,
                            struct sr_location *location);
 
 /**
+ * Returns brief, human-readable explanation of the stacktrace.
+ */
+char *
+sr_python_stacktrace_get_reason(struct sr_python_stacktrace *stacktrace);
+
+/**
  * Serializes stacktrace to string.
  * @returnes
  * Newly allocated memory containing the textual representation of the

@@ -118,6 +118,12 @@ sr_java_stacktrace_parse(const char **input,
                          struct sr_location *location);
 
 /**
+ * Returns brief, human-readable explanation of the stacktrace.
+ */
+char *
+sr_java_stacktrace_get_reason(struct sr_java_stacktrace *stacktrace);
+
+/**
  * Serializes stacktrace to string.
  * @returnes
  * Newly allocated memory containing the textual representation of the

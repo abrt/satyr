@@ -108,6 +108,10 @@ check(const char *path,
   printf("expected: %d, got: %d\n", frame_count, sr_koops_stacktrace_get_frame_count(stacktrace));
   assert(frame_count == sr_koops_stacktrace_get_frame_count(stacktrace));
 
+  char *reason = sr_koops_stacktrace_get_reason(stacktrace);
+  assert(reason);
+  free(reason);
+
   sr_koops_stacktrace_free(stacktrace);
   free(full_input);
 }

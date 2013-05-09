@@ -22,6 +22,7 @@
 #include "utils.h"
 #include "json.h"
 #include "strbuf.h"
+#include "normalize.h"
 #include <string.h>
 
 struct sr_koops_stacktrace *
@@ -311,4 +312,29 @@ sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace)
 
     sr_strbuf_append_char(strbuf, '}');
     return sr_strbuf_free_nobuf(strbuf);
+}
+
+char *
+sr_koops_stacktrace_get_reason(struct sr_koops_stacktrace *stacktrace)
+{
+    char *func = "<unknown>";
+    char *result;
+
+    struct sr_koops_stacktrace *copy = sr_koops_stacktrace_dup(stacktrace);
+    sr_normalize_koops_stacktrace(copy);
+
+    if (copy->frames && copy->frames->function_name)
+        func = copy->frames->function_name;
+
+    if (copy->frames && copy->frames->module_name)
+    {
+        result = sr_asprintf("Kernel oops in %s [%s]", func,
+                copy->frames->module_name);
+    }
+    else
+        result = sr_asprintf("Kernel oops in %s", func);
+
+    sr_koops_stacktrace_free(copy);
+
+    return result;
 }

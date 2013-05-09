@@ -62,6 +62,10 @@ main(void)
   stacktrace->crash_thread = thread1;
   stacktrace->threads = thread0;
 
+  char *reason = sr_core_stacktrace_get_reason(stacktrace);
+  assert(reason);
+  free(reason);
+
   char *json = sr_core_stacktrace_to_json(stacktrace);
   puts(json);
   assert(0 == strcmp(json,

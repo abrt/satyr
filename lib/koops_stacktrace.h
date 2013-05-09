@@ -148,8 +148,14 @@ char **
 sr_koops_stacktrace_parse_modules(const char **input);
 
 /**
+ * Returns brief, human-readable explanation of the stacktrace.
+ */
+char *
+sr_koops_stacktrace_get_reason(struct sr_koops_stacktrace *stacktrace);
+
+/**
  * Serializes stacktrace to string.
- * @returnes
+ * @returns
  * Newly allocated memory containing the textual representation of the
  * provided stacktrace.  Caller should free the memory when it's no
  * longer needed.

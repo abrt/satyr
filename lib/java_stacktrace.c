@@ -25,6 +25,7 @@
 #include "strbuf.h"
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 
 struct sr_java_stacktrace *
 sr_java_stacktrace_new()
@@ -154,4 +155,43 @@ sr_java_stacktrace_to_json(struct sr_java_stacktrace *stacktrace)
     sr_strbuf_append_str(strbuf, " ]\n");
     sr_strbuf_append_char(strbuf, '}');
     return sr_strbuf_free_nobuf(strbuf);
+}
+
+char *
+sr_java_stacktrace_get_reason(struct sr_java_stacktrace *stacktrace)
+{
+    char *exc = "<unknown>";
+    char *file = "<unknown>";
+    uint32_t line = 0;
+
+    if (stacktrace->threads)
+    {
+        struct sr_java_thread *t = stacktrace->threads;
+        if (t->frames)
+        {
+            struct sr_java_frame *f = t->frames;
+            bool exc_found = false;
+
+            while (f)
+            {
+                /* exception name - first frame w/ is_exception */
+                if (f->is_exception && f->name && !exc_found)
+                {
+                    exc = f->name;
+                    exc_found = true;
+                }
+
+                /* file - bottom of the stack */
+                if (!f->next && f->file_name)
+                {
+                    file = f->file_name;
+                    line = f->file_line;
+                }
+
+                f = f->next;
+            }
+        }
+    }
+
+    return sr_asprintf("Exception %s occurred in %s:%"PRIu32, exc, file, line);
 }

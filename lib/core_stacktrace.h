@@ -117,6 +117,12 @@ sr_core_stacktrace_from_json_text(const char *text,
                                   char **error_message);
 
 /**
+ * Returns brief, human-readable explanation of the stacktrace.
+ */
+char *
+sr_core_stacktrace_get_reason(struct sr_core_stacktrace *stacktrace);
+
+/**
  * Serializes stacktrace to string.
  * @returns
  * Newly allocated memory containing the textual representation of the

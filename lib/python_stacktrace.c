@@ -191,3 +191,26 @@ sr_python_stacktrace_to_json(struct sr_python_stacktrace *stacktrace)
     sr_strbuf_append_char(strbuf, '}');
     return sr_strbuf_free_nobuf(strbuf);
 }
+
+char *
+sr_python_stacktrace_get_reason(struct sr_python_stacktrace *stacktrace)
+{
+    char *exc = "Unknown error";
+    char *file = "<unknown>";
+    uint32_t line = 0;
+
+    struct sr_python_frame *frame = stacktrace->frames;
+    while (frame && frame->next)
+        frame = frame->next;
+
+    if (frame)
+    {
+        file = frame->file_name;
+        line = frame->file_line;
+    }
+
+    if (stacktrace->exception_name)
+        exc = stacktrace->exception_name;
+
+    return sr_asprintf("%s in %s:%"PRIu32, exc, file, line);
+}
