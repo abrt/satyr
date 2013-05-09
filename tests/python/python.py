@@ -50,8 +50,6 @@ class TestPythonStacktrace(BindingsTestCase):
         self.assertTrue(('Python stacktrace with %d frames' % frames_expected) in out)
 
     def test_getset(self):
-        self.assertGetSetCorrect(self.trace, 'file_name', None, 'moo.py')
-        self.assertGetSetCorrect(self.trace, 'file_line', 0, 42)
         self.assertGetSetCorrect(self.trace, 'exception_name', 'AttributeError', 'WhateverException')
 
 class TestPythonFrame(BindingsTestCase):

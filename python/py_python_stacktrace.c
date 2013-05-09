@@ -47,16 +47,12 @@ python_stacktrace_members[] =
 #define GSOFF_PY_MEMBER stacktrace
 #define GSOFF_C_STRUCT sr_python_stacktrace
 GSOFF_START
-GSOFF_MEMBER(file_name),
-GSOFF_MEMBER(file_line),
 GSOFF_MEMBER(exception_name)
 GSOFF_END
 
 static PyGetSetDef
 python_stacktrace_getset[] =
 {
-    SR_ATTRIBUTE_STRING(file_name,      "Source file name (string)"            ),
-    SR_ATTRIBUTE_UINT32(file_line,      "Source line number (positive integer)"),
     SR_ATTRIBUTE_STRING(exception_name, "Exception type (string)"              ),
     { NULL },
 };

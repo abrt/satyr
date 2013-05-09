@@ -37,14 +37,6 @@ struct sr_location;
 
 struct sr_python_stacktrace
 {
-    /* Name of the source file where an exception has been raised. */
-    char *file_name;
-
-    /* Line of the source file where the exception has been
-     * raised. First line has number 1. 0 means the file line is
-     * unknown. */
-    uint32_t file_line;
-
     /* Exception class name. */
     char *exception_name;
 

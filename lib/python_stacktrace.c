@@ -59,9 +59,6 @@ sr_python_stacktrace_dup(struct sr_python_stacktrace *stacktrace)
     struct sr_python_stacktrace *result = sr_python_stacktrace_new();
     memcpy(result, stacktrace, sizeof(struct sr_python_stacktrace));
 
-    if (result->file_name)
-        result->file_name = sr_strdup(result->file_name);
-
     if (result->exception_name)
         result->exception_name = sr_strdup(result->exception_name);
 
@@ -152,22 +149,6 @@ char *
 sr_python_stacktrace_to_json(struct sr_python_stacktrace *stacktrace)
 {
     struct sr_strbuf *strbuf = sr_strbuf_new();
-
-    /* Exception file name. */
-    if (stacktrace->file_name)
-    {
-        sr_strbuf_append_str(strbuf, ",   \"file_name\": ");
-        sr_json_append_escaped(strbuf, stacktrace->file_name);
-        sr_strbuf_append_str(strbuf, "\n");
-    }
-
-    /* Exception file line. */
-    if (stacktrace->file_line > 0)
-    {
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"file_line\": %"PRIu32"\n",
-                              stacktrace->file_line);
-    }
 
     /* Exception class name. */
     if (stacktrace->exception_name)
