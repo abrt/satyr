@@ -162,7 +162,7 @@ sr_python_stacktrace_to_json(struct sr_python_stacktrace *stacktrace)
     if (stacktrace->frames)
     {
         struct sr_python_frame *frame = stacktrace->frames;
-        sr_strbuf_append_str(strbuf, ",   \"frames\":\n");
+        sr_strbuf_append_str(strbuf, ",   \"stacktrace\":\n");
         while (frame)
         {
             if (frame == stacktrace->frames)

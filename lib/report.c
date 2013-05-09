@@ -71,6 +71,90 @@ sr_report_free(struct sr_report *report)
     free(report);
 }
 
+/* The object has to be non-empty, i.e. contain at least one key-value pair. */
+static void
+dismantle_object(char *obj)
+{
+    assert(obj);
+
+    size_t last = strlen(obj) - 1;
+
+    assert(obj[0] == '{');
+    assert(obj[last] == '}');
+
+    obj[0] = ',';
+    obj[last] = '\0';
+}
+
+static char *
+problem_object_string(struct sr_report *report, const char *report_type)
+{
+    struct sr_strbuf *strbuf = sr_strbuf_new();
+
+    /* Report type. */
+    assert(report_type);
+    sr_strbuf_append_str(strbuf, "{   \"type\": ");
+    sr_json_append_escaped(strbuf, report_type);
+    sr_strbuf_append_str(strbuf, "\n");
+
+    /* Component name. */
+    if (report->component_name)
+    {
+        sr_strbuf_append_str(strbuf, ",   \"component\": ");
+        sr_json_append_escaped(strbuf, report->component_name);
+        sr_strbuf_append_str(strbuf, "\n");
+    }
+
+    /* User type. */
+    sr_strbuf_append_strf(strbuf, ",   \"user\": {   \"root\": %s\n"  \
+                                  "            ,   \"local\": %s\n" \
+                                  "            }\n",
+                          report->user_root ? "true" : "false",
+                          report->user_local ? "true" : "false");
+
+    /* Stacktrace. */
+
+    /* Core stacktrace. */
+    if (report->core_stacktrace)
+    {
+        char *stacktrace = sr_core_stacktrace_to_json(report->core_stacktrace);
+        dismantle_object(stacktrace);
+        sr_strbuf_append_str(strbuf, stacktrace);
+        free(stacktrace);
+    }
+
+    /* Python stacktrace. */
+    if (report->python_stacktrace)
+    {
+        char *stacktrace = sr_python_stacktrace_to_json(report->python_stacktrace);
+        dismantle_object(stacktrace);
+        sr_strbuf_append_str(strbuf, stacktrace);
+        free(stacktrace);
+    }
+
+    /* Koops stacktrace. */
+    if (report->koops_stacktrace)
+    {
+        char *stacktrace = sr_koops_stacktrace_to_json(report->koops_stacktrace);
+        dismantle_object(stacktrace);
+        sr_strbuf_append_str(strbuf, stacktrace);
+        free(stacktrace);
+    }
+
+    /* Java stacktrace. */
+    if (report->java_stacktrace)
+    {
+        char *stacktrace = sr_java_stacktrace_to_json(report->java_stacktrace);
+        dismantle_object(stacktrace);
+        sr_strbuf_append_strf(strbuf, stacktrace);
+        free(stacktrace);
+    }
+
+    sr_strbuf_append_str(strbuf, "}");
+
+    return sr_strbuf_free_nobuf(strbuf);
+}
+
 char *
 sr_report_to_json(struct sr_report *report)
 {
@@ -83,29 +167,36 @@ sr_report_to_json(struct sr_report *report)
 
     /* Report type. */
     const char *report_type;
+    char *reason;
     switch (report->report_type)
     {
     default:
     case SR_REPORT_INVALID:
         report_type = "invalid";
+        reason = "invalid";
         break;
     case SR_REPORT_CORE:
         report_type = "core";
+        reason = sr_core_stacktrace_get_reason(report->core_stacktrace);
         break;
     case SR_REPORT_PYTHON:
         report_type = "python";
+        reason = sr_python_stacktrace_get_reason(report->python_stacktrace);
         break;
     case SR_REPORT_KERNELOOPS:
         report_type = "kerneloops";
+        reason = sr_koops_stacktrace_get_reason(report->koops_stacktrace);
         break;
     case SR_REPORT_JAVA:
         report_type = "java";
+        reason = sr_java_stacktrace_get_reason(report->java_stacktrace);
         break;
     }
 
-    sr_strbuf_append_str(strbuf, ",   \"report_type\": ");
-    sr_json_append_escaped(strbuf, report_type);
+    sr_strbuf_append_str(strbuf, ",   \"reason\": ");
+    sr_json_append_escaped(strbuf, reason);
     sr_strbuf_append_str(strbuf, "\n");
+    free(reason);
 
     /* Reporter name and version. */
     assert(report->reporter_name);
@@ -115,18 +206,11 @@ sr_report_to_json(struct sr_report *report)
                                  report->reporter_name,
                                  report->reporter_version);
     char *reporter_indented = sr_indent_except_first_line(reporter, strlen(",   \"reporter\": "));
+    free(reporter);
     sr_strbuf_append_strf(strbuf,
                           ",   \"reporter\": %s\n",
                           reporter_indented);
-
-    /* User type. */
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"user_root\": %s\n",
-                          report->user_root ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"user_local\": %s\n",
-                          report->user_local ? "true" : "false");
+    free(reporter_indented);
 
     /* Operating system. */
     if (report->operating_system)
@@ -141,77 +225,26 @@ sr_report_to_json(struct sr_report *report)
         free(opsys_str_indented);
     }
 
-    /* Component name. */
-    if (report->component_name)
-    {
-        sr_strbuf_append_str(strbuf, ",   \"component\": ");
-        sr_json_append_escaped(strbuf, report->component_name);
-        sr_strbuf_append_str(strbuf, "\n");
-    }
+    /* Problem section - stacktrace + other info. */
+    char *problem = problem_object_string(report, report_type);
+    char *problem_indented = sr_indent_except_first_line(problem, strlen(",   \"problem\": "));
+    free(problem);
+    sr_strbuf_append_strf(strbuf,
+                          ",   \"problem\": %s\n",
+                          problem_indented);
+    free(problem_indented);
 
-    /* RPM packages. */
+    /* Packages. (Only RPM supported so far.) */
     if (report->rpm_packages)
     {
         char *rpms_str = sr_rpm_package_to_json(report->rpm_packages, true);
-        char *rpms_str_indented = sr_indent_except_first_line(rpms_str, strlen(",   \"rpm_packages\": "));
+        char *rpms_str_indented = sr_indent_except_first_line(rpms_str, strlen(",   \"packages\": "));
         free(rpms_str);
         sr_strbuf_append_strf(strbuf,
-                              ",   \"rpm_packages\": %s\n",
+                              ",   \"packages\": %s\n",
                               rpms_str_indented);
 
         free(rpms_str_indented);
-    }
-
-    /* Core stacktrace. */
-    if (report->core_stacktrace)
-    {
-        char *core_stacktrace_str = sr_core_stacktrace_to_json(report->core_stacktrace);
-        char *core_stacktrace_str_indented = sr_indent_except_first_line(core_stacktrace_str, strlen(",   \"core_stacktrace\": "));
-        free(core_stacktrace_str);
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"core_stacktrace\": %s\n",
-                              core_stacktrace_str_indented);
-
-        free(core_stacktrace_str_indented);
-    }
-
-    /* Python stacktrace. */
-    if (report->python_stacktrace)
-    {
-        char *stacktrace = sr_python_stacktrace_to_json(report->python_stacktrace);
-        char *stacktrace_indented = sr_indent_except_first_line(stacktrace, strlen(",   \"python_stacktrace\": "));
-        free(stacktrace);
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"python_stacktrace\": %s\n",
-                              stacktrace_indented);
-
-        free(stacktrace_indented);
-    }
-
-    /* Koops stacktrace. */
-    if (report->koops_stacktrace)
-    {
-        char *stacktrace = sr_koops_stacktrace_to_json(report->koops_stacktrace);
-        char *stacktrace_indented = sr_indent_except_first_line(stacktrace, strlen(",   \"koops_stacktrace\": "));
-        free(stacktrace);
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"koops_stacktrace\": %s\n",
-                              stacktrace_indented);
-
-        free(stacktrace_indented);
-    }
-
-    /* Java stacktrace. */
-    if (report->java_stacktrace)
-    {
-        char *stacktrace = sr_java_stacktrace_to_json(report->java_stacktrace);
-        char *stacktrace_indented = sr_indent_except_first_line(stacktrace, strlen(",   \"java_stacktrace\": "));
-        free(stacktrace);
-        sr_strbuf_append_strf(strbuf,
-                              ",   \"java_stacktrace\": %s\n",
-                              stacktrace_indented);
-
-        free(stacktrace_indented);
     }
 
     sr_strbuf_append_str(strbuf, "}");
