@@ -1,4 +1,10 @@
-EXTRA_DIST = gdb_stacktraces java_stacktraces python_stacktraces kerneloopses programs python
+EXTRA_DIST = gdb_stacktraces \
+             java_stacktraces \
+             json_files \
+             kerneloopses \
+             programs \
+             python \
+             python_stacktraces
 
 ## ------------ ##
 ## package.m4.  ##
