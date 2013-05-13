@@ -1,0 +1,38 @@
+[110417.280426] WARNING: at mm/page_alloc.c:2204 __alloc_pages_nodemask+0x231/0x8f0()
+[110417.280429] Hardware name: Latitude E6420
+[110417.280431] Modules linked in: vfat fat usb_storage authenc l2tp_ppp pppox ppp_generic slhc l2tp_netlink l2tp_core rmd160 crypto_null camellia lzo cast6 cast5 deflate zlib_deflate cts gcm ccm serpent_sse2_x86_64 serpent_generic blowfish_generic blowfish_x86_64 blowfish_common twofish_generic twofish_x86_64_3way lrw twofish_x86_64 twofish_common xcbc sha256_generic sha512_generic des_generic ah6 ah4 esp6 esp4 xfrm4_mode_beet xfrm4_tunnel tunnel4 xfrm4_mode_tunnel xfrm4_mode_transport xfrm6_mode_transport xfrm6_mode_ro xfrm6_mode_beet xfrm6_mode_tunnel ipcomp ipcomp6 xfrm_ipcomp xfrm6_tunnel tunnel6 af_key snd_usb_audio snd_usbmidi_lib snd_rawmidi sctp libcrc32c tcp_lp wacom fuse lockd rfcomm bnep snd_hda_codec_hdmi snd_hda_codec_idt binfmt_misc arc4 uvcvideo snd_hda_intel videobuf2_core videodev snd_hda_codec ppdev media dell_wmi videobuf2_vmalloc sparse_keymap videobuf2_memops dell_laptop snd_hwdep snd_seq uinput dcdbas snd_seq_device btusb bluetooth iwlwifi snd_pcm parport_pc 
+joydev parport snd_timer microcode mac80211 snd soundcore snd_page_alloc i2c_i801 cfg80211 iTCO_wdt iTCO_vendor_support rfkill e1000e sunrpc xts gf128mul dm_crypt sdhci_pci sdhci mmc_core wmi i915 drm_kms_helper drm i2c_algo_bit i2c_core video [last unloaded: scsi_wait_scan]
+[110417.280525] Pid: 3, comm: ksoftirqd/0 Tainted: P    B D    O 3.3.7-1.fc16.x86_64 #1
+[110417.280528] Call Trace:
+[110417.280535]  [<ffffffff81057adf>] warn_slowpath_common+0x7f/0xc0
+[110417.280539]  [<ffffffff81057b3a>] warn_slowpath_null+0x1a/0x20
+[110417.280544]  [<ffffffff811296d1>] __alloc_pages_nodemask+0x231/0x8f0
+[110417.280550]  [<ffffffff8151fd80>] ? ip_copy_metadata+0x1c0/0x1c0
+[110417.280555]  [<ffffffff8151f860>] ? ip_forward_options+0x1f0/0x1f0
+[110417.280559]  [<ffffffff81160a93>] alloc_pages_current+0xa3/0x110
+[110417.280563]  [<ffffffff81125514>] __get_free_pages+0x14/0x50
+[110417.280569]  [<ffffffff8116bb5f>] kmalloc_order_trace+0x3f/0xd0
+[110417.280573]  [<ffffffff8116ca87>] __kmalloc+0x177/0x1a0
+[110417.280578]  [<ffffffffa0642332>] ? pppol2tp_xmit+0x42/0x220 [l2tp_ppp]
+[110417.280583]  [<ffffffff814db0a7>] pskb_expand_head+0x87/0x310
+[110417.280588]  [<ffffffff8113dc59>] ? __mod_zone_page_state+0x49/0x50
+[110417.280591]  [<ffffffff814da0f5>] ? kfree_skb+0x45/0xc0
+[110417.280595]  [<ffffffffa06424dd>] pppol2tp_xmit+0x1ed/0x220 [l2tp_ppp]
+[110417.280600]  [<ffffffffa062dd5b>] ppp_push+0x15b/0x650 [ppp_generic]
+[110417.280604]  [<ffffffff814db264>] ? pskb_expand_head+0x244/0x310
+[110417.280608]  [<ffffffff8112860b>] ? free_compound_page+0x1b/0x20
+[110417.280612]  [<ffffffff8112d053>] ? __put_compound_page+0x23/0x30
+[110417.280615]  [<ffffffff8112d1d5>] ? put_compound_page+0x125/0x1c0
+[110417.280619]  [<ffffffffa062e89f>] ppp_xmit_process+0x46f/0x660 [ppp_generic]
+[110417.280624]  [<ffffffffa062ebc8>] ppp_start_xmit+0x138/0x1d0 [ppp_generic]
+[110417.280628]  [<ffffffff814e85b2>] dev_hard_start_xmit+0x332/0x6d0
+[110417.280632]  [<ffffffff8150447a>] sch_direct_xmit+0xfa/0x1d0
+[110417.280635]  [<ffffffff815045f6>] __qdisc_run+0xa6/0x130
+[110417.280639]  [<ffffffff814e6883>] net_tx_action+0xe3/0x1f0
+[110417.280643]  [<ffffffff8105f0c8>] __do_softirq+0xb8/0x230
+[110417.280646]  [<ffffffff8105f2fa>] run_ksoftirqd+0xba/0x170
+[110417.280649]  [<ffffffff8105f240>] ? __do_softirq+0x230/0x230
+[110417.280654]  [<ffffffff81079da3>] kthread+0x93/0xa0
+[110417.280658]  [<ffffffff815fd8e4>] kernel_thread_helper+0x4/0x10
+[110417.280663]  [<ffffffff81079d10>] ? kthread_freezable_should_stop+0x70/0x70
+[110417.280666]  [<ffffffff815fd8e0>] ? gs_change+0x13/0x13

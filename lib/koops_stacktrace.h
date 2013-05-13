@@ -47,7 +47,6 @@ struct sr_koops_stacktrace
      */
 
     bool taint_module_proprietary;
-    bool taint_module_gpl;
     bool taint_module_out_of_tree;
     bool taint_forced_module;
     bool taint_forced_removal;
@@ -62,7 +61,6 @@ struct sr_koops_stacktrace
     bool taint_warning;
     bool taint_staging_driver;
     bool taint_firmware_workaround;
-    bool taint_virtual_box;
 
     /**
      * @brief List of loaded modules.

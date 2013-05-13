@@ -24,6 +24,7 @@
 #include "strbuf.h"
 #include "normalize.h"
 #include <string.h>
+#include <stddef.h>
 
 struct sr_koops_stacktrace *
 sr_koops_stacktrace_new()
@@ -114,6 +115,67 @@ sr_koops_stacktrace_remove_frame(struct sr_koops_stacktrace *stacktrace,
 
 }
 
+struct taint_flag {
+    char letter;
+    size_t member_offset;
+};
+
+/* http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/kernel/panic.c?id=HEAD */
+
+#define FLAG_OFFSET(flag) offsetof(struct sr_koops_stacktrace, taint_ ## flag)
+static struct taint_flag flags[] = {
+    { 'P', FLAG_OFFSET(module_proprietary)  },
+    { 'F', FLAG_OFFSET(forced_module)       },
+    { 'S', FLAG_OFFSET(smp_unsafe)          },
+    { 'R', FLAG_OFFSET(forced_removal)      },
+    { 'M', FLAG_OFFSET(mce)                 },
+    { 'B', FLAG_OFFSET(page_release)        },
+    { 'U', FLAG_OFFSET(userspace)           },
+    { 'D', FLAG_OFFSET(died_recently)       },
+    { 'A', FLAG_OFFSET(acpi_overridden)     },
+    { 'W', FLAG_OFFSET(warning)             },
+    { 'C', FLAG_OFFSET(staging_driver)      },
+    { 'I', FLAG_OFFSET(firmware_workaround) },
+    { 'O', FLAG_OFFSET(module_out_of_tree)  },
+    { '\0', 0 /* sentinel */                }
+};
+#undef FLAG_OFFSET
+
+/* Based on function kernel_tainted_short from abrt/src/lib/kernel.c */
+static bool
+parse_taint_flags(const char *input, struct sr_koops_stacktrace *stacktrace)
+{
+    /* example of flags: 'Tainted: G    B       ' */
+    const char *tainted = strstr(input, "Tainted: ");
+    if (!tainted)
+        return false;
+
+    tainted += strlen("Tainted: ");
+
+    for (;;)
+    {
+        if (tainted[0] >= 'A' && tainted[0] <= 'Z')
+        {
+            /* set the appropriate flag */
+            struct taint_flag *f;
+            for (f = flags; f->letter; f++)
+            {
+                if (tainted[0] == f->letter)
+                {
+                    *(bool *)((void *)stacktrace + f->member_offset) = true;
+                    break;
+                }
+            }
+        }
+        else if (tainted[0] != ' ')
+            break;
+
+        ++tainted;
+    }
+
+    return true;
+}
+
 struct sr_koops_stacktrace *
 sr_koops_stacktrace_parse(const char **input,
                           struct sr_location *location)
@@ -121,6 +183,9 @@ sr_koops_stacktrace_parse(const char **input,
     const char *local_input = *input;
 
     struct sr_koops_stacktrace *stacktrace = sr_koops_stacktrace_new();
+
+    /* Looks for the "Tainted: " line in the whole input */
+    parse_taint_flags(local_input, stacktrace);
 
     while (*local_input)
     {
@@ -244,6 +309,41 @@ sr_koops_stacktrace_parse_modules(const char **input)
     return result;
 }
 
+static char *
+taint_flags_to_json(struct sr_koops_stacktrace *stacktrace)
+{
+    struct sr_strbuf *strbuf = sr_strbuf_new();
+
+#define FLAG_APPEND(flag)                                   \
+    if (stacktrace->taint_ ## flag)                         \
+        sr_strbuf_append_strf(strbuf, ", \"" #flag "\"\n"); \
+
+    FLAG_APPEND(module_proprietary)
+    FLAG_APPEND(forced_module)
+    FLAG_APPEND(forced_removal)
+    FLAG_APPEND(smp_unsafe)
+    FLAG_APPEND(mce)
+    FLAG_APPEND(page_release)
+    FLAG_APPEND(userspace)
+    FLAG_APPEND(died_recently)
+    FLAG_APPEND(acpi_overridden)
+    FLAG_APPEND(warning)
+    FLAG_APPEND(staging_driver)
+    FLAG_APPEND(firmware_workaround)
+    FLAG_APPEND(module_out_of_tree)
+
+#undef FLAG_APPEND
+
+    if (strbuf->len == 0)
+        return sr_strdup("[]");
+
+    sr_strbuf_append_char(strbuf, ']');
+    char *result = sr_strbuf_free_nobuf(strbuf);
+    result[0] = '[';
+    result[strlen(result) - 2] = ' '; /* erase the last newline */
+    return result;
+}
+
 char *
 sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace)
 {
@@ -258,65 +358,11 @@ sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace)
     }
 
     /* Kernel taint flags. */
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_module_proprietary\": %s\n",
-                          stacktrace->taint_module_proprietary ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_module_gpl\": %s\n",
-                          stacktrace->taint_module_gpl ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_module_out_of_tree\": %s\n",
-                          stacktrace->taint_module_out_of_tree ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_forced_module\": %s\n",
-                          stacktrace->taint_forced_module ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_forced_removal\": %s\n",
-                          stacktrace->taint_forced_removal ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_smp_unsafe\": %s\n",
-                          stacktrace->taint_smp_unsafe ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_mce\": %s\n",
-                          stacktrace->taint_mce ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_page_release\": %s\n",
-                          stacktrace->taint_page_release ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_userspace\": %s\n",
-                          stacktrace->taint_userspace ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_died_recently\": %s\n",
-                          stacktrace->taint_died_recently ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_acpi_overridden\": %s\n",
-                          stacktrace->taint_acpi_overridden ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_warning\": %s\n",
-                          stacktrace->taint_warning ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_staging_driver\": %s\n",
-                          stacktrace->taint_staging_driver ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_firmware_workaround\": %s\n",
-                          stacktrace->taint_firmware_workaround ? "true" : "false");
-
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"taint_virtual_box\": %s\n",
-                          stacktrace->taint_virtual_box ? "true" : "false");
+    char *taint_flags = taint_flags_to_json(stacktrace);
+    char *indented_taint_flags = sr_indent_except_first_line(taint_flags, strlen(",   \"taint_flags\": "));
+    free(taint_flags);
+    sr_strbuf_append_strf(strbuf, ",   \"taint_flags\": %s\n", indented_taint_flags);
+    free(indented_taint_flags);
 
     /* Modules. */
     if (stacktrace->modules)
