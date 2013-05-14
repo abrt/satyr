@@ -312,13 +312,16 @@ sr_abrt_report_from_dir(const char *directory,
     free(component_filename);
 
     /* RPM packages. */
-    report->rpm_packages = sr_abrt_rpm_packages_from_dir(
-        directory, error_message);
-
-    if (!report->rpm_packages)
+    if (report->report_type != SR_REPORT_KERNELOOPS)
     {
-        sr_report_free(report);
-        return NULL;
+        report->rpm_packages = sr_abrt_rpm_packages_from_dir(
+            directory, error_message);
+
+        if (!report->rpm_packages)
+        {
+            sr_report_free(report);
+            return NULL;
+        }
     }
 
     /* Core stacktrace. */
@@ -399,6 +402,39 @@ sr_abrt_report_from_dir(const char *directory,
     /* Kerneloops stacktrace. */
     if (report->report_type == SR_REPORT_KERNELOOPS)
     {
+        /* Determine kernel version */
+        char *kernel_filename = sr_build_path(directory,
+                                              "kernel",
+                                              NULL);
+        char *kernel_contents = sr_file_to_string(kernel_filename,
+                                                  error_message);
+        free(kernel_filename);
+        if (!kernel_contents)
+        {
+            sr_report_free(report);
+            return NULL;
+        }
+
+        char *kernel_nevra = sr_asprintf("kernel-%s", kernel_contents);
+        struct sr_rpm_package *package = sr_rpm_package_new();
+        bool success = sr_rpm_package_parse_nevra(kernel_nevra,
+                                                  &package->name,
+                                                  &package->epoch,
+                                                  &package->version,
+                                                  &package->release,
+                                                  &package->architecture);
+        if (!success)
+        {
+            sr_rpm_package_free(package, true);
+            *error_message = sr_asprintf("Failed to parse \"%s\".",
+                                         kernel_nevra);
+
+            sr_report_free(report);
+            return NULL;
+        }
+        report->rpm_packages = package;
+
+        /* Load the Kerneloops stacktrace */
         char *backtrace_filename = sr_build_path(directory,
                                                  "backtrace",
                                                  NULL);
