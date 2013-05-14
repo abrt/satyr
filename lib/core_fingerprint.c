@@ -30,6 +30,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static void
 fingerprint_add_bool(struct sr_strbuf *buffer,
@@ -279,9 +280,9 @@ get_libcalls(char ***symbol_list,
 }
 
 static int
-strcmp_reverse(const char *s1, const char *s2)
+strcmp_wrapper(const char **s1, const char **s2)
 {
-    return -strcmp(s1, s2);
+    return strcmp(*s1, *s2);
 }
 
 static bool
@@ -308,7 +309,7 @@ fp_libcalls(struct sr_strbuf *fingerprint,
         return false;
 
     qsort(symbol_list, symbol_list_size,
-          sizeof(char*), (comparison_fn_t)strcmp_reverse);
+          sizeof(char*), (comparison_fn_t)strcmp_wrapper);
 
     /* Make it unique. */
     sr_struniq(symbol_list, &symbol_list_size);
@@ -347,7 +348,7 @@ fp_calltree_leaves(struct sr_strbuf *fingerprint,
         return false;
 
     qsort(symbol_list, symbol_list_size,
-          sizeof(char*), (comparison_fn_t)strcmp_reverse);
+          sizeof(char*), (comparison_fn_t)strcmp_wrapper);
 
     /* Make it unique. */
     sr_struniq(symbol_list, &symbol_list_size);
