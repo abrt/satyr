@@ -224,13 +224,20 @@ sr_rpm_package_uniq(struct sr_rpm_package *packages)
             }
             else
             {
+                /* deleted record is not the first in list */
                 if (prev)
+                {
                     prev->next = loop->next;
+                    sr_rpm_package_free(loop, false);
+                    loop = prev->next;
+                }
+                /* deleting first record */
                 else
+                {
                     packages = loop->next;
-
-                sr_rpm_package_free(loop, false);
-                loop = prev->next;
+                    sr_rpm_package_free(loop, false);
+                    loop = packages;
+                }
             }
 
             continue;

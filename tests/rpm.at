@@ -79,3 +79,80 @@ main(void)
   return 0;
 }
 ]])
+
+## ------------------- ##
+## sr_rpm_package_uniq ##
+## ------------------- ##
+AT_TESTFUN([sr_rpm_package_uniq],
+[[
+#include <lib/rpm.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdint.h>
+
+int
+main(void)
+{
+  struct sr_rpm_package *p1 = sr_rpm_package_new();
+  struct sr_rpm_package *p2 = sr_rpm_package_new();
+  struct sr_rpm_package *p3 = sr_rpm_package_new();
+
+  p1->name = sr_strdup("coreutils");
+  p1->version = sr_strdup("8.15");
+  p1->release = sr_strdup("10.fc17");
+  p1->next = p2;
+
+  p2->name = sr_strdup("coreutils");
+  p2->version = sr_strdup("8.15");
+  p2->release = sr_strdup("10.fc17");
+  p2->architecture = sr_strdup("x86_64");
+  p2->install_time = 1363628422;
+  p2->next = p3;
+
+  p3->name = sr_strdup("glibc");
+  p3->version = sr_strdup("2.15");
+  p3->release = sr_strdup("58.fc17");
+  p3->architecture = sr_strdup("x86_64");
+  p3->install_time = 1363628422;
+
+  struct sr_rpm_package *packages = p1;
+  packages = sr_rpm_package_uniq(packages);
+
+  assert(packages == p2);
+  assert(packages->next == p3);
+  assert(packages->next->next == NULL);
+
+  sr_rpm_package_free(packages, true);
+
+  p1 = sr_rpm_package_new();
+  p2 = sr_rpm_package_new();
+  p3 = sr_rpm_package_new();
+
+  p1->name = sr_strdup("glibc");
+  p1->version = sr_strdup("2.15");
+  p1->release = sr_strdup("58.fc17");
+  p1->architecture = sr_strdup("x86_64");
+  p1->install_time = 1363628422;
+  p1->next = p2;
+
+  p2->name = sr_strdup("coreutils");
+  p2->version = sr_strdup("8.15");
+  p2->release = sr_strdup("10.fc17");
+  p2->next = p3;
+
+  p3->name = sr_strdup("coreutils");
+  p3->version = sr_strdup("8.15");
+  p3->release = sr_strdup("10.fc17");
+  p3->architecture = sr_strdup("x86_64");
+  p3->install_time = 1363628422;
+
+  packages = p1;
+  packages = sr_rpm_package_uniq(packages);
+
+  assert(packages == p1);
+  assert(packages->next == p3);
+  assert(packages->next->next == NULL);
+
+  return 0;
+}
+]])
