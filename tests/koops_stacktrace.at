@@ -22,7 +22,6 @@ check(bool success,
 
     if (modules)
     {
-        assert(*input == '\0');
 	int offset = 0;
 	while (modules[offset])
         {
@@ -55,6 +54,38 @@ main(void)
     check(true,
           "[110417.280431] Modules linked in: vfat fat usb_storage",
 	  modules);
+
+    check(true,
+          "[110417.280431] Modules linked in: vfat fat usb_storage [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true,
+          "[110417.280431] Modules linked in: vfat fat usb_storage \n[last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true,
+          "[110417.280431] Modules linked in: vfat fat usb_storage\n [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true,
+          "[110417.280431] Modules linked in: vfat fat usb_st\norage [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true,
+          "[110417.280431] Modules linked in: vfat fat \nusb_storage [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true,
+          "[110417.280431] Modules linked in: vfat fat\n usb_storage [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true,
+          "[110417.280431] Modules linked in: vfat fat usb_storage\n"
+          "Pid: 31337, comm: ksoftirqd/2\n",
+          modules);
+
+    check(false, "[110417.280434] I hate autotest", modules);
+
     return 0;
 }
 ]])
@@ -299,7 +330,35 @@ main(void)
     "      , \"bluetooth\"\n"
     "      , \"iwlwifi\"\n"
     "      , \"snd_pcm\"\n"
-    "      , \"parport_pc\" ]\n"
+    "      , \"parport_pc\"\n"
+    "      , \"joydev\"\n"
+    "      , \"parport\"\n"
+    "      , \"snd_timer\"\n"
+    "      , \"microcode\"\n"
+    "      , \"mac80211\"\n"
+    "      , \"snd\"\n"
+    "      , \"soundcore\"\n"
+    "      , \"snd_page_alloc\"\n"
+    "      , \"i2c_i801\"\n"
+    "      , \"cfg80211\"\n"
+    "      , \"iTCO_wdt\"\n"
+    "      , \"iTCO_vendor_support\"\n"
+    "      , \"rfkill\"\n"
+    "      , \"e1000e\"\n"
+    "      , \"sunrpc\"\n"
+    "      , \"xts\"\n"
+    "      , \"gf128mul\"\n"
+    "      , \"dm_crypt\"\n"
+    "      , \"sdhci_pci\"\n"
+    "      , \"sdhci\"\n"
+    "      , \"mmc_core\"\n"
+    "      , \"wmi\"\n"
+    "      , \"i915\"\n"
+    "      , \"drm_kms_helper\"\n"
+    "      , \"drm\"\n"
+    "      , \"i2c_algo_bit\"\n"
+    "      , \"i2c_core\"\n"
+    "      , \"video\" ]\n"
     ",   \"frames\":\n"
     "      [ {   \"address\": 18446744071579204319\n"
     "        ,   \"reliable\": true\n"

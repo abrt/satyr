@@ -11,7 +11,7 @@ except ImportError:
 
 path = '../kerneloopses/rhbz-827868'
 frames_expected = 32
-mods_expected = 91
+mods_expected = 119
 
 if not os.path.isfile(path):
     path = '../' + path

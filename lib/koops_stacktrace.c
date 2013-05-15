@@ -144,6 +144,34 @@ sr_koops_stacktrace_parse(const char **input,
     return stacktrace;
 }
 
+static bool
+module_list_continues(const char *input)
+{
+    char *end = strchr(input, '\n');
+
+    /* Module list shouldn't be on the last line */
+    if (!end || input == end)
+        return false;
+
+    size_t line_len = end - input;
+    char *line = sr_malloc(line_len + 1);
+    memcpy(line, input, line_len);
+    line[line_len] = '\0';
+
+    bool res = true;
+
+    /* Usually follows the module list */
+    if (strstr(line, "Pid: "))
+        res = false;
+    /* There should be no timestamp in the continuation */
+    else if (sr_koops_skip_timestamp(&input))
+        res = false;
+    /* Other conditions may need to be added */
+
+    free(line);
+    return res;
+}
+
 char **
 sr_koops_stacktrace_parse_modules(const char **input)
 {
@@ -157,27 +185,58 @@ sr_koops_stacktrace_parse_modules(const char **input)
     if (!sr_skip_string(&local_input, "Modules linked in:"))
         return NULL;
 
-    sr_skip_char_span(&local_input, " \t");
+    int ws = sr_skip_char_span(&local_input, " \t");
 
     int result_size = 20, result_offset = 0;
     char **result = sr_malloc(result_size * sizeof(char*));
 
     char *module;
-    bool success;
-    while ((success = sr_parse_char_cspan(&local_input, " \t\n[", &module)))
+    while (true)
     {
-        // result_size is lowered by 1 because we need to terminate
-        // the list by a NULL pointer.
-        if (result_offset == result_size - 1)
+        if (sr_parse_char_cspan(&local_input, " \t\n[", &module))
         {
-            result_size *= 2;
-            result = sr_realloc(result,
-                                result_size * sizeof(char*));
-        }
+            // result_size is lowered by 1 because we need to terminate
+            // the list by a NULL pointer.
+            if (result_offset == result_size - 1)
+            {
+                result_size *= 2;
+                result = sr_realloc(result,
+                                    result_size * sizeof(char*));
+            }
 
-        result[result_offset] = module;
-        ++result_offset;
-        sr_skip_char_span(&local_input, " \t");
+            result[result_offset] = module;
+            ++result_offset;
+            ws = sr_skip_char_span(&local_input, " \t");
+        }
+        else if(*local_input == '\n')
+        {
+            /* We're at the end of the line. Check whether the next line might
+             * be a continuation of the module list. */
+            if (!module_list_continues(local_input + 1))
+                break;
+
+            local_input++;
+
+            /* If the next line does not start with space and there wasn't
+             * any space before the newline either, then the last module was
+             * split into two parts and we need to read the rest */
+            if (*local_input != ' ' && ws == 0 && result_offset > 0)
+            {
+                char *therest;
+                if (!sr_parse_char_cspan(&local_input, " \t\n[", &therest))
+                {
+                    break; /* wtf? */
+                }
+
+                char *tmp = sr_asprintf("%s%s", result[result_offset-1], therest);
+                free(result[result_offset-1]);
+                result[result_offset-1] = tmp;
+            }
+
+            ws = sr_skip_char_span(&local_input, " \t");
+        }
+        else
+            break;
     }
 
     result[result_offset] = NULL;
