@@ -176,6 +176,10 @@ sr_koops_frame_append(struct sr_koops_frame *dest,
                       struct sr_koops_frame *item);
 
 struct sr_koops_frame *
+sr_koops_frame_prepend(struct sr_koops_frame *dest,
+                       struct sr_koops_frame *item);
+
+struct sr_koops_frame *
 sr_koops_frame_parse(const char **input);
 
 /**

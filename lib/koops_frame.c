@@ -185,6 +185,17 @@ sr_koops_frame_append(struct sr_koops_frame *dest,
 }
 
 struct sr_koops_frame *
+sr_koops_frame_prepend(struct sr_koops_frame *dest,
+                       struct sr_koops_frame *item)
+{
+    if (!dest)
+        return item;
+
+    item->next = dest;
+    return item;
+}
+
+struct sr_koops_frame *
 sr_koops_frame_parse(const char **input)
 {
     const char *local_input = *input;

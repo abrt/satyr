@@ -176,6 +176,77 @@ parse_taint_flags(const char *input, struct sr_koops_stacktrace *stacktrace)
     return true;
 }
 
+/* a special line with instruction pointer may be present in the format
+ * RIP: 0010:[<ffffffff811c6ed5>]  [<ffffffff811c6ed5>] __block_write_full_page+0xa5/0x350
+ * (for x86_64), or
+ * EIP: [<f8e40765>] wdev_priv.part.8+0x3/0x5 [wl] SS:ESP 0068:f180dbf8
+ * (for i386, where it is AFTER the trace)
+ */
+static struct sr_koops_frame*
+parse_IP(const char **input)
+{
+    struct sr_koops_frame *frame;
+    const char *local_input = *input;
+    sr_skip_char_span(&local_input, " \t");
+
+    /* Skip timestamp if it's present. */
+    sr_koops_skip_timestamp(&local_input);
+    sr_skip_char_span(&local_input, " \t");
+
+    if (sr_skip_string(&local_input, "RIP:"))
+    {
+        if (!sr_skip_char_span(&local_input, " \t"))
+            return NULL;
+
+        /* The address is there twice, skip the first one */
+        if (!sr_skip_char_cspan(&local_input, " \t"))
+            return NULL;
+
+        if (!sr_skip_char_span(&local_input, " \t"))
+            return NULL;
+
+        frame = sr_koops_frame_parse(&local_input);
+        if (!frame)
+            return NULL;
+    }
+    else if(sr_skip_string(&local_input, "EIP:"))
+    {
+        if (!sr_skip_char_span(&local_input, " \t"))
+            return NULL;
+
+        frame = sr_koops_frame_new();
+
+        if (!sr_koops_parse_address(&local_input, &frame->address))
+        {
+            sr_koops_frame_free(frame);
+            return NULL;
+        }
+
+        sr_skip_char_span(&local_input, " \t");
+
+        /* Question mark means unreliable */
+        frame->reliable = sr_skip_char(&local_input, '?') != true;
+
+        sr_skip_char_span(&local_input, " \t");
+
+        if (!sr_koops_parse_function(&local_input,
+                                     &frame->function_name,
+                                     &frame->function_offset,
+                                     &frame->function_length,
+                                     &frame->module_name))
+        {
+            sr_koops_frame_free(frame);
+            return NULL;
+        }
+    }
+    else
+        return NULL;
+
+    sr_skip_char_cspan(&local_input, "\n");
+    *input = local_input;
+    return frame;
+}
+
 struct sr_koops_stacktrace *
 sr_koops_stacktrace_parse(const char **input,
                           struct sr_location *location)
@@ -183,25 +254,33 @@ sr_koops_stacktrace_parse(const char **input,
     const char *local_input = *input;
 
     struct sr_koops_stacktrace *stacktrace = sr_koops_stacktrace_new();
+    struct sr_koops_frame *frame;
+    bool parsed_ip = false;
 
     /* Looks for the "Tainted: " line in the whole input */
     parse_taint_flags(local_input, stacktrace);
 
     while (*local_input)
     {
-        struct sr_koops_frame *frame = sr_koops_frame_parse(&local_input);
-        if (!stacktrace->modules) {
-            stacktrace->modules = sr_koops_stacktrace_parse_modules(&local_input);
+        if (!stacktrace->modules &&
+            (stacktrace->modules = sr_koops_stacktrace_parse_modules(&local_input)))
+        {
         }
-
-        if (frame)
+        else if (!parsed_ip &&
+                 (frame = parse_IP(&local_input)))
+        {
+            /* this is the very first frame (even though for i386 is at the
+             * end, we need to prepend it */
+            stacktrace->frames = sr_koops_frame_prepend(stacktrace->frames, frame);
+            parsed_ip = true;
+        }
+        else if((frame = sr_koops_frame_parse(&local_input)))
         {
             stacktrace->frames = sr_koops_frame_append(stacktrace->frames, frame);
-            sr_skip_char(&local_input, '\n');
-            continue;
         }
+        else
+            sr_skip_char_cspan(&local_input, "\n");
 
-        sr_skip_char_cspan(&local_input, "\n");
         sr_skip_char(&local_input, '\n');
     }
 

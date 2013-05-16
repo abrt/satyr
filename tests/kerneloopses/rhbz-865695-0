@@ -1,0 +1,44 @@
+kernel BUG at include/net/cfg80211.h:2473!
+invalid opcode: 0000 [#1] SMP 
+Modules linked in: lockd sunrpc rfcomm bnep ip6t_REJECT nf_conntrack_ipv6 nf_defrag_ipv6 ip6table_filter ip6_tables nf_conntrack_ipv4 nf_defrag_ipv4 xt_state nf_conntrack iTCO_wdt iTCO_vendor_support hp_wmi sparse_keymap btusb uvcvideo videobuf2_vmalloc videobuf2_memops videobuf2_core bluetooth videodev media snd_hda_codec_idt snd_hda_intel snd_hda_codec snd_hwdep snd_seq coretemp microcode snd_seq_device serio_raw lib80211_crypt_tkip snd_pcm lpc_ich mfd_core wl(PO) crystalhd(C) snd_page_alloc atl1c cfg80211 snd_timer snd rfkill soundcore lib80211 uinput wmi i915 video i2c_algo_bit drm_kms_helper drm i2c_core
+Pid: 598, comm: wpa_supplicant Tainted: P         C O 3.6.1-1.fc17.i686.PAE #1 Hewlett-Packard HP Mini 110-1100/308F
+EIP: 0060:[<f8e40765>] EFLAGS: 00210246 CPU: 1
+EIP is at wdev_priv.part.8+0x3/0x5 [wl]
+EAX: 00000000 EBX: f3cf6120 ECX: f8fc05a0 EDX: f3e16400
+ESI: f3e16400 EDI: f3cf6120 EBP: f180dbf8 ESP: f180dbf8
+ DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
+CR0: 80050033 CR2: 099db264 CR3: 322aa000 CR4: 000007f0
+DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+DR6: ffff0ff0 DR7: 00000400
+Process wpa_supplicant (pid: 598, ti=f180c000 task=f2388000 task.ti=f180c000)
+Stack:
+ f180dc28 f8e3dde1 f180dc10 c09705a8 f8034728 00000119 f8034728 000080d0
+ f3e16400 f47c1600 00000000 f3cf6120 f180dc5c f8034a38 ffffffff 00000033
+ 00000003 f47c1600 f3cf6120 f3cf6000 f180dc88 f3e16400 f8043220 f8043640
+Call Trace:
+ [<f8e3dde1>] wl_cfg80211_scan+0x411/0x4a0 [wl]
+ [<c09705a8>] ? mutex_lock+0x18/0x40
+ [<f8034728>] ? nl80211_trigger_scan+0xc8/0x560 [cfg80211]
+ [<f8034728>] ? nl80211_trigger_scan+0xc8/0x560 [cfg80211]
+ [<f8034a38>] nl80211_trigger_scan+0x3d8/0x560 [cfg80211]
+ [<f802c210>] ? __cfg80211_rdev_from_attrs+0x170/0x170 [cfg80211]
+ [<c08a5595>] genl_rcv_msg+0x225/0x280
+ [<c08a5370>] ? genl_rcv+0x30/0x30
+ [<c08a4f26>] netlink_rcv_skb+0x86/0xa0
+ [<c08a535c>] genl_rcv+0x1c/0x30
+ [<c08a48f4>] netlink_unicast+0x164/0x1e0
+ [<c08a4b89>] netlink_sendmsg+0x219/0x370
+ [<c086cf74>] sock_sendmsg+0xa4/0xd0
+ [<c050aff8>] ? get_page_from_freelist+0x358/0x590
+ [<c086ded9>] __sys_sendmsg+0x299/0x2b0
+ [<c054f427>] ? mem_cgroup_charge_common+0x97/0x100
+ [<c050f85a>] ? lru_cache_add_lru+0x7a/0xa0
+ [<c0444bdd>] ? __kunmap_atomic+0x8d/0xe0
+ [<c0527754>] ? handle_pte_fault+0x4b4/0xad0
+ [<c047bb05>] ? scheduler_tick+0xd5/0x100
+ [<c0528e6d>] ? handle_mm_fault+0x1dd/0x280
+ [<c086f1ab>] sys_sendmsg+0x3b/0x60
+ [<c086f843>] sys_socketcall+0x273/0x2d0
+ [<c09793df>] sysenter_do_call+0x12/0x28
+Code: d0 e8 10 20 b3 c7 89 f0 e8 d9 85 ff ff 89 d8 e8 a2 cc 85 c7 31 d2 89 f8 e8 89 2b 91 c7 58 5b 5e 5f 5d c3 55 89 e5 0f 0b 55 89 e5 <0f> 0b 55 89 e5 3e 8d 74 26 00 0f 0b 55 89 e5 3e 8d 74 26 00 0f
+EIP: [<f8e40765>] wdev_priv.part.8+0x3/0x5 [wl] SS:ESP 0068:f180dbf8

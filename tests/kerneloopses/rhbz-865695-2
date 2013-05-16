@@ -1,0 +1,46 @@
+[   42.863016] kernel BUG at include/net/cfg80211.h:2473!
+[   42.863016] invalid opcode: 0000 [#1] SMP 
+[   42.863016] Modules linked in: be2iscsi iscsi_boot_sysfs bnx2i cnic uio cxgb4i cxgb4 cxgb3i cxgb3 mdio libcxgbi ib_iser rdma_cm ib_addr iw_cm ip6t_REJECT nf_conntrack_ipv6 ib_cm nf_defrag_ipv6 ib_sa ib_mad nf_conntrack_ipv4 nf_defrag_ipv4 ip6table_filter xt_state nf_conntrack ip6_tables ib_core iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi snd_hda_codec_hdmi snd_hda_codec_idt snd_hda_intel snd_hda_codec snd_usb_audio snd_usbmidi_lib snd_rawmidi snd_hwdep uvcvideo videobuf2_vmalloc videobuf2_memops videobuf2_core videodev media snd_seq snd_seq_device lib80211_crypt_tkip wl(PO) snd_pcm vhost_net tun macvtap macvlan kvm_amd snd_page_alloc snd_timer snd kvm sp5100_tco i2c_piix4 cfg80211 hp_wmi sparse_keymap rfkill joydev soundcore lib80211 jmb38x_ms memstick shpchp k10temp ir_lirc_codec lirc_dev microcode ir_mce_kbd_decoder ir_sanyo_decoder ir_sony_decoder ir_jvc_decoder ir_rc6_decoder ir_rc5_decoder ir_nec_decoder r8169 mii rc_rc6_mce ene_ir rc_core uinput ata_generic pata_acpi pata_atiixp sdhci_pci sdhci mmc_core wmi video radeon i2c_algo_bit drm_kms_helper ttm drm i2c_core
+[   42.863016] CPU 1 
+[   42.863016] Pid: 802, comm: wpa_supplicant Tainted: P           O 3.6.1-1.fc17.x86_64 #1 Hewlett-Packard Compaq Presario CQ40 Notebook PC/30FE
+[   42.863016] RIP: 0010:[<ffffffffa0525326>]  [<ffffffffa0525326>] wdev_priv.part.8+0x4/0x6 [wl]
+[   42.863016] RSP: 0018:ffff8801243fb958  EFLAGS: 00010246
+[   42.863016] RAX: 0000000000000000 RBX: ffff880138e111e0 RCX: ffff880138e111e0
+[   42.863016] RDX: ffff880138e111e0 RSI: ffff8801243b8000 RDI: ffff880138e111e0
+[   42.863016] RBP: ffff8801243fb958 R08: ffff88013fc96aa0 R09: 000000000000001a
+[   42.863016] R10: 0000000000000003 R11: ffff88013b402a00 R12: ffff880138e11000
+[   42.863016] R13: ffff8801243b8000 R14: ffff8801243b8000 R15: 0000000000000000
+[   42.863016] FS:  00007fbb1ce1f800(0000) GS:ffff88013fc80000(0000)      knlGS:0000000000000000
+[   42.863016] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   42.863016] CR2: 00000000013fa528 CR3: 00000001242f5000 CR4: 00000000000007e0
+[   42.863016] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[   42.863016] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+[   42.863016] Process wpa_supplicant (pid: 802, threadinfo ffff8801243fa000, task ffff880124322e20)
+[   42.863016] Stack:
+[   42.863016]  ffff8801243fb9a8 ffffffffa0522544 ffffffffa026ec78 ffffffffa026ec78
+[   42.863016]  000000000000000c ffff8801243fba28 ffff880138e11000 0000000000000001
+[   42.863016]  ffff8801243b8000 0000000000000000 ffff8801243fba08 ffffffffa026f005
+[   42.863016] Call Trace:
+[   42.863016]  [<ffffffffa0522544>] wl_cfg80211_scan+0x3f4/0x480 [wl]
+[   42.863016]  [<ffffffffa026ec78>] ? nl80211_trigger_scan+0xf8/0x610 [cfg80211]
+[   42.863016]  [<ffffffffa026ec78>] ? nl80211_trigger_scan+0xf8/0x610 [cfg80211]
+[   42.863016]  [<ffffffffa026f005>] nl80211_trigger_scan+0x485/0x610 [cfg80211]
+[   42.863016]  [<ffffffff81536f70>] genl_rcv_msg+0x250/0x2d0
+[   42.863016]  [<ffffffff81536d20>] ? genl_rcv+0x40/0x40
+[   42.863016]  [<ffffffff81536891>] netlink_rcv_skb+0xa1/0xb0
+[   42.863016]  [<ffffffff81536d05>] genl_rcv+0x25/0x40
+[   42.863016]  [<ffffffff815361ed>] netlink_unicast+0x19d/0x220
+[   42.863016]  [<ffffffff81536548>] netlink_sendmsg+0x2d8/0x390
+[   42.863016]  [<ffffffff814f598c>] sock_sendmsg+0xbc/0xf0
+[   42.863016]  [<ffffffff811861db>] ? __mem_cgroup_commit_charge+0x16b/0x3a0
+[   42.863016]  [<ffffffff8107f601>] ? __wake_up_bit+0x31/0x40
+[   42.863016]  [<ffffffff814f5d6c>] __sys_sendmsg+0x3ac/0x3c0
+[   42.863016]  [<ffffffff81154839>] ? handle_mm_fault+0x259/0x320
+[   42.863016]  [<ffffffff8161e17c>] ? do_page_fault+0x1bc/0x4b0
+[   42.863016]  [<ffffffff810d7a2c>] ? __audit_syscall_exit+0x3ec/0x450
+[   42.863016]  [<ffffffff814f7c09>] sys_sendmsg+0x49/0x90
+[   42.863016]  [<ffffffff816226e9>] system_call_fastpath+0x16/0x1b
+[   42.863016] Code: e7 e8 5f 79 ff ff 48 89 df e8 27 9e dd e0 31 f6 4c 89 ef e8 1d 93 e9 e0 5b 41 5c 41 5d 41 5e 5d c3 55 48 89 e5 0f 0b 55 48 89 e5 <0f> 0b 55 48 89 e5 66 66 66 66 90 0f 0b 55 48 89 e5 66 66 66 66 
+[   42.863016] RIP  [<ffffffffa0525326>] wdev_priv.part.8+0x4/0x6 [wl]
+[   42.863016]  RSP <ffff8801243fb958>
+[   43.232344] ---[ end trace eba191717996895b ]---
