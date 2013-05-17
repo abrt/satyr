@@ -291,29 +291,21 @@ sr_koops_stacktrace_parse(const char **input,
 static bool
 module_list_continues(const char *input)
 {
-    char *end = strchr(input, '\n');
-
-    /* Module list shouldn't be on the last line */
-    if (!end || input == end)
+    /* There should be no timestamp in the continuation */
+    if (sr_koops_skip_timestamp(&input))
         return false;
 
-    size_t line_len = end - input;
-    char *line = sr_malloc(line_len + 1);
-    memcpy(line, input, line_len);
-    line[line_len] = '\0';
-
-    bool res = true;
-
     /* Usually follows the module list */
-    if (strstr(line, "Pid: "))
-        res = false;
-    /* There should be no timestamp in the continuation */
-    else if (sr_koops_skip_timestamp(&input))
-        res = false;
+    if (sr_skip_string(&input, "Pid: "))
+        return false;
+
+    /* See tests/kerneloopses/rhbz-865695-2-notime */
+    if (sr_skip_string(&input, "CPU ") && sr_skip_char_span(&input, "0123456789"))
+        return false;
+
     /* Other conditions may need to be added */
 
-    free(line);
-    return res;
+    return true;
 }
 
 char **

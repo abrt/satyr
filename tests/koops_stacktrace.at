@@ -217,6 +217,7 @@ main(void)
   check("../../kerneloopses/rhbz-836206", "__might_sleep", "system_call_fastpath", 23, 0, 59);
   check("../../kerneloopses/rhbz-865695-0", "wdev_priv.part.8", "sysenter_do_call", 25, 3, 56);
   check("../../kerneloopses/rhbz-865695-2", "wdev_priv.part.8", "system_call_fastpath", 20, 2, 103);
+  check("../../kerneloopses/rhbz-865695-2-notime", "wdev_priv.part.8", "system_call_fastpath", 20, 2, 103);
 
   return 0;
 }
