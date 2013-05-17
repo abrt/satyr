@@ -460,7 +460,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                             if (top->type == SR_JSON_DOUBLE)
                                 top->u.dbl = strtod(i, (char**)&i);
                             else
-                                top->u.integer = strtol(i, (char**)&i, 10);
+                                top->u.integer = strtoll(i, (char**)&i, 10);
 
                             flags |= flag_next | flag_reproc;
                         }

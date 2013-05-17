@@ -70,7 +70,7 @@ struct sr_json_value
    union
    {
       int boolean;
-      long integer;
+      long long integer;
       double dbl;
 
       struct
