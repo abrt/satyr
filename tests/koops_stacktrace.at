@@ -109,7 +109,8 @@ check(const char *path,
       const char *first_function_name,
       const char *last_function_name,
       int frame_count,
-      int taint_count)
+      int taint_count,
+      int module_count)
 {
   char *error_message;
   char *full_input = sr_file_to_string(path, &error_message);
@@ -161,6 +162,15 @@ check(const char *path,
 
   assert(actual_taint_count == taint_count);
 
+  int actual_module_count = 0;
+  char** mod = stacktrace->modules;
+  while (mod && *mod)
+  {
+    mod++;
+    actual_module_count++;
+  }
+  assert(actual_module_count == module_count);
+
   sr_koops_stacktrace_free(stacktrace);
   free(full_input);
 }
@@ -168,45 +178,45 @@ check(const char *path,
 int
 main(void)
 {
-  check("../../kerneloopses/gitlog-01", "unwind_backtrace", "kthread", 15, 0);
-  check("../../kerneloopses/gitlog-02", "unwind_backtrace", "cpu_idle", 27, 0);
-  check("../../kerneloopses/gitlog-03", "lockdep_rcu_suspicious", "system_call_fastpath", 19, 0);
-  check("../../kerneloopses/gitlog-04", "lockdep_rcu_suspicious", "addrconf_forward_change", 7, 0);
-  check("../../kerneloopses/gitlog-05", "mark_held_locks", "sysenter_do_call", 26, 1);
-  check("../../kerneloopses/gitlog-06", "lock_acquire", "kernel_thread_helper", 23, 1);
-  check("../../kerneloopses/gitlog-07", "__slab_alloc.isra.50.constprop.56", "sysenter_do_call", 14, 0);
-  check("../../kerneloopses/gitlog-08", "unwind_backtrace", "sys_write", 13, 1);
+  check("../../kerneloopses/gitlog-01", "unwind_backtrace", "kthread", 15, 0, 0);
+  check("../../kerneloopses/gitlog-02", "unwind_backtrace", "cpu_idle", 27, 0, 0);
+  check("../../kerneloopses/gitlog-03", "lockdep_rcu_suspicious", "system_call_fastpath", 19, 0, 0);
+  check("../../kerneloopses/gitlog-04", "lockdep_rcu_suspicious", "addrconf_forward_change", 7, 0, 0);
+  check("../../kerneloopses/gitlog-05", "mark_held_locks", "sysenter_do_call", 26, 1, 0);
+  check("../../kerneloopses/gitlog-06", "lock_acquire", "kernel_thread_helper", 23, 1, 0);
+  check("../../kerneloopses/gitlog-07", "__slab_alloc.isra.50.constprop.56", "sysenter_do_call", 14, 0, 0);
+  check("../../kerneloopses/gitlog-08", "unwind_backtrace", "sys_write", 13, 1, 0);
 
-  check("../../kerneloopses/gitlog-09", "unwind_backtrace", "cpu_idle", 11, 1);
-  check("../../kerneloopses/gitlog-10", NULL, NULL, 0, 0);
-  check("../../kerneloopses/gitlog-11", "lockdep_rcu_suspicious", "out_of_memory", 12, 0);
-  check("../../kerneloopses/gitlog-12", "unwind_backtrace", "regulator_get_voltage", 6, 1);
+  check("../../kerneloopses/gitlog-09", "unwind_backtrace", "cpu_idle", 11, 1, 0);
+  check("../../kerneloopses/gitlog-10", NULL, NULL, 0, 0, 0);
+  check("../../kerneloopses/gitlog-11", "lockdep_rcu_suspicious", "out_of_memory", 12, 0, 0);
+  check("../../kerneloopses/gitlog-12", "unwind_backtrace", "regulator_get_voltage", 6, 1, 0);
 /*
-  check("../../kerneloopses/gitlog-13", "", "", 0);
-  check("../../kerneloopses/gitlog-14", "", "", 0);
-  check("../../kerneloopses/gitlog-15", "", "", 0);
-  check("../../kerneloopses/gitlog-16", "", "", 0);
-  check("../../kerneloopses/gitlog-17", "", "", 0);
-  check("../../kerneloopses/gitlog-18", "", "", 0);
-  check("../../kerneloopses/gitlog-19", "", "", 0);
-  check("../../kerneloopses/gitlog-20", "", "", 0);
-  check("../../kerneloopses/gitlog-21", "", "", 0);
-  check("../../kerneloopses/gitlog-22", "", "", 0);
-  check("../../kerneloopses/gitlog-23", "", "", 0);
-  check("../../kerneloopses/gitlog-24", "", "", 0);
-  check("../../kerneloopses/gitlog-25", "", "", 0);
-  check("../../kerneloopses/gitlog-26", "", "", 0);
-  check("../../kerneloopses/gitlog-27", "", "", 0);
-  check("../../kerneloopses/gitlog-28", "", "", 0);
-  check("../../kerneloopses/gitlog-29", "", "", 0);
-  check("../../kerneloopses/gitlog-30", "", "", 0);
-  check("../../kerneloopses/gitlog-31", "", "", 0);
+  check("../../kerneloopses/gitlog-13", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-14", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-15", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-16", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-17", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-18", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-19", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-20", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-21", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-22", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-23", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-24", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-25", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-26", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-27", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-28", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-29", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-30", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-31", "", "", 0, 0, 0);
 */
 
-  check("../../kerneloopses/rhbz-827868", "warn_slowpath_common", "gs_change", 32, 0);
-  check("../../kerneloopses/rhbz-836206", "__might_sleep", "system_call_fastpath", 23, 0);
-  check("../../kerneloopses/rhbz-865695-0", "wdev_priv.part.8", "sysenter_do_call", 25, 3);
-  check("../../kerneloopses/rhbz-865695-2", "wdev_priv.part.8", "system_call_fastpath", 20, 2);
+  check("../../kerneloopses/rhbz-827868", "warn_slowpath_common", "gs_change", 32, 0, 119);
+  check("../../kerneloopses/rhbz-836206", "__might_sleep", "system_call_fastpath", 23, 0, 59);
+  check("../../kerneloopses/rhbz-865695-0", "wdev_priv.part.8", "sysenter_do_call", 25, 3, 56);
+  check("../../kerneloopses/rhbz-865695-2", "wdev_priv.part.8", "system_call_fastpath", 20, 2, 103);
 
   return 0;
 }
