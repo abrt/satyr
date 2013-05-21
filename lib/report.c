@@ -105,12 +105,15 @@ problem_object_string(struct sr_report *report, const char *report_type)
         sr_strbuf_append_str(strbuf, "\n");
     }
 
-    /* User type. */
-    sr_strbuf_append_strf(strbuf, ",   \"user\": {   \"root\": %s\n"  \
-                                  "            ,   \"local\": %s\n" \
-                                  "            }\n",
-                          report->user_root ? "true" : "false",
-                          report->user_local ? "true" : "false");
+    if (report->report_type != SR_REPORT_KERNELOOPS)
+    {
+        /* User type (not applicable to koopses). */
+        sr_strbuf_append_strf(strbuf, ",   \"user\": {   \"root\": %s\n"  \
+                                      "            ,   \"local\": %s\n" \
+                                      "            }\n",
+                              report->user_root ? "true" : "false",
+                              report->user_local ? "true" : "false");
+    }
 
     /* Stacktrace. */
 
