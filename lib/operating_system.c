@@ -112,6 +112,14 @@ sr_operating_system_parse_etc_system_release(const char *etc_system_release,
     if (0 == strlen(*name))
         return false;
 
+    /* make the name all lower case */
+    char *a = *name;
+    while (*a)
+    {
+        *a = tolower(*a);
+        a++;
+    }
+
     const char *version_begin = release + strlen(" release ");
     const char *version_end = version_begin;
     while (isdigit(*version_end) || *version_end == '.')
