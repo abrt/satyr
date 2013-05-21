@@ -31,6 +31,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <search.h>
 
 static void
 fingerprint_add_bool(struct sr_strbuf *buffer,
@@ -363,23 +364,35 @@ fp_calltree_leaves(struct sr_strbuf *fingerprint,
     return true;
 }
 
+static void
+do_nothing(void *something)
+{
+}
+
 bool
 sr_core_fingerprint_generate(struct sr_core_stacktrace *stacktrace,
                              char **error_message)
 {
+    /* binary tree that works as a set of already processed binaries */
+    void *processed_files = NULL;
+    bool result = false;
+
     struct sr_core_thread *thread = stacktrace->threads;
     while (thread)
     {
         struct sr_core_frame *frame = thread->frames;
         while (frame)
         {
-            if (!frame->fingerprint && frame->file_name)
+            if (frame->file_name &&
+                !tfind(frame->file_name, &processed_files, (comparison_fn_t)strcmp))
             {
                 bool success = sr_core_fingerprint_generate_for_binary(
                     thread, frame->file_name, error_message);
 
-                if (!success)
-                    return false;
+                result |= success;
+
+                /* add file_name to the set of already processed files */
+                tsearch(frame->file_name, &processed_files, (comparison_fn_t)strcmp);
             }
 
             frame = frame->next;
@@ -388,7 +401,9 @@ sr_core_fingerprint_generate(struct sr_core_stacktrace *stacktrace,
         thread = thread->next;
     }
 
-    return true;
+    tdestroy(processed_files, do_nothing);
+
+    return result;
 }
 
 static bool

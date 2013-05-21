@@ -73,11 +73,8 @@ sr_abrt_create_core_stacktrace(const char *directory,
     if (!core_stacktrace)
         return false;
 
-    bool success = sr_core_fingerprint_generate(core_stacktrace,
-                                                error_message);
-
-    if (!success)
-        return false;
+    sr_core_fingerprint_generate(core_stacktrace,
+                                 error_message);
 
     if (hash_fingerprints)
         sr_core_fingerprint_hash(core_stacktrace);
@@ -90,9 +87,9 @@ sr_abrt_create_core_stacktrace(const char *directory,
     strcat(json, "\n");
 
     char *core_backtrace_filename = sr_build_path(directory, "core_backtrace", NULL);
-    success = sr_string_to_file(core_backtrace_filename,
-                                json,
-                                error_message);
+    bool success = sr_string_to_file(core_backtrace_filename,
+                                    json,
+                                    error_message);
 
     free(core_backtrace_filename);
     free(json);
