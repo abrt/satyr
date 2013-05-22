@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+    l(42)
+  File "./test.py", line 6, in <lambda>
+    l = lambda x: [ f(x) for i in range(10) ]
+  File "./test.py", line 4, in f
+    eval("0/0")
+  File "<string>", line 1, in <module>
+ZeroDivisionError: integer division or modulo by zero

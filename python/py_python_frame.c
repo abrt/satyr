@@ -50,7 +50,8 @@ frame_methods[] =
 GSOFF_START
 GSOFF_MEMBER(file_name),
 GSOFF_MEMBER(file_line),
-GSOFF_MEMBER(is_module),
+GSOFF_MEMBER(special_file),
+GSOFF_MEMBER(special_function),
 GSOFF_MEMBER(function_name),
 GSOFF_MEMBER(line_contents)
 GSOFF_END
@@ -58,11 +59,12 @@ GSOFF_END
 static PyGetSetDef
 frame_getset[] =
 {
-    SR_ATTRIBUTE_STRING(file_name,     "Source file name (string)"                       ),
-    SR_ATTRIBUTE_UINT32(file_line,     "Source line number (positive integer)"           ),
-    SR_ATTRIBUTE_BOOL  (is_module,     "True if the frame is from the main module (bool)"),
-    SR_ATTRIBUTE_STRING(function_name, "Function name (string)"                          ),
-    SR_ATTRIBUTE_STRING(line_contents, "Remaining line contents (string)"                ),
+    SR_ATTRIBUTE_STRING(file_name,        "Source file name (string)"                                                    ),
+    SR_ATTRIBUTE_BOOL  (special_file,     "True if the frame is not a real file, like stdin or eval'd string (bool)"     ),
+    SR_ATTRIBUTE_UINT32(file_line,        "Source line number (positive integer)"                                        ),
+    SR_ATTRIBUTE_STRING(function_name,    "Function name (string)"                                                       ),
+    SR_ATTRIBUTE_BOOL  (special_function, "True if the frame doesn't belong to a named function, e.g. lambda or a module"),
+    SR_ATTRIBUTE_STRING(line_contents,    "Remaining line contents (string)"                                             ),
     { NULL },
 };
 
@@ -167,16 +169,19 @@ sr_py_python_frame_str(PyObject *self)
 
 
     if (this->frame->file_name)
-      sr_strbuf_append_strf(buf, "File \"%s\"", this->frame->file_name);
+      sr_strbuf_append_strf(buf, "File \"%s%s%s\"",
+                            (this->frame->special_file ? "<" : ""),
+                            this->frame->file_name,
+                            (this->frame->special_file ? ">" : ""));
 
     if (this->frame->file_line)
       sr_strbuf_append_strf(buf, ", %d", this->frame->file_line);
 
     if (this->frame->function_name)
-      sr_strbuf_append_strf(buf, ", in %s", this->frame->function_name);
-
-    if (this->frame->is_module)
-      sr_strbuf_append_str(buf, ", in <module>");
+      sr_strbuf_append_strf(buf, ", in %s%s%s",
+                            (this->frame->special_function ? "<" : ""),
+                            this->frame->function_name,
+                            (this->frame->special_function ? ">" : ""));
 
     if (this->frame->line_contents)
       sr_strbuf_append_strf(buf, "\n    %s", this->frame->line_contents);

@@ -102,11 +102,17 @@ sr_python_frame_cmp(struct sr_python_frame *frame1,
     if (file_line != 0)
         return file_line;
 
-    /* is_module */
-    int is_module = frame1->is_module - frame2->is_module;
+    /* special_function */
+    int special_function = frame1->special_function - frame2->special_function;
 
-    if (is_module != 0)
-        return is_module;
+    if (special_function != 0)
+        return special_function;
+
+    /* special_file */
+    int special_file = frame1->special_file - frame2->special_file;
+
+    if (special_file != 0)
+        return special_file;
 
     /* line_contents */
     int line_contents = sr_strcmp0(frame1->line_contents,
@@ -170,6 +176,17 @@ sr_python_frame_parse(const char **input,
         return NULL;
     }
 
+    if (strlen(frame->file_name) > 0 &&
+        frame->file_name[0] == '<' &&
+        frame->file_name[strlen(frame->file_name)-1] == '>')
+    {
+        frame->special_file = true;
+        frame->file_name[strlen(frame->file_name)-1] = '\0';
+        char *inside = sr_strdup(frame->file_name + 1);
+        free(frame->file_name);
+        frame->file_name = inside;
+    }
+
     location->column += strlen(frame->file_name);
 
     if (0 == sr_skip_string(&local_input, "\", line "))
@@ -210,11 +227,15 @@ sr_python_frame_parse(const char **input,
 
     location->column += strlen(frame->function_name);
 
-    if (0 == strcmp(frame->function_name, "<module>"))
+    if (strlen(frame->function_name) > 0 &&
+        frame->function_name[0] == '<' &&
+        frame->function_name[strlen(frame->function_name)-1] == '>')
     {
-        frame->is_module = true;
+        frame->special_function = true;
+        frame->function_name[strlen(frame->function_name)-1] = '\0';
+        char *inside = sr_strdup(frame->function_name + 1);
         free(frame->function_name);
-        frame->function_name = NULL;
+        frame->function_name = inside;
     }
 
     sr_skip_char(&local_input, '\n');
@@ -237,10 +258,14 @@ sr_python_frame_to_json(struct sr_python_frame *frame)
 {
     struct sr_strbuf *strbuf = sr_strbuf_new();
 
-    /* Source file name. */
+    /* Source file name / special file. */
     if (frame->file_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"file_name\": ");
+        if (frame->special_file)
+            sr_strbuf_append_str(strbuf, ",   \"special_file\": ");
+        else
+            sr_strbuf_append_str(strbuf, ",   \"file_name\": ");
+
         sr_json_append_escaped(strbuf, frame->file_name);
         sr_strbuf_append_str(strbuf, "\n");
     }
@@ -253,15 +278,14 @@ sr_python_frame_to_json(struct sr_python_frame *frame)
                               frame->file_line);
     }
 
-    /* Is module. */
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"is_module\": %s\n",
-                          frame->is_module ? "true" : "false");
-
-    /* Function name. */
+    /* Function name / special function. */
     if (frame->function_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"function_name\": ");
+        if (frame->special_function)
+            sr_strbuf_append_str(strbuf, ",   \"special_function\": ");
+        else
+            sr_strbuf_append_str(strbuf, ",   \"function_name\": ");
+
         sr_json_append_escaped(strbuf, frame->function_name);
         sr_strbuf_append_str(strbuf, "\n");
     }

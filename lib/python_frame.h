@@ -37,11 +37,13 @@ struct sr_location;
 
 struct sr_python_frame
 {
+    bool special_file;
+
     char *file_name;
 
     uint32_t file_line;
 
-    bool is_module;
+    bool special_function;
 
     char *function_name;
 

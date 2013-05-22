@@ -52,6 +52,37 @@ class TestPythonStacktrace(BindingsTestCase):
     def test_getset(self):
         self.assertGetSetCorrect(self.trace, 'exception_name', 'AttributeError', 'WhateverException')
 
+    def test_special_files_and_frames(self):
+        path2 = str(path)
+        path2 = path2[0:-1] + '3'
+        with open(path2, 'r') as f:
+            trace = f.read()
+        trace = satyr.PythonStacktrace(trace)
+
+        f = trace.frames[0]
+        self.assertEqual(f.file_name, 'string')
+        self.assertEqual(f.function_name, 'module')
+        self.assertTrue(f.special_file)
+        self.assertTrue(f.special_function)
+
+        f = trace.frames[1]
+        self.assertEqual(f.file_name, './test.py')
+        self.assertEqual(f.function_name, 'f')
+        self.assertFalse(f.special_file)
+        self.assertFalse(f.special_function)
+
+        f = trace.frames[2]
+        self.assertEqual(f.file_name, './test.py')
+        self.assertEqual(f.function_name, 'lambda')
+        self.assertFalse(f.special_file)
+        self.assertTrue(f.special_function)
+
+        f = trace.frames[3]
+        self.assertEqual(f.file_name, 'stdin')
+        self.assertEqual(f.function_name, 'module')
+        self.assertTrue(f.special_file)
+        self.assertTrue(f.special_function)
+
 class TestPythonFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.PythonStacktrace(contents).frames[-1]
@@ -84,7 +115,8 @@ class TestPythonFrame(BindingsTestCase):
     def test_getset(self):
         self.assertGetSetCorrect(self.frame, 'file_name', '/usr/share/PackageKit/helpers/yum/yumBackend.py', 'java.py')
         self.assertGetSetCorrect(self.frame, 'file_line', 1830, 6667)
-        self.assertGetSetCorrect(self.frame, 'is_module', False, True)
+        self.assertGetSetCorrect(self.frame, 'special_file', False, True)
+        self.assertGetSetCorrect(self.frame, 'special_function', False, True)
         self.assertGetSetCorrect(self.frame, 'function_name', '_runYumTransaction', 'iiiiii')
         self.assertGetSetCorrect(self.frame, 'line_contents', 'rpmDisplay=rpmDisplay)', 'abcde')
 
