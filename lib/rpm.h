@@ -32,6 +32,21 @@ extern "C" {
 #include <stdbool.h>
 #include <inttypes.h>
 
+/* XXX: Should be moved to separated header once we support more package types.
+ */
+enum sr_package_role
+{
+    /* The role the package has in the problem is either unknown or
+     * irrelevant.
+     */
+    SR_ROLE_UNKNOWN = 0,
+
+    /* The packages contains the executable or script the execution of which
+     * caused the problem to manifest.
+     */
+    SR_ROLE_AFFECTED
+};
+
 struct sr_rpm_consistency
 {
     char *path;
@@ -55,6 +70,7 @@ struct sr_rpm_package
     char *release;
     char *architecture;
     uint64_t install_time;
+    enum sr_package_role role;
     struct sr_rpm_consistency *consistency;
     struct sr_rpm_package *next;
 };

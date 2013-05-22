@@ -201,46 +201,64 @@ sr_rpm_package_sort(struct sr_rpm_package *packages)
     return array[0];
 }
 
+static struct sr_rpm_package *
+package_merge(struct sr_rpm_package *p1, struct sr_rpm_package *p2)
+{
+    if (0 != sr_rpm_package_cmp_nvr(p1, p2))
+        return NULL;
+
+    if (p1->epoch != p2->epoch)
+        return NULL;
+
+    if (p1->architecture && p2->architecture &&
+        0 != sr_strcmp0(p1->architecture, p2->architecture))
+        return NULL;
+
+    struct sr_rpm_package *merged = sr_rpm_package_new();
+    merged->name = sr_strdup(p1->name);
+    merged->epoch = p1->epoch;
+    merged->version = sr_strdup(p1->version);
+    merged->release = sr_strdup(p1->release);
+
+    /* architecture is sometimes missing */
+    if (p1->architecture)
+        merged->architecture = sr_strdup(p1->architecture);
+    else if (p2->architecture)
+        merged->architecture = sr_strdup(p2->architecture);
+
+    merged->install_time = (p1->install_time ?
+                            p1->install_time : p2->install_time);
+
+    merged->role = (p1->role ? p1->role : p2->role);
+
+    return merged;
+}
+
 struct sr_rpm_package *
 sr_rpm_package_uniq(struct sr_rpm_package *packages)
 {
     struct sr_rpm_package *loop = packages, *prev = NULL;
     while (loop && loop->next)
     {
-        /* architecture is sometimes missing */
-        if (0 == sr_rpm_package_cmp_nvr(loop, loop->next))
+        struct sr_rpm_package *merged = package_merge(loop, loop->next);
+        if (merged)
         {
-            /* the architectures were not compared */
-            if (loop->architecture && loop->next->architecture &&
-                0 != sr_strcmp0(loop->architecture, loop->next->architecture))
-                continue;
-
-            /* keep the record with install_time */
-            if (loop->install_time)
+            /* deleted record is not the first in list */
+            if (prev)
             {
-                struct sr_rpm_package *next = loop->next->next;
-                sr_rpm_package_free(loop->next, false);
-                loop->next = next;
+                prev->next = merged;
             }
+            /* deleting first record */
             else
             {
-                /* deleted record is not the first in list */
-                if (prev)
-                {
-                    prev->next = loop->next;
-                    sr_rpm_package_free(loop, false);
-                    loop = prev->next;
-                }
-                /* deleting first record */
-                else
-                {
-                    packages = loop->next;
-                    sr_rpm_package_free(loop, false);
-                    loop = packages;
-                }
+                packages = merged;
             }
+            merged->next = loop->next->next;
 
-            continue;
+            sr_rpm_package_free(loop, false);
+            sr_rpm_package_free(loop->next, false);
+
+            loop = merged;
         }
 
         prev = loop;
@@ -513,6 +531,23 @@ sr_rpm_package_to_json(struct sr_rpm_package *package,
             sr_strbuf_append_strf(strbuf,
                                   ",   \"install_time\": %"PRIu64"\n",
                                   package->install_time);
+        }
+
+        /* Package role. */
+        if (package->role != 0)
+        {
+            char *role;
+            switch (package->role)
+            {
+            case SR_ROLE_AFFECTED:
+                role = "affected";
+                break;
+            default:
+                assert(0 && "Invalid role");
+                break;
+            }
+
+            sr_strbuf_append_strf(strbuf, ",   \"package_role\": \"%s\"\n", role);
         }
 
         /* Consistency. */

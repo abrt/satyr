@@ -100,6 +100,7 @@ main(void)
   p1->name = sr_strdup("coreutils");
   p1->version = sr_strdup("8.15");
   p1->release = sr_strdup("10.fc17");
+  p1->role = SR_ROLE_AFFECTED;
   p1->next = p2;
 
   p2->name = sr_strdup("coreutils");
@@ -118,11 +119,24 @@ main(void)
   struct sr_rpm_package *packages = p1;
   packages = sr_rpm_package_uniq(packages);
 
-  assert(packages == p2);
-  assert(packages->next == p3);
+  assert(0 == strcmp(packages->name, "coreutils") &&
+         0 == strcmp(packages->version, "8.15") &&
+         0 == strcmp(packages->release, "10.fc17") &&
+         0 == strcmp(packages->architecture, "x86_64") &&
+         packages->install_time == 1363628422 &&
+         packages->role == SR_ROLE_AFFECTED);
+
+  assert(0 == strcmp(packages->next->name, "glibc") &&
+         0 == strcmp(packages->next->version, "2.15") &&
+         0 == strcmp(packages->next->release, "58.fc17") &&
+         0 == strcmp(packages->next->architecture, "x86_64") &&
+         packages->next->install_time == 1363628422 &&
+         packages->next->role == SR_ROLE_UNKNOWN);
+
   assert(packages->next->next == NULL);
 
   sr_rpm_package_free(packages, true);
+
 
   p1 = sr_rpm_package_new();
   p2 = sr_rpm_package_new();
@@ -145,12 +159,25 @@ main(void)
   p3->release = sr_strdup("10.fc17");
   p3->architecture = sr_strdup("x86_64");
   p3->install_time = 1363628422;
+  p3->role = SR_ROLE_AFFECTED;
 
   packages = p1;
   packages = sr_rpm_package_uniq(packages);
 
-  assert(packages == p1);
-  assert(packages->next == p3);
+  assert(0 == strcmp(packages->name, "glibc") &&
+         0 == strcmp(packages->version, "2.15") &&
+         0 == strcmp(packages->release, "58.fc17") &&
+         0 == strcmp(packages->architecture, "x86_64") &&
+         packages->install_time == 1363628422 &&
+         packages->role == SR_ROLE_UNKNOWN);
+
+  assert(0 == strcmp(packages->next->name, "coreutils") &&
+         0 == strcmp(packages->next->version, "8.15") &&
+         0 == strcmp(packages->next->release, "10.fc17") &&
+         0 == strcmp(packages->next->architecture, "x86_64") &&
+         packages->next->install_time == 1363628422 &&
+         packages->next->role == SR_ROLE_AFFECTED);
+
   assert(packages->next->next == NULL);
 
   return 0;

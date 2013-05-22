@@ -211,6 +211,7 @@ sr_abrt_rpm_packages_from_dir(const char *directory,
     packages->version = file_contents(directory, "pkg_version", error_message);
     packages->release = file_contents(directory, "pkg_release", error_message);
     packages->architecture = file_contents(directory, "pkg_arch", error_message);
+    packages->role = SR_ROLE_AFFECTED;
 
     if (!(packages->name && packages->version && packages->release &&
           packages->architecture))
@@ -410,6 +411,7 @@ sr_abrt_report_from_dir(const char *directory,
                                                   &package->version,
                                                   &package->release,
                                                   &package->architecture);
+        package->role = SR_ROLE_AFFECTED;
         if (!success)
         {
             sr_rpm_package_free(package, true);
