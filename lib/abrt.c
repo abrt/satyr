@@ -222,23 +222,21 @@ sr_abrt_rpm_packages_from_dir(const char *directory,
 
     char *dso_list_contents = file_contents(directory, "dso_list",
                                             error_message);
-    if (!dso_list_contents)
+    if (dso_list_contents)
     {
-        sr_rpm_package_free(packages, true);
-        return NULL;
+        struct sr_rpm_package *dso_packages =
+            sr_abrt_parse_dso_list(dso_list_contents);
+
+        if (dso_packages)
+        {
+            packages = sr_rpm_package_append(packages, dso_packages);
+            packages = sr_rpm_package_sort(packages);
+            packages = sr_rpm_package_uniq(packages);
+        }
+
+        free(dso_list_contents);
     }
 
-    struct sr_rpm_package *dso_packages =
-        sr_abrt_parse_dso_list(dso_list_contents);
-
-    if (dso_packages)
-    {
-        packages = sr_rpm_package_append(packages, dso_packages);
-        packages = sr_rpm_package_sort(packages);
-        packages = sr_rpm_package_uniq(packages);
-    }
-
-    free(dso_list_contents);
     return packages;
 }
 
