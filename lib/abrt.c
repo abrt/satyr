@@ -34,6 +34,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+static char*
+file_contents(const char *directory, const char *file, char **error_message)
+{
+    char *path = sr_build_path(directory, file, NULL);
+    char *contents = sr_file_to_string(path, error_message);
+
+    free(path);
+    return contents;
+}
+
 bool
 sr_abrt_print_report_from_dir(const char *directory,
                                char **error_message)
@@ -56,11 +66,8 @@ sr_abrt_create_core_stacktrace(const char *directory,
                                bool hash_fingerprints,
                                char **error_message)
 {
-    char *executable_filename = sr_build_path(directory, "executable", NULL);
-    char *executable_contents = sr_file_to_string(executable_filename,
-                                                  error_message);
-
-    free(executable_filename);
+    char *executable_contents = file_contents(directory, "executable",
+                                              error_message);
     if (!executable_contents)
         return NULL;
 
@@ -182,11 +189,8 @@ struct sr_rpm_package *
 sr_abrt_rpm_packages_from_dir(const char *directory,
                               char **error_message)
 {
-    char *package_filename = sr_build_path(directory, "package", NULL);
-    char *package_contents = sr_file_to_string(package_filename,
-                                               error_message);
-
-    free(package_filename);
+    char *package_contents = file_contents(directory, "package",
+                                           error_message);
     if (!package_contents)
         return NULL;
 
@@ -208,9 +212,8 @@ sr_abrt_rpm_packages_from_dir(const char *directory,
 
     free(package_contents);
 
-    char *dso_list_filename = sr_build_path(directory, "dso_list", NULL);
-    char *dso_list_contents = sr_file_to_string(dso_list_filename, error_message);
-    free(dso_list_filename);
+    char *dso_list_contents = file_contents(directory, "dso_list",
+                                            error_message);
     if (!dso_list_contents)
     {
         sr_rpm_package_free(packages, true);
@@ -235,9 +238,8 @@ struct sr_operating_system *
 sr_abrt_operating_system_from_dir(const char *directory,
                                   char **error_message)
 {
-    char *release_filename = sr_build_path(directory, "os_release", NULL);
-    char *release_contents = sr_file_to_string(release_filename, error_message);
-    free(release_filename);
+    char *release_contents = file_contents(directory, "os_release",
+                                           error_message);
     if (!release_contents)
         return NULL;
 
@@ -254,9 +256,7 @@ sr_abrt_operating_system_from_dir(const char *directory,
         return NULL;
     }
 
-    char *arch_filename = sr_build_path(directory, "architecture", NULL);
-    os->architecture = sr_file_to_string(arch_filename, error_message);
-    free(arch_filename);
+    os->architecture = file_contents(directory, "architecture", error_message);
     if (!os->architecture)
     {
         sr_operating_system_free(os);
@@ -273,9 +273,7 @@ sr_abrt_report_from_dir(const char *directory,
     struct sr_report *report = sr_report_new();
 
     /* Report type. */
-    char *analyzer_filename = sr_build_path(directory, "analyzer", NULL);
-    char *analyzer_contents = sr_file_to_string(analyzer_filename, error_message);
-    free(analyzer_filename);
+    char *analyzer_contents = file_contents(directory, "analyzer", error_message);
     if (!analyzer_contents)
     {
         sr_report_free(report);
@@ -304,9 +302,7 @@ sr_abrt_report_from_dir(const char *directory,
     }
 
     /* Component name. */
-    char *component_filename = sr_build_path(directory, "component", NULL);
-    report->component_name = sr_file_to_string(component_filename, error_message);
-    free(component_filename);
+    report->component_name = file_contents(directory, "component", error_message);
 
     /* RPM packages. */
     if (report->report_type != SR_REPORT_KERNELOOPS)
@@ -324,11 +320,8 @@ sr_abrt_report_from_dir(const char *directory,
     /* Core stacktrace. */
     if (report->report_type == SR_REPORT_CORE)
     {
-        char *core_backtrace_filename = sr_build_path(directory, "core_backtrace", NULL);
-        char *core_backtrace_contents = sr_file_to_string(core_backtrace_filename,
-                                                          error_message);
-
-        free(core_backtrace_filename);
+        char *core_backtrace_contents = file_contents(directory, "core_backtrace",
+                                                      error_message);
         if (!core_backtrace_contents)
         {
             sr_report_free(report);
@@ -365,14 +358,8 @@ sr_abrt_report_from_dir(const char *directory,
     /* Python stacktrace. */
     if (report->report_type == SR_REPORT_PYTHON)
     {
-        char *backtrace_filename = sr_build_path(directory,
-                                                 "backtrace",
-                                                 NULL);
-
-        char *backtrace_contents = sr_file_to_string(backtrace_filename,
-                                                     error_message);
-
-        free(backtrace_filename);
+        char *backtrace_contents = file_contents(directory, "backtrace",
+                                                 error_message);
         if (!backtrace_contents)
         {
             sr_report_free(report);
@@ -400,12 +387,8 @@ sr_abrt_report_from_dir(const char *directory,
     if (report->report_type == SR_REPORT_KERNELOOPS)
     {
         /* Determine kernel version */
-        char *kernel_filename = sr_build_path(directory,
-                                              "kernel",
-                                              NULL);
-        char *kernel_contents = sr_file_to_string(kernel_filename,
-                                                  error_message);
-        free(kernel_filename);
+        char *kernel_contents = file_contents(directory, "kernel",
+                                              error_message);
         if (!kernel_contents)
         {
             sr_report_free(report);
@@ -432,14 +415,7 @@ sr_abrt_report_from_dir(const char *directory,
         report->rpm_packages = package;
 
         /* Load the Kerneloops stacktrace */
-        char *backtrace_filename = sr_build_path(directory,
-                                                 "backtrace",
-                                                 NULL);
-
-        char *backtrace_contents = sr_file_to_string(backtrace_filename,
-                                                     error_message);
-
-        free(backtrace_filename);
+        char *backtrace_contents = file_contents(directory, "backtrace", error_message);
         if (!backtrace_contents)
         {
             sr_report_free(report);
@@ -466,14 +442,7 @@ sr_abrt_report_from_dir(const char *directory,
     /* Java stacktrace. */
     if (report->report_type == SR_REPORT_JAVA)
     {
-        char *backtrace_filename = sr_build_path(directory,
-                                                 "backtrace",
-                                                 NULL);
-
-        char *backtrace_contents = sr_file_to_string(backtrace_filename,
-                                                     error_message);
-
-        free(backtrace_filename);
+        char *backtrace_contents = file_contents(directory, "backtrace", error_message);
         if (!backtrace_contents)
         {
             sr_report_free(report);
