@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 static char*
 file_contents(const char *directory, const char *file, char **error_message)
@@ -189,28 +190,34 @@ struct sr_rpm_package *
 sr_abrt_rpm_packages_from_dir(const char *directory,
                               char **error_message)
 {
-    char *package_contents = file_contents(directory, "package",
-                                           error_message);
-    if (!package_contents)
-        return NULL;
 
-    struct sr_rpm_package *packages = sr_rpm_package_new();
-    bool success = sr_rpm_package_parse_nvr(package_contents,
-                                            &packages->name,
-                                            &packages->version,
-                                            &packages->release);
-
-    if (!success)
+    char *epoch_str = file_contents(directory, "pkg_epoch", error_message);
+    if (!epoch_str)
     {
-        sr_rpm_package_free(packages, true);
-        *error_message = sr_asprintf("Failed to parse \"%s\".",
-                                     package_contents);
-
-        free(package_contents);
         return NULL;
     }
+    unsigned long epoch = strtoul(epoch_str, NULL, 10);
+    if (epoch == ULONG_MAX)
+    {
+        *error_message = sr_asprintf("Epoch '%s' is not a number", epoch_str);
+        return NULL;
+    }
+    free(epoch_str);
 
-    free(package_contents);
+    struct sr_rpm_package *packages = sr_rpm_package_new();
+
+    packages->epoch = (uint32_t)epoch;
+    packages->name = file_contents(directory, "pkg_name", error_message);
+    packages->version = file_contents(directory, "pkg_version", error_message);
+    packages->release = file_contents(directory, "pkg_release", error_message);
+    packages->architecture = file_contents(directory, "pkg_arch", error_message);
+
+    if (!(packages->name && packages->version && packages->release &&
+          packages->architecture))
+    {
+        sr_rpm_package_free(packages, false);
+        return NULL;
+    }
 
     char *dso_list_contents = file_contents(directory, "dso_list",
                                             error_message);
