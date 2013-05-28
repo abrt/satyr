@@ -13,6 +13,14 @@ except ImportError:
 path = '../gdb_stacktraces/rhbz-803600'
 threads_expected = 2
 frames_expected = 227
+expected_short_text = '''Thread no. 1 (5 frames)
+ #0 validate_row at gtktreeview.c
+ #1 validate_visible_area at gtktreeview.c
+ #2 gtk_tree_view_bin_expose at gtktreeview.c
+ #3 gtk_tree_view_expose at gtktreeview.c
+ #4 _gtk_marshal_BOOLEAN__BOXED at gtkmarshalers.c
+'''
+
 
 if not os.path.isfile(path):
     path = '../' + path
@@ -57,6 +65,9 @@ class TestGdbStacktrace(BindingsTestCase):
     def test_str(self):
         out = str(self.trace)
         self.assertTrue(('Stacktrace with %d threads' % threads_expected) in out)
+
+    def test_to_short_text(self):
+        self.assertEqual(self.trace.to_short_text(5), expected_short_text)
 
 class TestGdbThread(BindingsTestCase):
     def setUp(self):

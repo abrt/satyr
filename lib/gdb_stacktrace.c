@@ -291,6 +291,7 @@ sr_gdb_stacktrace_to_text(struct sr_gdb_stacktrace *stacktrace, bool verbose)
     {
         sr_strbuf_append_str(str, "Crash frame: ");
         sr_gdb_frame_append_to_str(stacktrace->crash, str, verbose);
+        sr_strbuf_append_char(str, '\n');
     }
 
     struct sr_gdb_thread *thread = stacktrace->threads;
@@ -467,44 +468,17 @@ sr_gdb_stacktrace_set_libnames(struct sr_gdb_stacktrace *stacktrace)
     struct sr_gdb_thread *thread = stacktrace->threads;
     while (thread)
     {
-        struct sr_gdb_frame *frame = thread->frames;
-        while (frame)
-        {
-            struct sr_gdb_sharedlib *lib = sr_gdb_sharedlib_find_address(stacktrace->libs,
-                                                                         frame->address);
-            if (lib)
-            {
-                char *s1, *s2;
-
-                /* Strip directory and version after the .so suffix. */
-                s1 = strrchr(lib->soname, '/');
-                if (!s1)
-                    s1 = lib->soname;
-                else
-                    s1++;
-                s2 = strstr(s1, ".so");
-                if (!s2)
-                    s2 = s1 + strlen(s1);
-                else
-                    s2 += strlen(".so");
-
-                if (frame->library_name)
-                    free(frame->library_name);
-                frame->library_name = sr_strndup(s1, s2 - s1);
-            }
-            frame = frame->next;
-        }
+        sr_gdb_thread_set_libnames(thread, stacktrace->libs);
         thread = thread->next;
     }
 }
 
-struct sr_gdb_thread *
-sr_gdb_stacktrace_get_optimized_thread(struct sr_gdb_stacktrace *stacktrace,
-                                       int max_frames)
+char *
+sr_gdb_stacktrace_to_short_text(struct sr_gdb_stacktrace *stacktrace,
+                                int max_frames)
 {
     struct sr_gdb_thread *crash_thread;
 
-    stacktrace = sr_gdb_stacktrace_dup(stacktrace);
     crash_thread = sr_gdb_stacktrace_find_crash_thread(stacktrace);
 
     if (!crash_thread)
@@ -513,26 +487,12 @@ sr_gdb_stacktrace_get_optimized_thread(struct sr_gdb_stacktrace *stacktrace,
         return NULL;
     }
 
-    sr_gdb_stacktrace_remove_threads_except_one(stacktrace, crash_thread);
-    sr_gdb_stacktrace_set_libnames(stacktrace);
-    sr_normalize_gdb_thread(crash_thread);
-    sr_gdb_normalize_optimize_thread(crash_thread);
+    struct sr_gdb_thread *optimized_thread
+        = sr_gdb_thread_get_optimized(crash_thread, stacktrace->libs,
+                                      max_frames);
+    struct sr_strbuf *strbuf = sr_strbuf_new();
+    sr_gdb_thread_append_to_str(optimized_thread, strbuf, true);
 
-    /* Remove frames with no function name (i.e. signal handlers). */
-    struct sr_gdb_frame *frame = crash_thread->frames, *frame_next;
-    while (frame)
-    {
-        frame_next = frame->next;
-        if (!frame->function_name)
-            sr_gdb_thread_remove_frame(crash_thread, frame);
-        frame = frame_next;
-    }
-
-    if (max_frames > 0)
-        sr_gdb_thread_remove_frames_below_n(crash_thread, max_frames);
-
-    crash_thread = sr_gdb_thread_dup(crash_thread, false);
-    sr_gdb_stacktrace_free(stacktrace);
-
-    return crash_thread;
+    sr_gdb_thread_free(optimized_thread);
+    return sr_strbuf_free_nobuf(strbuf);
 }

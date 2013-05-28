@@ -19,6 +19,8 @@
 */
 #include "gdb_thread.h"
 #include "gdb_frame.h"
+#include "gdb_sharedlib.h"
+#include "normalize.h"
 #include "location.h"
 #include "utils.h"
 #include "strbuf.h"
@@ -258,7 +260,7 @@ sr_gdb_thread_remove_frames_below_n(struct sr_gdb_thread *thread,
 void
 sr_gdb_thread_append_to_str(struct sr_gdb_thread *thread,
                             struct sr_strbuf *dest,
-                             bool verbose)
+                            bool verbose)
 {
     int frame_count = sr_gdb_thread_get_frame_count(thread);
     if (verbose)
@@ -274,6 +276,7 @@ sr_gdb_thread_append_to_str(struct sr_gdb_thread *thread,
     while (frame)
     {
         sr_gdb_frame_append_to_str(frame, dest, verbose);
+        sr_strbuf_append_char(dest, '\n');
         frame = frame->next;
     }
 }
@@ -477,4 +480,63 @@ sr_gdb_thread_format_funs(struct sr_gdb_thread *thread)
     }
 
     return sr_strbuf_free_nobuf(buf);
+}
+
+void
+sr_gdb_thread_set_libnames(struct sr_gdb_thread *thread, struct sr_gdb_sharedlib *libs)
+{
+    struct sr_gdb_frame *frame = thread->frames;
+    while (frame)
+    {
+        struct sr_gdb_sharedlib *lib = sr_gdb_sharedlib_find_address(libs,
+                                                                     frame->address);
+        if (lib)
+        {
+            char *s1, *s2;
+
+            /* Strip directory and version after the .so suffix. */
+            s1 = strrchr(lib->soname, '/');
+            if (!s1)
+                s1 = lib->soname;
+            else
+                s1++;
+            s2 = strstr(s1, ".so");
+            if (!s2)
+                s2 = s1 + strlen(s1);
+            else
+                s2 += strlen(".so");
+
+            if (frame->library_name)
+                free(frame->library_name);
+            frame->library_name = sr_strndup(s1, s2 - s1);
+        }
+        frame = frame->next;
+    }
+}
+
+struct sr_gdb_thread *
+sr_gdb_thread_get_optimized(struct sr_gdb_thread *thread,
+                            struct sr_gdb_sharedlib *libs, int max_frames)
+{
+    thread = sr_gdb_thread_dup(thread, false);
+
+    if (libs)
+        sr_gdb_thread_set_libnames(thread, libs);
+    sr_normalize_gdb_thread(thread);
+    sr_gdb_normalize_optimize_thread(thread);
+
+    /* Remove frames with no function name (i.e. signal handlers). */
+    struct sr_gdb_frame *frame = thread->frames, *frame_next;
+    while (frame)
+    {
+        frame_next = frame->next;
+        if (!frame->function_name)
+            sr_gdb_thread_remove_frame(thread, frame);
+        frame = frame_next;
+    }
+
+    if (max_frames > 0)
+        sr_gdb_thread_remove_frames_below_n(thread, max_frames);
+
+    return thread;
 }

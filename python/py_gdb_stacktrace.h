@@ -73,7 +73,7 @@ PyObject *sr_py_gdb_stacktrace_get_duplication_hash(PyObject *self, PyObject *ar
 PyObject *sr_py_gdb_stacktrace_find_address(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_stacktrace_set_libnames(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_stacktrace_normalize(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_stacktrace_get_optimized_thread(PyObject *self, PyObject *args);
+PyObject * sr_py_gdb_stacktrace_to_short_text(PyObject *self, PyObject *args);
 
 #ifdef __cplusplus
 }

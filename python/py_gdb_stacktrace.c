@@ -57,8 +57,9 @@
 #define b_normalize_doc "Usage: stacktrace.normalize()\n" \
                         "Normalizes all threads in the stacktrace."
 
-#define b_get_optimized_thread_doc "Usage: stacktrace.get_optimized_thread(max_frames)\n" \
-                        "Returns thread optimized for comparison."
+#define b_to_short_text "Usage: stacktrace.to_short_text([max_frames])\n" \
+                        "Returns short text representation of the crash thread. If max_frames is\n" \
+                        "specified, the result includes only that much topmost frames.\n"
 
 #define b_crashframe_doc (char *)"Readonly. By default the field contains None. After " \
                          "calling the find_crash_frame method, a reference to " \
@@ -88,7 +89,7 @@ gdb_stacktrace_methods[] =
     { "find_address",         sr_py_gdb_stacktrace_find_address,         METH_VARARGS, b_find_address_doc         },
     { "set_libnames",         sr_py_gdb_stacktrace_set_libnames,         METH_NOARGS,  b_set_libnames_doc         },
     { "normalize",            sr_py_gdb_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc            },
-    { "get_optimized_thread", sr_py_gdb_stacktrace_get_optimized_thread, METH_VARARGS, b_get_optimized_thread_doc },
+    { "to_short_text",        sr_py_gdb_stacktrace_to_short_text,        METH_VARARGS, b_to_short_text            },
     { NULL },
 };
 
@@ -681,35 +682,29 @@ sr_py_gdb_stacktrace_normalize(PyObject *self, PyObject *args)
 }
 
 PyObject *
-sr_py_gdb_stacktrace_get_optimized_thread(PyObject *self, PyObject *args)
+sr_py_gdb_stacktrace_to_short_text(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
     if (stacktrace_prepare_linked_list(this) < 0)
         return NULL;
 
-    int max_frames;
-    if (!PyArg_ParseTuple(args, "i", &max_frames))
+    int max_frames = 0;
+    if (!PyArg_ParseTuple(args, "|i", &max_frames))
         return NULL;
 
-    struct sr_gdb_thread *thread =
-        sr_gdb_stacktrace_get_optimized_thread(this->stacktrace, max_frames);
-    if (!thread)
+    char *text =
+        sr_gdb_stacktrace_to_short_text(this->stacktrace, max_frames);
+    if (!text)
     {
         PyErr_SetString(PyExc_LookupError, "Crash thread not found");
         return NULL;
     }
 
-    struct sr_py_gdb_thread *result = (struct sr_py_gdb_thread*)
-        PyObject_New(struct sr_py_gdb_thread, &sr_py_gdb_thread_type);
-
-    if (!result)
-        return PyErr_NoMemory();
-
-    result->thread = thread;
-    result->frames = frame_linked_list_to_python_list(result->thread);
-
     if (stacktrace_rebuild_thread_python_list(this) < 0)
         return NULL;
 
-    return (PyObject*)result;
+    PyObject *result = PyString_FromString(text);
+
+    free(text);
+    return result;
 }

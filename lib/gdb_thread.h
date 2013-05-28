@@ -35,6 +35,7 @@ extern "C" {
 struct sr_gdb_frame;
 struct sr_strbuf;
 struct sr_location;
+struct sr_gdb_sharedlib;
 
 /**
  * @brief A thread of execution of a GDB-produced stack trace.
@@ -244,6 +245,20 @@ sr_gdb_thread_parse_funs(const char *input);
 char *
 sr_gdb_thread_format_funs(struct sr_gdb_thread *thread);
 
+/**
+ * Set library names in all frames in the thread according to the
+ * the sharedlib data.
+ */
+void
+sr_gdb_thread_set_libnames(struct sr_gdb_thread *thread,
+                           struct sr_gdb_sharedlib *libs);
+
+/**
+ * Return copy of the thread optimized for comparison.
+ */
+struct sr_gdb_thread *
+sr_gdb_thread_get_optimized(struct sr_gdb_thread *thread,
+                            struct sr_gdb_sharedlib *libs, int max_frames);
 #ifdef __cplusplus
 }
 #endif

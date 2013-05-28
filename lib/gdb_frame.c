@@ -246,8 +246,6 @@ sr_gdb_frame_append_to_str(struct sr_gdb_frame *frame,
 
     if (frame->signal_handler_called)
         sr_strbuf_append_str(str, " <signal handler called>");
-
-    sr_strbuf_append_str(str, "\n");
 }
 
 /**

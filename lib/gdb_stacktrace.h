@@ -290,25 +290,23 @@ sr_gdb_stacktrace_parse_header(const char **input,
 void
 sr_gdb_stacktrace_set_libnames(struct sr_gdb_stacktrace *stacktrace);
 
-// TODO: move somewhere else and refactor
 /**
- * Return crash thread optimized for comparison. It's normalized, with
- * library names set and functions without names (signal handlers) are
- * removed.
+ * Return short text representation of the crash thread.  The trace is
+ * normalized and functions without names (signal handlers) are removed.
  * @param stacktrace
  * It must be non-NULL pointer. It's not modified by calling this
  * function.
  * @param max_frames
  * The maximum number of frames in the returned crash thread.
- * Superfluous frames are removed from the returned thread.
+ * Superfluous frames are not included in the output.
  * @returns
- * A newly allocated thread structure or NULL. NULL is returned when the
- * crashing thread could not be found. The returned structure should be
- * released by sr_gdb_thread_free() by the caller.
+ * Brief text representation of the crash thread suitable for being part of a
+ * bugzilla comment. The string is allocated by the function and must be freed
+ * using the free() function.
  */
-struct sr_gdb_thread *
-sr_gdb_stacktrace_get_optimized_thread(struct sr_gdb_stacktrace *stacktrace,
-                                       int max_frames);
+char *
+sr_gdb_stacktrace_to_short_text(struct sr_gdb_stacktrace *stacktrace,
+                                int max_frames);
 
 #ifdef __cplusplus
 }
