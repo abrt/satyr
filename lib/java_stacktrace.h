@@ -133,6 +133,9 @@ sr_java_stacktrace_get_reason(struct sr_java_stacktrace *stacktrace);
 char *
 sr_java_stacktrace_to_json(struct sr_java_stacktrace *stacktrace);
 
+struct sr_java_thread *
+sr_java_find_crash_thread(struct sr_java_stacktrace *stacktrace);
+
 #ifdef __cplusplus
 }
 #endif

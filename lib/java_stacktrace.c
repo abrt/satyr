@@ -195,3 +195,11 @@ sr_java_stacktrace_get_reason(struct sr_java_stacktrace *stacktrace)
 
     return sr_asprintf("Exception %s occurred in %s:%"PRIu32, exc, file, line);
 }
+
+struct sr_java_thread *
+sr_java_find_crash_thread(struct sr_java_stacktrace *stacktrace)
+{
+    /* FIXME: is the first thread the crash (or otherwise interesting) thread?
+     */
+    return stacktrace->threads;
+}
