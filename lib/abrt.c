@@ -286,15 +286,7 @@ sr_abrt_report_from_dir(const char *directory,
         return NULL;
     }
 
-    if (0 == strncmp(analyzer_contents, "CCpp", 4))
-        report->report_type = SR_REPORT_CORE;
-    else if (0 == strncmp(analyzer_contents, "Python", 6))
-        report->report_type = SR_REPORT_PYTHON;
-    else if (0 == strncmp(analyzer_contents, "Kerneloops", 10))
-        report->report_type = SR_REPORT_KERNELOOPS;
-    else if (0 == strncmp(analyzer_contents, "Java", 4))
-        report->report_type = SR_REPORT_JAVA;
-
+    report->report_type = sr_abrt_type_from_analyzer(analyzer_contents);
     free(analyzer_contents);
 
     /* Operating system. */
@@ -474,4 +466,19 @@ sr_abrt_report_from_dir(const char *directory,
     }
 
     return report;
+}
+
+enum sr_report_type
+sr_abrt_type_from_analyzer(const char *analyzer)
+{
+    if (0 == strncmp(analyzer, "CCpp", 4))
+        return SR_REPORT_CORE;
+    else if (0 == strncmp(analyzer, "Python", 6))
+        return SR_REPORT_PYTHON;
+    else if (0 == strncmp(analyzer, "Kerneloops", 10))
+        return SR_REPORT_KERNELOOPS;
+    else if (0 == strncmp(analyzer, "Java", 4))
+        return SR_REPORT_JAVA;
+
+    return SR_REPORT_INVALID;
 }

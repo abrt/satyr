@@ -24,6 +24,7 @@
 extern "C" {
 #endif
 
+#include "report_type.h"
 #include <stdbool.h>
 
 bool
@@ -49,6 +50,9 @@ sr_abrt_operating_system_from_dir(const char *directory,
 struct sr_report *
 sr_abrt_report_from_dir(const char *directory,
                         char **error_message);
+
+enum sr_report_type
+sr_abrt_type_from_analyzer(const char *analyzer);
 
 #ifdef __cplusplus
 }
