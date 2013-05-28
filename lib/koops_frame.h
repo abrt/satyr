@@ -33,6 +33,8 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
+struct sr_strbuf;
+
 /**
  * @brief Kernel oops stack frame.
  */
@@ -213,6 +215,13 @@ sr_koops_parse_function(const char **input,
  */
 char *
 sr_koops_frame_to_json(struct sr_koops_frame *frame);
+
+/**
+ * Appends textual representation of the frame to the string buffer dest.
+ */
+void
+sr_koops_frame_append_to_str(struct sr_koops_frame *frame,
+                             struct sr_strbuf *dest);
 
 #ifdef __cplusplus
 }

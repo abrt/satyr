@@ -34,6 +34,7 @@ extern "C" {
 #include <stdint.h>
 
 struct sr_location;
+struct sr_strbuf;
 
 struct sr_python_frame
 {
@@ -169,6 +170,13 @@ sr_python_frame_parse(const char **input,
  */
 char *
 sr_python_frame_to_json(struct sr_python_frame *frame);
+
+/**
+ * Appends textual representation of the frame to the string buffer dest.
+ */
+void
+sr_python_frame_append_to_str(struct sr_python_frame *frame,
+                              struct sr_strbuf *dest);
 
 #ifdef __cplusplus
 }

@@ -302,3 +302,26 @@ sr_python_frame_to_json(struct sr_python_frame *frame)
     sr_strbuf_append_char(strbuf, '}');
     return sr_strbuf_free_nobuf(strbuf);
 }
+
+void
+sr_python_frame_append_to_str(struct sr_python_frame *frame,
+                              struct sr_strbuf *dest)
+{
+    sr_strbuf_append_strf(dest, "%s%s%s",
+                          (frame->special_function ? "<" : ""),
+                          (frame->function_name ? frame->function_name : "??"),
+                          (frame->special_function ? ">" : ""));
+
+    if (frame->file_name)
+    {
+        sr_strbuf_append_strf(dest, " in %s%s%s",
+                              (frame->special_file ? "<" : ""),
+                              frame->file_name,
+                              (frame->special_file ? ">" : ""));
+
+        if (frame->file_line)
+        {
+            sr_strbuf_append_strf(dest, ":%d", frame->file_line);
+        }
+    }
+}

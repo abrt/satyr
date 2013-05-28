@@ -482,3 +482,15 @@ sr_koops_frame_to_json(struct sr_koops_frame *frame)
     sr_strbuf_append_str(strbuf, "}");
     return sr_strbuf_free_nobuf(strbuf);
 }
+
+void
+sr_koops_frame_append_to_str(struct sr_koops_frame *frame,
+                             struct sr_strbuf *str)
+{
+    sr_strbuf_append_strf(str, "%s%s",
+                          (frame->reliable ? "" : "? "),
+                          (frame->function_name ? frame->function_name : "??"));
+
+    if (frame->module_name)
+        sr_strbuf_append_strf(str, " in %s", frame->module_name);
+}

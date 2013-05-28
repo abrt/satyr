@@ -196,6 +196,13 @@ sr_core_frame_from_json(struct sr_json_value *root,
 char *
 sr_core_frame_to_json(struct sr_core_frame *frame);
 
+/**
+ * Appends textual representation of the frame to the string buffer dest.
+ */
+void
+sr_core_frame_append_to_str(struct sr_core_frame *frame,
+                            struct sr_strbuf *dest);
+
 #ifdef __cplusplus
 }
 #endif

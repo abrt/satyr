@@ -351,3 +351,23 @@ sr_core_frame_to_json(struct sr_core_frame *frame)
     sr_strbuf_append_char(strbuf, '}');
     return sr_strbuf_free_nobuf(strbuf);
 }
+
+void
+sr_core_frame_append_to_str(struct sr_core_frame *frame,
+                            struct sr_strbuf *dest)
+{
+    if (frame->function_name)
+    {
+        sr_strbuf_append_str(dest, frame->function_name);
+    }
+    else
+    {
+        sr_strbuf_append_strf(dest, "%s+%"PRIu64, frame->build_id,
+                              frame->build_id_offset);
+    }
+
+    if (frame->file_name)
+    {
+        sr_strbuf_append_strf(dest, " in %s", frame->file_name);
+    }
+}
