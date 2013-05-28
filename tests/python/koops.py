@@ -12,6 +12,14 @@ except ImportError:
 path = '../kerneloopses/rhbz-827868'
 frames_expected = 32
 mods_expected = 119
+expected_short_text = '''#1 warn_slowpath_common
+#2 warn_slowpath_null
+#3 __alloc_pages_nodemask
+#4 ? ip_copy_metadata
+#5 ? ip_forward_options
+#6 alloc_pages_current
+#7 __get_free_pages
+'''
 
 if not os.path.isfile(path):
     path = '../' + path
@@ -52,6 +60,9 @@ class TestKerneloops(BindingsTestCase):
     def test_str(self):
         out = str(self.koops)
         self.assertTrue(('Kerneloops with %d frames' % frames_expected) in out)
+
+    def test_to_short_text(self):
+        self.assertEqual(self.koops.to_short_text(7), expected_short_text)
 
 class TestKoopsFrame(BindingsTestCase):
     def setUp(self):

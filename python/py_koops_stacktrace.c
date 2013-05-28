@@ -5,6 +5,7 @@
 #include "lib/koops_stacktrace.h"
 #include "lib/location.h"
 #include "lib/normalize.h"
+#include "lib/stacktrace.h"
 
 #define stacktrace_doc "satyr.Kerneloops - class representing a kerneloops stacktrace\n" \
                       "Usage:\n" \
@@ -19,6 +20,10 @@
 #define b_normalize_doc "Usage: stacktrace.normalize()\n" \
                         "Normalizes the stacktrace."
 
+#define b_to_short_text "Usage: stacktrace.to_short_text([max_frames])\n" \
+                        "Returns short text representation of the stacktrace. If max_frames is\n" \
+                        "specified, the result includes only that much topmost frames.\n"
+
 #define b_frames_doc "A list containing frames"
 #define b_modules_doc "Modules loaded at the time of the event (list of strings)"
 
@@ -29,6 +34,7 @@ koops_stacktrace_methods[] =
     /* methods */
     { "dup",                  sr_py_koops_stacktrace_dup,                  METH_NOARGS,  b_dup_doc                   },
     { "normalize",            sr_py_koops_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc             },
+    { "to_short_text",        sr_py_koops_stacktrace_to_short_text,        METH_VARARGS, b_to_short_text             },
     { NULL },
 };
 
@@ -325,4 +331,26 @@ sr_py_koops_stacktrace_normalize(PyObject *self, PyObject *args)
         return NULL;
 
     Py_RETURN_NONE;
+}
+
+PyObject *
+sr_py_koops_stacktrace_to_short_text(PyObject *self, PyObject *args)
+{
+    int max_frames = 0;
+    if (!PyArg_ParseTuple(args, "|i", &max_frames))
+        return NULL;
+
+    struct sr_py_koops_stacktrace *this = (struct sr_py_koops_stacktrace*)self;
+    if (koops_stacktrace_prepare_linked_list(this) < 0)
+        return NULL;
+
+    char *text =
+        sr_stacktrace_to_short_text((struct sr_stacktrace *)this->stacktrace, max_frames);
+    if (!text)
+        return NULL;
+
+    PyObject *result = PyString_FromString(text);
+
+    free(text);
+    return result;
 }

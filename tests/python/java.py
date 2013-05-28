@@ -12,6 +12,15 @@ except ImportError:
 path = '../java_stacktraces/java-02'
 threads_expected = 1
 frames_expected = 32
+expected_short_text = '''#1 org.hibernate.exception.ConstraintViolationException: could not insert: [com.example.myproject.MyEntity]
+#2 \tat org.hibernate.exception.SQLStateConverter.convert(SQLStateConverter.java:96) [unknown]
+#3 \tat org.hibernate.exception.JDBCExceptionHelper.convert(JDBCExceptionHelper.java:66) [unknown]
+#4 \tat org.hibernate.id.insert.AbstractSelectingDelegate.performInsert(AbstractSelectingDelegate.java:64) [unknown]
+#5 com.example.myproject.MyProjectServletException
+#6 \tat com.example.myproject.MyServlet.doPost(MyServlet.java:169) [unknown]
+#7 \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:727) [unknown]
+#8 \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:820) [unknown]
+'''
 
 if not os.path.isfile(path):
     path = '../' + path
@@ -51,6 +60,10 @@ class TestJavaStacktrace(BindingsTestCase):
     def test_str(self):
         out = str(self.trace)
         self.assertTrue(('Java stacktrace with %d threads' % threads_expected) in out)
+
+    def test_to_short_text(self):
+        self.assertEqual(self.trace.to_short_text(8), expected_short_text)
+
 
 class TestJavaThread(BindingsTestCase):
     def setUp(self):

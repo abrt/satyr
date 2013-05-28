@@ -12,6 +12,13 @@ except ImportError:
 
 path = '../python_stacktraces/python-01'
 frames_expected = 11
+expected_short_text = '''#1 _getPackage in /usr/share/PackageKit/helpers/yum/yumBackend.py:2534
+#2 updateProgress in /usr/share/PackageKit/helpers/yum/yumBackend.py:2593
+#3 _do_start in /usr/share/PackageKit/helpers/yum/yumBackend.py:2551
+#4 start in /usr/lib/python2.6/site-packages/urlgrabber/progress.py:129
+#5 downloadPkgs in /usr/lib/yum-plugins/presto.py:419
+#6 predownload_hook in /usr/lib/yum-plugins/presto.py:577
+'''
 
 if not os.path.isfile(path):
     path = '../' + path
@@ -82,6 +89,9 @@ class TestPythonStacktrace(BindingsTestCase):
         self.assertEqual(f.function_name, 'module')
         self.assertTrue(f.special_file)
         self.assertTrue(f.special_function)
+
+    def test_to_short_text(self):
+        self.assertEqual(self.trace.to_short_text(6), expected_short_text)
 
 class TestPythonFrame(BindingsTestCase):
     def setUp(self):

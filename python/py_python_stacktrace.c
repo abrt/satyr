@@ -7,6 +7,7 @@
 #include "lib/python_stacktrace.h"
 #include "lib/location.h"
 #include "lib/normalize.h"
+#include "lib/stacktrace.h"
 
 #define stacktrace_doc "satyr.PythonStacktrace - class representing a python stacktrace\n" \
                       "Usage:\n" \
@@ -17,6 +18,10 @@
                   "Returns: satyr.PythonStacktrace - a new clone of python stacktrace\n" \
                   "Clones the PythonStacktrace object. All new structures are independent " \
                   "on the original object."
+
+#define f_to_short_text "Usage: stacktrace.to_short_text([max_frames])\n" \
+                        "Returns short text representation of the stacktrace. If max_frames is\n" \
+                        "specified, the result includes only that much topmost frames.\n"
 
 #define f_normalize_doc "Usage: stacktrace.normalize()\n" \
                         "Normalizes the stacktrace."
@@ -30,7 +35,8 @@ static PyMethodDef
 python_stacktrace_methods[] =
 {
     /* methods */
-    { "dup", sr_py_python_stacktrace_dup, METH_NOARGS, f_dup_doc },
+    { "dup",           sr_py_python_stacktrace_dup,           METH_NOARGS,  f_dup_doc },
+    { "to_short_text", sr_py_python_stacktrace_to_short_text, METH_VARARGS, f_to_short_text },
 //    { "normalize", sr_py_python_stacktrace_normalize, METH_NOARGS, f_normalize_doc },
     { NULL },
 };
@@ -283,6 +289,28 @@ sr_py_python_stacktrace_dup(PyObject *self, PyObject *args)
         return NULL;
 
     return (PyObject*)bo;
+}
+
+PyObject *
+sr_py_python_stacktrace_to_short_text(PyObject *self, PyObject *args)
+{
+    int max_frames = 0;
+    if (!PyArg_ParseTuple(args, "|i", &max_frames))
+        return NULL;
+
+    struct sr_py_python_stacktrace *this = (struct sr_py_python_stacktrace*)self;
+    if (python_stacktrace_prepare_linked_list(this) < 0)
+        return NULL;
+
+    char *text =
+        sr_stacktrace_to_short_text((struct sr_stacktrace *)this->stacktrace, max_frames);
+    if (!text)
+        return NULL;
+
+    PyObject *result = PyString_FromString(text);
+
+    free(text);
+    return result;
 }
 
 /*

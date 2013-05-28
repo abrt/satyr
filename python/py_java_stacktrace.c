@@ -6,6 +6,7 @@
 #include "lib/java_thread.h"
 #include "lib/location.h"
 #include "lib/normalize.h"
+#include "lib/stacktrace.h"
 
 #define stacktrace_doc "satyr.JavaStacktrace - class representing a java stacktrace\n" \
                       "Usage:\n" \
@@ -16,6 +17,10 @@
                   "Returns: satyr.JavaStacktrace - a new clone of java stacktrace\n" \
                   "Clones the stacktrace object. All new structures are independent " \
                   "on the original object."
+
+#define b_to_short_text "Usage: stacktrace.to_short_text([max_frames])\n" \
+                        "Returns short text representation of the stacktrace. If max_frames is\n" \
+                        "specified, the result includes only that much topmost frames.\n"
 
 #define b_normalize_doc "Usage: stacktrace.normalize()\n" \
                         "Normalizes all threads in the stacktrace."
@@ -28,6 +33,7 @@ java_stacktrace_methods[] =
 {
     /* methods */
     { "dup",                  sr_py_java_stacktrace_dup,                  METH_NOARGS,  b_dup_doc                  },
+    { "to_short_text",        sr_py_java_stacktrace_to_short_text,        METH_VARARGS, b_to_short_text            },
 //    { "normalize",            sr_py_java_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc            },
     { NULL },
 };
@@ -270,6 +276,28 @@ sr_py_java_stacktrace_dup(PyObject *self, PyObject *args)
         return NULL;
 
     return (PyObject*)bo;
+}
+
+PyObject *
+sr_py_java_stacktrace_to_short_text(PyObject *self, PyObject *args)
+{
+    int max_frames = 0;
+    if (!PyArg_ParseTuple(args, "|i", &max_frames))
+        return NULL;
+
+    struct sr_py_java_stacktrace *this = (struct sr_py_java_stacktrace*)self;
+    if (java_stacktrace_prepare_linked_list(this) < 0)
+        return NULL;
+
+    char *text =
+        sr_stacktrace_to_short_text((struct sr_stacktrace *)this->stacktrace, max_frames);
+    if (!text)
+        return NULL;
+
+    PyObject *result = PyString_FromString(text);
+
+    free(text);
+    return result;
 }
 
 /*

@@ -59,6 +59,7 @@ int sr_py_koops_stacktrace_set_modules(PyObject *self, PyObject *rhs, void *data
 /* methods */
 PyObject *sr_py_koops_stacktrace_dup(PyObject *self, PyObject *args);
 PyObject *sr_py_koops_stacktrace_normalize(PyObject *self, PyObject *args);
+PyObject *sr_py_koops_stacktrace_to_short_text(PyObject *self, PyObject *args);
 
 
 #ifdef __cplusplus

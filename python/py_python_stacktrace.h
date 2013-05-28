@@ -55,6 +55,7 @@ PyObject *sr_py_python_stacktrace_str(PyObject *self);
 /* methods */
 PyObject *sr_py_python_stacktrace_dup(PyObject *self, PyObject *args);
 PyObject *sr_py_python_stacktrace_normalize(PyObject *self, PyObject *args);
+PyObject *sr_py_python_stacktrace_to_short_text(PyObject *self, PyObject *args);
 
 
 #ifdef __cplusplus
