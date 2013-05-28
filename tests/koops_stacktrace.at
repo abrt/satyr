@@ -100,6 +100,7 @@ AT_TESTFUN([sr_koops_stacktrace_parse],
 #include <lib/koops_frame.h>
 #include <lib/location.h>
 #include <lib/utils.h>
+#include <lib/thread.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -138,8 +139,9 @@ check(const char *path,
   else
       assert(!first_function_name && !last_function_name && 0 == frame_count);
 
-  printf("expected: %d, got: %d\n", frame_count, sr_koops_stacktrace_get_frame_count(stacktrace));
-  assert(frame_count == sr_koops_stacktrace_get_frame_count(stacktrace));
+  printf("expected: %d, got: %d\n", frame_count,
+         sr_thread_frame_count((struct sr_thread*) stacktrace));
+  assert(frame_count == sr_thread_frame_count((struct sr_thread*) stacktrace));
 
   char *reason = sr_koops_stacktrace_get_reason(stacktrace);
   assert(reason);

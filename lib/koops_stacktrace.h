@@ -117,12 +117,6 @@ struct sr_koops_stacktrace *
 sr_koops_stacktrace_dup(struct sr_koops_stacktrace *stacktrace);
 
 /**
- * Returns the number of frames in the Kerneloops stacktrace.
- */
-int
-sr_koops_stacktrace_get_frame_count(struct sr_koops_stacktrace *stacktrace);
-
-/**
  * Removes the frame from the stack trace and then deletes it.
  * @returns
  * True if the frame was found in the thread and removed and deleted.

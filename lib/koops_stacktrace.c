@@ -75,19 +75,6 @@ sr_koops_stacktrace_dup(struct sr_koops_stacktrace *stacktrace)
     return result;
 }
 
-int
-sr_koops_stacktrace_get_frame_count(struct sr_koops_stacktrace *stacktrace)
-{
-    struct sr_koops_frame *frame = stacktrace->frames;
-    int count = 0;
-    while (frame)
-    {
-        frame = frame->next;
-        ++count;
-    }
-    return count;
-}
-
 bool
 sr_koops_stacktrace_remove_frame(struct sr_koops_stacktrace *stacktrace,
                                  struct sr_koops_frame *frame)

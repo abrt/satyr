@@ -70,20 +70,6 @@ sr_python_stacktrace_dup(struct sr_python_stacktrace *stacktrace)
     return result;
 }
 
-int
-sr_python_stacktrace_get_frame_count(struct sr_python_stacktrace *stacktrace)
-{
-    struct sr_python_frame *frame = stacktrace->frames;
-    int count = 0;
-    while (frame)
-    {
-        frame = frame->next;
-        ++count;
-    }
-
-    return count;
-}
-
 struct sr_python_stacktrace *
 sr_python_stacktrace_parse(const char **input,
                            struct sr_location *location)

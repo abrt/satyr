@@ -22,6 +22,7 @@
 #include "utils.h"
 #include "metrics.h"
 #include "normalize.h"
+#include "thread.h"
 #include <stdio.h>
 #include <limits.h>
 #include <string.h>
@@ -32,8 +33,8 @@ sr_gdb_thread_jarowinkler_distance_custom(struct sr_gdb_thread *thread1,
                                           struct sr_gdb_thread *thread2,
                                           sr_gdb_frame_cmp_type compare_func)
 {
-    int frame1_count = sr_gdb_thread_get_frame_count(thread1);
-    int frame2_count = sr_gdb_thread_get_frame_count(thread2);
+    int frame1_count = sr_thread_frame_count((struct sr_thread*) thread1);
+    int frame2_count = sr_thread_frame_count((struct sr_thread*) thread2);
 
     if (frame1_count == 0 && frame2_count == 0)
     {
@@ -160,8 +161,8 @@ sr_gdb_thread_levenshtein_distance_custom(struct sr_gdb_thread *thread1,
                                           bool transposition,
                                           sr_gdb_frame_cmp_type compare_func)
 {
-    int m = sr_gdb_thread_get_frame_count(thread1) + 1;
-    int n = sr_gdb_thread_get_frame_count(thread2) + 1;
+    int m = sr_thread_frame_count((struct sr_thread*) thread1) + 1;
+    int n = sr_thread_frame_count((struct sr_thread*) thread2) + 1;
 
     // store only two last rows and columns instead of whole 2D array
     int dist[m + n + 1], dist1[m + n + 1], dist2;
@@ -260,8 +261,8 @@ sr_gdb_thread_levenshtein_distance_f(struct sr_gdb_thread *thread1,
 {
     int frame_count1, frame_count2, max_frame_count;
 
-    frame_count1 = sr_gdb_thread_get_frame_count(thread1);
-    frame_count2 = sr_gdb_thread_get_frame_count(thread2);
+    frame_count1 = sr_thread_frame_count((struct sr_thread*) thread1);
+    frame_count2 = sr_thread_frame_count((struct sr_thread*) thread2);
     max_frame_count = frame_count1 > frame_count2 ? frame_count1 : frame_count2;
 
     if (!max_frame_count)

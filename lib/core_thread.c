@@ -117,20 +117,6 @@ sr_core_thread_append(struct sr_core_thread *dest,
     return dest;
 }
 
-int
-sr_core_thread_get_frame_count(struct sr_core_thread *thread)
-{
-    struct sr_core_frame *frame = thread->frames;
-    int count = 0;
-    while (frame)
-    {
-        frame = frame->next;
-        ++count;
-    }
-
-    return count;
-}
-
 struct sr_core_frame *
 sr_core_thread_find_exit_frame(struct sr_core_thread *thread)
 {

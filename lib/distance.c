@@ -28,19 +28,18 @@
 #include "koops_frame.h"
 #include "python_stacktrace.h"
 #include "python_frame.h"
+#include "thread.h"
 #include <stdlib.h>
 
 typedef int (*frame_cmp_function)(void*, void*);
 typedef void* (*frame_next_function)(void*);
 typedef void* (*thread_first_frame_function)(void*);
-typedef int (*thread_get_frame_count_function)(void*);
 
 struct type_specific_functions
 {
     frame_cmp_function frame_cmp;
     frame_next_function frame_next;
     thread_first_frame_function thread_first_frame;
-    thread_get_frame_count_function thread_get_frame_count;
 };
 
 float
@@ -48,8 +47,8 @@ distance_jaro_winkler(struct type_specific_functions functions,
                       void *thread1,
                       void *thread2)
 {
-    int frame1_count = functions.thread_get_frame_count(thread1);
-    int frame2_count = functions.thread_get_frame_count(thread2);
+    int frame1_count = sr_thread_frame_count((struct sr_thread*) thread1);
+    int frame2_count = sr_thread_frame_count((struct sr_thread*) thread2);
 
     if (frame1_count == 0 && frame2_count == 0)
         return 1.0;
@@ -199,8 +198,8 @@ distance_levenshtein(struct type_specific_functions functions,
                      void *thread2,
                      bool transposition)
 {
-    int m = functions.thread_get_frame_count(thread1) + 1;
-    int n = functions.thread_get_frame_count(thread2) + 1;
+    int m = sr_thread_frame_count((struct sr_thread*) thread1) + 1;
+    int n = sr_thread_frame_count((struct sr_thread*) thread2) + 1;
 
     // store only two last rows and columns instead of whole 2D array
     int dist[m + n + 1], dist1[m + n + 1];
@@ -307,17 +306,10 @@ thread_first_frame_gdb(void *thread)
     return ((struct sr_gdb_thread*)thread)->frames;
 }
 
-static int
-thread_get_frame_count_gdb(void *thread)
-{
-    return sr_gdb_thread_get_frame_count((struct sr_gdb_thread*)thread);
-}
-
 struct type_specific_functions gdb_specific_functions = {
     frame_cmp_gdb,
     frame_next_gdb,
     thread_first_frame_gdb,
-    thread_get_frame_count_gdb
 };
 
 float
@@ -350,17 +342,10 @@ thread_first_frame_core(void *thread)
     return ((struct sr_core_thread*)thread)->frames;
 }
 
-static int
-thread_get_frame_count_core(void *thread)
-{
-    return sr_core_thread_get_frame_count((struct sr_core_thread*)thread);
-}
-
 struct type_specific_functions core_specific_functions = {
     frame_cmp_core,
     frame_next_core,
     thread_first_frame_core,
-    thread_get_frame_count_core
 };
 
 float
@@ -393,17 +378,10 @@ thread_first_frame_java(void *thread)
     return ((struct sr_java_thread*)thread)->frames;
 }
 
-static int
-thread_get_frame_count_java(void *thread)
-{
-    return sr_java_thread_get_frame_count((struct sr_java_thread*)thread);
-}
-
 struct type_specific_functions java_specific_functions = {
     frame_cmp_java,
     frame_next_java,
     thread_first_frame_java,
-    thread_get_frame_count_java
 };
 
 float
@@ -436,17 +414,10 @@ thread_first_frame_koops(void *stacktrace)
     return ((struct sr_koops_stacktrace*)stacktrace)->frames;
 }
 
-static int
-thread_get_frame_count_koops(void *stacktrace)
-{
-    return sr_koops_stacktrace_get_frame_count((struct sr_koops_stacktrace*)stacktrace);
-}
-
 struct type_specific_functions koops_specific_functions = {
     frame_cmp_koops,
     frame_next_koops,
     thread_first_frame_koops,
-    thread_get_frame_count_koops
 };
 
 float
@@ -480,17 +451,10 @@ thread_first_frame_python(void *stacktrace)
     return ((struct sr_python_stacktrace*)stacktrace)->frames;
 }
 
-static int
-thread_get_frame_count_python(void *stacktrace)
-{
-    return sr_python_stacktrace_get_frame_count((struct sr_python_stacktrace*)stacktrace);
-}
-
 struct type_specific_functions python_specific_functions = {
     frame_cmp_python,
     frame_next_python,
     thread_first_frame_python,
-    thread_get_frame_count_python
 };
 
 float

@@ -118,20 +118,6 @@ sr_java_thread_append(struct sr_java_thread *dest,
     return dest;
 }
 
-int
-sr_java_thread_get_frame_count(struct sr_java_thread *thread)
-{
-    struct sr_java_frame *frame = thread->frames;
-    int count = 0;
-    while (frame)
-    {
-        frame = frame->next;
-        ++count;
-    }
-
-    return count;
-}
-
 void
 sr_java_thread_quality_counts(struct sr_java_thread *thread,
                               int *ok_count,

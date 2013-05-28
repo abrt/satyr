@@ -24,6 +24,7 @@
 #include "location.h"
 #include "utils.h"
 #include "strbuf.h"
+#include "thread.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -124,19 +125,6 @@ sr_gdb_thread_append(struct sr_gdb_thread *dest,
 
     dest_loop->next = item;
     return dest;
-}
-
-int
-sr_gdb_thread_get_frame_count(struct sr_gdb_thread *thread)
-{
-    struct sr_gdb_frame *frame = thread->frames;
-    int count = 0;
-    while (frame)
-    {
-        frame = frame->next;
-        ++count;
-    }
-    return count;
 }
 
 void
@@ -263,7 +251,8 @@ sr_gdb_thread_append_to_str(struct sr_gdb_thread *thread,
                             struct sr_strbuf *dest,
                             bool verbose)
 {
-    int frame_count = sr_gdb_thread_get_frame_count(thread);
+    int frame_count = sr_thread_frame_count(
+            (struct sr_thread*) thread);
     if (verbose)
     {
         sr_strbuf_append_strf(dest, "Thread no. %d (%d frames)\n",

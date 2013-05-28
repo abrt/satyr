@@ -123,12 +123,6 @@ struct sr_core_thread *
 sr_core_thread_append(struct sr_core_thread *dest,
                       struct sr_core_thread *item);
 
-/**
- * Returns the number of frames in the thread.
- */
-int
-sr_core_thread_get_frame_count(struct sr_core_thread *thread);
-
 struct sr_core_frame *
 sr_core_thread_find_exit_frame(struct sr_core_thread *thread);
 

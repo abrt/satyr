@@ -84,12 +84,6 @@ struct sr_python_stacktrace *
 sr_python_stacktrace_dup(struct sr_python_stacktrace *stacktrace);
 
 /**
- * Returns the number of frames in the stacktrace.
- */
-int
-sr_python_stacktrace_get_frame_count(struct sr_python_stacktrace *stacktrace);
-
-/**
  * Parses a textual Python stacktrace and puts it into a structure.
  * If parsing fails, the input parameter is not changed and NULL is
  * returned.

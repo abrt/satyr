@@ -127,12 +127,6 @@ sr_java_thread_append(struct sr_java_thread *dest,
                       struct sr_java_thread *item);
 
 /**
- * Returns the number of frames in the thread.
- */
-int
-sr_java_thread_get_frame_count(struct sr_java_thread *thread);
-
-/**
  * Counts the number of 'good' frames and the number of all frames in
  * a thread. Good means that the function name is known (so it's not
  * just '??').

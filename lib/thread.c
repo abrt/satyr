@@ -51,6 +51,20 @@ SR_NEXT_FUNC(core_next, struct sr_thread, struct sr_core_thread)
 SR_NEXT_FUNC(java_next, struct sr_thread, struct sr_java_thread)
 SR_NEXT_FUNC(gdb_next, struct sr_thread, struct sr_gdb_thread)
 
+static int
+generic_frame_count(struct sr_thread *thread)
+{
+    struct sr_frame *frame = sr_thread_frames(thread);
+    int count = 0;
+    while (frame)
+    {
+        frame = sr_frame_next(frame);
+        ++count;
+    }
+
+    return count;
+}
+
 static struct sr_thread *
 no_next_thread(struct sr_thread *thread)
 {
@@ -61,12 +75,14 @@ no_next_thread(struct sr_thread *thread)
 
 typedef struct sr_frame* (*frames_fn_t)(struct sr_thread*);
 typedef int (*cmp_fn_t)(struct sr_thread*, struct sr_thread*);
+typedef int (*frame_count_fn_t)(struct sr_thread*);
 typedef struct sr_thread* (*next_fn_t)(struct sr_thread*);
 
 struct methods
 {
     frames_fn_t frames;
     cmp_fn_t cmp;
+    frame_count_fn_t frame_count;
     next_fn_t next;
 };
 
@@ -78,30 +94,35 @@ static struct methods dtable[SR_REPORT_NUM] =
     {
         .frames = (frames_fn_t) core_frames,
         .cmp = (cmp_fn_t) sr_core_thread_cmp,
+        .frame_count = (frame_count_fn_t) generic_frame_count,
         .next = (next_fn_t) core_next,
     },
     [SR_REPORT_PYTHON] =
     {
         .frames = (frames_fn_t) python_frames,
         .cmp = (cmp_fn_t) NULL,
+        .frame_count = (frame_count_fn_t) generic_frame_count,
         .next = (next_fn_t) no_next_thread,
     },
     [SR_REPORT_KERNELOOPS] =
     {
         .frames = (frames_fn_t) koops_frames,
         .cmp = (cmp_fn_t) NULL,
+        .frame_count = (frame_count_fn_t) generic_frame_count,
         .next = (next_fn_t) no_next_thread,
     },
     [SR_REPORT_JAVA] =
     {
         .frames = (frames_fn_t) java_frames,
         .cmp = (cmp_fn_t) sr_java_thread_cmp,
+        .frame_count = (frame_count_fn_t) generic_frame_count,
         .next = (next_fn_t) java_next,
     },
     [SR_REPORT_GDB] =
     {
         .frames = (frames_fn_t) gdb_frames,
         .cmp = (cmp_fn_t) sr_gdb_thread_cmp,
+        .frame_count = (frame_count_fn_t) generic_frame_count,
         .next = (next_fn_t) gdb_next,
     },
 };
@@ -110,6 +131,12 @@ struct sr_frame *
 sr_thread_frames(struct sr_thread *thread)
 {
     return SR_DISPATCH(thread->type, frames)(thread);
+}
+
+int
+sr_thread_frame_count(struct sr_thread *thread)
+{
+    return SR_DISPATCH(thread->type, frame_count)(thread);
 }
 
 int

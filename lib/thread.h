@@ -55,6 +55,9 @@ sr_thread_frames(struct sr_thread *thread);
  * always unequal.
  */
 int
+sr_thread_frame_count(struct sr_thread *thread);
+
+int
 sr_thread_cmp(struct sr_thread *t1, struct sr_thread *t2);
 
 /**

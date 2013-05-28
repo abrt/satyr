@@ -124,12 +124,6 @@ sr_gdb_thread_append(struct sr_gdb_thread *dest,
                      struct sr_gdb_thread *item);
 
 /**
- * Returns the number of frames in the thread.
- */
-int
-sr_gdb_thread_get_frame_count(struct sr_gdb_thread *thread);
-
-/**
  * Counts the number of 'good' frames and the number of all frames in
  * a thread. Good means that the function name is known (so it's not
  * just '??').
