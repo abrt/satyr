@@ -93,3 +93,39 @@ main(void)
   return 0;
 }
 ]])
+
+## -------------------------------- ##
+## sr_core_frame_abstract_functions ##
+## -------------------------------- ##
+
+AT_TESTFUN([sr_core_frame_abstract_functions],
+[[
+#include <lib/core_frame.h>
+#include <lib/strbuf.h>
+#include <lib/frame.h>
+#include <assert.h>
+
+int
+main(void)
+{
+  struct sr_core_frame *frame = sr_core_frame_new();;
+  frame->address = 0xffffffff1;
+  frame->build_id = sr_strdup("aabbccddeeff1");
+  frame->build_id_offset = 2561;
+  frame->function_name = sr_strdup("test1");
+  frame->file_name = sr_strdup("executable1");
+  frame->fingerprint = sr_strdup("ab");
+  frame->next = 0xdeadbeef;
+
+  assert(sr_frame_next((struct sr_frame*)frame) == (void*)0xdeadbeef);
+
+  struct sr_strbuf *strbuf = sr_strbuf_new();
+  sr_frame_append_to_str((struct sr_frame*)frame, strbuf);
+  char *res = sr_strbuf_free_nobuf(strbuf);
+
+  assert(0 == strcmp(res, "test1 in executable1"));
+  free(res);
+
+  return 0;
+}
+]])

@@ -188,6 +188,7 @@ AT_TESTFUN([sr_java_frame_append_to_str],
 #include <lib/java_frame.h>
 #include <lib/strbuf.h>
 #include <lib/utils.h>
+#include <lib/frame.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -206,7 +207,12 @@ check(struct sr_java_frame *frame, const char *expected)
 
   assert(strcmp(expected, buf->buf) == 0);
 
+  struct sr_strbuf *buf2 = sr_strbuf_new();
+  sr_frame_append_to_str((struct sr_frame*)frame, buf2);
+  assert(strcmp(expected, buf2->buf) == 0);
+
   sr_strbuf_free(buf);
+  sr_strbuf_free(buf2);
 }
 
 int

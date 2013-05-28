@@ -143,7 +143,11 @@ check(const char *path,
 
   char *reason = sr_koops_stacktrace_get_reason(stacktrace);
   assert(reason);
+  char *reason2 = sr_stacktrace_get_reason(stacktrace);
+  assert(reason2);
+  assert(0 == strcmp(reason, reason2));
   free(reason);
+  free(reason2);
 
   int actual_taint_count =
     stacktrace->taint_module_proprietary +
@@ -643,6 +647,10 @@ main(void)
     "        ,   \"from_function_length\": 0\n"
     "        } ]\n"
     "}"));
+
+  char *json2 = sr_stacktrace_to_json(stacktrace);
+  assert(0 == strcmp(json, json2));
+  free(json2);
 
   sr_koops_stacktrace_free(stacktrace);
   free(json);

@@ -59,3 +59,45 @@ main(void)
   return 0;
 }
 ]])
+
+## --------------------------------- ##
+## sr_core_thread_abstract_functions ##
+## --------------------------------- ##
+
+AT_TESTFUN([sr_core_thread_abstract_functions],
+[[
+#include <lib/core_thread.h>
+#include <lib/core_frame.h>
+#include <lib/utils.h>
+#include <lib/thread.h>
+#include <assert.h>
+
+int
+main(void)
+{
+  struct sr_core_frame *frame1 = sr_core_frame_new();
+  frame1->address = 0xffffffff0;
+  frame1->build_id = sr_strdup("aabbccddeeff0");
+  frame1->build_id_offset = 2560;
+  frame1->function_name = sr_strdup("test0");
+  frame1->file_name = sr_strdup("executable0");
+
+  struct sr_core_frame *frame0 = sr_core_frame_new();;
+  frame0->address = 0xffffffff1;
+  frame0->build_id = sr_strdup("aabbccddeeff1");
+  frame0->build_id_offset = 2561;
+  frame0->function_name = sr_strdup("test1");
+  frame0->file_name = sr_strdup("executable1");
+  frame0->fingerprint = sr_strdup("ab");
+  frame0->next = frame1;
+
+  struct sr_core_thread *thread = sr_core_thread_new();
+  thread->frames = frame0;
+
+  assert(sr_thread_frames((struct sr_thread*) thread) == thread->frames);
+  assert(sr_thread_next((struct sr_thread*) thread) == thread->next);
+  assert(sr_thread_frame_count((struct sr_thread*) thread) == 2);
+
+  return 0;
+}
+]])

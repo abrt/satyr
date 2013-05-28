@@ -23,11 +23,13 @@ main(void)
   struct sr_java_thread *thread1 = create_real_main_thread_objects();
 
   assert(0 == sr_java_thread_cmp(thread0, thread1));
+  assert(0 == sr_thread_cmp(thread0, thread1));
 
   sr_java_frame_free_full(thread1->frames);
   thread1->frames = NULL;
 
   assert(0 != sr_java_thread_cmp(thread0, thread1));
+  assert(0 != sr_thread_cmp(thread0, thread1));
 
   sr_java_thread_free(thread1);
 
@@ -36,6 +38,7 @@ main(void)
   thread1->name = sr_strdup("worker");
 
   assert(0 != sr_java_thread_cmp(thread0, thread1));
+  assert(0 != sr_thread_cmp(thread0, thread1));
 
   sr_java_thread_free(thread0);
   sr_java_thread_free(thread1);

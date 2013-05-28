@@ -66,6 +66,10 @@ main(void)
   assert(reason);
   free(reason);
 
+  reason = sr_stacktrace_get_reason((struct sr_stacktrace*) stacktrace);
+  assert(reason);
+  free(reason);
+
   char *json = sr_core_stacktrace_to_json(stacktrace);
   puts(json);
   assert(0 == strcmp(json,
@@ -104,6 +108,9 @@ main(void)
             "        } ]\n"
             "}"));
 
+  char *json2 = sr_stacktrace_to_json((struct sr_stacktrace*) stacktrace);
+  assert(0 == strcmp(json, json2));
+
   sr_core_stacktrace_free(stacktrace);
   return 0;
 }
@@ -113,25 +120,19 @@ main(void)
 ## sr_core_stacktrace_from_json ##
 ## ---------------------------- ##
 
-AT_TESTFUN([sr_core_stacktrace_to_json],
+AT_TESTFUN([sr_core_stacktrace_from_json],
 [[
 #include <lib/core_stacktrace.h>
 #include <lib/core_thread.h>
 #include <lib/core_frame.h>
 #include <lib/utils.h>
+#include <lib/report_type.h>
 #include <assert.h>
 #include <signal.h>
 
-int
-main(void)
+void
+check(struct sr_core_stacktrace *stacktrace)
 {
-  char *error_message;
-  char *full_input = sr_file_to_string("../../json_files/core-01", &error_message);
-  assert(full_input);
-
-  struct sr_core_stacktrace *stacktrace = sr_core_stacktrace_from_json_text(full_input,
-     &error_message);
-
   assert(stacktrace);
   assert(stacktrace->signal == SIGABRT);
   assert(stacktrace->executable);
@@ -172,6 +173,24 @@ main(void)
   assert(0 == strcmp(f->function_name, "__libc_start_main"));
   assert(0 == strcmp(f->file_name, "/usr/lib64/libc-2.15.so"));
   assert(0 == strcmp(f->fingerprint, "5ff4a3d3743fdde711c49033d1e01784477e57fb"));
+}
+
+int
+main(void)
+{
+  char *error_message;
+  char *full_input = sr_file_to_string("../../json_files/core-01", &error_message);
+  assert(full_input);
+
+  struct sr_core_stacktrace *stacktrace = sr_core_stacktrace_from_json_text(full_input,
+     &error_message);
+  check(stacktrace);
+  sr_core_stacktrace_free(stacktrace);
+
+  stacktrace = (struct sr_core_stacktrace*) sr_stacktrace_parse(SR_REPORT_CORE,
+     full_input, &error_message);
+  check(stacktrace);
+  sr_stacktrace_free((struct sr_stacktrace*) stacktrace);
 
   return 0;
 }

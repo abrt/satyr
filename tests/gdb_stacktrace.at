@@ -86,6 +86,11 @@ check(const char *path, const char *first_thread_function_name)
   struct sr_gdb_thread *crash_thread = sr_gdb_stacktrace_find_crash_thread(stacktrace);
   assert(crash_thread);
   assert(0 == strcmp(crash_thread->frames->function_name, first_thread_function_name));
+
+  struct sr_gdb_thread *crash_thread2 = sr_stacktrace_find_crash_thread(stacktrace);
+  assert(crash_thread2);
+  assert(crash_thread == crash_thread2);
+
   sr_gdb_stacktrace_free(stacktrace);
   free(full_input);
 }
