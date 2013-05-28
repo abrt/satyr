@@ -33,6 +33,9 @@ pkginclude_HEADERS = \
 	strbuf.h \
 	unstrip.h \
 	utils.h \
+	stacktrace.h \
+	thread.h \
+	frame.h \
 	report_type.h
 
 lib_LTLIBRARIES = libsatyr.la
@@ -73,7 +76,10 @@ libsatyr_la_SOURCES = \
 	sha1.c \
 	strbuf.c \
 	unstrip.c \
-	utils.c
+	utils.c \
+	stacktrace.c \
+	thread.c \
+	frame.c
 
 libsatyr_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE $(GLIB_CFLAGS)
 libsatyr_la_LDFLAGS = -version-info 1:0:0 $(GLIB_LIBS)
