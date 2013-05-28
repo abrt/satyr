@@ -46,6 +46,7 @@ sr_gdb_frame_init(struct sr_gdb_frame *frame)
     frame->address = -1;
     frame->library_name = NULL;
     frame->next = NULL;
+    frame->type = SR_REPORT_GDB;
 }
 
 void

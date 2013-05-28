@@ -30,6 +30,7 @@
 extern "C" {
 #endif
 
+#include "report_type.h"
 #include <stdbool.h>
 #include <inttypes.h>
 
@@ -37,6 +38,8 @@ struct sr_location;
 
 struct sr_koops_stacktrace
 {
+    enum sr_report_type type;
+
     /**
      * @brief Version of the kernel.
      */

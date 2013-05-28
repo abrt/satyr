@@ -42,6 +42,7 @@ sr_core_frame_init(struct sr_core_frame *frame)
     frame->fingerprint = NULL;
     frame->fingerprint_hashed = false;
     frame->next = NULL;
+    frame->type = SR_REPORT_CORE;
 }
 
 void

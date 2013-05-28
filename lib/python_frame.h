@@ -30,6 +30,7 @@
 extern "C" {
 #endif
 
+#include "report_type.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -38,6 +39,8 @@ struct sr_strbuf;
 
 struct sr_python_frame
 {
+    enum sr_report_type type;
+
     bool special_file;
 
     char *file_name;

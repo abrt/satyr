@@ -29,6 +29,7 @@
 extern "C" {
 #endif
 
+#include "report_type.h"
 #include <stdbool.h>
 #include <inttypes.h>
 
@@ -42,6 +43,8 @@ struct sr_json_value;
  */
 struct sr_core_thread
 {
+    enum sr_report_type type;
+
     /** Thread id. */
     int64_t id;
 

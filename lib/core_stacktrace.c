@@ -53,6 +53,7 @@ sr_core_stacktrace_init(struct sr_core_stacktrace *stacktrace)
     stacktrace->executable = NULL;
     stacktrace->crash_thread = NULL;
     stacktrace->threads = NULL;
+    stacktrace->type = SR_REPORT_CORE;
 }
 
 void

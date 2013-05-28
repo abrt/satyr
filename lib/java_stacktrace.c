@@ -41,6 +41,7 @@ void
 sr_java_stacktrace_init(struct sr_java_stacktrace *stacktrace)
 {
     memset(stacktrace, 0, sizeof(*stacktrace));
+    stacktrace->type = SR_REPORT_JAVA;
 }
 
 void

@@ -30,6 +30,7 @@
 extern "C" {
 #endif
 
+#include "report_type.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -40,6 +41,8 @@ struct sr_strbuf;
  */
 struct sr_koops_frame
 {
+    enum sr_report_type type;
+
     /**
      * Address of the function in memory.  It is set to 0 when the
      * address is not available.  In such a case, function_name is

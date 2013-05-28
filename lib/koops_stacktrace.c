@@ -40,6 +40,7 @@ void
 sr_koops_stacktrace_init(struct sr_koops_stacktrace *stacktrace)
 {
     memset(stacktrace, 0, sizeof(struct sr_koops_stacktrace));
+    stacktrace->type = SR_REPORT_KERNELOOPS;
 }
 
 void

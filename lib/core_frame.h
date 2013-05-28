@@ -29,6 +29,7 @@
 extern "C" {
 #endif
 
+#include "report_type.h"
 #include <inttypes.h>
 #include <stdbool.h>
 
@@ -41,6 +42,8 @@ struct sr_json_value;
  */
 struct sr_core_frame
 {
+    enum sr_report_type type;
+
     /** Address of the machine code in memory.  This is useful only
      * when build_id is not present for some reason.  For example,
      * this might be a null dereference (address is 0) or calling a

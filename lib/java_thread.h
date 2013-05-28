@@ -30,6 +30,7 @@
 extern "C" {
 #endif
 
+#include "report_type.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -44,6 +45,8 @@ struct sr_location;
  */
 struct sr_java_thread
 {
+    enum sr_report_type type;
+
     /**
      * Thread name. Can be NULL
      */

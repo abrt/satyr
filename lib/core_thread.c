@@ -37,6 +37,7 @@ sr_core_thread_init(struct sr_core_thread *thread)
 {
     thread->frames = NULL;
     thread->next = NULL;
+    thread->type = SR_REPORT_CORE;
 }
 
 void

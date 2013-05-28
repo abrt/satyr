@@ -30,6 +30,7 @@
 extern "C" {
 #endif
 
+#include "report_type.h"
 #include <stdbool.h>
 
 struct sr_gdb_thread;
@@ -47,6 +48,8 @@ struct sr_location;
  */
 struct sr_gdb_stacktrace
 {
+    enum sr_report_type type;
+
     struct sr_gdb_thread *threads;
 
     /**

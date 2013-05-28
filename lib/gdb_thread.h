@@ -29,6 +29,7 @@
 extern "C" {
 #endif
 
+#include "report_type.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -44,6 +45,8 @@ struct sr_gdb_sharedlib;
  */
 struct sr_gdb_thread
 {
+    enum sr_report_type type;
+
     uint32_t number;
 
     /**

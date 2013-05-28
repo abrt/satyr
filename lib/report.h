@@ -24,17 +24,9 @@
 extern "C" {
 #endif
 
+#include "report_type.h"
 #include <inttypes.h>
 #include <stdbool.h>
-
-enum sr_report_type
-{
-    SR_REPORT_INVALID = 0,
-    SR_REPORT_CORE,
-    SR_REPORT_PYTHON,
-    SR_REPORT_KERNELOOPS,
-    SR_REPORT_JAVA
-};
 
 struct sr_report
 {

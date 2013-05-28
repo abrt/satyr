@@ -32,7 +32,8 @@ pkginclude_HEADERS = \
 	sha1.h \
 	strbuf.h \
 	unstrip.h \
-	utils.h
+	utils.h \
+	report_type.h
 
 lib_LTLIBRARIES = libsatyr.la
 libsatyr_la_SOURCES = \

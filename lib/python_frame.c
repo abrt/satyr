@@ -39,6 +39,7 @@ void
 sr_python_frame_init(struct sr_python_frame *frame)
 {
     memset(frame, 0, sizeof(struct sr_python_frame));
+    frame->type = SR_REPORT_PYTHON;
 }
 
 void

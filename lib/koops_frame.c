@@ -40,6 +40,7 @@ void
 sr_koops_frame_init(struct sr_koops_frame *frame)
 {
     memset(frame, 0, sizeof(struct sr_koops_frame));
+    frame->type = SR_REPORT_KERNELOOPS;
 }
 
 void

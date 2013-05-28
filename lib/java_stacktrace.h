@@ -33,10 +33,13 @@ extern "C" {
 struct sr_java_thread;
 struct sr_location;
 
+#include "report_type.h"
 #include <stdint.h>
 
 struct sr_java_stacktrace
 {
+    enum sr_report_type type;
+
     /**
      * Threads of stack trace. Always non-NULL.
      */

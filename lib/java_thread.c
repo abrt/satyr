@@ -43,6 +43,7 @@ sr_java_thread_init(struct sr_java_thread *thread)
     thread->name = NULL;
     thread->frames = NULL;
     thread->next = NULL;
+    thread->type = SR_REPORT_JAVA;
 }
 
 void

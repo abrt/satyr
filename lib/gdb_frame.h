@@ -29,6 +29,7 @@
 extern "C" {
 #endif
 
+#include "report_type.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -43,6 +44,8 @@ struct sr_location;
  */
 struct sr_gdb_frame
 {
+    enum sr_report_type type;
+
     /**
      * A function name or NULL. If it's NULL, signal_handler_called is
      * true.

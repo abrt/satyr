@@ -23,6 +23,7 @@
 #include "utils.h"
 #include "json.h"
 #include "sha1.h"
+#include "report_type.h"
 #include "strbuf.h"
 #include <stdio.h>
 #include <string.h>
@@ -42,6 +43,7 @@ void
 sr_python_stacktrace_init(struct sr_python_stacktrace *stacktrace)
 {
     memset(stacktrace, 0, sizeof(struct sr_python_stacktrace));
+    stacktrace->type = SR_REPORT_PYTHON;
 }
 
 void

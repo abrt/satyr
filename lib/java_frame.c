@@ -54,6 +54,7 @@ void
 sr_java_frame_init(struct sr_java_frame *frame)
 {
     memset(frame, 0, sizeof(*frame));
+    frame->type = SR_REPORT_JAVA;
 }
 
 void

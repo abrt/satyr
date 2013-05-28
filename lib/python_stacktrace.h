@@ -30,6 +30,7 @@
 extern "C" {
 #endif
 
+#include "report_type.h"
 #include <stdint.h>
 
 struct sr_python_frame;
@@ -37,6 +38,8 @@ struct sr_location;
 
 struct sr_python_stacktrace
 {
+    enum sr_report_type type;
+
     /* Exception class name. */
     char *exception_name;
 

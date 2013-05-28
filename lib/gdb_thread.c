@@ -42,6 +42,7 @@ sr_gdb_thread_init(struct sr_gdb_thread *thread)
     thread->number = -1;
     thread->frames = NULL;
     thread->next = NULL;
+    thread->type = SR_REPORT_GDB;
 }
 
 void

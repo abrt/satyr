@@ -44,6 +44,7 @@ sr_gdb_stacktrace_init(struct sr_gdb_stacktrace *stacktrace)
     stacktrace->threads = NULL;
     stacktrace->crash = NULL;
     stacktrace->libs = NULL;
+    stacktrace->type = SR_REPORT_GDB;
 }
 
 void
