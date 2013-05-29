@@ -64,6 +64,9 @@ sr_gdb_frame_free(struct sr_gdb_frame *frame)
 struct sr_gdb_frame *
 sr_gdb_frame_dup(struct sr_gdb_frame *frame, bool siblings)
 {
+    if (!frame)
+        return NULL;
+
     struct sr_gdb_frame *result = sr_gdb_frame_new();
     memcpy(result, frame, sizeof(struct sr_gdb_frame));
 
