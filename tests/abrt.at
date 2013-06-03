@@ -48,6 +48,26 @@ main(void)
     sr_abrt_parse_dso_list(dso_list);
 
   assert(packages);
+
+  struct sr_rpm_package *p = packages;
+  assert(0 == strcmp(p->name, "bzip2-libs"));
+  assert(0 == strcmp(p->version, "1.0.5"));
+  assert(0 == strcmp(p->release, "7.el6_0"));
+  assert(0 == strcmp(p->architecture, "x86_64"));
+  assert(0 == p->epoch);
+  assert(p->install_time == 1342032228);
+
+  /* last package */
+  while(p->next)
+    p = p->next;
+
+  assert(0 == strcmp(p->name, "glibc"));
+  assert(0 == strcmp(p->version, "2.12"));
+  assert(0 == strcmp(p->release, "1.80.el6_3.5"));
+  assert(0 == strcmp(p->architecture, "x86_64"));
+  assert(0 == p->epoch);
+  assert(p->install_time == 1346116822);
+
   sr_rpm_package_free(packages, true);
   return 0;
 }

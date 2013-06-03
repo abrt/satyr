@@ -157,11 +157,13 @@ sr_abrt_parse_dso_list(const char *text)
             break;
         }
 
-        pos = strrchr(pos, ' ');
+        char *line = sr_strndup(pos, eol - pos);
+        pos = strrchr(line, ' ');
         if (!pos)
         {
             pos = eol;
             sr_rpm_package_free(dso_package, true);
+            free(line);
             continue;
         }
 
@@ -170,6 +172,7 @@ sr_abrt_parse_dso_list(const char *text)
         // Parse the package install time.
         int len = sr_parse_uint64((const char**)&pos,
                                   &dso_package->install_time);
+        free(line);
 
         if (len <= 0)
         {
