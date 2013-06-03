@@ -395,6 +395,17 @@ unwind_thread(struct UCD_info *ui,
                 entry->function_name = sr_strdup(funcname);
         }
 
+        if (!entry->function_name)
+        {
+            size_t funcname_len = 512;
+            char *funcname = sr_malloc(funcname_len);
+
+            if (unw_get_proc_name(&c, funcname, funcname_len, NULL) == 0)
+                entry->function_name = funcname;
+            else
+                free(funcname);
+        }
+
         trace = sr_core_frame_append(trace, entry);
         /*
         printf("%s 0x%llx %s %s -\n",
