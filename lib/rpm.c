@@ -260,9 +260,11 @@ sr_rpm_package_uniq(struct sr_rpm_package *packages)
 
             loop = merged;
         }
-
-        prev = loop;
-        loop = loop->next;
+        else
+        {
+            prev = loop;
+            loop = loop->next;
+        }
     }
 
     return packages;

@@ -183,3 +183,50 @@ main(void)
   return 0;
 }
 ]])
+
+## -------------------- ##
+## sr_rpm_package_uniq3 ##
+## -------------------- ##
+AT_TESTFUN([sr_rpm_package_uniq3],
+[[
+#include <lib/rpm.h>
+#include <lib/utils.h>
+#include <assert.h>
+#include <stdint.h>
+
+int
+main(void)
+{
+  struct sr_rpm_package *p1 = sr_rpm_package_new();
+  struct sr_rpm_package *p2 = sr_rpm_package_new();
+  struct sr_rpm_package *p3 = sr_rpm_package_new();
+
+  p1->name = sr_strdup("pango");
+  p1->version = sr_strdup("1.32.3");
+  p1->release = sr_strdup("1.fc18");
+  p1->architecture = sr_strdup("x86_64");
+  p2->install_time = 1363628422;
+  p1->next = p2;
+
+  p2->name = sr_strdup("pango");
+  p2->version = sr_strdup("1.32.3");
+  p2->release = sr_strdup("1.fc18");
+  p2->architecture = sr_strdup("x86_64");
+  p2->install_time = 1363628422;
+  p2->next = p3;
+
+  p3->name = sr_strdup("pango");
+  p3->version = sr_strdup("1.32.3");
+  p3->release = sr_strdup("1.fc18");
+  p3->architecture = sr_strdup("x86_64");
+  p3->install_time = 1363628422;
+
+  struct sr_rpm_package *packages = p1;
+  packages = sr_rpm_package_uniq(packages);
+
+  assert(packages);
+  assert(!packages->next);
+
+  return 0;
+}
+]])
