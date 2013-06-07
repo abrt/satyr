@@ -38,6 +38,7 @@ struct sr_py_koops_stacktrace
 {
     PyObject_HEAD
     PyObject *frames;
+    PyObject *taint_flags;
     struct sr_koops_stacktrace *stacktrace;
 };
 
@@ -55,6 +56,8 @@ PyObject *sr_py_koops_stacktrace_str(PyObject *self);
 /* getters & setters */
 PyObject *sr_py_koops_stacktrace_get_modules(PyObject *self, void *data);
 int sr_py_koops_stacktrace_set_modules(PyObject *self, PyObject *rhs, void *data);
+PyObject *sr_py_koops_stacktrace_get_taint_flags(PyObject *self, void *data);
+int sr_py_koops_stacktrace_set_taint_flags(PyObject *self, PyObject *rhs, void *data);
 
 /* methods */
 PyObject *sr_py_koops_stacktrace_dup(PyObject *self, PyObject *args);

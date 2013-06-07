@@ -41,6 +41,20 @@ class TestKerneloops(BindingsTestCase):
         #self.assertEqual(len(self.koops.modules), 2)
         self.assertRaises(NotImplementedError, self.koops.__delattr__, 'modules')
 
+    def test_correct_taint_flags(self):
+        for val in self.koops.taint_flags.values():
+            self.assertFalse(val);
+        path = '../kerneloopses/rhbz-827868-modified'
+        if not os.path.isfile(path):
+            path = '../' + path
+        with file(path) as f:
+            contents = f.read()
+        tainted_koops = satyr.Kerneloops(contents)
+
+        true_flags = { f for (f, v) in tainted_koops.taint_flags.items() if v == True}
+        self.assertEqual(true_flags,
+            set(['module_proprietary', 'page_release', 'died_recently', 'module_out_of_tree']))
+
     def test_dup(self):
         dup = self.koops.dup()
         self.assertNotEqual(id(dup.frames), id(self.koops.frames))

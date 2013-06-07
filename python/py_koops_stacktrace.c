@@ -1,5 +1,6 @@
 #include "py_koops_frame.h"
 #include "py_koops_stacktrace.h"
+#include "py_common.h"
 #include "lib/strbuf.h"
 #include "lib/koops_frame.h"
 #include "lib/koops_stacktrace.h"
@@ -25,6 +26,8 @@
                         "specified, the result includes only that much topmost frames.\n"
 
 #define b_frames_doc "A list containing frames"
+#define b_taint_flags_doc "Dictionary of kernel taint flags. Keys are the flag names,\n" \
+                          "values are booleans indicating whether the flag is set."
 #define b_modules_doc "Modules loaded at the time of the event (list of strings)"
 
 
@@ -49,6 +52,7 @@ static PyGetSetDef
 koops_stacktrace_getset[] =
 {
     { (char*)"modules", sr_py_koops_stacktrace_get_modules, sr_py_koops_stacktrace_set_modules, (char*)b_modules_doc, NULL },
+    { (char*)"taint_flags", sr_py_koops_stacktrace_get_taint_flags, sr_py_koops_stacktrace_set_taint_flags, (char*)b_taint_flags_doc, NULL },
     { NULL },
 };
 
@@ -166,6 +170,30 @@ int
 sr_py_koops_stacktrace_set_modules(PyObject *self, PyObject *rhs, void *data)
 {
     PyErr_SetString(PyExc_NotImplementedError, "Setting module list is not implemented.");
+    return -1;
+}
+
+PyObject *
+sr_py_koops_stacktrace_get_taint_flags(PyObject *self, void *data)
+{
+    struct sr_koops_stacktrace *st = ((struct sr_py_koops_stacktrace*)self)->stacktrace;
+    PyObject *flags = PyDict_New();
+
+    struct sr_taint_flag *f;
+    for (f = sr_flags; f->letter; f++)
+    {
+        PyObject *val = MEMB_T(bool, st, f->member_offset) ? Py_True : Py_False;
+        if (PyDict_SetItemString(flags, f->name, val) == -1)
+            return NULL;
+    }
+
+    return flags;
+}
+
+int
+sr_py_koops_stacktrace_set_taint_flags(PyObject *self, PyObject *rhs, void *data)
+{
+    PyErr_SetString(PyExc_NotImplementedError, "Setting taint flags is not implemented.");
     return -1;
 }
 
