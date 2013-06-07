@@ -26,6 +26,31 @@
 #include <string.h>
 #include <stddef.h>
 
+/* http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/kernel/panic.c?id=HEAD */
+
+#define FLAG_OFFSET(flag) offsetof(struct sr_koops_stacktrace, taint_ ## flag)
+#define FLAG(letter, name)  { letter, FLAG_OFFSET(name), #name }
+
+struct sr_taint_flag sr_flags[] = {
+    FLAG('P', module_proprietary),
+    FLAG('F', forced_module),
+    FLAG('S', smp_unsafe),
+    FLAG('R', forced_removal),
+    FLAG('M', mce),
+    FLAG('B', page_release),
+    FLAG('U', userspace),
+    FLAG('D', died_recently),
+    FLAG('A', acpi_overridden),
+    FLAG('W', warning),
+    FLAG('C', staging_driver),
+    FLAG('I', firmware_workaround),
+    FLAG('O', module_out_of_tree),
+    { '\0', 0, NULL} /* sentinel */
+};
+
+#undef FLAG
+#undef FLAG_OFFSET
+
 struct sr_koops_stacktrace *
 sr_koops_stacktrace_new()
 {
@@ -103,32 +128,6 @@ sr_koops_stacktrace_remove_frame(struct sr_koops_stacktrace *stacktrace,
 
 }
 
-struct taint_flag {
-    char letter;
-    size_t member_offset;
-};
-
-/* http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/kernel/panic.c?id=HEAD */
-
-#define FLAG_OFFSET(flag) offsetof(struct sr_koops_stacktrace, taint_ ## flag)
-static struct taint_flag flags[] = {
-    { 'P', FLAG_OFFSET(module_proprietary)  },
-    { 'F', FLAG_OFFSET(forced_module)       },
-    { 'S', FLAG_OFFSET(smp_unsafe)          },
-    { 'R', FLAG_OFFSET(forced_removal)      },
-    { 'M', FLAG_OFFSET(mce)                 },
-    { 'B', FLAG_OFFSET(page_release)        },
-    { 'U', FLAG_OFFSET(userspace)           },
-    { 'D', FLAG_OFFSET(died_recently)       },
-    { 'A', FLAG_OFFSET(acpi_overridden)     },
-    { 'W', FLAG_OFFSET(warning)             },
-    { 'C', FLAG_OFFSET(staging_driver)      },
-    { 'I', FLAG_OFFSET(firmware_workaround) },
-    { 'O', FLAG_OFFSET(module_out_of_tree)  },
-    { '\0', 0 /* sentinel */                }
-};
-#undef FLAG_OFFSET
-
 /* Based on function kernel_tainted_short from abrt/src/lib/kernel.c */
 static bool
 parse_taint_flags(const char *input, struct sr_koops_stacktrace *stacktrace)
@@ -145,8 +144,8 @@ parse_taint_flags(const char *input, struct sr_koops_stacktrace *stacktrace)
         if (tainted[0] >= 'A' && tainted[0] <= 'Z')
         {
             /* set the appropriate flag */
-            struct taint_flag *f;
-            for (f = flags; f->letter; f++)
+            struct sr_taint_flag *f;
+            for (f = sr_flags; f->letter; f++)
             {
                 if (tainted[0] == f->letter)
                 {
@@ -373,25 +372,15 @@ taint_flags_to_json(struct sr_koops_stacktrace *stacktrace)
 {
     struct sr_strbuf *strbuf = sr_strbuf_new();
 
-#define FLAG_APPEND(flag)                                   \
-    if (stacktrace->taint_ ## flag)                         \
-        sr_strbuf_append_strf(strbuf, ", \"" #flag "\"\n"); \
-
-    FLAG_APPEND(module_proprietary)
-    FLAG_APPEND(forced_module)
-    FLAG_APPEND(forced_removal)
-    FLAG_APPEND(smp_unsafe)
-    FLAG_APPEND(mce)
-    FLAG_APPEND(page_release)
-    FLAG_APPEND(userspace)
-    FLAG_APPEND(died_recently)
-    FLAG_APPEND(acpi_overridden)
-    FLAG_APPEND(warning)
-    FLAG_APPEND(staging_driver)
-    FLAG_APPEND(firmware_workaround)
-    FLAG_APPEND(module_out_of_tree)
-
-#undef FLAG_APPEND
+    struct sr_taint_flag *f;
+    for (f = sr_flags; f->letter; f++)
+    {
+        bool val = *(bool *)((void *)stacktrace + f->member_offset);
+        if (val == true)
+        {
+            sr_strbuf_append_strf(strbuf, ", \"%s\"\n", f->name);
+        }
+    }
 
     if (strbuf->len == 0)
         return sr_strdup("[]");
