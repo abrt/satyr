@@ -7,8 +7,8 @@ AT_BANNER([GDB stacktraces])
 ## ------------------------------------------- ##
 AT_TESTFUN([sr_gdb_stacktrace_remove_threads_except_one],
 [[
-#include <lib/gdb_stacktrace.h>
-#include <lib/gdb_thread.h>
+#include "gdb/stacktrace.h"
+#include "gdb/thread.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -61,11 +61,11 @@ main(void)
 ## ----------------------------------- ##
 AT_TESTFUN([sr_gdb_stacktrace_find_crash_thread],
 [
-#include <lib/gdb_stacktrace.h>
-#include <lib/gdb_thread.h>
-#include <lib/gdb_frame.h>
-#include <lib/location.h>
-#include <lib/utils.h>
+#include "gdb/stacktrace.h"
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "location.h"
+#include "utils.h"
 #include <assert.h>
 #include <string.h>
 
@@ -111,11 +111,11 @@ main(void)
 ## ----------------------------------- ##
 AT_TESTFUN([sr_gdb_stacktrace_limit_frame_depth],
 [[
-#include <lib/gdb_stacktrace.h>
-#include <lib/gdb_thread.h>
-#include <lib/location.h>
-#include <lib/utils.h>
-#include <lib/thread.h>
+#include "gdb/stacktrace.h"
+#include "gdb/thread.h"
+#include "location.h"
+#include "utils.h"
+#include "thread.h"
 #include <assert.h>
 
 int
@@ -151,10 +151,10 @@ main(void)
 ## --------------------------------- ##
 AT_TESTFUN([sr_gdb_stacktrace_quality_complex],
 [[
-#include <lib/gdb_stacktrace.h>
-#include <lib/gdb_thread.h>
-#include <lib/location.h>
-#include <lib/utils.h>
+#include "gdb/stacktrace.h"
+#include "gdb/thread.h"
+#include "location.h"
+#include "utils.h"
 #include <assert.h>
 
 int
@@ -180,11 +180,11 @@ main(void)
 ## --------------------------------- ##
 AT_TESTFUN([sr_gdb_stacktrace_get_crash_frame],
 [[
-#include <lib/gdb_stacktrace.h>
-#include <lib/gdb_thread.h>
-#include <lib/gdb_frame.h>
-#include <lib/location.h>
-#include <lib/utils.h>
+#include "gdb/stacktrace.h"
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "location.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdio.h>
 

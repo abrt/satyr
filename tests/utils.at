@@ -8,7 +8,7 @@ AT_BANNER([Utils])
 
 AT_TESTFUN([sr_strcmp0],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -28,7 +28,7 @@ int main(void)
 
 AT_TESTFUN([sr_strchr_location],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -64,7 +64,7 @@ int main(void)
 
 AT_TESTFUN([sr_strstr_location],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -104,7 +104,7 @@ int main(void)
 
 AT_TESTFUN([sr_strspn_location],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -137,7 +137,7 @@ int main(void)
 
 AT_TESTFUN([sr_skip_char],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -154,7 +154,7 @@ int main(void)
 
 AT_TESTFUN([sr_skip_char_limited],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -172,7 +172,7 @@ int main(void)
 
 AT_TESTFUN([sr_parse_char_limited],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -209,7 +209,7 @@ int main(void)
 
 AT_TESTFUN([sr_skip_char_sequence],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -227,7 +227,7 @@ int main(void)
 
 AT_TESTFUN([sr_skip_char_span],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -249,7 +249,7 @@ int main(void)
 
 AT_TESTFUN([sr_skip_char_span_location],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -283,7 +283,7 @@ int main(void)
 
 AT_TESTFUN([sr_parse_char_span],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -307,7 +307,7 @@ int main(void)
 
 AT_TESTFUN([sr_parse_char_cspan],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -331,7 +331,7 @@ int main(void)
 
 AT_TESTFUN([sr_skip_string],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -351,7 +351,7 @@ int main(void)
 
 AT_TESTFUN([sr_parse_string],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -371,7 +371,7 @@ int main(void)
 
 AT_TESTFUN([sr_skip_uint],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -388,7 +388,7 @@ int main(void)
 
 AT_TESTFUN([sr_parse_uint32],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 #include <stdint.h>
 int main(void)
@@ -408,7 +408,7 @@ int main(void)
 
 AT_TESTFUN([sr_skip_hexadecimal_0xuint],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 int main(void)
 {
@@ -425,7 +425,7 @@ int main(void)
 
 AT_TESTFUN([sr_parse_hexadecimal_0xuint64],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 #include <stdint.h>
 int main(void)
@@ -449,7 +449,7 @@ int main(void)
 
 AT_TESTFUN([sr_indent],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 #include <stdint.h>
 int main(void)
@@ -467,7 +467,7 @@ int main(void)
 
 AT_TESTFUN([sr_struniq],
 [[
-#include <lib/utils.h>
+#include "utils.h"
 #include <assert.h>
 void do_check(char **in, size_t inlen, char **out, size_t outlen)
 {
@@ -508,8 +508,8 @@ int main(void)
 
 AT_TESTFUN([sr_sha1_hash],
 [[
-#include <lib/sha1.h>
-#include <lib/utils.h>
+#include "sha1.h"
+#include "utils.h"
 #include <assert.h>
 #include <string.h>
 

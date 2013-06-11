@@ -18,11 +18,11 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "normalize.h"
-#include "gdb_frame.h"
-#include "gdb_thread.h"
-#include "gdb_stacktrace.h"
-#include "koops_frame.h"
-#include "koops_stacktrace.h"
+#include "gdb/frame.h"
+#include "gdb/thread.h"
+#include "gdb/stacktrace.h"
+#include "koops/frame.h"
+#include "koops/stacktrace.h"
 #include "utils.h"
 #include <string.h>
 #include <assert.h>

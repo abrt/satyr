@@ -1,11 +1,11 @@
 #include "py_common.h"
 #include "py_java_thread.h"
 #include "py_java_frame.h"
-#include "lib/strbuf.h"
-#include "lib/java_thread.h"
-#include "lib/java_frame.h"
-#include "lib/location.h"
-#include "lib/utils.h"
+#include "strbuf.h"
+#include "java/thread.h"
+#include "java/frame.h"
+#include "location.h"
+#include "utils.h"
 
 #define thread_doc "satyr.JavaThread - class representing a thread in a stacktrace\n" \
                    "Usage:\n" \

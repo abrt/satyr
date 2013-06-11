@@ -1,12 +1,12 @@
 #include "py_java_stacktrace.h"
 #include "py_java_thread.h"
 #include "py_java_frame.h"
-#include "lib/strbuf.h"
-#include "lib/java_stacktrace.h"
-#include "lib/java_thread.h"
-#include "lib/location.h"
-#include "lib/normalize.h"
-#include "lib/stacktrace.h"
+#include "strbuf.h"
+#include "java/stacktrace.h"
+#include "java/thread.h"
+#include "location.h"
+#include "normalize.h"
+#include "stacktrace.h"
 
 #define stacktrace_doc "satyr.JavaStacktrace - class representing a java stacktrace\n" \
                       "Usage:\n" \

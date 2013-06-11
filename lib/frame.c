@@ -23,11 +23,11 @@
 #include "strbuf.h"
 #include "frame.h"
 
-#include "gdb_frame.h"
-#include "core_frame.h"
-#include "python_frame.h"
-#include "koops_frame.h"
-#include "java_frame.h"
+#include "gdb/frame.h"
+#include "core/frame.h"
+#include "python/frame.h"
+#include "koops/frame.h"
+#include "java/frame.h"
 
 #include <stdio.h>
 

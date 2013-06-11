@@ -18,9 +18,9 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "java_stacktrace.h"
-#include "java_thread.h"
-#include "java_frame.h"
+#include "java/stacktrace.h"
+#include "java/thread.h"
+#include "java/frame.h"
 #include "utils.h"
 #include "strbuf.h"
 #include <stdio.h>

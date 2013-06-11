@@ -7,8 +7,8 @@ AT_BANNER([Operating system])
 ## -------------------------------------------- ##
 AT_TESTFUN([sr_operating_system_parse_etc_system_release],
 [[
-#include <lib/operating_system.h>
-#include <lib/utils.h>
+#include "operating_system.h"
+#include "utils.h"
 #include <stdio.h>
 #include <assert.h>
 

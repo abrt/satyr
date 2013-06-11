@@ -7,8 +7,8 @@ AT_BANNER([ABRT])
 ## ---------------------- ##
 AT_TESTFUN([sr_abrt_parse_dso_list],
 [[
-#include <lib/abrt.h>
-#include <lib/rpm.h>
+#include "abrt.h"
+#include "rpm.h"
 #include <assert.h>
 
 int

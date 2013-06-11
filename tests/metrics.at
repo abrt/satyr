@@ -2,13 +2,13 @@ AT_BANNER([Metrics])
 
 m4_define([UTILS],
 [#include <stdarg.h>
-#include <lib/gdb_thread.h>
-#include <lib/gdb_frame.h>
-#include <lib/utils.h>
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "utils.h"
 #include <stdlib.h>
 #include <assert.h>
-#include <lib/metrics.h>
-#include <lib/normalize.h>
+#include "metrics.h"
+#include "normalize.h"
 
 static struct sr_gdb_thread *
 create_thread(int count, ...)

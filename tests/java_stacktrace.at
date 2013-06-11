@@ -7,14 +7,14 @@ AT_BANNER([Java stacktrace])
 ## ---------------------- ##
 AT_TESTFUN([sr_java_stacktrace_cmp],
 [[
-#include <lib/java_stacktrace.h>
-#include <lib/java_thread.h>
-#include <lib/java_frame.h>
+#include "java/stacktrace.h"
+#include "java/thread.h"
+#include "java/frame.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <tests/java_testcases.c>
+#include "java_testcases.c"
 
 int
 main(void)
@@ -44,15 +44,15 @@ main(void)
 ## ---------------------- ##
 AT_TESTFUN([sr_java_stacktrace_dup],
 [[
-#include <lib/java_stacktrace.h>
-#include <lib/java_thread.h>
-#include <lib/java_frame.h>
-#include <lib/location.h>
+#include "java/stacktrace.h"
+#include "java/thread.h"
+#include "java/frame.h"
+#include "location.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <tests/java_testcases.c>
+#include "java_testcases.c"
 
 int
 main(void)
@@ -76,15 +76,15 @@ main(void)
 ## ------------------------ ##
 AT_TESTFUN([sr_java_stacktrace_parse],
 [[
-#include <lib/java_stacktrace.h>
-#include <lib/java_thread.h>
-#include <lib/java_frame.h>
-#include <lib/location.h>
+#include "java/stacktrace.h"
+#include "java/thread.h"
+#include "java/frame.h"
+#include "location.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <tests/java_testcases.c>
+#include "java_testcases.c"
 
 static void
 check(char *input,
@@ -129,9 +129,9 @@ main(void)
 ## ------------------------- ##
 AT_TESTFUN([sr_java_stacktrace_reason],
 [[
-#include <lib/java_stacktrace.h>
-#include <lib/location.h>
-#include <lib/utils.h>
+#include "java/stacktrace.h"
+#include "location.h"
+#include "utils.h"
 #include <assert.h>
 
 int main(void)

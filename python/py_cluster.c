@@ -1,7 +1,7 @@
 #include "py_cluster.h"
 #include "py_metrics.h"
-#include "lib/strbuf.h"
-#include "lib/cluster.h"
+#include "strbuf.h"
+#include "cluster.h"
 
 #define dendrogram_doc "satyr.Dendrogram - a dendrogram created by clustering algorithm\n"
 

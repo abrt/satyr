@@ -18,16 +18,16 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "distance.h"
-#include "gdb_thread.h"
-#include "gdb_frame.h"
-#include "core_thread.h"
-#include "core_frame.h"
-#include "java_thread.h"
-#include "java_frame.h"
-#include "koops_stacktrace.h"
-#include "koops_frame.h"
-#include "python_stacktrace.h"
-#include "python_frame.h"
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "core/thread.h"
+#include "core/frame.h"
+#include "java/thread.h"
+#include "java/frame.h"
+#include "koops/stacktrace.h"
+#include "koops/frame.h"
+#include "python/stacktrace.h"
+#include "python/frame.h"
 #include "thread.h"
 #include <stdlib.h>
 

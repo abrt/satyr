@@ -1,46 +1,11 @@
-pkginclude_HEADERS = \
-	abrt.h \
-	callgraph.h \
-	cluster.h \
-	core_fingerprint.h \
-	core_frame.h \
-	core_stacktrace.h \
-	core_thread.h \
-	core_unwind.h \
-	deb.h \
-	disasm.h \
-	distance.h \
-	elves.h \
-	gdb_frame.h \
-	gdb_sharedlib.h \
-	gdb_stacktrace.h \
-	gdb_thread.h \
-	java_frame.h \
-	java_thread.h \
-	java_stacktrace.h \
-	json.h \
-	koops_frame.h \
-	koops_stacktrace.h \
-	location.h \
-	metrics.h \
-	normalize.h \
-	operating_system.h \
-	python_frame.h \
-	python_stacktrace.h \
-	report.h \
-	rpm.h \
-	sha1.h \
-	strbuf.h \
-	unstrip.h \
-	utils.h \
-	stacktrace.h \
-	thread.h \
-	frame.h \
-	report_type.h
-
 lib_LTLIBRARIES = libsatyr.la
 libsatyr_la_SOURCES = \
-	$(pkginclude_HEADERS) \
+	callgraph.h \
+	cluster.h \
+	disasm.h \
+	elves.h \
+	sha1.h \
+	unstrip.h \
 	abrt.c \
 	callgraph.c \
 	cluster.c \
@@ -81,7 +46,7 @@ libsatyr_la_SOURCES = \
 	thread.c \
 	frame.c
 
-libsatyr_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE $(GLIB_CFLAGS)
+libsatyr_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE -I$(top_srcdir)/include $(GLIB_CFLAGS)
 libsatyr_la_LDFLAGS = -version-info 1:0:0 $(GLIB_LIBS)
 
 if HAVE_LIBOPCODES

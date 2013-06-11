@@ -1,10 +1,10 @@
 #include "py_common.h"
 #include "py_gdb_thread.h"
 #include "py_gdb_frame.h"
-#include "lib/strbuf.h"
-#include "lib/gdb_thread.h"
-#include "lib/gdb_frame.h"
-#include "lib/location.h"
+#include "strbuf.h"
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "location.h"
 
 #define thread_doc "satyr.GdbThread - class representing a thread in a stacktrace\n" \
                    "Usage:\n" \

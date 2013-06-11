@@ -8,8 +8,8 @@ AT_BANNER([Core frames])
 
 AT_TESTFUN([sr_core_frame_dup],
 [[
-#include <lib/core_frame.h>
-#include <lib/utils.h>
+#include "core/frame.h"
+#include "utils.h"
 #include <assert.h>
 
 int
@@ -64,8 +64,8 @@ main(void)
 
 AT_TESTFUN([sr_core_frame_to_json],
 [[
-#include <lib/core_frame.h>
-#include <lib/utils.h>
+#include "core/frame.h"
+#include "utils.h"
 #include <assert.h>
 
 int
@@ -100,9 +100,9 @@ main(void)
 
 AT_TESTFUN([sr_core_frame_abstract_functions],
 [[
-#include <lib/core_frame.h>
-#include <lib/strbuf.h>
-#include <lib/frame.h>
+#include "core/frame.h"
+#include "strbuf.h"
+#include "frame.h"
 #include <assert.h>
 
 int

@@ -38,7 +38,8 @@ _satyr_la_SOURCES = \
 
 _satyr_la_CPPFLAGS = \
     -DLOCALSTATEDIR='"$(localstatedir)"' \
-    -I.. \
+    -I../include \
+    -I../lib \
     $(PYTHON_CFLAGS) \
     -D_GNU_SOURCE \
     -Wall -Wwrite-strings \

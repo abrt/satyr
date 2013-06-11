@@ -4,11 +4,11 @@ AT_BANNER([Normalization])
 
 m4_define([UTILS],
 [#include <stdarg.h>
-#include <lib/gdb_thread.h>
-#include <lib/gdb_frame.h>
-#include <lib/utils.h>
-#include <lib/metrics.h>
-#include <lib/normalize.h>
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "utils.h"
+#include "metrics.h"
+#include "normalize.h"
 #include <stdlib.h>
 #include <assert.h>
 
@@ -47,10 +47,10 @@ create_thread(int count, ...)
 # frame if they have address 0x0000 and function ??.
 AT_TESTFUN([sr_normalize_gdb_thread_removes_zeroes],
 [[
-#include <lib/normalize.h>
-#include <lib/gdb_frame.h>
-#include <lib/gdb_thread.h>
-#include <lib/utils.h>
+#include "normalize.h"
+#include "gdb/frame.h"
+#include "gdb/thread.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdlib.h>
 

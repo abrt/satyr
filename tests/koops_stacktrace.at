@@ -7,7 +7,7 @@ AT_BANNER([Kerneloops stacktraces])
 ## --------------------------------- ##
 AT_TESTFUN([sr_koops_stacktrace_parse_modules],
 [[
-#include <lib/koops_stacktrace.h>
+#include "koops/stacktrace.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -96,11 +96,11 @@ main(void)
 
 AT_TESTFUN([sr_koops_stacktrace_parse],
 [[
-#include <lib/koops_stacktrace.h>
-#include <lib/koops_frame.h>
-#include <lib/location.h>
-#include <lib/utils.h>
-#include <lib/thread.h>
+#include "koops/stacktrace.h"
+#include "koops/frame.h"
+#include "location.h"
+#include "utils.h"
+#include "thread.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -234,9 +234,9 @@ main(void)
 ## --------------------------- ##
 AT_TESTFUN([sr_koops_stacktrace_to_json],
 [[
-#include <lib/koops_stacktrace.h>
-#include <lib/location.h>
-#include <lib/utils.h>
+#include "koops/stacktrace.h"
+#include "location.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdlib.h>
 

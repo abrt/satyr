@@ -17,10 +17,10 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "gdb_stacktrace.h"
-#include "gdb_thread.h"
-#include "gdb_frame.h"
-#include "gdb_sharedlib.h"
+#include "gdb/stacktrace.h"
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "gdb/sharedlib.h"
 #include "utils.h"
 #include "strbuf.h"
 #include "location.h"

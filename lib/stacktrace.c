@@ -26,11 +26,11 @@
 #include "stacktrace.h"
 #include "thread.h"
 
-#include "gdb_stacktrace.h"
-#include "core_stacktrace.h"
-#include "python_stacktrace.h"
-#include "koops_stacktrace.h"
-#include "java_stacktrace.h"
+#include "gdb/stacktrace.h"
+#include "core/stacktrace.h"
+#include "python/stacktrace.h"
+#include "koops/stacktrace.h"
+#include "java/stacktrace.h"
 
 #include <stdlib.h>
 

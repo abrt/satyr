@@ -8,7 +8,7 @@ AT_BANNER([Kerneloops frames])
 
 AT_TESTFUN([sr_koops_skip_timestamp],
 [[
-#include <lib/koops_frame.h>
+#include "koops/frame.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -44,7 +44,7 @@ main(void)
 
 AT_TESTFUN([sr_koops_parse_address],
 [[
-#include <lib/koops_frame.h>
+#include "koops/frame.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -81,7 +81,7 @@ main(void)
 
 AT_TESTFUN([sr_koops_parse_module_name],
 [[
-#include <lib/koops_frame.h>
+#include "koops/frame.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -123,7 +123,7 @@ main(void)
 
 AT_TESTFUN([sr_koops_parse_function],
 [[
-#include <lib/koops_frame.h>
+#include "koops/frame.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -177,7 +177,7 @@ main(void)
 
 AT_TESTFUN([sr_koops_frame_parse],
 [[
-#include <lib/koops_frame.h>
+#include "koops/frame.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -249,7 +249,7 @@ main(void)
 
 AT_TESTFUN([sr_koops_frame_to_json],
 [[
-#include <lib/koops_frame.h>
+#include "koops/frame.h"
 #include <assert.h>
 #include <stdlib.h>
 

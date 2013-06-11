@@ -2,12 +2,12 @@
 #include "py_gdb_thread.h"
 #include "py_gdb_frame.h"
 #include "py_gdb_sharedlib.h"
-#include "lib/strbuf.h"
-#include "lib/gdb_stacktrace.h"
-#include "lib/gdb_thread.h"
-#include "lib/gdb_sharedlib.h"
-#include "lib/location.h"
-#include "lib/normalize.h"
+#include "strbuf.h"
+#include "gdb/stacktrace.h"
+#include "gdb/thread.h"
+#include "gdb/sharedlib.h"
+#include "location.h"
+#include "normalize.h"
 
 #define stacktrace_doc "satyr.GdbStacktrace - class representing a stacktrace\n" \
                       "Usage:\n" \

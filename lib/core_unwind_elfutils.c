@@ -18,9 +18,9 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "utils.h"
-#include "core_frame.h"
-#include "core_thread.h"
-#include "core_stacktrace.h"
+#include "core/frame.h"
+#include "core/thread.h"
+#include "core/stacktrace.h"
 #include "config.h"
 
 #if (defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF && defined HAVE_LIBDW && defined HAVE_ELFUTILS_LIBDWFL_H && defined HAVE_DWFL_FRAME_STATE_CORE)

@@ -17,7 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "python_frame.h"
+#include "python/frame.h"
 #include "utils.h"
 #include "location.h"
 #include "strbuf.h"

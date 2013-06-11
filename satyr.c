@@ -17,18 +17,18 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "lib/gdb_stacktrace.h"
-#include "lib/gdb_thread.h"
-#include "lib/gdb_frame.h"
-#include "lib/utils.h"
-#include "lib/location.h"
-#include "lib/strbuf.h"
-#include "lib/metrics.h"
-#include "lib/cluster.h"
-#include "lib/normalize.h"
-#include "lib/report.h"
-#include "lib/abrt.h"
-#include "lib/config.h"
+#include "gdb/stacktrace.h"
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "utils.h"
+#include "location.h"
+#include "strbuf.h"
+#include "metrics.h"
+#include "cluster.h"
+#include "normalize.h"
+#include "report.h"
+#include "abrt.h"
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

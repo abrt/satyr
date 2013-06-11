@@ -1,13 +1,13 @@
 #include "py_common.h"
 #include "py_python_frame.h"
 #include "py_python_stacktrace.h"
-#include "lib/utils.h"
-#include "lib/strbuf.h"
-#include "lib/python_frame.h"
-#include "lib/python_stacktrace.h"
-#include "lib/location.h"
-#include "lib/normalize.h"
-#include "lib/stacktrace.h"
+#include "utils.h"
+#include "strbuf.h"
+#include "python/frame.h"
+#include "python/stacktrace.h"
+#include "location.h"
+#include "normalize.h"
+#include "stacktrace.h"
 
 #define stacktrace_doc "satyr.PythonStacktrace - class representing a python stacktrace\n" \
                       "Usage:\n" \

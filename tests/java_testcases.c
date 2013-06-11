@@ -1,7 +1,7 @@
-#include "lib/java_stacktrace.h"
-#include "lib/java_thread.h"
-#include "lib/java_frame.h"
-#include "lib/utils.h"
+#include "java/stacktrace.h"
+#include "java/thread.h"
+#include "java/frame.h"
+#include "utils.h"
 
 #define XYZ_JTC_UT_STACKTRACE "java.lang.RuntimeException: java.lang.NullPointerException: null\n"\
 "\tat SimpleTest.throwNullPointerException(SimpleTest.java:36)\n"\

@@ -17,10 +17,10 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "core_fingerprint.h"
-#include "core_stacktrace.h"
-#include "core_frame.h"
-#include "core_thread.h"
+#include "core/fingerprint.h"
+#include "core/stacktrace.h"
+#include "core/frame.h"
+#include "core/thread.h"
 #include "utils.h"
 #include "strbuf.h"
 #include "elves.h"

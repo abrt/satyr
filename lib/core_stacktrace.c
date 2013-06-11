@@ -17,12 +17,12 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "core_stacktrace.h"
-#include "core_frame.h"
-#include "core_thread.h"
-#include "gdb_stacktrace.h"
-#include "gdb_frame.h"
-#include "gdb_thread.h"
+#include "core/stacktrace.h"
+#include "core/frame.h"
+#include "core/thread.h"
+#include "gdb/stacktrace.h"
+#include "gdb/frame.h"
+#include "gdb/thread.h"
 #include "location.h"
 #include "normalize.h"
 #include "utils.h"

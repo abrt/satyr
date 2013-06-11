@@ -7,7 +7,7 @@ AT_BANNER([String buffer])
 ## --------------------- ##
 AT_TESTFUN([sr_strbuf_append_char],
 [[
-#include <lib/strbuf.h>
+#include "strbuf.h"
 #include <assert.h>
 
 int
@@ -36,7 +36,7 @@ main(void)
 ## -------------------- ##
 AT_TESTFUN([sr_strbuf_append_str],
 [[
-#include <lib/strbuf.h>
+#include "strbuf.h"
 #include <assert.h>
 
 /* Test appending strings of certain length. 'len' must be < 50. */

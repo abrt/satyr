@@ -7,14 +7,14 @@ AT_BANNER([Java threads])
 ## ------------------ ##
 AT_TESTFUN([sr_java_thread_cmp],
 [[
-#include <lib/java_thread.h>
-#include <lib/java_frame.h>
-#include <lib/location.h>
+#include "java/thread.h"
+#include "java/frame.h"
+#include "location.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <tests/java_testcases.c>
+#include "java_testcases.c"
 
 int
 main(void)
@@ -52,14 +52,14 @@ main(void)
 ## ------------------ ##
 AT_TESTFUN([sr_java_thread_dup],
 [[
-#include <lib/java_thread.h>
-#include <lib/java_frame.h>
-#include <lib/location.h>
+#include "java/thread.h"
+#include "java/frame.h"
+#include "location.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <tests/java_testcases.c>
+#include "java_testcases.c"
 
 int
 main(void)
@@ -81,13 +81,13 @@ main(void)
 ## --------------------------- ##
 AT_TESTFUN([sr_java_thread_remove_frame],
 [[
-#include <lib/java_frame.h>
-#include <lib/location.h>
-#include <lib/utils.h>
+#include "java/frame.h"
+#include "location.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdlib.h>
 
-#include <tests/java_testcases.c>
+#include "java_testcases.c"
 
 int
 main(void)
@@ -126,13 +126,13 @@ main(void)
 ## ---------------------------------- ##
 AT_TESTFUN([sr_java_thread_remove_frames_above],
 [[
-#include <lib/java_frame.h>
-#include <lib/location.h>
-#include <lib/utils.h>
+#include "java/frame.h"
+#include "location.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdlib.h>
 
-#include <tests/java_testcases.c>
+#include "java_testcases.c"
 
 int
 main(void)
@@ -172,13 +172,13 @@ main(void)
 ## ------------------------------------ ##
 AT_TESTFUN([sr_java_thread_remove_frames_below_n],
 [[
-#include <lib/java_frame.h>
-#include <lib/location.h>
-#include <lib/utils.h>
+#include "java/frame.h"
+#include "location.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdlib.h>
 
-#include <tests/java_testcases.c>
+#include "java_testcases.c"
 
 int
 main(void)
@@ -220,15 +220,15 @@ main(void)
 ## -------------------- ##
 AT_TESTFUN([sr_java_thread_parse],
 [[
-#include <lib/java_thread.h>
-#include <lib/java_frame.h>
-#include <lib/location.h>
-#include <lib/strbuf.h>
+#include "java/thread.h"
+#include "java/frame.h"
+#include "location.h"
+#include "strbuf.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <tests/java_testcases.c>
+#include "java_testcases.c"
 
 static void
 check(const char *input,

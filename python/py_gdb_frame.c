@@ -22,10 +22,10 @@
 
 #include <inttypes.h>
 
-#include "lib/location.h"
-#include "lib/strbuf.h"
-#include "lib/utils.h"
-#include "lib/gdb_frame.h"
+#include "location.h"
+#include "strbuf.h"
+#include "utils.h"
+#include "gdb/frame.h"
 
 #define frame_doc "satyr.GdbFrame - class representing a frame in a thread\n" \
                   "Usage:\n" \

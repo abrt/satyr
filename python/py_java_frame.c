@@ -19,10 +19,10 @@
 */
 #include "py_common.h"
 #include "py_java_frame.h"
-#include "lib/location.h"
-#include "lib/strbuf.h"
-#include "lib/utils.h"
-#include "lib/java_frame.h"
+#include "location.h"
+#include "strbuf.h"
+#include "utils.h"
+#include "java/frame.h"
 
 #define frame_doc "satyr.JavaFrame - class representing a java frame\n" \
                   "Usage:\n" \

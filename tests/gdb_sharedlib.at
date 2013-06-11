@@ -7,8 +7,8 @@ AT_BANNER([GDB sharedlib])
 ## ---------------------- ##
 AT_TESTFUN([sr_gdb_sharedlib_parse],
 [[
-#include <lib/gdb_sharedlib.h>
-#include <lib/utils.h>
+#include "gdb/sharedlib.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -34,8 +34,8 @@ main(void)
 ## ---------------------- ##
 AT_TESTFUN([sr_gdb_sharedlib_count],
 [[
-#include <lib/gdb_sharedlib.h>
-#include <lib/utils.h>
+#include "gdb/sharedlib.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -58,7 +58,7 @@ main(void)
 ## ----------------------- ##
 AT_TESTFUN([sr_gdb_sharedlib_append],
 [[
-#include <lib/gdb_sharedlib.h>
+#include "gdb/sharedlib.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -84,8 +84,8 @@ main(void)
 ## ----------------------------- ##
 AT_TESTFUN([sr_gdb_sharedlib_find_address],
 [[
-#include <lib/gdb_sharedlib.h>
-#include <lib/utils.h>
+#include "gdb/sharedlib.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdlib.h>
 

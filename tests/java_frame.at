@@ -7,8 +7,8 @@ AT_BANNER([Java frames])
 ## ----------------- ##
 AT_TESTFUN([sr_java_frame_cmp],
 [[
-#include <lib/java_frame.h>
-#include <lib/utils.h>
+#include "java/frame.h"
+#include "utils.h"
 #include <assert.h>
 
 int
@@ -86,8 +86,8 @@ main(void)
 ## ----------------- ##
 AT_TESTFUN([sr_java_frame_dup],
 [[
-#include <lib/java_frame.h>
-#include <lib/utils.h>
+#include "java/frame.h"
+#include "utils.h"
 #include <assert.h>
 
 int
@@ -185,10 +185,10 @@ main(void)
 
 AT_TESTFUN([sr_java_frame_append_to_str],
 [[
-#include <lib/java_frame.h>
-#include <lib/strbuf.h>
-#include <lib/utils.h>
-#include <lib/frame.h>
+#include "java/frame.h"
+#include "strbuf.h"
+#include "utils.h"
+#include "frame.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -274,10 +274,10 @@ main(void)
 
 AT_TESTFUN([sr_java_frame_parse],
 [[
-#include <lib/java_frame.h>
-#include <lib/location.h>
-#include <lib/strbuf.h>
-#include <lib/utils.h>
+#include "java/frame.h"
+#include "location.h"
+#include "strbuf.h"
+#include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -496,16 +496,16 @@ main(void)
 
 AT_TESTFUN([sr_java_frame_parse_exception],
 [[
-#include <lib/java_frame.h>
-#include <lib/location.h>
-#include <lib/strbuf.h>
-#include <lib/utils.h>
+#include "java/frame.h"
+#include "location.h"
+#include "strbuf.h"
+#include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 
-#include <tests/java_testcases.c>
+#include "java_testcases.c"
 
 static void
 check(char *input,

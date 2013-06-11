@@ -22,10 +22,10 @@
 
 #include <inttypes.h>
 
-#include "lib/location.h"
-#include "lib/strbuf.h"
-#include "lib/utils.h"
-#include "lib/koops_frame.h"
+#include "location.h"
+#include "strbuf.h"
+#include "utils.h"
+#include "koops/frame.h"
 
 #define frame_doc "satyr.KerneloopsFrame - class representing a frame in a kerneloops\n" \
                   "Usage:\n" \

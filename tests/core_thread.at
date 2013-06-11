@@ -8,9 +8,9 @@ AT_BANNER([Core threads])
 
 AT_TESTFUN([sr_core_thread_to_json],
 [[
-#include <lib/core_thread.h>
-#include <lib/core_frame.h>
-#include <lib/utils.h>
+#include "core/thread.h"
+#include "core/frame.h"
+#include "utils.h"
 #include <assert.h>
 
 int
@@ -66,10 +66,10 @@ main(void)
 
 AT_TESTFUN([sr_core_thread_abstract_functions],
 [[
-#include <lib/core_thread.h>
-#include <lib/core_frame.h>
-#include <lib/utils.h>
-#include <lib/thread.h>
+#include "core/thread.h"
+#include "core/frame.h"
+#include "utils.h"
+#include "thread.h"
 #include <assert.h>
 
 int

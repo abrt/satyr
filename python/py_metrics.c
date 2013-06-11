@@ -1,7 +1,7 @@
 #include "py_metrics.h"
 #include "py_gdb_thread.h"
-#include "lib/strbuf.h"
-#include "lib/metrics.h"
+#include "strbuf.h"
+#include "metrics.h"
 
 #define distances_doc "satyr.Distances - class representing distances between objects\n" \
                       "Usage:\n" \

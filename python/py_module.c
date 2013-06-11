@@ -13,7 +13,7 @@
 #include "py_java_stacktrace.h"
 #include "py_metrics.h"
 
-#include "lib/gdb_sharedlib.h"
+#include "gdb/sharedlib.h"
 
 static PyMethodDef
 module_methods[]=

@@ -7,10 +7,10 @@ AT_BANNER([GDB threads])
 ## -------------------------- ##
 AT_TESTFUN([sr_gdb_thread_remove_frame],
 [[
-#include <lib/gdb_thread.h>
-#include <lib/gdb_frame.h>
-#include <lib/location.h>
-#include <lib/utils.h>
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "location.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -72,10 +72,10 @@ main(void)
 ## --------------------------------- ##
 AT_TESTFUN([sr_gdb_thread_remove_frames_above],
 [[
-#include <lib/gdb_thread.h>
-#include <lib/gdb_frame.h>
-#include <lib/location.h>
-#include <lib/utils.h>
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "location.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -138,10 +138,10 @@ main(void)
 ## ----------------------------------- ##
 AT_TESTFUN([sr_gdb_thread_remove_frames_below_n],
 [[
-#include <lib/gdb_thread.h>
-#include <lib/gdb_frame.h>
-#include <lib/location.h>
-#include <lib/utils.h>
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "location.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -205,9 +205,9 @@ main(void)
 ## ------------------- ##
 AT_TESTFUN([sr_gdb_thread_parse],
 [[
-#include <lib/gdb_thread.h>
-#include <lib/gdb_frame.h>
-#include <lib/location.h>
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "location.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -304,9 +304,9 @@ main(void)
 ## ----------------------------- ##
 AT_TESTFUN([sr_gdb_thread_parse-locations],
 [[
-#include <lib/gdb_thread.h>
-#include <lib/gdb_frame.h>
-#include <lib/location.h>
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "location.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -374,7 +374,7 @@ main(void)
 ## ---------------------- ##
 AT_TESTFUN([sr_gdb_thread_skip_lwp],
 [[
-#include <lib/gdb_thread.h>
+#include "gdb/thread.h"
 #include <assert.h>
 #include <stdlib.h>
 

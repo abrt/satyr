@@ -23,11 +23,11 @@
 #include "thread.h"
 #include "frame.h"
 
-#include "gdb_thread.h"
-#include "core_thread.h"
-#include "python_stacktrace.h"
-#include "koops_stacktrace.h"
-#include "java_thread.h"
+#include "gdb/thread.h"
+#include "core/thread.h"
+#include "python/stacktrace.h"
+#include "koops/stacktrace.h"
+#include "java/thread.h"
 
 #include <stdio.h>
 

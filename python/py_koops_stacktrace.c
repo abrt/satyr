@@ -1,12 +1,12 @@
 #include "py_koops_frame.h"
 #include "py_koops_stacktrace.h"
 #include "py_common.h"
-#include "lib/strbuf.h"
-#include "lib/koops_frame.h"
-#include "lib/koops_stacktrace.h"
-#include "lib/location.h"
-#include "lib/normalize.h"
-#include "lib/stacktrace.h"
+#include "strbuf.h"
+#include "koops/frame.h"
+#include "koops/stacktrace.h"
+#include "location.h"
+#include "normalize.h"
+#include "stacktrace.h"
 
 #define stacktrace_doc "satyr.Kerneloops - class representing a kerneloops stacktrace\n" \
                       "Usage:\n" \

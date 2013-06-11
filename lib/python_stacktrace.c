@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "python_stacktrace.h"
-#include "python_frame.h"
+#include "python/stacktrace.h"
+#include "python/frame.h"
 #include "location.h"
 #include "utils.h"
 #include "json.h"

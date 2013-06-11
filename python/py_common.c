@@ -20,7 +20,7 @@
 
 #include "py_common.h"
 
-#include "lib/utils.h"
+#include "utils.h"
 
 /*
  * Generic getters/setters that accept a struct getset_offsets as the data

@@ -1,11 +1,11 @@
-SUBDIRS = lib python tests
+SUBDIRS = lib python tests include
 
 # Automatic update of libtool.
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status libtool
 
 bin_PROGRAMS = satyr
-satyr_CFLAGS = -Wall
+satyr_CFLAGS = -Wall -Iinclude -Ilib
 satyr_SOURCES = satyr.c
 satyr_LDADD = lib/libsatyr.la
 

@@ -19,10 +19,10 @@
 */
 #include "py_common.h"
 #include "py_python_frame.h"
-#include "lib/location.h"
-#include "lib/strbuf.h"
-#include "lib/utils.h"
-#include "lib/python_frame.h"
+#include "location.h"
+#include "strbuf.h"
+#include "utils.h"
+#include "python/frame.h"
 
 #define frame_doc "satyr.PythonFrame - class representing a python frame\n" \
                   "Usage:\n" \

@@ -1,7 +1,7 @@
 #include "py_common.h"
 #include "py_gdb_sharedlib.h"
-#include "lib/gdb_sharedlib.h"
-#include "lib/utils.h"
+#include "gdb/sharedlib.h"
+#include "utils.h"
 
 #define sharedlib_doc "satyr.GdbSharedlib - class representing a shared library loaded at the moment of crash"
 

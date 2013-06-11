@@ -7,7 +7,7 @@ AT_BANNER([RPM])
 ## ------------------------- ##
 AT_TESTFUN([sr_rpm_package_parse_nvr],
 [[
-#include <lib/rpm.h>
+#include "rpm.h"
 #include <assert.h>
 
 int
@@ -32,7 +32,7 @@ main(void)
 ## --------------------------- ##
 AT_TESTFUN([sr_rpm_package_parse_nevra],
 [[
-#include <lib/rpm.h>
+#include "rpm.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -85,8 +85,8 @@ main(void)
 ## ------------------- ##
 AT_TESTFUN([sr_rpm_package_uniq],
 [[
-#include <lib/rpm.h>
-#include <lib/utils.h>
+#include "rpm.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -189,8 +189,8 @@ main(void)
 ## -------------------- ##
 AT_TESTFUN([sr_rpm_package_uniq3],
 [[
-#include <lib/rpm.h>
-#include <lib/utils.h>
+#include "rpm.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdint.h>
 
