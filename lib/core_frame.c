@@ -21,7 +21,21 @@
 #include "utils.h"
 #include "strbuf.h"
 #include "json.h"
+#include "generic_frame.h"
+#include "internal_utils.h"
 #include <string.h>
+
+/* Method table */
+
+DEFINE_NEXT_FUNC(core_next, struct sr_frame, struct sr_core_frame)
+
+struct frame_methods core_frame_methods =
+{
+    .append_to_str = (append_to_str_fn_t) sr_core_frame_append_to_str,
+    .next = (next_frame_fn_t) core_next,
+};
+
+/* Public functions */
 
 struct sr_core_frame *
 sr_core_frame_new()

@@ -46,17 +46,6 @@ extern "C" {
 
 #define __sr_printf(x, y) __attribute__((format(printf, (x), (y))))
 
-#define SR_DISPATCH(type, method) \
-    (assert((type > SR_REPORT_INVALID) && (type) < SR_REPORT_NUM && dtable[type].method), \
-    dtable[type].method)
-
-#define SR_NEXT_FUNC(name, abstract_t, concrete_t)       \
-    static abstract_t *                                  \
-    name(abstract_t *node)                               \
-    {                                                    \
-        return (abstract_t *)((concrete_t *)node)->next; \
-    }                                                    \
-
 /**
  * Debugging output to stdout while parsing.
  * Default value is false.

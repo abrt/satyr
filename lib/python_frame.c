@@ -22,8 +22,22 @@
 #include "location.h"
 #include "strbuf.h"
 #include "json.h"
+#include "generic_frame.h"
+#include "internal_utils.h"
 #include <string.h>
 #include <inttypes.h>
+
+/* Method table */
+
+DEFINE_NEXT_FUNC(python_next, struct sr_frame, struct sr_python_frame)
+
+struct frame_methods python_frame_methods =
+{
+    .append_to_str = (append_to_str_fn_t) sr_python_frame_append_to_str,
+    .next = (next_frame_fn_t) python_next,
+};
+
+/* Public functions */
 
 struct sr_python_frame *
 sr_python_frame_new()

@@ -23,6 +23,9 @@
 #include "json.h"
 #include "strbuf.h"
 #include "normalize.h"
+#include "generic_thread.h"
+#include "generic_stacktrace.h"
+#include "internal_utils.h"
 #include <string.h>
 #include <stddef.h>
 
@@ -50,6 +53,31 @@ struct sr_taint_flag sr_flags[] = {
 
 #undef FLAG
 #undef FLAG_OFFSET
+
+/* Method tables */
+
+DEFINE_THREAD_FUNC(koops_frames, struct sr_koops_stacktrace)
+
+struct thread_methods koops_thread_methods =
+{
+    .frames = (frames_fn_t) koops_frames,
+    .cmp = (cmp_fn_t) NULL,
+    .frame_count = (frame_count_fn_t) thread_frame_count,
+    .next = (next_thread_fn_t) thread_no_next_thread,
+};
+
+struct stacktrace_methods koops_stacktrace_methods =
+{
+    .parse = (parse_fn_t) stacktrace_parse_wrapper,
+    .parse_location = (parse_location_fn_t) sr_koops_stacktrace_parse,
+    .to_short_text = (to_short_text_fn_t) stacktrace_to_short_text,
+    .to_json = (to_json_fn_t) sr_koops_stacktrace_to_json,
+    .get_reason = (get_reason_fn_t) sr_koops_stacktrace_get_reason,
+    .find_crash_thread = (find_crash_thread_fn_t) stacktrace_one_thread_only,
+    .free = (free_fn_t) sr_koops_stacktrace_free,
+};
+
+/* Public functions */
 
 struct sr_koops_stacktrace *
 sr_koops_stacktrace_new()

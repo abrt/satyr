@@ -25,10 +25,35 @@
 #include "strbuf.h"
 #include "location.h"
 #include "normalize.h"
+#include "generic_stacktrace.h"
+#include "internal_utils.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+
+/* Method table */
+
+/* for not used/implemented methods */
+static char *
+gdb_return_null(struct sr_stacktrace *stacktrace)
+{
+    return NULL;
+}
+
+struct stacktrace_methods gdb_stacktrace_methods =
+{
+    .parse = (parse_fn_t) stacktrace_parse_wrapper,
+    .parse_location = (parse_location_fn_t) sr_gdb_stacktrace_parse,
+    .to_short_text = (to_short_text_fn_t) sr_gdb_stacktrace_to_short_text,
+    .to_json = (to_json_fn_t) gdb_return_null,
+    .get_reason = (get_reason_fn_t) gdb_return_null,
+    .find_crash_thread =
+        (find_crash_thread_fn_t) sr_gdb_stacktrace_find_crash_thread,
+    .free = (free_fn_t) sr_gdb_stacktrace_free,
+};
+
+/* Public functions */
 
 struct sr_gdb_stacktrace *
 sr_gdb_stacktrace_new()

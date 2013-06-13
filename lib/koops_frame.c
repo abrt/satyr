@@ -21,10 +21,24 @@
 #include "utils.h"
 #include "strbuf.h"
 #include "json.h"
+#include "generic_frame.h"
+#include "internal_utils.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+
+/* Method table */
+
+DEFINE_NEXT_FUNC(koops_next, struct sr_frame, struct sr_koops_frame)
+
+struct frame_methods koops_frame_methods =
+{
+    .append_to_str = (append_to_str_fn_t) sr_koops_frame_append_to_str,
+    .next = (next_frame_fn_t) koops_next,
+};
+
+/* Public functions */
 
 struct sr_koops_frame *
 sr_koops_frame_new()

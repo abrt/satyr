@@ -23,11 +23,25 @@
 #include "location.h"
 #include "utils.h"
 #include "json.h"
+#include "generic_frame.h"
+#include "internal_utils.h"
 #include <string.h>
 #include <inttypes.h>
 
 #define SR_JF_MARK_NATIVE_METHOD "Native Method"
 #define SR_JF_MARK_UNKNOWN_SOURCE "Unknown Source"
+
+/* Method table */
+
+DEFINE_NEXT_FUNC(java_next, struct sr_frame, struct sr_java_frame)
+
+struct frame_methods java_frame_methods =
+{
+    .append_to_str = (append_to_str_fn_t) sr_java_frame_append_to_str,
+    .next = (next_frame_fn_t) java_next,
+};
+
+/* Public functions */
 
 struct sr_java_frame *
 sr_java_frame_new()

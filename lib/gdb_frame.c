@@ -21,10 +21,24 @@
 #include "utils.h"
 #include "strbuf.h"
 #include "location.h"
+#include "generic_frame.h"
+#include "internal_utils.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+
+/* Method table */
+
+DEFINE_NEXT_FUNC(gdb_next, struct sr_frame, struct sr_gdb_frame)
+
+struct frame_methods gdb_frame_methods =
+{
+    .append_to_str = (append_to_str_fn_t) sr_gdb_frame_append_to_str,
+    .next = (next_frame_fn_t) gdb_next,
+};
+
+/* Public functions */
 
 struct sr_gdb_frame *
 sr_gdb_frame_new()

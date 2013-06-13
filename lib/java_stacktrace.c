@@ -23,9 +23,27 @@
 #include "java/frame.h"
 #include "utils.h"
 #include "strbuf.h"
+#include "generic_stacktrace.h"
+#include "internal_utils.h"
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+
+/* Method table */
+
+struct stacktrace_methods java_stacktrace_methods =
+{
+    .parse = (parse_fn_t) stacktrace_parse_wrapper,
+    .parse_location = (parse_location_fn_t) sr_java_stacktrace_parse,
+    .to_short_text = (to_short_text_fn_t) stacktrace_to_short_text,
+    .to_json = (to_json_fn_t) sr_java_stacktrace_to_json,
+    .get_reason = (get_reason_fn_t) sr_java_stacktrace_get_reason,
+    .find_crash_thread =
+        (find_crash_thread_fn_t) sr_java_find_crash_thread,
+    .free = (free_fn_t) sr_java_stacktrace_free,
+};
+
+/* Public functions */
 
 struct sr_java_stacktrace *
 sr_java_stacktrace_new()

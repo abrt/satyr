@@ -24,10 +24,26 @@
 #include "location.h"
 #include "utils.h"
 #include "strbuf.h"
-#include "thread.h"
+#include "generic_thread.h"
+#include "internal_utils.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* Method table */
+
+DEFINE_THREAD_FUNC(gdb_frames, struct sr_gdb_thread)
+DEFINE_NEXT_FUNC(gdb_next, struct sr_thread, struct sr_gdb_thread)
+
+struct thread_methods gdb_thread_methods =
+{
+    .frames = (frames_fn_t) gdb_frames,
+    .cmp = (cmp_fn_t) sr_gdb_thread_cmp,
+    .frame_count = (frame_count_fn_t) thread_frame_count,
+    .next = (next_thread_fn_t) gdb_next,
+};
+
+/* Public functions */
 
 struct sr_gdb_thread *
 sr_gdb_thread_new()

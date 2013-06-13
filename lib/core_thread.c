@@ -22,7 +22,24 @@
 #include "utils.h"
 #include "strbuf.h"
 #include "json.h"
+#include "generic_thread.h"
+#include "internal_utils.h"
 #include <string.h>
+
+/* Method table */
+
+DEFINE_THREAD_FUNC(core_frames, struct sr_core_thread)
+DEFINE_NEXT_FUNC(core_next, struct sr_thread, struct sr_core_thread)
+
+struct thread_methods core_thread_methods =
+{
+    .frames = (frames_fn_t) core_frames,
+    .cmp = (cmp_fn_t) sr_core_thread_cmp,
+    .frame_count = (frame_count_fn_t) thread_frame_count,
+    .next = (next_thread_fn_t) core_next,
+};
+
+/* Public functions */
 
 struct sr_core_thread *
 sr_core_thread_new()

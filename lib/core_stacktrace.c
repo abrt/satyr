@@ -29,12 +29,31 @@
 #include "strbuf.h"
 #include "unstrip.h"
 #include "json.h"
+#include "generic_stacktrace.h"
+#include "internal_utils.h"
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+
+/* Method table */
+
+struct stacktrace_methods core_stacktrace_methods =
+{
+    /* core parser returns error_message directly */
+    .parse = (parse_fn_t) sr_core_stacktrace_from_json_text,
+    .parse_location = (parse_location_fn_t) NULL,
+    .to_short_text = (to_short_text_fn_t) stacktrace_to_short_text,
+    .to_json = (to_json_fn_t) sr_core_stacktrace_to_json,
+    .get_reason = (get_reason_fn_t) sr_core_stacktrace_get_reason,
+    .find_crash_thread =
+        (find_crash_thread_fn_t) sr_core_stacktrace_find_crash_thread,
+    .free = (free_fn_t) sr_core_stacktrace_free,
+};
+
+/* Public functions */
 
 struct sr_core_stacktrace *
 sr_core_stacktrace_new()

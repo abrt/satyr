@@ -20,10 +20,17 @@ libsatyr_la_SOURCES = \
 	disasm.c \
 	distance.c \
 	elves.c \
+	generic_stacktrace.c \
+	generic_stacktrace.h \
+	generic_thread.c \
+	generic_thread.h \
+	generic_frame.c \
+	generic_frame.h \
 	gdb_stacktrace.c \
 	gdb_frame.c \
 	gdb_sharedlib.c \
 	gdb_thread.c \
+	internal_utils.h \
 	java_frame.c \
 	java_thread.c \
 	java_stacktrace.c \
@@ -41,10 +48,7 @@ libsatyr_la_SOURCES = \
 	sha1.c \
 	strbuf.c \
 	unstrip.c \
-	utils.c \
-	stacktrace.c \
-	thread.c \
-	frame.c
+	utils.c
 
 libsatyr_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE -I$(top_srcdir)/include $(GLIB_CFLAGS)
 libsatyr_la_LDFLAGS = -version-info 1:0:0 $(GLIB_LIBS)
