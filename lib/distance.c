@@ -178,8 +178,19 @@ distance_levenshtein(struct sr_thread *thread1,
 {
     assert(thread1->type == thread2->type);
 
-    int m = sr_thread_frame_count(thread1) + 1;
-    int n = sr_thread_frame_count(thread2) + 1;
+    int frame_count1 = sr_thread_frame_count(thread1);
+    int frame_count2 = sr_thread_frame_count(thread2);
+
+    int max_frame_count = frame_count2;
+    if (max_frame_count < frame_count1)
+        max_frame_count = frame_count1;
+
+    /* Avoid division by zero in case we get two empty threads */
+    if (max_frame_count == 0)
+        return 0.0;
+
+    int m = frame_count1 + 1;
+    int n = frame_count2 + 1;
 
     // store only two last rows and columns instead of whole 2D array
     int dist[m + n + 1], dist1[m + n + 1];
@@ -243,7 +254,7 @@ distance_levenshtein(struct sr_thread *thread1,
         curr_frame2 = sr_frame_next(curr_frame2);
     }
 
-    return dist[n];
+    return (float)dist[n] / max_frame_count;
 }
 
 float
