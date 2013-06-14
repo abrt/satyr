@@ -7,7 +7,6 @@ m4_define([UTILS],
 #include "gdb/thread.h"
 #include "gdb/frame.h"
 #include "utils.h"
-#include "metrics.h"
 #include "normalize.h"
 #include <stdlib.h>
 #include <assert.h>

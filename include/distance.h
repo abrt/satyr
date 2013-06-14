@@ -86,6 +86,100 @@ sr_distance(enum sr_distance_type distance_type,
             struct sr_thread *thread1,
             struct sr_thread *thread2);
 
+/**
+ * @brief A distance matrix of stack trace threads.
+ *
+ * The distances are stored in a m-by-n two-dimensional array, where
+ * only entries (i, j) where i < j are actually stored.
+ */
+struct sr_distances
+{
+    int m;
+    int n;
+    float *distances;
+};
+
+/**
+ * Creates and initializes a new distances structure.
+ * @param m
+ * Number of rows.
+ * @param n
+ * Number of columns.
+ * @returns
+ * It never returns NULL. The returned pointer must be released by
+ * calling the function sr_distances_free().
+ */
+struct sr_distances *
+sr_distances_new(int m, int n);
+
+/**
+ * Creates a duplicate of the distances structure.
+ * @param distances
+ * It must be non-NULL pointer. The structure is not modified by calling
+ * this function.
+ * @returns
+ * This function never returns NULL.
+ */
+struct sr_distances *
+sr_distances_dup(struct sr_distances *distances);
+
+/**
+ * Releases the memory held by the distances structure.
+ * @param distances
+ * If the distances is NULL, no operation is performed.
+ */
+void
+sr_distances_free(struct sr_distances *distances);
+
+/**
+ * Gets the entry (i, j) from the distance matrix.
+ * @param distances
+ * It must be non-NULL pointer.
+ * @param i
+ * Row in the matrix.
+ * @param j
+ * Column in the matrix.
+ * @returns
+ * For entries (i, i) zero distance is returned and values returned for
+ * entries (i, j) and (j, i) are the same.
+ */
+float
+sr_distances_get_distance(struct sr_distances *distances, int i, int j);
+
+/**
+ * Sets the entry (i, j) from the distance matrix.
+ * @param distances
+ * It must be non-NULL pointer.
+ * @param i
+ * Row in the matrix.
+ * @param j
+ * Column in the matrix.
+ * @param d
+ * Distance.
+ */
+void
+sr_distances_set_distance(struct sr_distances *distances,
+                          int i,
+                          int j,
+                          float d);
+
+/**
+ * Creates a distances structure by comparing threads.
+ * @param threads
+ * Array of threads. They are not modified by calling this function.
+ * @param m
+ * Compare first m threads from the array with other threads.
+ * @param n
+ * Number of threads in the passed array.
+ * @param dist_func
+ * Distance function which will be used to compare the threads. It's assumed to
+ * be symmetric and return zero distance for equal threads.
+ * @returns
+ * This function never returns NULL.
+ */
+struct sr_distances *
+sr_threads_compare(struct sr_thread **threads, int m, int n,
+                   enum sr_distance_type dist_type);
 #ifdef __cplusplus
 }
 #endif

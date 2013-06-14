@@ -20,8 +20,12 @@
 #include "distance.h"
 #include "thread.h"
 #include "frame.h"
+#include "normalize.h"
+#include "utils.h"
+#include "gdb/thread.h"
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
 float
 distance_jaro_winkler(struct sr_thread *thread1,
@@ -279,4 +283,160 @@ sr_distance(enum sr_distance_type distance_type,
     default:
         return 1.0f;
     }
+}
+
+static int
+get_distance_position(const struct sr_distances *distances, int i, int j)
+{
+    /* The array holds only matrix entries (i, j) where i < j,
+     * locate the position in the array. */
+    assert(i < j && i >= 0 && i < distances->m && j < distances->n);
+
+    int h = distances->n, l = distances->n - i;
+
+    return ((h * h - h) - (l * l - l)) / 2 + j - 1;
+}
+
+struct sr_distances *
+sr_distances_new(int m, int n)
+{
+    struct sr_distances *distances = sr_malloc(sizeof(struct sr_distances));
+
+    /* The number of rows has to be smaller than columns. */
+    if (m >= n)
+        m = n - 1;
+
+    assert(m > 0 && n > 1 && m < n);
+
+    distances->m = m;
+    distances->n = n;
+    distances->distances = sr_malloc(sizeof(*distances->distances) *
+                                      (get_distance_position(distances, m - 1, n - 1) + 1));
+
+    return distances;
+}
+
+struct sr_distances *
+sr_distances_dup(struct sr_distances *distances)
+{
+    struct sr_distances *dup_distances;
+
+    dup_distances = sr_distances_new(distances->m, distances->n);
+    memcpy(dup_distances->distances, distances->distances,
+            sizeof(*distances->distances) *
+            (get_distance_position(distances, distances->m - 1, distances->n - 1) + 1));
+
+    return dup_distances;
+}
+
+void
+sr_distances_free(struct sr_distances *distances)
+{
+    if (!distances)
+        return;
+
+    free(distances->distances);
+    free(distances);
+}
+
+float
+sr_distances_get_distance(struct sr_distances *distances, int i, int j)
+{
+    if (i == j)
+        return 0.0;
+
+    if (i > j)
+    {
+        int x;
+        x = j, j = i, i = x;
+    }
+
+    return distances->distances[get_distance_position(distances, i, j)];
+}
+
+void
+sr_distances_set_distance(struct sr_distances *distances,
+                          int i,
+                          int j,
+                          float d)
+{
+    if (i == j)
+        return;
+
+    if (i > j)
+    {
+        int x;
+        x = j, j = i, i = x;
+    }
+
+    distances->distances[get_distance_position(distances, i, j)] = d;
+}
+
+struct sr_distances *
+sr_threads_compare(struct sr_thread **threads,
+                   int m,
+                   int n,
+                   enum sr_distance_type dist_type)
+{
+    struct sr_distances *distances;
+    int i, j;
+    float dist;
+
+    distances = sr_distances_new(m, n);
+
+    if (n <= 0)
+        return distances;
+
+    /* Check that all threads are of the same type */
+    enum sr_report_type type, prev_type = threads[0]->type;
+    for (i = 0; i < n; i++)
+    {
+        type = threads[i]->type;
+        assert(prev_type == type);
+        prev_type = type;
+    }
+
+    for (i = 0; i < m; i++)
+    {
+        for (j = i + 1; j < n; j++)
+        {
+            /* XXX: GDB crashes have a special normalization step for
+             * clustering. If there's something similar for other types, we can
+             * generalize it -- meanwhile there's a separate case for GDB here
+             */
+            if (type == SR_REPORT_GDB)
+            {
+                struct sr_gdb_thread *thread1 = (struct sr_gdb_thread*)threads[i],
+                                     *thread2 = (struct sr_gdb_thread*)threads[j];
+                int ok = 0, all = 0;
+
+                sr_gdb_thread_quality_counts(thread1, &ok, &all);
+                sr_gdb_thread_quality_counts(thread2, &ok, &all);
+
+                if (ok != all)
+                {
+                    /* There are some unknown function names, try to pair them, but
+                     * the threads need to be copied first. */
+                    thread1 = sr_gdb_thread_dup(thread1, false);
+                    thread2 = sr_gdb_thread_dup(thread2, false);
+                    sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
+                }
+
+                dist = sr_distance(dist_type, (struct sr_thread*)thread1,
+                                   (struct sr_thread*)thread2);
+
+                if (ok != all)
+                {
+                    sr_gdb_thread_free(thread1);
+                    sr_gdb_thread_free(thread2);
+                }
+            }
+            else
+                dist = sr_distance(dist_type, threads[i], threads[j]);
+
+            distances->distances[get_distance_position(distances, i, j)] = dist;
+        }
+    }
+
+    return distances;
 }

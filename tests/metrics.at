@@ -7,7 +7,6 @@ m4_define([UTILS],
 #include "utils.h"
 #include <stdlib.h>
 #include <assert.h>
-#include "metrics.h"
 #include "normalize.h"
 #include "distance.h"
 
@@ -364,7 +363,7 @@ main()
   threads[[2]] = create_thread(3, "asd", "agd", "??");
   threads[[3]] = create_thread(3, "dg", "??", "??");
 
-  struct sr_distances *distances = sr_gdb_threads_compare(threads, 3, 4, sr_gdb_thread_jaccard_distance);
+  struct sr_distances *distances = sr_threads_compare(threads, 3, 4, SR_DISTANCE_JACCARD);
   assert(is_dist_equal(0.6, sr_distances_get_distance(distances, 0, 1)));
   assert(is_dist_equal(0.6, sr_distances_get_distance(distances, 0, 2)));
   assert(is_dist_equal(1.0, sr_distances_get_distance(distances, 0, 3)));

@@ -23,7 +23,6 @@
 #include "utils.h"
 #include "location.h"
 #include "strbuf.h"
-#include "metrics.h"
 #include "cluster.h"
 #include "normalize.h"
 #include "report.h"

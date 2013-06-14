@@ -1,7 +1,7 @@
 #include "py_metrics.h"
 #include "py_gdb_thread.h"
 #include "strbuf.h"
-#include "metrics.h"
+#include "distance.h"
 
 #define distances_doc "satyr.Distances - class representing distances between objects\n" \
                       "Usage:\n" \
@@ -103,7 +103,7 @@ sr_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
     if (PyArg_ParseTuple(args, "sO!i", &dist_name, &PyList_Type, &thread_list, &m))
     {
         n = PyList_Size(thread_list);
-        struct sr_gdb_thread *threads[n];
+        struct sr_thread *threads[n];
 
         for (i = 0; i < n; i++)
         {
@@ -119,7 +119,7 @@ sr_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
             {
                 return NULL;
             }
-            threads[i] = to->thread;
+            threads[i] = (struct sr_thread*)to->thread;
         }
         if (m < 1 || n < 2)
         {
@@ -127,19 +127,19 @@ sr_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
             return NULL;
         }
 
-        sr_dist_thread_type dist_func;
+        enum sr_distance_type dist_type;
 
         if (!strcmp(dist_name, "jaccard"))
-            dist_func = sr_gdb_thread_jaccard_distance;
+            dist_type = SR_DISTANCE_JACCARD;
         else if (!strcmp(dist_name, "levenshtein"))
-            dist_func = sr_gdb_thread_levenshtein_distance_f;
+            dist_type = SR_DISTANCE_LEVENSHTEIN;
         else
         {
             PyErr_SetString(PyExc_ValueError, "Unknown name of distance function");
             return NULL;
         }
 
-        o->distances = sr_gdb_threads_compare(threads, m, n, dist_func);
+        o->distances = sr_threads_compare(threads, m, n, dist_type);
     }
     else if (PyArg_ParseTuple(args, "ii", &m, &n))
     {

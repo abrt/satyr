@@ -38,7 +38,6 @@ libsatyr_la_SOURCES = \
 	koops_frame.c \
 	koops_stacktrace.c \
 	location.c \
-	metrics.c \
 	normalize.c \
 	operating_system.c \
 	python_frame.c \

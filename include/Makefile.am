@@ -5,7 +5,6 @@ mainheaders_HEADERS = \
 	distance.h \
 	json.h \
 	location.h \
-	metrics.h \
 	normalize.h \
 	operating_system.h \
 	report.h \

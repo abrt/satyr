@@ -19,7 +19,7 @@
 */
 
 #include "cluster.h"
-#include "metrics.h"
+#include "distance.h"
 #include "utils.h"
 #include <stdlib.h>
 #include <string.h>

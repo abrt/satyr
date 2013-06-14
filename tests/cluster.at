@@ -2,7 +2,7 @@ AT_BANNER([Clustering])
 
 AT_TESTFUN([sr_distances_cluster_objects],
 [
-#include "metrics.h"
+#include "distance.h"
 #include "cluster.h"
 #include <assert.h>
 #include <stdio.h>
@@ -71,7 +71,6 @@ main()
 
 AT_TESTFUN([sr_dendrogram_cut],
 [
-#include "metrics.h"
 #include "cluster.h"
 #include <assert.h>
 #include <stdio.h>
