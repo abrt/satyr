@@ -51,12 +51,15 @@ struct sr_frame *
 sr_thread_frames(struct sr_thread *thread);
 
 /**
- * Compares two threads. Returns 0 on equality. Threads of distinct type are
- * always unequal.
+ * Returns the number of frames in the thread.
  */
 int
 sr_thread_frame_count(struct sr_thread *thread);
 
+/**
+ * Compares two threads. Returns 0 on equality. Threads of distinct type are
+ * always unequal.
+ */
 int
 sr_thread_cmp(struct sr_thread *t1, struct sr_thread *t2);
 
