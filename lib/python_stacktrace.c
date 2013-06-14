@@ -39,7 +39,7 @@ DEFINE_THREAD_FUNC(python_frames, struct sr_python_stacktrace)
 struct thread_methods python_thread_methods =
 {
     .frames = (frames_fn_t) python_frames,
-    .cmp = (cmp_fn_t) NULL,
+    .cmp = (thread_cmp_fn_t) NULL,
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) thread_no_next_thread,
 };

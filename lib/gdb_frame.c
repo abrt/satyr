@@ -32,10 +32,18 @@
 
 DEFINE_NEXT_FUNC(gdb_next, struct sr_frame, struct sr_gdb_frame)
 
+static int
+frame_cmp_without_number(struct sr_gdb_frame *frame1, struct sr_gdb_frame *frame2)
+{
+    return sr_gdb_frame_cmp(frame1, frame2, false);
+}
+
 struct frame_methods gdb_frame_methods =
 {
     .append_to_str = (append_to_str_fn_t) sr_gdb_frame_append_to_str,
     .next = (next_frame_fn_t) gdb_next,
+    .cmp = (frame_cmp_fn_t) frame_cmp_without_number,
+    .cmp_distance = (frame_cmp_fn_t) sr_gdb_frame_cmp_distance,
 };
 
 /* Public functions */

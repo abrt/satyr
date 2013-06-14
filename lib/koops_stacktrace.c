@@ -61,7 +61,7 @@ DEFINE_THREAD_FUNC(koops_frames, struct sr_koops_stacktrace)
 struct thread_methods koops_thread_methods =
 {
     .frames = (frames_fn_t) koops_frames,
-    .cmp = (cmp_fn_t) NULL,
+    .cmp = (thread_cmp_fn_t) NULL,
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) thread_no_next_thread,
 };

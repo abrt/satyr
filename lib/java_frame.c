@@ -39,6 +39,8 @@ struct frame_methods java_frame_methods =
 {
     .append_to_str = (append_to_str_fn_t) sr_java_frame_append_to_str,
     .next = (next_frame_fn_t) java_next,
+    .cmp = (frame_cmp_fn_t) sr_java_frame_cmp,
+    .cmp_distance = (frame_cmp_fn_t) sr_java_frame_cmp_distance,
 };
 
 /* Public functions */

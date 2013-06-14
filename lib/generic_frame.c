@@ -43,3 +43,21 @@ sr_frame_next(struct sr_frame *frame)
 {
     return DISPATCH(dtable, frame->type, next)(frame);
 }
+
+int
+sr_frame_cmp(struct sr_frame *frame1, struct sr_frame *frame2)
+{
+    if (frame1->type != frame2->type)
+        return frame1->type - frame2->type;
+
+    return DISPATCH(dtable, frame1->type, cmp)(frame1, frame2);
+}
+
+int
+sr_frame_cmp_distance(struct sr_frame *frame1, struct sr_frame *frame2)
+{
+    if (frame1->type != frame2->type)
+        return frame1->type - frame2->type;
+
+    return DISPATCH(dtable, frame1->type, cmp_distance)(frame1, frame2);
+}

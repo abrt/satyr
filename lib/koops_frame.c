@@ -36,6 +36,8 @@ struct frame_methods koops_frame_methods =
 {
     .append_to_str = (append_to_str_fn_t) sr_koops_frame_append_to_str,
     .next = (next_frame_fn_t) koops_next,
+    .cmp = (frame_cmp_fn_t) sr_koops_frame_cmp,
+    .cmp_distance = (frame_cmp_fn_t) sr_koops_frame_cmp_distance,
 };
 
 /* Public functions */

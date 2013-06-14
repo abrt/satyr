@@ -21,14 +21,14 @@
 #include "thread.h"
 
 typedef struct sr_frame* (*frames_fn_t)(struct sr_thread*);
-typedef int (*cmp_fn_t)(struct sr_thread*, struct sr_thread*);
+typedef int (*thread_cmp_fn_t)(struct sr_thread*, struct sr_thread*);
 typedef int (*frame_count_fn_t)(struct sr_thread*);
 typedef struct sr_thread* (*next_thread_fn_t)(struct sr_thread*);
 
 struct thread_methods
 {
     frames_fn_t frames;
-    cmp_fn_t cmp;
+    thread_cmp_fn_t cmp;
     frame_count_fn_t frame_count;
     next_thread_fn_t next;
 };

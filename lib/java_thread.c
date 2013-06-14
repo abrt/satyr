@@ -38,7 +38,7 @@ DEFINE_NEXT_FUNC(java_next, struct sr_thread, struct sr_java_thread)
 struct thread_methods java_thread_methods =
 {
     .frames = (frames_fn_t) java_frames,
-    .cmp = (cmp_fn_t) sr_java_thread_cmp,
+    .cmp = (thread_cmp_fn_t) sr_java_thread_cmp,
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) java_next,
 };

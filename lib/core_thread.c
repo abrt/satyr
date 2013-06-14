@@ -34,7 +34,7 @@ DEFINE_NEXT_FUNC(core_next, struct sr_thread, struct sr_core_thread)
 struct thread_methods core_thread_methods =
 {
     .frames = (frames_fn_t) core_frames,
-    .cmp = (cmp_fn_t) sr_core_thread_cmp,
+    .cmp = (thread_cmp_fn_t) sr_core_thread_cmp,
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) core_next,
 };

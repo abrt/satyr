@@ -33,6 +33,8 @@ struct frame_methods core_frame_methods =
 {
     .append_to_str = (append_to_str_fn_t) sr_core_frame_append_to_str,
     .next = (next_frame_fn_t) core_next,
+    .cmp = (frame_cmp_fn_t) sr_core_frame_cmp,
+    .cmp_distance = (frame_cmp_fn_t) sr_core_frame_cmp_distance,
 };
 
 /* Public functions */
@@ -176,6 +178,8 @@ int
 sr_core_frame_cmp_distance(struct sr_core_frame *frame1,
                            struct sr_core_frame *frame2)
 {
+    /* TODO: we should not rely on function name and we definitely should use
+     * build id */
     /* Function name. */
     int function_name = sr_strcmp0(frame1->function_name,
                                     frame2->function_name);

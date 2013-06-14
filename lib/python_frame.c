@@ -35,6 +35,8 @@ struct frame_methods python_frame_methods =
 {
     .append_to_str = (append_to_str_fn_t) sr_python_frame_append_to_str,
     .next = (next_frame_fn_t) python_next,
+    .cmp = (frame_cmp_fn_t) sr_python_frame_cmp,
+    .cmp_distance = (frame_cmp_fn_t) sr_python_frame_cmp_distance,
 };
 
 /* Public functions */

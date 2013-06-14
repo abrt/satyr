@@ -57,6 +57,20 @@ sr_frame_next(struct sr_frame *frame);
 void
 sr_frame_append_to_str(struct sr_frame *frame, struct sr_strbuf *strbuf);
 
+/**
+ * Compares two frames. Returns 0 on equality. Frames of distinct type are
+ * always unequal.
+ */
+int
+sr_frame_cmp(struct sr_frame *t1, struct sr_frame *t2);
+
+/**
+ * Compares two frames for the purpose of thread distance computation. Returns
+ * 0 on equality. Frames of distinct type are always unequal.
+ */
+int
+sr_frame_cmp_distance(struct sr_frame *t1, struct sr_frame *t2);
+
 #ifdef __cplusplus
 }
 #endif
