@@ -31,16 +31,7 @@ extern "C" {
 
 #include <stdbool.h>
 
-struct sr_gdb_frame;
-struct sr_gdb_thread;
-struct sr_core_frame;
-struct sr_core_thread;
-struct sr_java_frame;
-struct sr_java_thread;
-struct sr_koops_frame;
-struct sr_koops_stacktrace;
-struct sr_python_frame;
-struct sr_python_stacktrace;
+struct sr_thread;
 
 enum sr_distance_type
 {
@@ -91,29 +82,9 @@ enum sr_distance_type
 };
 
 float
-sr_distance_gdb(enum sr_distance_type distance_type,
-                struct sr_gdb_thread *thread1,
-                struct sr_gdb_thread *thread2);
-
-float
-sr_distance_core(enum sr_distance_type distance_type,
-                 struct sr_core_thread *thread1,
-                 struct sr_core_thread *thread2);
-
-float
-sr_distance_java(enum sr_distance_type distance_type,
-                 struct sr_java_thread *thread1,
-                 struct sr_java_thread *thread2);
-
-float
-sr_distance_koops(enum sr_distance_type distance_type,
-                  struct sr_koops_stacktrace *stacktrace1,
-                  struct sr_koops_stacktrace *stacktrace2);
-
-float
-sr_distance_python(enum sr_distance_type distance_type,
-                   struct sr_python_stacktrace *stacktrace1,
-                   struct sr_python_stacktrace *stacktrace2);
+sr_distance(enum sr_distance_type distance_type,
+            struct sr_thread *thread1,
+            struct sr_thread *thread2);
 
 #ifdef __cplusplus
 }

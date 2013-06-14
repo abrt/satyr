@@ -18,37 +18,19 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "distance.h"
-#include "gdb/thread.h"
-#include "gdb/frame.h"
-#include "core/thread.h"
-#include "core/frame.h"
-#include "java/thread.h"
-#include "java/frame.h"
-#include "koops/stacktrace.h"
-#include "koops/frame.h"
-#include "python/stacktrace.h"
-#include "python/frame.h"
 #include "thread.h"
+#include "frame.h"
 #include <stdlib.h>
-
-typedef int (*frame_cmp_function)(void*, void*);
-typedef void* (*frame_next_function)(void*);
-typedef void* (*thread_first_frame_function)(void*);
-
-struct type_specific_functions
-{
-    frame_cmp_function frame_cmp;
-    frame_next_function frame_next;
-    thread_first_frame_function thread_first_frame;
-};
+#include <assert.h>
 
 float
-distance_jaro_winkler(struct type_specific_functions functions,
-                      void *thread1,
-                      void *thread2)
+distance_jaro_winkler(struct sr_thread *thread1,
+                      struct sr_thread *thread2)
 {
-    int frame1_count = sr_thread_frame_count((struct sr_thread*) thread1);
-    int frame2_count = sr_thread_frame_count((struct sr_thread*) thread2);
+    assert(thread1->type == thread2->type);
+
+    int frame1_count = sr_thread_frame_count(thread1);
+    int frame2_count = sr_thread_frame_count(thread2);
 
     if (frame1_count == 0 && frame2_count == 0)
         return 1.0;
@@ -61,17 +43,17 @@ distance_jaro_winkler(struct type_specific_functions functions,
     bool still_prefix = true;
     float trans_count = 0, match_count = 0;
 
-    void *curr_frame = functions.thread_first_frame(thread1);
+    struct sr_frame *curr_frame = sr_thread_frames(thread1);
     for (int i = 1; curr_frame; ++i)
     {
         bool match = false;
-        void *curr_frame2 = functions.thread_first_frame(thread2);
+        struct sr_frame *curr_frame2 = sr_thread_frames(thread2);
         for (int j = 1; !match && curr_frame2; ++j)
         {
             /* Whether the prefix continues to be the same for both
              * threads or not.
              */
-            if (i == j && 0 != functions.frame_cmp(curr_frame, curr_frame2))
+            if (i == j && 0 != sr_frame_cmp_distance(curr_frame, curr_frame2))
                 still_prefix = false;
 
             /* Getting a match only if not too far away from each
@@ -79,14 +61,14 @@ distance_jaro_winkler(struct type_specific_functions functions,
              * functions.
              */
             if (abs(i - j) <= max_frame_count / 2 - 1 &&
-                0 == functions.frame_cmp(curr_frame, curr_frame2))
+                0 == sr_frame_cmp_distance(curr_frame, curr_frame2))
             {
                 match = true;
                 if (i != j)
                     ++trans_count;  // transposition in place
             }
 
-            curr_frame2 = functions.frame_next(curr_frame2);
+            curr_frame2 = sr_frame_next(curr_frame2);
         }
 
         if (still_prefix)
@@ -95,7 +77,7 @@ distance_jaro_winkler(struct type_specific_functions functions,
         if (match)
             ++match_count;
 
-        curr_frame = functions.frame_next(curr_frame);
+        curr_frame = sr_frame_next(curr_frame);
     }
 
     trans_count /= 2;
@@ -120,36 +102,35 @@ distance_jaro_winkler(struct type_specific_functions functions,
 }
 
 static bool
-distance_jaccard_frames_contain(struct type_specific_functions functions,
-                                void *frames,
-                                void *frame)
+distance_jaccard_frames_contain(struct sr_frame *haystack,
+                                struct sr_frame *needle)
 {
-    while (frames)
+    while (haystack)
     {
         // Checking if functions are the same but not both "??".
-        if (!functions.frame_cmp(frames, frame))
+        if (!sr_frame_cmp_distance(haystack, needle))
             return true;
 
-        frames = functions.frame_next(frames);
+        haystack = sr_frame_next(haystack);
     }
 
     return false;
 }
 
 float
-distance_jaccard(struct type_specific_functions functions,
-                 void *thread1,
-                 void *thread2)
+distance_jaccard(struct sr_thread *thread1,
+                 struct sr_thread *thread2)
 {
+    assert(thread1->type == thread2->type);
+
     int intersection_size = 0, set1_size = 0, set2_size = 0;
 
-    for (void *curr_frame = functions.thread_first_frame(thread1);
+    for (struct sr_frame *curr_frame = sr_thread_frames(thread1);
          curr_frame;
-         curr_frame = functions.frame_next(curr_frame))
+         curr_frame = sr_frame_next(curr_frame))
     {
         if (distance_jaccard_frames_contain(
-                functions,
-                functions.frame_next(curr_frame),
+                sr_frame_next(curr_frame),
                 curr_frame))
         {
             continue; // not last, skip
@@ -158,21 +139,19 @@ distance_jaccard(struct type_specific_functions functions,
         ++set1_size;
 
         if (distance_jaccard_frames_contain(
-                functions,
-                functions.thread_first_frame(thread2),
+                sr_thread_frames(thread2),
                 curr_frame))
         {
             ++intersection_size;
         }
     }
 
-    for (void *curr_frame = functions.thread_first_frame(thread2);
+    for (struct sr_frame *curr_frame = sr_thread_frames(thread2);
          curr_frame;
-         curr_frame = functions.frame_next(curr_frame))
+         curr_frame = sr_frame_next(curr_frame))
     {
         if (distance_jaccard_frames_contain(
-                functions,
-                functions.frame_next(curr_frame),
+                sr_frame_next(curr_frame),
                 curr_frame))
         {
             continue; // not last, skip
@@ -193,13 +172,14 @@ distance_jaccard(struct type_specific_functions functions,
 }
 
 float
-distance_levenshtein(struct type_specific_functions functions,
-                     void *thread1,
-                     void *thread2,
+distance_levenshtein(struct sr_thread *thread1,
+                     struct sr_thread *thread2,
                      bool transposition)
 {
-    int m = sr_thread_frame_count((struct sr_thread*) thread1) + 1;
-    int n = sr_thread_frame_count((struct sr_thread*) thread2) + 1;
+    assert(thread1->type == thread2->type);
+
+    int m = sr_thread_frame_count(thread1) + 1;
+    int n = sr_thread_frame_count(thread2) + 1;
 
     // store only two last rows and columns instead of whole 2D array
     int dist[m + n + 1], dist1[m + n + 1];
@@ -211,13 +191,13 @@ distance_levenshtein(struct type_specific_functions functions,
     for (int i = 0; i <= n; ++i)
         dist[m + i] = i;
 
-    void *curr_frame2 = functions.thread_first_frame(thread2);
-    void *prev_frame = NULL;
-    void *prev_frame2 = NULL;
+    struct sr_frame *curr_frame2 = sr_thread_frames(thread2);
+    struct sr_frame *prev_frame = NULL;
+    struct sr_frame *prev_frame2 = NULL;
 
     for (int j = 1; curr_frame2; ++j)
     {
-        void *curr_frame = functions.thread_first_frame(thread1);
+        struct sr_frame *curr_frame = sr_thread_frames(thread1);
         for (int i = 1; curr_frame; ++i)
         {
             int l = m + j - i;
@@ -230,7 +210,7 @@ distance_levenshtein(struct type_specific_functions functions,
             /*similar characters have distance equal to the previous
               one diagonally, "??" functions aren't taken as
               similar */
-            if (0 == functions.frame_cmp(curr_frame, curr_frame2))
+            if (0 == sr_frame_cmp_distance(curr_frame, curr_frame2))
                 cost = 0;
             else
             {
@@ -249,222 +229,43 @@ distance_levenshtein(struct type_specific_functions functions,
               taking into account that "??" functions are not similar*/
             if (transposition &&
                 (i >= 2 && j >= 2 && dist[l] > dist2 + cost &&
-                 0 == functions.frame_cmp(curr_frame, prev_frame2) &&
-                 0 == functions.frame_cmp(prev_frame, curr_frame2)))
+                 0 == sr_frame_cmp_distance(curr_frame, prev_frame2) &&
+                 0 == sr_frame_cmp_distance(prev_frame, curr_frame2)))
             {
                 dist[l] = dist2 + cost;
             }
 
             prev_frame = curr_frame;
-            curr_frame = functions.frame_next(curr_frame);
+            curr_frame = sr_frame_next(curr_frame);
         }
 
         prev_frame2 = curr_frame2;
-        curr_frame2 = functions.frame_next(curr_frame2);
+        curr_frame2 = sr_frame_next(curr_frame2);
     }
 
     return dist[n];
 }
 
-static float
-distance(enum sr_distance_type distance_type,
-         struct type_specific_functions functions,
-         void *thread1,
-         void *thread2)
+float
+sr_distance(enum sr_distance_type distance_type,
+            struct sr_thread *thread1,
+            struct sr_thread *thread2)
 {
+    /* Different thread types are always unequal. */
+    if (thread1->type != thread2->type)
+        return 1.0f;
+
     switch (distance_type)
     {
     case SR_DISTANCE_JARO_WINKLER:
-        return distance_jaro_winkler(functions, thread1, thread2);
+        return distance_jaro_winkler(thread1, thread2);
     case SR_DISTANCE_JACCARD:
-        return distance_jaccard(functions, thread1, thread2);
+        return distance_jaccard(thread1, thread2);
     case SR_DISTANCE_LEVENSHTEIN:
-        return distance_levenshtein(functions, thread1, thread2, false);
+        return distance_levenshtein(thread1, thread2, false);
     case SR_DISTANCE_DAMERAU_LEVENSHTEIN:
-        return distance_levenshtein(functions, thread1, thread2, true);
+        return distance_levenshtein(thread1, thread2, true);
     default:
         return 1.0f;
     }
 }
-
-static int
-frame_cmp_gdb(void *frame1, void *frame2)
-{
-    return sr_gdb_frame_cmp_distance((struct sr_gdb_frame*)frame1,
-                                     (struct sr_gdb_frame*)frame2);
-}
-
-static void *
-frame_next_gdb(void *frame)
-{
-    return ((struct sr_gdb_frame*)frame)->next;
-}
-
-static void *
-thread_first_frame_gdb(void *thread)
-{
-    return ((struct sr_gdb_thread*)thread)->frames;
-}
-
-struct type_specific_functions gdb_specific_functions = {
-    frame_cmp_gdb,
-    frame_next_gdb,
-    thread_first_frame_gdb,
-};
-
-float
-sr_distance_gdb(enum sr_distance_type distance_type,
-                struct sr_gdb_thread *thread1,
-                struct sr_gdb_thread *thread2)
-{
-    return distance(distance_type,
-                    gdb_specific_functions,
-                    thread1,
-                    thread2);
-}
-
-static int
-frame_cmp_core(void *frame1, void *frame2)
-{
-    return sr_core_frame_cmp_distance((struct sr_core_frame*)frame1,
-                                      (struct sr_core_frame*)frame2);
-}
-
-static void *
-frame_next_core(void *frame)
-{
-    return ((struct sr_core_frame*)frame)->next;
-}
-
-static void *
-thread_first_frame_core(void *thread)
-{
-    return ((struct sr_core_thread*)thread)->frames;
-}
-
-struct type_specific_functions core_specific_functions = {
-    frame_cmp_core,
-    frame_next_core,
-    thread_first_frame_core,
-};
-
-float
-sr_distance_core(enum sr_distance_type distance_type,
-                 struct sr_core_thread *thread1,
-                 struct sr_core_thread *thread2)
-{
-    return distance(distance_type,
-                    core_specific_functions,
-                    thread1,
-                    thread2);
-}
-
-static int
-frame_cmp_java(void *frame1, void *frame2)
-{
-    return sr_java_frame_cmp_distance((struct sr_java_frame*)frame1,
-                                      (struct sr_java_frame*)frame2);
-}
-
-static void *
-frame_next_java(void *frame)
-{
-    return ((struct sr_java_frame*)frame)->next;
-}
-
-static void *
-thread_first_frame_java(void *thread)
-{
-    return ((struct sr_java_thread*)thread)->frames;
-}
-
-struct type_specific_functions java_specific_functions = {
-    frame_cmp_java,
-    frame_next_java,
-    thread_first_frame_java,
-};
-
-float
-sr_distance_java(enum sr_distance_type distance_type,
-                 struct sr_java_thread *thread1,
-                 struct sr_java_thread *thread2)
-{
-    return distance(distance_type,
-                    java_specific_functions,
-                    thread1,
-                    thread2);
-}
-
-static int
-frame_cmp_koops(void *frame1, void *frame2)
-{
-    return sr_koops_frame_cmp_distance((struct sr_koops_frame*)frame1,
-                                       (struct sr_koops_frame*)frame2);
-}
-
-static void *
-frame_next_koops(void *frame)
-{
-    return ((struct sr_koops_frame*)frame)->next;
-}
-
-static void *
-thread_first_frame_koops(void *stacktrace)
-{
-    return ((struct sr_koops_stacktrace*)stacktrace)->frames;
-}
-
-struct type_specific_functions koops_specific_functions = {
-    frame_cmp_koops,
-    frame_next_koops,
-    thread_first_frame_koops,
-};
-
-float
-sr_distance_koops(enum sr_distance_type distance_type,
-                  struct sr_koops_stacktrace *stacktrace1,
-                  struct sr_koops_stacktrace *stacktrace2)
-{
-    return distance(distance_type,
-                    koops_specific_functions,
-                    stacktrace1,
-                    stacktrace2);
-}
-
-
-static int
-frame_cmp_python(void *frame1, void *frame2)
-{
-    return sr_python_frame_cmp_distance((struct sr_python_frame*)frame1,
-                                        (struct sr_python_frame*)frame2);
-}
-
-static void *
-frame_next_python(void *frame)
-{
-    return ((struct sr_python_frame*)frame)->next;
-}
-
-static void *
-thread_first_frame_python(void *stacktrace)
-{
-    return ((struct sr_python_stacktrace*)stacktrace)->frames;
-}
-
-struct type_specific_functions python_specific_functions = {
-    frame_cmp_python,
-    frame_next_python,
-    thread_first_frame_python,
-};
-
-float
-sr_distance_python(enum sr_distance_type distance_type,
-                   struct sr_python_stacktrace *stacktrace1,
-                   struct sr_python_stacktrace *stacktrace2)
-{
-    return distance(distance_type,
-                    python_specific_functions,
-                    stacktrace1,
-                    stacktrace2);
-}
-
