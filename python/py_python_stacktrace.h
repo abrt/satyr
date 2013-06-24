@@ -34,11 +34,15 @@ extern "C" {
 
 PyTypeObject sr_py_python_stacktrace_type;
 
+/* The beginning of this structure has to have the same layout as
+ * sr_py_base_thread.
+ */
 struct sr_py_python_stacktrace
 {
     PyObject_HEAD
-    PyObject *frames;
     struct sr_python_stacktrace *stacktrace;
+    PyObject *frames;
+    PyTypeObject *frame_type;
 };
 
 /* constructor */
@@ -55,7 +59,6 @@ PyObject *sr_py_python_stacktrace_str(PyObject *self);
 /* methods */
 PyObject *sr_py_python_stacktrace_dup(PyObject *self, PyObject *args);
 PyObject *sr_py_python_stacktrace_normalize(PyObject *self, PyObject *args);
-PyObject *sr_py_python_stacktrace_to_short_text(PyObject *self, PyObject *args);
 
 
 #ifdef __cplusplus

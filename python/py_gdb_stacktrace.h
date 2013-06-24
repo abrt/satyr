@@ -37,19 +37,20 @@ struct sr_py_gdb_thread;
 
 PyTypeObject sr_py_gdb_stacktrace_type;
 
+/* The beginning of this structure has to have the same layout as
+ * sr_py_multi_thread_stacktrace.
+ */
 struct sr_py_gdb_stacktrace
 {
     PyObject_HEAD
     struct sr_gdb_stacktrace *stacktrace;
     PyObject *threads;
+    PyTypeObject *thread_type;
+    PyTypeObject *frame_type;
     struct sr_py_gdb_frame *crashframe;
     struct sr_py_gdb_thread *crashthread;
     PyObject *libs;
 };
-
-/* helpers */
-int stacktrace_prepare_linked_list(struct sr_py_gdb_stacktrace *stacktrace);
-PyObject *stacktrace_prepare_thread_list(struct sr_gdb_stacktrace *stacktrace);
 
 /* constructor */
 PyObject *sr_py_gdb_stacktrace_new(PyTypeObject *object,

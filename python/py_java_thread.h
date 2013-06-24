@@ -34,17 +34,16 @@ extern "C" {
 
 PyTypeObject sr_py_java_thread_type;
 
+/* The beginning of this structure has to have the same layout as
+ * sr_py_base_thread.
+ */
 struct sr_py_java_thread
 {
     PyObject_HEAD
-    PyObject *frames;
     struct sr_java_thread *thread;
+    PyObject *frames;
+    PyTypeObject *frame_type;
 };
-
-/* helpers */
-int java_thread_prepare_linked_list(struct sr_py_java_thread *thread);
-PyObject *java_frame_linked_list_to_python_list(struct sr_java_thread *thread);
-int java_thread_rebuild_python_list(struct sr_py_java_thread *thread);
 
 /* constructor */
 PyObject *sr_py_java_thread_new(PyTypeObject *object,
@@ -56,9 +55,6 @@ void sr_py_java_thread_free(PyObject *object);
 
 /* str */
 PyObject *sr_py_java_thread_str(PyObject *self);
-
-/* cmp */
-int sr_py_java_thread_cmp(struct sr_py_java_thread *self, struct sr_py_java_thread *other);
 
 /* methods */
 PyObject *sr_py_java_thread_dup(PyObject *self, PyObject *args);

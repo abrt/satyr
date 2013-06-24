@@ -1,7 +1,7 @@
 /*
-    py_java_stacktrace.h
+    py_base_stacktrace.h
 
-    Copyright (C) 2010, 2011, 2012  Red Hat, Inc.
+    Copyright (C) 2013 Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef SATYR_PY_JAVA_STACKTRACE_H
-#define SATYR_PY_JAVA_STACKTRACE_H
+#ifndef SATYR_PY_BASE_STACKTRACE_H
+#define SATYR_PY_BASE_STACKTRACE_H
 
 /**
  * @file
- * @brief Python bindings for Java stack trace.
+ * @brief Base classes for stacktrace structures.
  */
 
 #ifdef __cplusplus
@@ -32,37 +32,30 @@ extern "C" {
 #include <Python.h>
 #include <structmember.h>
 
-struct sr_py_java_frame;
-struct sr_py_java_thread;
+#include "py_base_thread.h"
 
-PyTypeObject sr_py_java_stacktrace_type;
+extern PyTypeObject sr_py_single_stacktrace_type;
+extern PyTypeObject sr_py_multi_stacktrace_type;
 
-/* The beginning of this structure has to have the same layout as
- * sr_py_multi_thread_stacktrace.
- */
-struct sr_py_java_stacktrace
+/* Python object for multi threaded stacktraces. */
+struct sr_py_multi_stacktrace
 {
     PyObject_HEAD
-    struct sr_java_stacktrace *stacktrace;
+    struct sr_stacktrace *stacktrace;
     PyObject *threads;
     PyTypeObject *thread_type;
     PyTypeObject *frame_type;
 };
 
-/* constructor */
-PyObject *sr_py_java_stacktrace_new(PyTypeObject *object,
-                                    PyObject *args,
-                                    PyObject *kwds);
-
-/* destructor */
-void sr_py_java_stacktrace_free(PyObject *object);
-
-/* str */
-PyObject *sr_py_java_stacktrace_str(PyObject *self);
+/* helpers */
+int threads_prepare_linked_list(struct sr_py_multi_stacktrace *stacktrace);
+int threads_free_python_list(struct sr_py_multi_stacktrace *stacktrace);
+PyObject *threads_to_python_list(struct sr_stacktrace *stacktrace,
+                                 PyTypeObject *thread_type, PyTypeObject *frame_type);
 
 /* methods */
-PyObject *sr_py_java_stacktrace_dup(PyObject *self, PyObject *args);
-PyObject *sr_py_java_stacktrace_normalize(PyObject *self, PyObject *args);
+PyObject *sr_py_single_stacktrace_to_short_text(PyObject *self, PyObject *args);
+PyObject *sr_py_multi_stacktrace_to_short_text(PyObject *self, PyObject *args);
 
 #ifdef __cplusplus
 }

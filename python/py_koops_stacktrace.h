@@ -34,12 +34,16 @@ extern "C" {
 
 PyTypeObject sr_py_koops_stacktrace_type;
 
+/* The beginning of this structure has to have the same layout as
+ * sr_py_base_thread.
+ */
 struct sr_py_koops_stacktrace
 {
     PyObject_HEAD
-    PyObject *frames;
-    PyObject *taint_flags;
     struct sr_koops_stacktrace *stacktrace;
+    PyObject *frames;
+    PyTypeObject *frame_type;
+    PyObject *taint_flags;
 };
 
 /* constructor */
@@ -62,7 +66,6 @@ int sr_py_koops_stacktrace_set_taint_flags(PyObject *self, PyObject *rhs, void *
 /* methods */
 PyObject *sr_py_koops_stacktrace_dup(PyObject *self, PyObject *args);
 PyObject *sr_py_koops_stacktrace_normalize(PyObject *self, PyObject *args);
-PyObject *sr_py_koops_stacktrace_to_short_text(PyObject *self, PyObject *args);
 
 
 #ifdef __cplusplus

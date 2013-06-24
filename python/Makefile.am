@@ -10,6 +10,10 @@ _satyr_la_SOURCES = \
     py_cluster.c \
     py_base_frame.h \
     py_base_frame.c \
+    py_base_thread.h \
+    py_base_thread.c \
+    py_base_stacktrace.h \
+    py_base_stacktrace.c \
     py_gdb_frame.h \
     py_gdb_frame.c \
     py_gdb_sharedlib.h \

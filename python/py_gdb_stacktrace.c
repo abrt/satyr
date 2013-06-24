@@ -2,6 +2,8 @@
 #include "py_gdb_thread.h"
 #include "py_gdb_frame.h"
 #include "py_gdb_sharedlib.h"
+#include "py_base_thread.h"
+#include "py_base_stacktrace.h"
 #include "strbuf.h"
 #include "gdb/stacktrace.h"
 #include "gdb/thread.h"
@@ -96,7 +98,6 @@ gdb_stacktrace_methods[] =
 static PyMemberDef
 gdb_stacktrace_members[] =
 {
-    { (char *)"threads",     T_OBJECT_EX, offsetof(struct sr_py_gdb_stacktrace, threads),     0,        b_threads_doc     },
     { (char *)"crashframe",  T_OBJECT_EX, offsetof(struct sr_py_gdb_stacktrace, crashframe),  READONLY, b_crashframe_doc  },
     { (char *)"crashthread", T_OBJECT_EX, offsetof(struct sr_py_gdb_stacktrace, crashthread), READONLY, b_crashthread_doc },
     { (char *)"libs",        T_OBJECT_EX, offsetof(struct sr_py_gdb_stacktrace, libs),        0,        b_libs_doc        },
@@ -135,7 +136,7 @@ PyTypeObject sr_py_gdb_stacktrace_type = {
     gdb_stacktrace_methods,               /* tp_methods */
     gdb_stacktrace_members,               /* tp_members */
     NULL,                           /* tp_getset */
-    NULL,                           /* tp_base */
+    &sr_py_multi_stacktrace_type,   /* tp_base */
     NULL,                           /* tp_dict */
     NULL,                           /* tp_descr_get */
     NULL,                           /* tp_descr_set */
@@ -153,50 +154,15 @@ PyTypeObject sr_py_gdb_stacktrace_type = {
 };
 
 /* helpers */
-int
-stacktrace_prepare_linked_list(struct sr_py_gdb_stacktrace *stacktrace)
+static int
+gdb_prepare_linked_lists(struct sr_py_gdb_stacktrace *stacktrace)
 {
-    int i;
-    PyObject *item;
-
-    /* thread */
-    struct sr_py_gdb_thread *current = NULL, *prev = NULL;
-    for (i = 0; i < PyList_Size(stacktrace->threads); ++i)
-    {
-        item = PyList_GetItem(stacktrace->threads, i);
-        if (!item)
-            return -1;
-
-        Py_INCREF(item);
-        if (!PyObject_TypeCheck(item, &sr_py_gdb_thread_type))
-        {
-            Py_XDECREF(current);
-            Py_XDECREF(prev);
-            PyErr_SetString(PyExc_TypeError,
-                            "threads must be a list of satyr.Thread objects");
-            return -1;
-        }
-
-        current = (struct sr_py_gdb_thread*)item;
-        if (thread_prepare_linked_list(current) < 0)
-            return -1;
-
-        if (i == 0)
-            stacktrace->stacktrace->threads = current->thread;
-        else
-            prev->thread->next = current->thread;
-
-        Py_XDECREF(prev);
-        prev = current;
-    }
-
-    if (current)
-    {
-        current->thread->next = NULL;
-        Py_XDECREF(current);
-    }
+    if (threads_prepare_linked_list((struct sr_py_multi_stacktrace *) stacktrace) < 0)
+        return -1;
 
     /* sharedlib */
+    int i;
+    PyObject *item;
     struct sr_py_gdb_sharedlib *currentlib = NULL, *prevlib = NULL;
     for (i = 0; i < PyList_Size(stacktrace->libs); ++i)
     {
@@ -282,8 +248,10 @@ thread_linked_list_to_python_list(struct sr_gdb_stacktrace *stacktrace)
         item = (struct sr_py_gdb_thread*)
             PyObject_New(struct sr_py_gdb_thread, &sr_py_gdb_thread_type);
 
+        item->frame_type = &sr_py_gdb_frame_type;
         item->thread = thread;
-        item->frames = frame_linked_list_to_python_list(thread);
+        item->frames = frames_to_python_list((struct sr_thread *)thread,
+                                             &sr_py_gdb_frame_type);
         if (!item->frames)
             return NULL;
 
@@ -320,6 +288,11 @@ sharedlib_linked_list_to_python_list(struct sr_gdb_stacktrace *stacktrace)
     return result;
 }
 
+/* XXX Why GDB stacktrace needs this function while other types do not? Is it
+ * because the methods here modify the linked lists and other types have no
+ * such methods? Shouldn't we do a copy of the linked list *before* we call the
+ * C function on it?
+ */
 int
 stacktrace_rebuild_thread_python_list(struct sr_py_gdb_stacktrace *stacktrace)
 {
@@ -338,7 +311,8 @@ stacktrace_rebuild_thread_python_list(struct sr_py_gdb_stacktrace *stacktrace)
         return -1;
     }
     stacktrace->stacktrace->threads = newlinkedlist;
-    stacktrace->threads = thread_linked_list_to_python_list(stacktrace->stacktrace);
+    stacktrace->threads = threads_to_python_list((struct sr_stacktrace *)stacktrace->stacktrace,
+                                                 &sr_py_gdb_thread_type, &sr_py_gdb_frame_type);
     return 0;
 }
 
@@ -381,6 +355,8 @@ sr_py_gdb_stacktrace_new(PyTypeObject *object,
     if (!PyArg_ParseTuple(args, "|s", &str))
         return NULL;
 
+    bo->thread_type = &sr_py_gdb_thread_type;
+    bo->frame_type = &sr_py_gdb_frame_type;
     bo->crashframe = (struct sr_py_gdb_frame*)Py_None;
     bo->crashthread = (struct sr_py_gdb_thread*)Py_None;
     if (str)
@@ -443,7 +419,7 @@ PyObject *
 sr_py_gdb_stacktrace_dup(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
-    if (stacktrace_prepare_linked_list(this) < 0)
+    if (gdb_prepare_linked_lists(this) < 0)
         return NULL;
 
     struct sr_py_gdb_stacktrace *bo = (struct sr_py_gdb_stacktrace*)
@@ -453,6 +429,8 @@ sr_py_gdb_stacktrace_dup(PyObject *self, PyObject *args)
     if (!bo)
         return PyErr_NoMemory();
 
+    bo->thread_type = &sr_py_gdb_thread_type;
+    bo->frame_type = &sr_py_gdb_frame_type;
     bo->stacktrace = sr_gdb_stacktrace_dup(this->stacktrace);
     if (!bo->stacktrace)
         return NULL;
@@ -490,7 +468,7 @@ PyObject *
 sr_py_gdb_stacktrace_find_crash_frame(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace *)self;
-    if (stacktrace_prepare_linked_list(this) < 0)
+    if (gdb_prepare_linked_lists(this) < 0)
         return NULL;
 
     /* destroys linked list - need to rebuild python list */
@@ -520,7 +498,7 @@ PyObject *
 sr_py_gdb_stacktrace_find_crash_thread(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
-    if (stacktrace_prepare_linked_list(this) < 0)
+    if (gdb_prepare_linked_lists(this) < 0)
         return NULL;
 
     /* destroys linked list - need to rebuild python list */
@@ -537,8 +515,10 @@ sr_py_gdb_stacktrace_find_crash_thread(PyObject *self, PyObject *args)
     if (!result)
         return PyErr_NoMemory();
 
+    result->frame_type = &sr_py_gdb_frame_type;
     result->thread = sr_gdb_thread_dup(thread, false);
-    result->frames = frame_linked_list_to_python_list(result->thread);
+    result->frames = frames_to_python_list((struct sr_thread *)result->thread,
+                                           result->frame_type);
     this->crashthread = result;
 
     if (stacktrace_rebuild_thread_python_list(this) < 0)
@@ -551,7 +531,7 @@ PyObject *
 sr_py_gdb_stacktrace_limit_frame_depth(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
-    if (stacktrace_prepare_linked_list(this) < 0)
+    if (gdb_prepare_linked_lists(this) < 0)
         return NULL;
 
     int depth;
@@ -570,7 +550,7 @@ PyObject *
 sr_py_gdb_stacktrace_quality_simple(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
-    if (stacktrace_prepare_linked_list(this) < 0)
+    if (gdb_prepare_linked_lists(this) < 0)
         return NULL;
 
     /* does not destroy the linked list */
@@ -582,7 +562,7 @@ PyObject *
 sr_py_gdb_stacktrace_quality_complex(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
-    if (stacktrace_prepare_linked_list(this) < 0)
+    if (gdb_prepare_linked_lists(this) < 0)
         return NULL;
 
     /* does not destroy the linked list */
@@ -594,7 +574,7 @@ PyObject *
 sr_py_gdb_stacktrace_get_duplication_hash(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
-    if (stacktrace_prepare_linked_list(this) < 0)
+    if (gdb_prepare_linked_lists(this) < 0)
         return NULL;
 
     /* does not destroy the linked list */
@@ -609,7 +589,7 @@ PyObject *
 sr_py_gdb_stacktrace_find_address(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
-    if (stacktrace_prepare_linked_list(this) < 0)
+    if (gdb_prepare_linked_lists(this) < 0)
         return NULL;
 
     unsigned long long address;
@@ -642,7 +622,7 @@ PyObject *
 sr_py_gdb_stacktrace_set_libnames(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
-    if (stacktrace_prepare_linked_list(this) < 0)
+    if (gdb_prepare_linked_lists(this) < 0)
         return NULL;
 
     /* does not destroy the linked list */
@@ -657,7 +637,7 @@ PyObject *
 sr_py_gdb_stacktrace_normalize(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
-    if (stacktrace_prepare_linked_list(this) < 0)
+    if (gdb_prepare_linked_lists(this) < 0)
         return NULL;
 
     /* destroys the linked list and frees some parts */
@@ -685,7 +665,7 @@ PyObject *
 sr_py_gdb_stacktrace_to_short_text(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
-    if (stacktrace_prepare_linked_list(this) < 0)
+    if (gdb_prepare_linked_lists(this) < 0)
         return NULL;
 
     int max_frames = 0;

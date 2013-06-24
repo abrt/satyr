@@ -1,7 +1,7 @@
 /*
-    py_gdb_thread.h
+    py_base_thread.h
 
-    Copyright (C) 2010, 2011, 2012  Red Hat, Inc.
+    Copyright (C) 2013 Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef SATYR_PY_GDB_THREAD_H
-#define SATYR_PY_GDB_THREAD_H
+#ifndef SATYR_PY_BASE_THREAD_H
+#define SATYR_PY_BASE_THREAD_H
 
 /**
  * @file
- * @brief Python bindings for GDB thread.
+ * @brief Base class for threads.
  */
 
 #ifdef __cplusplus
@@ -32,35 +32,22 @@ extern "C" {
 #include <Python.h>
 #include <structmember.h>
 
-PyTypeObject sr_py_gdb_thread_type;
+extern PyTypeObject sr_py_base_thread_type;
 
-/* The beginning of this structure has to have the same layout as
- * sr_py_base_thread.
- */
-struct sr_py_gdb_thread
+struct sr_py_base_thread
 {
     PyObject_HEAD
-    struct sr_gdb_thread *thread;
+    struct sr_thread *thread;
     PyObject *frames;
     PyTypeObject *frame_type;
 };
 
-/* constructor */
-PyObject *sr_py_gdb_thread_new(PyTypeObject *object,
-                               PyObject *args,
-                               PyObject *kwds);
+/* helpers */
+int frames_prepare_linked_list(struct sr_py_base_thread *thread);
+int frames_free_python_list(struct sr_py_base_thread *thread);
+PyObject *frames_to_python_list(struct sr_thread *thread, PyTypeObject *frame_type);
 
-/* destructor */
-void sr_py_gdb_thread_free(PyObject *object);
-
-/* str */
-PyObject *sr_py_gdb_thread_str(PyObject *self);
-
-/* methods */
-PyObject *sr_py_gdb_thread_dup(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_thread_quality_counts(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_thread_quality(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_thread_format_funs(PyObject *self, PyObject *args);
+int sr_py_base_thread_cmp(struct sr_py_base_thread *self, struct sr_py_base_thread *other);
 
 #ifdef __cplusplus
 }

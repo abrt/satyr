@@ -1,4 +1,5 @@
 #include "py_common.h"
+#include "py_base_thread.h"
 #include "py_gdb_thread.h"
 #include "py_gdb_frame.h"
 #include "strbuf.h"
@@ -30,9 +31,6 @@
 #define t_format_funs_doc "Usage: thread.format_funs()\n" \
                       "Returns: string"
 
-#define t_frames_doc (char *)"A list containing satyr.Frame objects representing " \
-                     "frames in a thread."
-
 static PyMethodDef
 gdb_thread_methods[] =
 {
@@ -41,13 +39,6 @@ gdb_thread_methods[] =
     { "quality_counts", sr_py_gdb_thread_quality_counts, METH_NOARGS,  t_quality_counts_doc },
     { "quality",        sr_py_gdb_thread_quality,        METH_NOARGS,  t_quality_doc        },
     { "format_funs",    sr_py_gdb_thread_format_funs,    METH_NOARGS, t_format_funs_doc    },
-    { NULL },
-};
-
-static PyMemberDef
-gdb_thread_members[] =
-{
-    { (char *)"frames", T_OBJECT_EX, offsetof(struct sr_py_gdb_thread, frames), 0, t_frames_doc },
     { NULL },
 };
 
@@ -77,7 +68,7 @@ PyTypeObject sr_py_gdb_thread_type =
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
-    (cmpfunc)sr_py_gdb_thread_cmp, /* tp_compare */
+    NULL,                       /* tp_compare */
     NULL,                       /* tp_repr */
     NULL,                       /* tp_as_number */
     NULL,                       /* tp_as_sequence */
@@ -97,9 +88,9 @@ PyTypeObject sr_py_gdb_thread_type =
     NULL,                       /* tp_iter */
     NULL,                       /* tp_iternext */
     gdb_thread_methods,         /* tp_methods */
-    gdb_thread_members,         /* tp_members */
+    NULL,                       /* tp_members */
     gdb_thread_getset,          /* tp_getset */
-    NULL,                       /* tp_base */
+    &sr_py_base_thread_type,    /* tp_base */
     NULL,                       /* tp_dict */
     NULL,                       /* tp_descr_get */
     NULL,                       /* tp_descr_set */
@@ -116,119 +107,6 @@ PyTypeObject sr_py_gdb_thread_type =
     NULL,                       /* tp_weaklist */
 };
 
-/* helpers */
-int
-thread_prepare_linked_list(struct sr_py_gdb_thread *thread)
-{
-    int i;
-    PyObject *item;
-    struct sr_py_gdb_frame *current = NULL, *prev = NULL;
-
-    for (i = 0; i < PyList_Size(thread->frames); ++i)
-    {
-        item = PyList_GetItem(thread->frames, i);
-        if (!item)
-            return -1;
-
-        Py_INCREF(item);
-
-        if (!PyObject_TypeCheck(item, &sr_py_gdb_frame_type))
-        {
-            Py_XDECREF(item);
-            Py_XDECREF(prev);
-            PyErr_SetString(PyExc_TypeError, "frames must be a list of satyr.Frame objects");
-            return -1;
-        }
-
-        current = (struct sr_py_gdb_frame*)item;
-        if (i == 0)
-            thread->thread->frames = current->frame;
-        else
-            prev->frame->next = current->frame;
-
-        Py_XDECREF(prev);
-        prev = current;
-    }
-
-    if (current)
-    {
-        current->frame->next = NULL;
-        Py_DECREF(current);
-    }
-
-    return 0;
-}
-
-int
-thread_free_frame_python_list(struct sr_py_gdb_thread *thread)
-{
-    int i;
-    PyObject *item;
-
-    for (i = 0; i < PyList_Size(thread->frames); ++i)
-    {
-        item = PyList_GetItem(thread->frames, i);
-        if (!item)
-            return -1;
-        Py_DECREF(item);
-    }
-    Py_DECREF(thread->frames);
-
-    return 0;
-}
-
-PyObject *
-frame_linked_list_to_python_list(struct sr_gdb_thread *thread)
-{
-    PyObject *result = PyList_New(0);
-    if (!result)
-        return NULL;
-
-    struct sr_gdb_frame *frame = thread->frames;
-    struct sr_py_gdb_frame *item;
-    while (frame)
-    {
-        item = (struct sr_py_gdb_frame*)
-            PyObject_New(struct sr_py_gdb_frame, &sr_py_gdb_frame_type);
-
-        if (!item)
-            return PyErr_NoMemory();
-
-        item->frame = frame;
-        if (PyList_Append(result, (PyObject *)item) < 0)
-            return NULL;
-
-        frame = frame->next;
-    }
-
-    return result;
-}
-
-int
-thread_rebuild_python_list(struct sr_py_gdb_thread *thread)
-{
-    struct sr_gdb_frame *newlinkedlist = sr_gdb_frame_dup(thread->thread->frames, true);
-    if (thread_free_frame_python_list(thread) < 0)
-        return -1;
-    /* linked list */
-    thread->thread->frames = newlinkedlist;
-    /* python list */
-    thread->frames = frame_linked_list_to_python_list(thread->thread);
-    if (!thread->frames)
-    {
-        struct sr_gdb_frame *next;
-        while (newlinkedlist)
-        {
-            next = newlinkedlist->next;
-            sr_gdb_frame_free(newlinkedlist);
-            newlinkedlist = next;
-        }
-        return -1;
-    }
-
-    return 0;
-}
-
 /* constructor */
 PyObject *
 sr_py_gdb_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
@@ -239,6 +117,8 @@ sr_py_gdb_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 
     if (!to)
         return PyErr_NoMemory();
+
+    to->frame_type = &sr_py_gdb_frame_type;
 
     const char *str = NULL;
     int only_funs = 0;
@@ -262,7 +142,8 @@ sr_py_gdb_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
         {
             to->thread = sr_gdb_thread_parse_funs(str);
         }
-        to->frames = frame_linked_list_to_python_list(to->thread);
+        to->frames = frames_to_python_list((struct sr_thread*)to->thread,
+                                           to->frame_type);
         if (!to->frames)
             return NULL;
     }
@@ -280,7 +161,7 @@ void
 sr_py_gdb_thread_free(PyObject *object)
 {
     struct sr_py_gdb_thread *this = (struct sr_py_gdb_thread *)object;
-    thread_free_frame_python_list(this);
+    frames_free_python_list((struct sr_py_base_thread*) this);
     this->thread->frames = NULL;
     sr_gdb_thread_free(this->thread);
     PyObject_Del(object);
@@ -305,7 +186,7 @@ PyObject *
 sr_py_gdb_thread_dup(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_thread *this = (struct sr_py_gdb_thread *)self;
-    if (thread_prepare_linked_list(this) < 0)
+    if (frames_prepare_linked_list((struct sr_py_base_thread*) this) < 0)
         return NULL;
 
     struct sr_py_gdb_thread *to = (struct sr_py_gdb_thread*)
@@ -314,33 +195,23 @@ sr_py_gdb_thread_dup(PyObject *self, PyObject *args)
     if (!to)
         return PyErr_NoMemory();
 
+    to->frame_type = &sr_py_gdb_frame_type;
+
     to->thread = sr_gdb_thread_dup(this->thread, false);
     if (!to->thread)
         return NULL;
 
-    to->frames = frame_linked_list_to_python_list(to->thread);
+    to->frames = frames_to_python_list((struct sr_thread*)to->thread,
+                                       to->frame_type);
 
     return (PyObject *)to;
-}
-
-int
-sr_py_gdb_thread_cmp(struct sr_py_gdb_thread *self, struct sr_py_gdb_thread *other)
-{
-    if (thread_prepare_linked_list(self) < 0
-        || thread_prepare_linked_list(other) < 0)
-    {
-        /* exception is already set */
-        return -1;
-    }
-
-    return normalize_cmp(sr_gdb_thread_cmp(self->thread, other->thread));
 }
 
 PyObject *
 sr_py_gdb_thread_quality_counts(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_thread *this = (struct sr_py_gdb_thread *)self;
-    if (thread_prepare_linked_list(this) < 0)
+    if (frames_prepare_linked_list((struct sr_py_base_thread *)this) < 0)
         return NULL;
 
     int ok = 0, all = 0;
@@ -352,7 +223,7 @@ PyObject *
 sr_py_gdb_thread_quality(PyObject *self, PyObject *args)
 {
     struct sr_py_gdb_thread *this = (struct sr_py_gdb_thread *)self;
-    if (thread_prepare_linked_list(this) < 0)
+    if (frames_prepare_linked_list((struct sr_py_base_thread *)this) < 0)
         return NULL;
 
     return Py_BuildValue("f", sr_gdb_thread_quality(this->thread));

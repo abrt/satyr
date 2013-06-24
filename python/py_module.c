@@ -1,6 +1,8 @@
 #include <Python.h>
 #include "py_cluster.h"
 #include "py_base_frame.h"
+#include "py_base_thread.h"
+#include "py_base_stacktrace.h"
 #include "py_gdb_frame.h"
 #include "py_gdb_sharedlib.h"
 #include "py_gdb_stacktrace.h"
@@ -32,6 +34,24 @@ init_satyr()
     if (PyType_Ready(&sr_py_base_frame_type) < 0)
     {
         puts("PyType_Ready(&sr_py_base_frame_type) < 0");
+        return;
+    }
+
+    if (PyType_Ready(&sr_py_base_thread_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_base_thread_type) < 0");
+        return;
+    }
+
+    if (PyType_Ready(&sr_py_single_stacktrace_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_single_stacktrace_type) < 0");
+        return;
+    }
+
+    if (PyType_Ready(&sr_py_multi_stacktrace_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_multi_stacktrace_type) < 0");
         return;
     }
 
@@ -124,6 +144,18 @@ init_satyr()
     Py_INCREF(&sr_py_base_frame_type);
     PyModule_AddObject(module, "BaseFrame",
                        (PyObject *)&sr_py_base_frame_type);
+
+    Py_INCREF(&sr_py_base_thread_type);
+    PyModule_AddObject(module, "BaseThread",
+                       (PyObject *)&sr_py_base_thread_type);
+
+    Py_INCREF(&sr_py_single_stacktrace_type);
+    PyModule_AddObject(module, "SingleThreadStacktrace",
+                       (PyObject *)&sr_py_single_stacktrace_type);
+
+    Py_INCREF(&sr_py_multi_stacktrace_type);
+    PyModule_AddObject(module, "MultiThreadStacktrace",
+                       (PyObject *)&sr_py_multi_stacktrace_type);
 
     Py_INCREF(&sr_py_gdb_frame_type);
     PyModule_AddObject(module, "GdbFrame",

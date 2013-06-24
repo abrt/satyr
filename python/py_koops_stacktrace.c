@@ -1,5 +1,6 @@
 #include "py_koops_frame.h"
 #include "py_koops_stacktrace.h"
+#include "py_base_stacktrace.h"
 #include "py_common.h"
 #include "strbuf.h"
 #include "koops/frame.h"
@@ -37,14 +38,6 @@ koops_stacktrace_methods[] =
     /* methods */
     { "dup",                  sr_py_koops_stacktrace_dup,                  METH_NOARGS,  b_dup_doc                   },
     { "normalize",            sr_py_koops_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc             },
-    { "to_short_text",        sr_py_koops_stacktrace_to_short_text,        METH_VARARGS, b_to_short_text             },
-    { NULL },
-};
-
-static PyMemberDef
-koops_stacktrace_members[] =
-{
-    { (char *)"frames", T_OBJECT_EX, offsetof(struct sr_py_koops_stacktrace, frames), 0, (char *) b_frames_doc },
     { NULL },
 };
 
@@ -86,9 +79,9 @@ PyTypeObject sr_py_koops_stacktrace_type = {
     NULL,                           /* tp_iter */
     NULL,                           /* tp_iternext */
     koops_stacktrace_methods,       /* tp_methods */
-    koops_stacktrace_members,       /* tp_members */
+    NULL,                           /* tp_members */
     koops_stacktrace_getset,        /* tp_getset */
-    NULL,                           /* tp_base */
+    &sr_py_single_stacktrace_type,  /* tp_base */
     NULL,                           /* tp_dict */
     NULL,                           /* tp_descr_get */
     NULL,                           /* tp_descr_set */
@@ -104,49 +97,6 @@ PyTypeObject sr_py_koops_stacktrace_type = {
     NULL,                           /* tp_subclasses */
     NULL,                           /* tp_weaklist */
 };
-
-/* helpers */
-int
-koops_stacktrace_prepare_linked_list(struct sr_py_koops_stacktrace *stacktrace)
-{
-    int i;
-    PyObject *item;
-
-    struct sr_py_koops_frame *current = NULL, *prev = NULL;
-    for (i = 0; i < PyList_Size(stacktrace->frames); ++i)
-    {
-        item = PyList_GetItem(stacktrace->frames, i);
-        if (!item)
-            return -1;
-
-        Py_INCREF(item);
-        if (!PyObject_TypeCheck(item, &sr_py_koops_frame_type))
-        {
-            Py_XDECREF(current);
-            Py_XDECREF(prev);
-            PyErr_SetString(PyExc_TypeError,
-                            "frames must be a list of satyr.KerneloopsFrame objects");
-            return -1;
-        }
-
-        current = (struct sr_py_koops_frame*)item;
-        if (i == 0)
-            stacktrace->stacktrace->frames = current->frame;
-        else
-            prev->frame->next = current->frame;
-
-        Py_XDECREF(prev);
-        prev = current;
-    }
-
-    if (current)
-    {
-        current->frame->next = NULL;
-        Py_XDECREF(current);
-    }
-
-    return 0;
-}
 
 PyObject *
 sr_py_koops_stacktrace_get_modules(PyObject *self, void *data)
@@ -197,52 +147,6 @@ sr_py_koops_stacktrace_set_taint_flags(PyObject *self, PyObject *rhs, void *data
     return -1;
 }
 
-PyObject *
-koops_frame_linked_list_to_python_list(struct sr_koops_stacktrace *stacktrace)
-{
-    PyObject *result = PyList_New(0);
-    if (!result)
-        return PyErr_NoMemory();
-
-    struct sr_koops_frame *frame = stacktrace->frames;
-    struct sr_py_koops_frame *item;
-
-    while(frame)
-    {
-        item = (struct sr_py_koops_frame*)
-            PyObject_New(struct sr_py_koops_frame, &sr_py_koops_frame_type);
-
-        if (!item)
-            return PyErr_NoMemory();
-
-        item->frame = frame;
-        if (PyList_Append(result, (PyObject *)item) < 0)
-            return NULL;
-
-        frame = frame->next;
-    }
-
-    return result;
-}
-
-int
-koops_free_frame_python_list(struct sr_py_koops_stacktrace *stacktrace)
-{
-    int i;
-    PyObject *item;
-
-    for (i = 0; i < PyList_Size(stacktrace->frames); ++i)
-    {
-        item = PyList_GetItem(stacktrace->frames, i);
-        if (!item)
-          return -1;
-        Py_DECREF(item);
-    }
-    Py_DECREF(stacktrace->frames);
-
-    return 0;
-}
-
 /* constructor */
 PyObject *
 sr_py_koops_stacktrace_new(PyTypeObject *object,
@@ -255,6 +159,8 @@ sr_py_koops_stacktrace_new(PyTypeObject *object,
 
     if (!bo)
         return PyErr_NoMemory();
+
+    bo->frame_type = &sr_py_koops_frame_type;
 
     const char *str = NULL;
     if (!PyArg_ParseTuple(args, "|s", &str))
@@ -271,7 +177,7 @@ sr_py_koops_stacktrace_new(PyTypeObject *object,
             return NULL;
         }
 
-        bo->frames = koops_frame_linked_list_to_python_list(bo->stacktrace);
+        bo->frames = frames_to_python_list((struct sr_thread *)bo->stacktrace, bo->frame_type);
     }
     else
     {
@@ -287,7 +193,7 @@ void
 sr_py_koops_stacktrace_free(PyObject *object)
 {
     struct sr_py_koops_stacktrace *this = (struct sr_py_koops_stacktrace*)object;
-    koops_free_frame_python_list(this);
+    frames_free_python_list((struct sr_py_base_thread *)this);
     this->stacktrace->frames = NULL;
     sr_koops_stacktrace_free(this->stacktrace);
     PyObject_Del(object);
@@ -312,7 +218,7 @@ PyObject *
 sr_py_koops_stacktrace_dup(PyObject *self, PyObject *args)
 {
     struct sr_py_koops_stacktrace *this = (struct sr_py_koops_stacktrace*)self;
-    if (koops_stacktrace_prepare_linked_list(this) < 0)
+    if (frames_prepare_linked_list((struct sr_py_base_thread *)this) < 0)
         return NULL;
 
     struct sr_py_koops_stacktrace *bo = (struct sr_py_koops_stacktrace*)
@@ -322,11 +228,12 @@ sr_py_koops_stacktrace_dup(PyObject *self, PyObject *args)
     if (!bo)
         return PyErr_NoMemory();
 
+    bo->frame_type = &sr_py_koops_frame_type;
     bo->stacktrace = sr_koops_stacktrace_dup(this->stacktrace);
     if (!bo->stacktrace)
         return NULL;
 
-    bo->frames = koops_frame_linked_list_to_python_list(bo->stacktrace);
+    bo->frames = frames_to_python_list((struct sr_thread *)bo->stacktrace, bo->frame_type);
     if (!bo->frames)
         return NULL;
 
@@ -337,14 +244,14 @@ PyObject *
 sr_py_koops_stacktrace_normalize(PyObject *self, PyObject *args)
 {
     struct sr_py_koops_stacktrace *this = (struct sr_py_koops_stacktrace*)self;
-    if (koops_stacktrace_prepare_linked_list(this) < 0)
+    if (frames_prepare_linked_list((struct sr_py_base_thread *)this) < 0)
         return NULL;
 
     /* destroys the linked list and frees some parts */
     /* need to rebuild python list manually */
     struct sr_koops_stacktrace *tmp = sr_koops_stacktrace_dup(this->stacktrace);
     sr_normalize_koops_stacktrace(tmp);
-    if (koops_free_frame_python_list(this) < 0)
+    if (frames_free_python_list((struct sr_py_base_thread *)this) < 0)
     {
         sr_koops_stacktrace_free(tmp);
         return NULL;
@@ -354,31 +261,9 @@ sr_py_koops_stacktrace_normalize(PyObject *self, PyObject *args)
     tmp->frames = NULL;
     sr_koops_stacktrace_free(tmp);
 
-    this->frames = koops_frame_linked_list_to_python_list(this->stacktrace);
+    this->frames = frames_to_python_list((struct sr_thread *)this->stacktrace, this->frame_type);
     if (!this->frames)
         return NULL;
 
     Py_RETURN_NONE;
-}
-
-PyObject *
-sr_py_koops_stacktrace_to_short_text(PyObject *self, PyObject *args)
-{
-    int max_frames = 0;
-    if (!PyArg_ParseTuple(args, "|i", &max_frames))
-        return NULL;
-
-    struct sr_py_koops_stacktrace *this = (struct sr_py_koops_stacktrace*)self;
-    if (koops_stacktrace_prepare_linked_list(this) < 0)
-        return NULL;
-
-    char *text =
-        sr_stacktrace_to_short_text((struct sr_stacktrace *)this->stacktrace, max_frames);
-    if (!text)
-        return NULL;
-
-    PyObject *result = PyString_FromString(text);
-
-    free(text);
-    return result;
 }

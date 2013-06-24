@@ -1,4 +1,5 @@
 #include "py_common.h"
+#include "py_base_thread.h"
 #include "py_java_thread.h"
 #include "py_java_frame.h"
 #include "strbuf.h"
@@ -45,13 +46,6 @@ java_thread_methods[] =
     { NULL },
 };
 
-static PyMemberDef
-java_thread_members[] =
-{
-    { (char *)"frames", T_OBJECT_EX, offsetof(struct sr_py_java_thread, frames), 0, t_frames_doc },
-    { NULL },
-};
-
 /* See python/py_common.h and python/py_gdb_frame.c for generic getters/setters documentation. */
 #define GSOFF_PY_STRUCT sr_py_java_thread
 #define GSOFF_PY_MEMBER thread
@@ -78,7 +72,7 @@ PyTypeObject sr_py_java_thread_type =
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
-    (cmpfunc)sr_py_java_thread_cmp, /* tp_compare */
+    NULL,                       /* tp_compare */
     NULL,                       /* tp_repr */
     NULL,                       /* tp_as_number */
     NULL,                       /* tp_as_sequence */
@@ -98,9 +92,9 @@ PyTypeObject sr_py_java_thread_type =
     NULL,                       /* tp_iter */
     NULL,                       /* tp_iternext */
     java_thread_methods,        /* tp_methods */
-    java_thread_members,        /* tp_members */
+    NULL,                       /* tp_members */
     java_thread_getset,         /* tp_getset */
-    NULL,                       /* tp_base */
+    &sr_py_base_thread_type,    /* tp_base */
     NULL,                       /* tp_dict */
     NULL,                       /* tp_descr_get */
     NULL,                       /* tp_descr_set */
@@ -117,94 +111,6 @@ PyTypeObject sr_py_java_thread_type =
     NULL,                       /* tp_weaklist */
 };
 
-/* helpers */
-int
-java_thread_prepare_linked_list(struct sr_py_java_thread *thread)
-{
-    int i;
-    PyObject *item;
-    struct sr_py_java_frame *current = NULL, *prev = NULL;
-
-    for (i = 0; i < PyList_Size(thread->frames); ++i)
-    {
-        item = PyList_GetItem(thread->frames, i);
-        if (!item)
-            return -1;
-
-        Py_INCREF(item);
-
-        if (!PyObject_TypeCheck(item, &sr_py_java_frame_type))
-        {
-            Py_XDECREF(item);
-            Py_XDECREF(prev);
-            PyErr_SetString(PyExc_TypeError, "frames must be a list of satyr.JavaFrame objects");
-            return -1;
-        }
-
-        current = (struct sr_py_java_frame*)item;
-        if (i == 0)
-            thread->thread->frames = current->frame;
-        else
-            prev->frame->next = current->frame;
-
-        Py_XDECREF(prev);
-        prev = current;
-    }
-
-    if (current)
-    {
-        current->frame->next = NULL;
-        Py_DECREF(current);
-    }
-
-    return 0;
-}
-
-int
-java_thread_free_frame_python_list(struct sr_py_java_thread *thread)
-{
-    int i;
-    PyObject *item;
-
-    for (i = 0; i < PyList_Size(thread->frames); ++i)
-    {
-        item = PyList_GetItem(thread->frames, i);
-        if (!item)
-            return -1;
-        Py_DECREF(item);
-    }
-    Py_DECREF(thread->frames);
-
-    return 0;
-}
-
-PyObject *
-java_frame_linked_list_to_python_list(struct sr_java_thread *thread)
-{
-    PyObject *result = PyList_New(0);
-    if (!result)
-        return NULL;
-
-    struct sr_java_frame *frame = thread->frames;
-    struct sr_py_java_frame *item;
-    while (frame)
-    {
-        item = (struct sr_py_java_frame*)
-            PyObject_New(struct sr_py_java_frame, &sr_py_java_frame_type);
-
-        if (!item)
-            return PyErr_NoMemory();
-
-        item->frame = frame;
-        if (PyList_Append(result, (PyObject *)item) < 0)
-            return NULL;
-
-        frame = frame->next;
-    }
-
-    return result;
-}
-
 /* constructor */
 PyObject *
 sr_py_java_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
@@ -215,6 +121,8 @@ sr_py_java_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 
     if (!to)
         return PyErr_NoMemory();
+
+    to->frame_type = &sr_py_java_frame_type;
 
     const char *str = NULL;
     if (!PyArg_ParseTuple(args, "|s", &str))
@@ -230,7 +138,7 @@ sr_py_java_thread_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
             PyErr_SetString(PyExc_ValueError, location.message);
             return NULL;
         }
-        to->frames = java_frame_linked_list_to_python_list(to->thread);
+        to->frames = frames_to_python_list((struct sr_thread *)to->thread, to->frame_type);
         if (!to->frames)
             return NULL;
     }
@@ -248,7 +156,7 @@ void
 sr_py_java_thread_free(PyObject *object)
 {
     struct sr_py_java_thread *this = (struct sr_py_java_thread *)object;
-    java_thread_free_frame_python_list(this);
+    frames_free_python_list((struct sr_py_base_thread *)this);
     this->thread->frames = NULL;
     sr_java_thread_free(this->thread);
     PyObject_Del(object);
@@ -275,7 +183,7 @@ PyObject *
 sr_py_java_thread_dup(PyObject *self, PyObject *args)
 {
     struct sr_py_java_thread *this = (struct sr_py_java_thread *)self;
-    if (java_thread_prepare_linked_list(this) < 0)
+    if (frames_prepare_linked_list((struct sr_py_base_thread *)this) < 0)
         return NULL;
 
     struct sr_py_java_thread *to = (struct sr_py_java_thread*)
@@ -284,33 +192,21 @@ sr_py_java_thread_dup(PyObject *self, PyObject *args)
     if (!to)
         return PyErr_NoMemory();
 
+    to->frame_type = &sr_py_java_frame_type;
     to->thread = sr_java_thread_dup(this->thread, false);
     if (!to->thread)
         return NULL;
 
-    to->frames = java_frame_linked_list_to_python_list(to->thread);
+    to->frames = frames_to_python_list((struct sr_thread *)to->thread, to->frame_type);
 
     return (PyObject *)to;
-}
-
-int
-sr_py_java_thread_cmp(struct sr_py_java_thread *self, struct sr_py_java_thread *other)
-{
-    if (java_thread_prepare_linked_list(self) < 0
-        || java_thread_prepare_linked_list(other) < 0)
-    {
-        /* exception is already set */
-        return -1;
-    }
-
-    return normalize_cmp(sr_java_thread_cmp(self->thread, other->thread));
 }
 
 PyObject *
 sr_py_java_thread_quality_counts(PyObject *self, PyObject *args)
 {
     struct sr_py_java_thread *this = (struct sr_py_java_thread *)self;
-    if (java_thread_prepare_linked_list(this) < 0)
+    if (frames_prepare_linked_list((struct sr_py_base_thread *)this) < 0)
         return NULL;
 
     int ok = 0, all = 0;
@@ -322,7 +218,7 @@ PyObject *
 sr_py_java_thread_quality(PyObject *self, PyObject *args)
 {
     struct sr_py_java_thread *this = (struct sr_py_java_thread *)self;
-    if (java_thread_prepare_linked_list(this) < 0)
+    if (frames_prepare_linked_list((struct sr_py_base_thread *)this) < 0)
         return NULL;
 
     return Py_BuildValue("f", sr_java_thread_quality(this->thread));
