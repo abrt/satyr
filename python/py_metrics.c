@@ -1,13 +1,15 @@
 #include "py_metrics.h"
-#include "py_gdb_thread.h"
+#include "py_base_thread.h"
 #include "strbuf.h"
 #include "distance.h"
 
 #define distances_doc "satyr.Distances - class representing distances between objects\n" \
                       "Usage:\n" \
                       "satyr.Distances(m, n) - creates an m-by-n distance matrix\n" \
-                      "satyr.Distances(dist_name, [threads], m) - compares first m threads with others\n" \
-                      "dist_name: \"jaccard\" or \"levenshtein\"\n"
+                      "satyr.Distances([threads], m, dist_type=DISTANCE_LEVENSHTEIN) \n"\
+                      "        - compares first m threads with others\n" \
+                      "dist_type (optional): DISTANCE_LEVENSHTEIN, DISTANCE_JACCARD \n"\
+                      "                      or DISTANCE_DAMERAU_LEVENSHTEIN\n"
 
 #define di_get_size_doc "Usage: distances.get_size()\n" \
                        "Returns: (m, n) - size of the distance matrix"
@@ -98,24 +100,35 @@ sr_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 
     PyObject * thread_list;
     int i, m, n;
-    const char *dist_name;
+    int dist_type = SR_DISTANCE_LEVENSHTEIN;
+    static const char *kwlist[] = { "threads", "m", "dist_type", NULL };
 
-    if (PyArg_ParseTuple(args, "sO!i", &dist_name, &PyList_Type, &thread_list, &m))
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "O!i|i", (char **)kwlist,
+                                    &PyList_Type, &thread_list, &m, &dist_type))
     {
         n = PyList_Size(thread_list);
         struct sr_thread *threads[n];
+        PyTypeObject *thread_type = NULL;
 
         for (i = 0; i < n; i++)
         {
             PyObject *obj = PyList_GetItem(thread_list, i);
-            if (!PyObject_TypeCheck(obj, &sr_py_gdb_thread_type))
+            if (!PyObject_TypeCheck(obj, &sr_py_base_thread_type))
             {
-                PyErr_SetString(PyExc_TypeError, "Must be a list of satyr.Thread objects");
+                PyErr_SetString(PyExc_TypeError, "Must be a list of satyr.BaseThread objects");
                 return NULL;
             }
 
-            struct sr_py_gdb_thread *to = (struct sr_py_gdb_thread*)obj;
-            if (thread_prepare_linked_list(to) < 0)
+            /* check that the type is the same as in the previous thread */
+            if (thread_type && obj->ob_type != thread_type)
+            {
+                PyErr_SetString(PyExc_TypeError, "All threads in the list must have the same type");
+                return NULL;
+            }
+            thread_type = obj->ob_type;
+
+            struct sr_py_base_thread *to = (struct sr_py_base_thread*)obj;
+            if (frames_prepare_linked_list(to) < 0)
             {
                 return NULL;
             }
@@ -127,15 +140,15 @@ sr_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
             return NULL;
         }
 
-        enum sr_distance_type dist_type;
-
-        if (!strcmp(dist_name, "jaccard"))
-            dist_type = SR_DISTANCE_JACCARD;
-        else if (!strcmp(dist_name, "levenshtein"))
-            dist_type = SR_DISTANCE_LEVENSHTEIN;
-        else
+        if (dist_type < 0 || dist_type >= SR_DISTANCE_NUM)
         {
-            PyErr_SetString(PyExc_ValueError, "Unknown name of distance function");
+            PyErr_SetString(PyExc_ValueError, "Invalid distance type");
+            return NULL;
+        }
+
+        if (dist_type == SR_DISTANCE_JARO_WINKLER)
+        {
+            PyErr_SetString(PyExc_ValueError, "Cannot use DISTANCE_JARO_WINKLER as it is not a metric");
             return NULL;
         }
 

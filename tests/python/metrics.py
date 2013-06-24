@@ -25,14 +25,14 @@ class TestDistances(unittest.TestCase):
         thread1 = satyr.GdbThread("f1 lib1\n", True)
         thread2 = satyr.GdbThread("f1 lib1\n", True)
 
-        distances = satyr.Distances("levenshtein", [thread1, thread2], 2)
+        distances = satyr.Distances([thread1, thread2], 2, satyr.DISTANCE_LEVENSHTEIN)
         self.assertAlmostEqual(distances.get_distance(0, 1), 0.0)
 
         # original backtrace
         thread1 = satyr.GdbThread("f1 lib1\nf2 lib2\nf3 lib3\n", True)
         thread2 = satyr.GdbThread("f1 lib1\nf4 lib4\nf5 lib5\n", True)
 
-        distances = satyr.Distances("levenshtein", [thread1, thread2], 2)
+        distances = satyr.Distances([thread1, thread2], 2, satyr.DISTANCE_LEVENSHTEIN)
         self.assertNotAlmostEqual(distances.get_distance(0, 1), 0.0)
         self.assertAlmostEqual(distances.get_distance(0, 1), 0.66666668)
 
@@ -41,7 +41,7 @@ class TestDistances(unittest.TestCase):
         thread1.frames[1:] = []
         thread2.frames[1:] = []
 
-        distances = satyr.Distances("levenshtein", [thread1, thread2], 2)
+        distances = satyr.Distances([thread1, thread2], 2, satyr.DISTANCE_LEVENSHTEIN)
         self.assertAlmostEqual(distances.get_distance(0, 1), 0.0)
 
     def test_distance_gdb(self):
