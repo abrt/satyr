@@ -18,6 +18,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <stdlib.h>
+
 #include "internal_utils.h"
 #include "strbuf.h"
 #include "location.h"
@@ -115,6 +117,19 @@ struct sr_thread *
 sr_stacktrace_find_crash_thread(struct sr_stacktrace *stacktrace)
 {
     return DISPATCH(dtable, stacktrace->type, find_crash_thread)(stacktrace);
+}
+
+struct sr_thread *
+sr_stacktrace_threads(struct sr_stacktrace *stacktrace)
+{
+    return DISPATCH(dtable, stacktrace->type, threads)(stacktrace);
+}
+
+void
+sr_stacktrace_set_threads(struct sr_stacktrace *stacktrace, struct sr_thread *threads)
+{
+    assert(threads == NULL || stacktrace->type == threads->type);
+    DISPATCH(dtable, stacktrace->type, set_threads)(stacktrace, threads);
 }
 
 void

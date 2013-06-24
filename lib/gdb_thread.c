@@ -32,15 +32,19 @@
 
 /* Method table */
 
-DEFINE_THREAD_FUNC(gdb_frames, struct sr_gdb_thread)
+DEFINE_FRAMES_FUNC(gdb_frames, struct sr_gdb_thread)
+DEFINE_SET_FRAMES_FUNC(gdb_set_frames, struct sr_gdb_thread)
 DEFINE_NEXT_FUNC(gdb_next, struct sr_thread, struct sr_gdb_thread)
+DEFINE_SET_NEXT_FUNC(gdb_set_next, struct sr_thread, struct sr_gdb_thread)
 
 struct thread_methods gdb_thread_methods =
 {
     .frames = (frames_fn_t) gdb_frames,
+    .set_frames = (set_frames_fn_t) gdb_set_frames,
     .cmp = (thread_cmp_fn_t) sr_gdb_thread_cmp,
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) gdb_next,
+    .set_next = (set_next_thread_fn_t) gdb_set_next,
 };
 
 /* Public functions */

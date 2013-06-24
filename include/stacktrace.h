@@ -63,6 +63,18 @@ struct sr_thread *
 sr_stacktrace_find_crash_thread(struct sr_stacktrace *stacktrace);
 
 /**
+ * Returns pointer to the first thread.
+ */
+struct sr_thread *
+sr_stacktrace_threads(struct sr_stacktrace *stacktrace);
+
+/**
+ * Set the threads linked list pointer.
+ */
+void
+sr_stacktrace_set_threads(struct sr_stacktrace *stacktrace, struct sr_thread *threads);
+
+/**
  * Convert stacktrace to json and return it as text.
  */
 char *

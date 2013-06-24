@@ -31,6 +31,9 @@
 
 /* Method table */
 
+DEFINE_THREADS_FUNC(java_threads, struct sr_java_stacktrace)
+DEFINE_SET_THREADS_FUNC(java_set_threads, struct sr_java_stacktrace)
+
 struct stacktrace_methods java_stacktrace_methods =
 {
     .parse = (parse_fn_t) stacktrace_parse_wrapper,
@@ -40,6 +43,8 @@ struct stacktrace_methods java_stacktrace_methods =
     .get_reason = (get_reason_fn_t) sr_java_stacktrace_get_reason,
     .find_crash_thread =
         (find_crash_thread_fn_t) sr_java_find_crash_thread,
+    .threads = (threads_fn_t) java_threads,
+    .set_threads = (set_threads_fn_t) java_set_threads,
     .free = (free_fn_t) sr_java_stacktrace_free,
 };
 

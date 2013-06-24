@@ -18,6 +18,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <stdlib.h>
+
 #include "report_type.h"
 #include "internal_utils.h"
 #include "generic_frame.h"
@@ -42,6 +44,13 @@ struct sr_frame *
 sr_frame_next(struct sr_frame *frame)
 {
     return DISPATCH(dtable, frame->type, next)(frame);
+}
+
+void
+sr_frame_set_next(struct sr_frame *cur, struct sr_frame *next)
+{
+    assert(next == NULL || cur->type == next->type);
+    DISPATCH(dtable, cur->type, set_next)(cur, next);
 }
 
 int

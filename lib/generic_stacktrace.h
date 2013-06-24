@@ -27,6 +27,8 @@ typedef char* (*to_short_text_fn_t)(struct sr_stacktrace*, int);
 typedef char* (*to_json_fn_t)(struct sr_stacktrace *);
 typedef char* (*get_reason_fn_t)(struct sr_stacktrace *);
 typedef struct sr_thread* (*find_crash_thread_fn_t)(struct sr_stacktrace *);
+typedef struct sr_thread* (*threads_fn_t)(struct sr_stacktrace *);
+typedef void (*set_threads_fn_t)(struct sr_stacktrace *, struct sr_thread *);
 typedef void (*free_fn_t)(struct sr_stacktrace *);
 
 struct stacktrace_methods
@@ -37,11 +39,20 @@ struct stacktrace_methods
     to_json_fn_t to_json;
     get_reason_fn_t get_reason;
     find_crash_thread_fn_t find_crash_thread;
+    threads_fn_t threads;
+    set_threads_fn_t set_threads;
     free_fn_t free;
 };
 
 extern struct stacktrace_methods core_stacktrace_methods, python_stacktrace_methods,
        koops_stacktrace_methods, gdb_stacktrace_methods, java_stacktrace_methods;
+
+/* Macros to generate accessors for the "threads" member. */
+#define DEFINE_THREADS_FUNC(name, concrete_t) \
+    DEFINE_GETTER(name, threads, struct sr_stacktrace, concrete_t, struct sr_thread)
+
+#define DEFINE_SET_THREADS_FUNC(name, concrete_t) \
+    DEFINE_SETTER(name, threads, struct sr_stacktrace, concrete_t, struct sr_thread)
 
 /* XXX generic functions */
 struct sr_stacktrace *

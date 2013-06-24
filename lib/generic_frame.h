@@ -22,12 +22,14 @@
 
 typedef void (*append_to_str_fn_t)(struct sr_frame *, struct sr_strbuf *);
 typedef struct sr_frame* (*next_frame_fn_t)(struct sr_frame *);
+typedef void (*set_next_frame_fn_t)(struct sr_frame *, struct sr_frame *);
 typedef int (*frame_cmp_fn_t)(struct sr_frame *, struct sr_frame *);
 
 struct frame_methods
 {
     append_to_str_fn_t append_to_str;
     next_frame_fn_t next;
+    set_next_frame_fn_t set_next;
     frame_cmp_fn_t cmp;
     frame_cmp_fn_t cmp_distance;
 };

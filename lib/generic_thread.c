@@ -24,6 +24,7 @@
 #include "generic_thread.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 //XXX
 /* Note that python and koops do not have multiple threads, thus the functions
@@ -68,6 +69,13 @@ sr_thread_frames(struct sr_thread *thread)
     return DISPATCH(dtable, thread->type, frames)(thread);
 }
 
+void
+sr_thread_set_frames(struct sr_thread *thread, struct sr_frame *frame)
+{
+    assert(frame == NULL || thread->type == frame->type);
+    DISPATCH(dtable, thread->type, set_frames)(thread, frame);
+}
+
 int
 sr_thread_frame_count(struct sr_thread *thread)
 {
@@ -87,4 +95,11 @@ struct sr_thread *
 sr_thread_next(struct sr_thread *thread)
 {
     return DISPATCH(dtable, thread->type, next)(thread);
+}
+
+void
+sr_thread_set_next(struct sr_thread *cur, struct sr_thread *next)
+{
+    assert(next == NULL || cur->type == next->type);
+    DISPATCH(dtable, cur->type, set_next)(cur, next);
 }

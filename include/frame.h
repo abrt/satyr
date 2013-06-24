@@ -52,6 +52,12 @@ struct sr_frame *
 sr_frame_next(struct sr_frame *frame);
 
 /**
+ * Set the next pointer.
+ */
+void
+sr_frame_set_next(struct sr_frame *cur, struct sr_frame *next);
+
+/**
  * Appends textual representation of the frame to buffer strbuf.
  */
 void

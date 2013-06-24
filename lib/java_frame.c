@@ -34,11 +34,13 @@
 /* Method table */
 
 DEFINE_NEXT_FUNC(java_next, struct sr_frame, struct sr_java_frame)
+DEFINE_SET_NEXT_FUNC(java_set_next, struct sr_frame, struct sr_java_frame)
 
 struct frame_methods java_frame_methods =
 {
     .append_to_str = (append_to_str_fn_t) sr_java_frame_append_to_str,
     .next = (next_frame_fn_t) java_next,
+    .set_next = (set_next_frame_fn_t) java_set_next,
     .cmp = (frame_cmp_fn_t) sr_java_frame_cmp,
     .cmp_distance = (frame_cmp_fn_t) sr_java_frame_cmp_distance,
 };

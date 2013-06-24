@@ -51,6 +51,12 @@ struct sr_frame *
 sr_thread_frames(struct sr_thread *thread);
 
 /**
+ * Set the frame linked list pointer.
+ */
+void
+sr_thread_set_frames(struct sr_thread *thread, struct sr_frame *frames);
+
+/**
  * Returns the number of frames in the thread.
  */
 int
@@ -68,6 +74,12 @@ sr_thread_cmp(struct sr_thread *t1, struct sr_thread *t2);
  */
 struct sr_thread *
 sr_thread_next(struct sr_thread *thread);
+
+/**
+ * Set the next pointer.
+ */
+void
+sr_thread_set_next(struct sr_thread *cur, struct sr_thread *next);
 
 #ifdef __cplusplus
 }

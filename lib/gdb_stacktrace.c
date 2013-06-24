@@ -41,6 +41,9 @@ gdb_return_null(struct sr_stacktrace *stacktrace)
     return NULL;
 }
 
+DEFINE_THREADS_FUNC(gdb_threads, struct sr_gdb_stacktrace)
+DEFINE_SET_THREADS_FUNC(gdb_set_threads, struct sr_gdb_stacktrace)
+
 struct stacktrace_methods gdb_stacktrace_methods =
 {
     .parse = (parse_fn_t) stacktrace_parse_wrapper,
@@ -50,6 +53,8 @@ struct stacktrace_methods gdb_stacktrace_methods =
     .get_reason = (get_reason_fn_t) gdb_return_null,
     .find_crash_thread =
         (find_crash_thread_fn_t) sr_gdb_stacktrace_find_crash_thread,
+    .threads = (threads_fn_t) gdb_threads,
+    .set_threads = (set_threads_fn_t) gdb_set_threads,
     .free = (free_fn_t) sr_gdb_stacktrace_free,
 };
 

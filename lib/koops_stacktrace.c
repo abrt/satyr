@@ -56,14 +56,17 @@ struct sr_taint_flag sr_flags[] = {
 
 /* Method tables */
 
-DEFINE_THREAD_FUNC(koops_frames, struct sr_koops_stacktrace)
+DEFINE_FRAMES_FUNC(koops_frames, struct sr_koops_stacktrace)
+DEFINE_SET_FRAMES_FUNC(koops_set_frames, struct sr_koops_stacktrace)
 
 struct thread_methods koops_thread_methods =
 {
     .frames = (frames_fn_t) koops_frames,
+    .set_frames = (set_frames_fn_t) koops_set_frames,
     .cmp = (thread_cmp_fn_t) NULL,
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) thread_no_next_thread,
+    .set_next = (set_next_thread_fn_t) NULL,
 };
 
 struct stacktrace_methods koops_stacktrace_methods =
@@ -74,6 +77,8 @@ struct stacktrace_methods koops_stacktrace_methods =
     .to_json = (to_json_fn_t) sr_koops_stacktrace_to_json,
     .get_reason = (get_reason_fn_t) sr_koops_stacktrace_get_reason,
     .find_crash_thread = (find_crash_thread_fn_t) stacktrace_one_thread_only,
+    .threads = (threads_fn_t) stacktrace_one_thread_only,
+    .set_threads = (set_threads_fn_t) NULL,
     .free = (free_fn_t) sr_koops_stacktrace_free,
 };
 

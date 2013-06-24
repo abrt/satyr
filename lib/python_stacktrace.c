@@ -34,14 +34,17 @@
 
 /* Method tables */
 
-DEFINE_THREAD_FUNC(python_frames, struct sr_python_stacktrace)
+DEFINE_FRAMES_FUNC(python_frames, struct sr_python_stacktrace)
+DEFINE_SET_FRAMES_FUNC(python_set_frames, struct sr_python_stacktrace)
 
 struct thread_methods python_thread_methods =
 {
     .frames = (frames_fn_t) python_frames,
+    .set_frames = (set_frames_fn_t) python_set_frames,
     .cmp = (thread_cmp_fn_t) NULL,
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) thread_no_next_thread,
+    .set_next = (set_next_thread_fn_t) NULL,
 };
 
 struct stacktrace_methods python_stacktrace_methods =
@@ -52,6 +55,8 @@ struct stacktrace_methods python_stacktrace_methods =
     .to_json = (to_json_fn_t) sr_python_stacktrace_to_json,
     .get_reason = (get_reason_fn_t) sr_python_stacktrace_get_reason,
     .find_crash_thread = (find_crash_thread_fn_t) stacktrace_one_thread_only,
+    .threads = (threads_fn_t) stacktrace_one_thread_only,
+    .set_threads = (set_threads_fn_t) NULL,
     .free = (free_fn_t) sr_python_stacktrace_free,
 };
 

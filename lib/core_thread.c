@@ -28,15 +28,19 @@
 
 /* Method table */
 
-DEFINE_THREAD_FUNC(core_frames, struct sr_core_thread)
+DEFINE_FRAMES_FUNC(core_frames, struct sr_core_thread)
+DEFINE_SET_FRAMES_FUNC(core_set_frames, struct sr_core_thread)
 DEFINE_NEXT_FUNC(core_next, struct sr_thread, struct sr_core_thread)
+DEFINE_SET_NEXT_FUNC(core_set_next, struct sr_thread, struct sr_core_thread)
 
 struct thread_methods core_thread_methods =
 {
     .frames = (frames_fn_t) core_frames,
+    .set_frames = (set_frames_fn_t) core_set_frames,
     .cmp = (thread_cmp_fn_t) sr_core_thread_cmp,
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) core_next,
+    .set_next = (set_next_thread_fn_t) core_set_next,
 };
 
 /* Public functions */

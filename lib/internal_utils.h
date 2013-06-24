@@ -24,10 +24,19 @@
     (assert((type > SR_REPORT_INVALID) && (type) < SR_REPORT_NUM && table[type]->method), \
     table[type]->method)
 
-#define DEFINE_NEXT_FUNC(name, abstract_t, concrete_t)   \
-    static abstract_t *                                  \
-    name(abstract_t *node)                               \
-    {                                                    \
-        return (abstract_t *)((concrete_t *)node)->next; \
+#define DEFINE_GETTER(name, member, struct_abstract_t, struct_concrete_t, member_abstract_t) \
+    static member_abstract_t *                                                               \
+    name(struct_abstract_t *node)                                                            \
+    {                                                                                        \
+        return (member_abstract_t *)((struct_concrete_t *)node)->member;                     \
     }
 
+#define DEFINE_SETTER(name, member, struct_abstract_t, struct_concrete_t, member_abstract_t) \
+    static void                                                                              \
+    name(struct_abstract_t *node, member_abstract_t *val)                                    \
+    {                                                                                        \
+        ((struct_concrete_t *)node)->member = (void*) val;                                   \
+    }
+
+#define DEFINE_NEXT_FUNC(name, abstract_t, concrete_t) DEFINE_GETTER(name, next, abstract_t, concrete_t, abstract_t)
+#define DEFINE_SET_NEXT_FUNC(name, abstract_t, concrete_t) DEFINE_SETTER(name, next, abstract_t, concrete_t, abstract_t)

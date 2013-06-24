@@ -19,30 +19,34 @@
 */
 
 #include "thread.h"
+#include "internal_utils.h"
 
 typedef struct sr_frame* (*frames_fn_t)(struct sr_thread*);
+typedef void (*set_frames_fn_t)(struct sr_thread*, struct sr_frame*);
 typedef int (*thread_cmp_fn_t)(struct sr_thread*, struct sr_thread*);
 typedef int (*frame_count_fn_t)(struct sr_thread*);
 typedef struct sr_thread* (*next_thread_fn_t)(struct sr_thread*);
+typedef void (*set_next_thread_fn_t)(struct sr_thread*, struct sr_thread*);
 
 struct thread_methods
 {
     frames_fn_t frames;
+    set_frames_fn_t set_frames;
     thread_cmp_fn_t cmp;
     frame_count_fn_t frame_count;
     next_thread_fn_t next;
+    set_next_thread_fn_t set_next;
 };
 
 extern struct thread_methods core_thread_methods, python_thread_methods,
        koops_thread_methods, gdb_thread_methods, java_thread_methods;
 
-/* Macro to generate accessors for the "frames" member. */
-#define DEFINE_THREAD_FUNC(name, concrete_t)                    \
-    static struct sr_frame *                                    \
-    name(struct sr_frame *node)                                 \
-    {                                                           \
-        return (struct sr_frame *)((concrete_t *)node)->frames; \
-    }                                                           \
+/* Macros to generate accessors for the "frames" member. */
+#define DEFINE_FRAMES_FUNC(name, concrete_t) \
+    DEFINE_GETTER(name, frames, struct sr_thread, concrete_t, struct sr_frame)
+
+#define DEFINE_SET_FRAMES_FUNC(name, concrete_t) \
+    DEFINE_SETTER(name, frames, struct sr_thread, concrete_t, struct sr_frame)
 
 int
 thread_frame_count(struct sr_thread *thread);

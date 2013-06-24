@@ -40,6 +40,9 @@
 
 /* Method table */
 
+DEFINE_THREADS_FUNC(core_threads, struct sr_core_stacktrace)
+DEFINE_SET_THREADS_FUNC(core_set_threads, struct sr_core_stacktrace)
+
 struct stacktrace_methods core_stacktrace_methods =
 {
     /* core parser returns error_message directly */
@@ -50,6 +53,8 @@ struct stacktrace_methods core_stacktrace_methods =
     .get_reason = (get_reason_fn_t) sr_core_stacktrace_get_reason,
     .find_crash_thread =
         (find_crash_thread_fn_t) sr_core_stacktrace_find_crash_thread,
+    .threads = (threads_fn_t) core_threads,
+    .set_threads = (set_threads_fn_t) core_set_threads,
     .free = (free_fn_t) sr_core_stacktrace_free,
 };
 
