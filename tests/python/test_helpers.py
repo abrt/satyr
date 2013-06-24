@@ -1,3 +1,4 @@
+import os
 import unittest
 
 class BindingsTestCase(unittest.TestCase):
@@ -9,6 +10,13 @@ class BindingsTestCase(unittest.TestCase):
         obj.__setattr__(attr, new_val)
         self.assertEqual(obj.__getattribute__(attr), new_val)
         self.assertRaises(TypeError, obj.__delattr__, attr)
+
+def load_input_contents(path):
+    if not os.path.isfile(path):
+        path = '../' + path
+
+    with file(path) as f:
+        return f.read()
 
 if __name__ == '__main__':
     import sys

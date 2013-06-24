@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
-import os
 import unittest
 
-from test_helpers import BindingsTestCase
+from test_helpers import BindingsTestCase, load_input_contents
 
 try:
     import _satyr as satyr
@@ -11,6 +10,7 @@ except ImportError:
     import satyr
 
 path = '../python_stacktraces/python-01'
+contents = load_input_contents(path)
 frames_expected = 11
 expected_short_text = '''#1 _getPackage in /usr/share/PackageKit/helpers/yum/yumBackend.py:2534
 #2 updateProgress in /usr/share/PackageKit/helpers/yum/yumBackend.py:2593
@@ -19,12 +19,6 @@ expected_short_text = '''#1 _getPackage in /usr/share/PackageKit/helpers/yum/yum
 #5 downloadPkgs in /usr/lib/yum-plugins/presto.py:419
 #6 predownload_hook in /usr/lib/yum-plugins/presto.py:577
 '''
-
-if not os.path.isfile(path):
-    path = '../' + path
-
-with file(path) as f:
-    contents = f.read()
 
 class TestPythonStacktrace(BindingsTestCase):
     def setUp(self):
@@ -60,10 +54,7 @@ class TestPythonStacktrace(BindingsTestCase):
         self.assertGetSetCorrect(self.trace, 'exception_name', 'AttributeError', 'WhateverException')
 
     def test_special_files_and_frames(self):
-        path2 = str(path)
-        path2 = path2[0:-1] + '3'
-        with open(path2, 'r') as f:
-            trace = f.read()
+        trace = load_input_contents('../python_stacktraces/python-03')
         trace = satyr.PythonStacktrace(trace)
 
         f = trace.frames[0]

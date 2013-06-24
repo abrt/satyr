@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-import os
 import unittest
-from test_helpers import BindingsTestCase
+from test_helpers import BindingsTestCase, load_input_contents
 
 try:
     import _satyr as satyr
@@ -10,7 +9,7 @@ except ImportError:
     import satyr
 
 
-path = '../gdb_stacktraces/rhbz-803600'
+contents = load_input_contents('../gdb_stacktraces/rhbz-803600')
 threads_expected = 2
 frames_expected = 227
 expected_short_text = '''Thread no. 1 (5 frames)
@@ -20,13 +19,6 @@ expected_short_text = '''Thread no. 1 (5 frames)
  #3 gtk_tree_view_expose at gtktreeview.c
  #4 _gtk_marshal_BOOLEAN__BOXED at gtkmarshalers.c
 '''
-
-
-if not os.path.isfile(path):
-    path = '../' + path
-
-with file(path) as f:
-    contents = f.read()
 
 class TestGdbStacktrace(BindingsTestCase):
     def setUp(self):

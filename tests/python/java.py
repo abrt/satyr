@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 
-import os
 import unittest
-from test_helpers import BindingsTestCase
+from test_helpers import BindingsTestCase, load_input_contents
 
 try:
     import _satyr as satyr
 except ImportError:
     import satyr
 
-path = '../java_stacktraces/java-02'
+contents = load_input_contents('../java_stacktraces/java-02')
 threads_expected = 1
 frames_expected = 32
 expected_short_text = '''#1 org.hibernate.exception.ConstraintViolationException: could not insert: [com.example.myproject.MyEntity]
@@ -21,12 +20,6 @@ expected_short_text = '''#1 org.hibernate.exception.ConstraintViolationException
 #7 \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:727) [unknown]
 #8 \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:820) [unknown]
 '''
-
-if not os.path.isfile(path):
-    path = '../' + path
-
-with file(path) as f:
-    contents = f.read()
 
 class TestJavaStacktrace(BindingsTestCase):
     def setUp(self):

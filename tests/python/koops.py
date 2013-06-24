@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 
-import os
 import unittest
-from test_helpers import BindingsTestCase
+from test_helpers import BindingsTestCase, load_input_contents
 
 try:
     import _satyr as satyr
 except ImportError:
     import satyr
 
-path = '../kerneloopses/rhbz-827868'
+contents = load_input_contents('../kerneloopses/rhbz-827868')
 frames_expected = 32
 mods_expected = 119
 expected_short_text = '''#1 warn_slowpath_common
@@ -20,12 +19,6 @@ expected_short_text = '''#1 warn_slowpath_common
 #6 alloc_pages_current
 #7 __get_free_pages
 '''
-
-if not os.path.isfile(path):
-    path = '../' + path
-
-with file(path) as f:
-    contents = f.read()
 
 class TestKerneloops(BindingsTestCase):
     def setUp(self):
@@ -44,11 +37,7 @@ class TestKerneloops(BindingsTestCase):
     def test_correct_taint_flags(self):
         for val in self.koops.taint_flags.values():
             self.assertFalse(val);
-        path = '../kerneloopses/rhbz-827868-modified'
-        if not os.path.isfile(path):
-            path = '../' + path
-        with file(path) as f:
-            contents = f.read()
+        contents = load_input_contents('../kerneloopses/rhbz-827868-modified')
         tainted_koops = satyr.Kerneloops(contents)
 
         true_flags = { f for (f, v) in tainted_koops.taint_flags.items() if v == True}
