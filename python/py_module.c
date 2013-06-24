@@ -1,5 +1,6 @@
 #include <Python.h>
 #include "py_cluster.h"
+#include "py_base_frame.h"
 #include "py_gdb_frame.h"
 #include "py_gdb_sharedlib.h"
 #include "py_gdb_stacktrace.h"
@@ -28,6 +29,12 @@ module_methods[]=
 PyMODINIT_FUNC
 init_satyr()
 {
+    if (PyType_Ready(&sr_py_base_frame_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_base_frame_type) < 0");
+        return;
+    }
+
     if (PyType_Ready(&sr_py_gdb_frame_type) < 0)
     {
         puts("PyType_Ready(&sr_py_gdb_frame_type) < 0");
@@ -113,6 +120,10 @@ init_satyr()
         puts("module == NULL");
         return;
     }
+
+    Py_INCREF(&sr_py_base_frame_type);
+    PyModule_AddObject(module, "BaseFrame",
+                       (PyObject *)&sr_py_base_frame_type);
 
     Py_INCREF(&sr_py_gdb_frame_type);
     PyModule_AddObject(module, "GdbFrame",

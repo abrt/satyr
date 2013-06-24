@@ -19,6 +19,7 @@
 */
 #include "py_common.h"
 #include "py_gdb_frame.h"
+#include "py_base_frame.h"
 
 #include <inttypes.h>
 
@@ -134,7 +135,7 @@ sr_py_gdb_frame_type =
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
-    sr_py_gdb_frame_cmp,        /* tp_compare */
+    NULL,                       /* tp_compare */
     NULL,                       /* tp_repr */
     NULL,                       /* tp_as_number */
     NULL,                       /* tp_as_sequence */
@@ -156,7 +157,7 @@ sr_py_gdb_frame_type =
     frame_methods,              /* tp_methods */
     NULL,                       /* tp_members */
     frame_getset,               /* tp_getset */
-    NULL,                       /* tp_base */
+    &sr_py_base_frame_type,     /* tp_base */
     NULL,                       /* tp_dict */
     NULL,                       /* tp_descr_get */
     NULL,                       /* tp_descr_set */
@@ -251,15 +252,6 @@ sr_py_gdb_frame_dup(PyObject *self, PyObject *args)
     fo->frame = sr_gdb_frame_dup(this->frame, false);
 
     return (PyObject*)fo;
-}
-
-int
-sr_py_gdb_frame_cmp(PyObject *self, PyObject *other)
-{
-    struct sr_gdb_frame *f1 = ((struct sr_py_gdb_frame*)self)->frame;
-    struct sr_gdb_frame *f2 = ((struct sr_py_gdb_frame*)other)->frame;
-
-    return normalize_cmp(sr_gdb_frame_cmp(f1, f2, true));
 }
 
 PyObject *

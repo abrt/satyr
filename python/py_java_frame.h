@@ -34,6 +34,9 @@ extern "C" {
 
 PyTypeObject sr_py_java_frame_type;
 
+/* The beginning of this structure has to have the same layout as
+ * sr_py_base_frame.
+ */
 struct sr_py_java_frame
 {
     PyObject_HEAD
@@ -55,11 +58,6 @@ void sr_py_java_frame_free(PyObject *object);
  * str
  */
 PyObject *sr_py_java_frame_str(PyObject *self);
-
-/**
- * cmp
- */
-int sr_py_java_frame_cmp(PyObject *self, PyObject *other);
 
 /* methods */
 PyObject *sr_py_java_frame_dup(PyObject *self, PyObject *args);

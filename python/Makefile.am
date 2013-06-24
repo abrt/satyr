@@ -8,6 +8,8 @@ clientexec_LTLIBRARIES = _satyr.la
 _satyr_la_SOURCES = \
     py_cluster.h \
     py_cluster.c \
+    py_base_frame.h \
+    py_base_frame.c \
     py_gdb_frame.h \
     py_gdb_frame.c \
     py_gdb_sharedlib.h \

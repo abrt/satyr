@@ -1,7 +1,7 @@
 /*
-    py_python_frame.h
+    py_base_frame.h
 
-    Copyright (C) 2010, 2011, 2012  Red Hat, Inc.
+    Copyright (C) 2013 Red Hat, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef SATYR_PY_PYTHON_FRAME_H
-#define SATYR_PY_PYTHON_FRAME_H
+#ifndef SATYR_PY_BASE_FRAME_H
+#define SATYR_PY_BASE_FRAME_H
 
 /**
  * @file
- * @brief Python bindings for PYTHON frame.
+ * @brief Base class for call frames.
  */
 
 #ifdef __cplusplus
@@ -32,35 +32,17 @@ extern "C" {
 #include <Python.h>
 #include <structmember.h>
 
-PyTypeObject sr_py_python_frame_type;
+extern PyTypeObject sr_py_base_frame_type;
 
-/* The beginning of this structure has to have the same layout as
- * sr_py_base_frame.
- */
-struct sr_py_python_frame
+struct sr_py_base_frame
 {
     PyObject_HEAD
-    struct sr_python_frame *frame;
+    struct sr_frame *frame;
 };
 
-/**
- * Constructor.
- */
-PyObject *sr_py_python_frame_new(PyTypeObject *object,
-                                 PyObject *args, PyObject *kwds);
+int sr_py_base_frame_cmp(struct sr_py_base_frame *self, struct sr_py_base_frame *other);
 
-/**
- * Destructor.
- */
-void sr_py_python_frame_free(PyObject *object);
-
-/**
- * str
- */
-PyObject *sr_py_python_frame_str(PyObject *self);
-
-/* methods */
-PyObject *sr_py_python_frame_dup(PyObject *self, PyObject *args);
+PyObject *sr_py_base_frame_short_string(PyObject *self, PyObject *args);
 
 #ifdef __cplusplus
 }
