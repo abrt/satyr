@@ -49,6 +49,9 @@ PyObject *frames_to_python_list(struct sr_thread *thread, PyTypeObject *frame_ty
 
 int sr_py_base_thread_cmp(struct sr_py_base_thread *self, struct sr_py_base_thread *other);
 
+/* methods */
+PyObject *sr_py_base_thread_distance(PyObject *self, PyObject *args, PyObject *kwds);
+
 #ifdef __cplusplus
 }
 #endif

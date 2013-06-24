@@ -16,6 +16,7 @@
 #include "py_java_stacktrace.h"
 #include "py_metrics.h"
 
+#include "distance.h"
 #include "gdb/sharedlib.h"
 
 static PyMethodDef
@@ -172,6 +173,14 @@ init_satyr()
     Py_INCREF(&sr_py_distances_type);
     PyModule_AddObject(module, "Distances",
                        (PyObject *)&sr_py_distances_type);
+
+    PyModule_AddIntConstant(module, "DISTANCE_JARO_WINKLER",
+                            SR_DISTANCE_JARO_WINKLER);
+    PyModule_AddIntConstant(module, "DISTANCE_JACCARD", SR_DISTANCE_JACCARD);
+    PyModule_AddIntConstant(module, "DISTANCE_LEVENSHTEIN",
+                            SR_DISTANCE_LEVENSHTEIN);
+    PyModule_AddIntConstant(module, "DISTANCE_DAMERAU_LEVENSHTEIN",
+                            SR_DISTANCE_DAMERAU_LEVENSHTEIN);
 
     Py_INCREF(&sr_py_dendrogram_type);
     PyModule_AddObject(module, "Dendrogram",

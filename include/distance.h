@@ -78,7 +78,10 @@ enum sr_distance_type
      * Like the Levenshtein distance, but with transpositions. NOTE:
      * The triangle inequality does not hold.
      */
-    SR_DISTANCE_DAMERAU_LEVENSHTEIN
+    SR_DISTANCE_DAMERAU_LEVENSHTEIN,
+
+    /* Sentinel, keep it the last entry. */
+    SR_DISTANCE_NUM
 };
 
 float

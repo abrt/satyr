@@ -23,14 +23,22 @@
 
 #include "thread.h"
 #include "frame.h"
+#include "distance.h"
 
 #define thread_doc "satyr.BaseThread - base class for threads"
 #define frames_doc "A list containing objects representing frames in a thread."
+
+#define distance_doc "Usage: thread.distance(other, dist_type=DISTANCE_LEVENSHTEIN)\n"\
+                     "other: other thread\n"\
+                     "dist_type (optional): one of DISTANCE_LEVENSHTEIN, DISTANCE_JARO_WINKLER,\n"\
+                     "                      DISTANCE_JACCARD or DISTANCE_DAMERAU_LEVENSHTEIN\n"\
+                     "Returns: positive float - distance between the two threads"
 
 static PyMethodDef
 thread_methods[] =
 {
     /* methods */
+    { "distance", (PyCFunction)sr_py_base_thread_distance, METH_VARARGS|METH_KEYWORDS, distance_doc },
     { NULL },
 };
 
@@ -202,4 +210,35 @@ sr_py_base_thread_cmp(struct sr_py_base_thread *self, struct sr_py_base_thread *
     }
 
     return normalize_cmp(sr_thread_cmp(self->thread, other->thread));
+}
+
+/* methods */
+PyObject *
+sr_py_base_thread_distance(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    PyObject *other;
+    int dist_type = SR_DISTANCE_LEVENSHTEIN;
+    static const char *kwlist[] = { "other", "dist_type", NULL };
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|i", (char **)kwlist,
+                                     &sr_py_base_thread_type, &other, &dist_type))
+        return NULL;
+
+    struct sr_py_base_thread *t1 = (struct sr_py_base_thread *)self;
+    struct sr_py_base_thread *t2 = (struct sr_py_base_thread *)other;
+
+    if (self->ob_type != other->ob_type)
+    {
+        PyErr_SetString(PyExc_TypeError, "Both threads must have the same type");
+        return NULL;
+    }
+
+    if (dist_type < 0 || dist_type >= SR_DISTANCE_NUM)
+    {
+        PyErr_SetString(PyExc_ValueError, "Invalid distance type");
+        return NULL;
+    }
+
+    float dist = sr_distance(dist_type, t1->thread, t2->thread);
+    return PyFloat_FromDouble((double)dist);
 }
