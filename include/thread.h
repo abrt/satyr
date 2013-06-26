@@ -37,6 +37,8 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+
 #include "report_type.h"
 
 struct sr_thread
@@ -80,6 +82,41 @@ sr_thread_next(struct sr_thread *thread);
  */
 void
 sr_thread_set_next(struct sr_thread *cur, struct sr_thread *next);
+
+/**
+ * Releases the memory held by the thread. The thread siblings are not
+ * released.
+ * @param thread
+ * If thread is NULL, no operation is performed.
+ */
+void
+sr_thread_free(struct sr_thread *thread);
+
+/**
+ * Removes the frame from the thread and then deletes it.
+ * @returns
+ * True if the frame was found in the thread and removed and deleted.
+ * False if the frame was not found in the thread.
+ */
+bool
+sr_thread_remove_frame(struct sr_thread *thread, struct sr_frame *frame);
+
+/**
+ * Removes all the frames from the thread that are above certain
+ * frame.
+ * @returns
+ * True if the frame was found, and all the frames that were above the
+ * frame in the thread were removed from the thread and then deleted.
+ * False if the frame was not found in the thread.
+ */
+bool
+sr_thread_remove_frames_above(struct sr_thread *thread, struct sr_frame *frame);
+
+/**
+ * Return a copy of the thread (without its siblings).
+ */
+struct sr_thread *
+sr_thread_dup(struct sr_thread *thread);
 
 #ifdef __cplusplus
 }

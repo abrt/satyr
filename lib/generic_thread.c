@@ -45,6 +45,59 @@ thread_frame_count(struct sr_thread *thread)
     return count;
 }
 
+bool
+thread_remove_frame(struct sr_thread *thread, struct sr_frame *frame)
+{
+    struct sr_frame *loop_frame = sr_thread_frames(thread),
+        *prev_frame = NULL;
+
+    while (loop_frame)
+    {
+        if (loop_frame == frame)
+        {
+            if (prev_frame)
+                sr_frame_set_next(prev_frame, sr_frame_next(loop_frame));
+            else
+                sr_thread_set_frames(thread, sr_frame_next(loop_frame));
+
+            sr_frame_free(loop_frame);
+            return true;
+        }
+
+        prev_frame = loop_frame;
+        loop_frame = sr_frame_next(loop_frame);
+    }
+
+    return false;
+}
+
+bool
+thread_remove_frames_above(struct sr_thread *thread, struct sr_frame *frame)
+{
+    /* Check that the frame is present in the thread. */
+    struct sr_frame *loop_frame = sr_thread_frames(thread);
+    while (loop_frame)
+    {
+        if (loop_frame == frame)
+            break;
+
+        loop_frame = sr_frame_next(loop_frame);
+    }
+
+    if (!loop_frame)
+        return false;
+
+    /* Delete all the frames up to the frame. */
+    while (sr_thread_frames(thread) != frame)
+    {
+        loop_frame = sr_frame_next(sr_thread_frames(thread));
+        sr_frame_free(sr_thread_frames(thread));
+        sr_thread_set_frames(thread, loop_frame);
+    }
+
+    return true;
+}
+
 struct sr_thread *
 thread_no_next_thread(struct sr_thread *thread)
 {
@@ -118,4 +171,33 @@ thread_append_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
 {
     DISPATCH(dtable, thread->type, thread_append_bthash_text)
             (thread, flags, strbuf);
+}
+
+void
+sr_thread_free(struct sr_thread *thread)
+{
+    if (!thread)
+        return;
+
+    DISPATCH(dtable, thread->type, thread_free)(thread);
+}
+
+bool
+sr_thread_remove_frame(struct sr_thread *thread, struct sr_frame *frame)
+{
+    assert(thread->type == frame->type);
+    return DISPATCH(dtable, thread->type, remove_frame)(thread, frame);
+}
+
+bool
+sr_thread_remove_frames_above(struct sr_thread *thread, struct sr_frame *frame)
+{
+    assert(thread->type == frame->type);
+    return DISPATCH(dtable, thread->type, remove_frames_above)(thread, frame);
+}
+
+struct sr_thread*
+sr_thread_dup(struct sr_thread *thread)
+{
+    return DISPATCH(dtable, thread->type, thread_dup)(thread);
 }

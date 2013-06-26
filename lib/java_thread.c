@@ -41,6 +41,7 @@ DEFINE_FRAMES_FUNC(java_frames, struct sr_java_thread)
 DEFINE_SET_FRAMES_FUNC(java_set_frames, struct sr_java_thread)
 DEFINE_NEXT_FUNC(java_next, struct sr_thread, struct sr_java_thread)
 DEFINE_SET_NEXT_FUNC(java_set_next, struct sr_thread, struct sr_java_thread)
+DEFINE_DUP_WRAPPER_FUNC(java_dup, struct sr_java_thread, sr_java_thread_dup)
 
 struct thread_methods java_thread_methods =
 {
@@ -52,6 +53,11 @@ struct thread_methods java_thread_methods =
     .set_next = (set_next_thread_fn_t) java_set_next,
     .thread_append_bthash_text =
         (thread_append_bthash_text_fn_t) java_append_bthash_text,
+    .thread_free = (thread_free_fn_t) sr_java_thread_free,
+    .remove_frame = (remove_frame_fn_t) thread_remove_frame,
+    .remove_frames_above =
+        (remove_frames_above_fn_t) thread_remove_frames_above,
+    .thread_dup = (thread_dup_fn_t) java_dup,
 };
 
 /* Public functions */

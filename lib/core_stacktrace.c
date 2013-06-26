@@ -59,7 +59,7 @@ struct stacktrace_methods core_stacktrace_methods =
         (find_crash_thread_fn_t) sr_core_stacktrace_find_crash_thread,
     .threads = (threads_fn_t) core_threads,
     .set_threads = (set_threads_fn_t) core_set_threads,
-    .free = (free_fn_t) sr_core_stacktrace_free,
+    .stacktrace_free = (stacktrace_free_fn_t) sr_core_stacktrace_free,
     .stacktrace_append_bthash_text =
         (stacktrace_append_bthash_text_fn_t) core_append_bthash_text,
 };

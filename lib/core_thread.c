@@ -33,6 +33,7 @@ DEFINE_FRAMES_FUNC(core_frames, struct sr_core_thread)
 DEFINE_SET_FRAMES_FUNC(core_set_frames, struct sr_core_thread)
 DEFINE_NEXT_FUNC(core_next, struct sr_thread, struct sr_core_thread)
 DEFINE_SET_NEXT_FUNC(core_set_next, struct sr_thread, struct sr_core_thread)
+DEFINE_DUP_WRAPPER_FUNC(core_dup, struct sr_core_thread, sr_core_thread_dup)
 
 struct thread_methods core_thread_methods =
 {
@@ -44,6 +45,11 @@ struct thread_methods core_thread_methods =
     .set_next = (set_next_thread_fn_t) core_set_next,
     .thread_append_bthash_text =
         (thread_append_bthash_text_fn_t) thread_no_bthash_text,
+    .thread_free = (thread_free_fn_t) sr_core_thread_free,
+    .remove_frame = (remove_frame_fn_t) thread_remove_frame,
+    .remove_frames_above =
+        (remove_frames_above_fn_t) thread_remove_frames_above,
+    .thread_dup = (thread_dup_fn_t) core_dup,
 };
 
 /* Public functions */

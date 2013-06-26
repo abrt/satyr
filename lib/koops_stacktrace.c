@@ -73,6 +73,11 @@ struct thread_methods koops_thread_methods =
     .next = (next_thread_fn_t) thread_no_next_thread,
     .set_next = (set_next_thread_fn_t) NULL,
     .thread_append_bthash_text = (thread_append_bthash_text_fn_t) thread_no_bthash_text,
+    .thread_free = (thread_free_fn_t) sr_koops_stacktrace_free,
+    .remove_frame = (remove_frame_fn_t) thread_remove_frame,
+    .remove_frames_above =
+        (remove_frames_above_fn_t) thread_remove_frames_above,
+    .thread_dup = (thread_dup_fn_t) sr_koops_stacktrace_dup,
 };
 
 struct stacktrace_methods koops_stacktrace_methods =
@@ -85,7 +90,7 @@ struct stacktrace_methods koops_stacktrace_methods =
     .find_crash_thread = (find_crash_thread_fn_t) stacktrace_one_thread_only,
     .threads = (threads_fn_t) stacktrace_one_thread_only,
     .set_threads = (set_threads_fn_t) NULL,
-    .free = (free_fn_t) sr_koops_stacktrace_free,
+    .stacktrace_free = (stacktrace_free_fn_t) sr_koops_stacktrace_free,
     .stacktrace_append_bthash_text =
         (stacktrace_append_bthash_text_fn_t) koops_append_bthash_text,
 };

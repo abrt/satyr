@@ -53,7 +53,7 @@ struct stacktrace_methods java_stacktrace_methods =
         (find_crash_thread_fn_t) sr_java_find_crash_thread,
     .threads = (threads_fn_t) java_threads,
     .set_threads = (set_threads_fn_t) java_set_threads,
-    .free = (free_fn_t) sr_java_stacktrace_free,
+    .stacktrace_free = (stacktrace_free_fn_t) sr_java_stacktrace_free,
     .stacktrace_append_bthash_text =
         (stacktrace_append_bthash_text_fn_t) java_append_bthash_text,
 };

@@ -32,7 +32,7 @@ typedef char* (*get_reason_fn_t)(struct sr_stacktrace *);
 typedef struct sr_thread* (*find_crash_thread_fn_t)(struct sr_stacktrace *);
 typedef struct sr_thread* (*threads_fn_t)(struct sr_stacktrace *);
 typedef void (*set_threads_fn_t)(struct sr_stacktrace *, struct sr_thread *);
-typedef void (*free_fn_t)(struct sr_stacktrace *);
+typedef void (*stacktrace_free_fn_t)(struct sr_stacktrace *);
 typedef void (*stacktrace_append_bthash_text_fn_t)(struct sr_stacktrace *, enum sr_bthash_flags,
                                                    struct sr_strbuf *);
 
@@ -46,7 +46,7 @@ struct stacktrace_methods
     find_crash_thread_fn_t find_crash_thread;
     threads_fn_t threads;
     set_threads_fn_t set_threads;
-    free_fn_t free;
+    stacktrace_free_fn_t stacktrace_free;
     stacktrace_append_bthash_text_fn_t stacktrace_append_bthash_text;
 };
 

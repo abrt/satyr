@@ -79,3 +79,11 @@ frame_append_bthash_text(struct sr_frame *frame, enum sr_bthash_flags flags,
     DISPATCH(dtable, frame->type, frame_append_bthash_text)
             (frame, flags, strbuf);
 }
+
+void sr_frame_free(struct sr_frame *frame)
+{
+    if (!frame)
+        return;
+
+    DISPATCH(dtable, frame->type, frame_free)(frame);
+}

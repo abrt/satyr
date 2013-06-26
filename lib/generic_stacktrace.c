@@ -138,7 +138,10 @@ sr_stacktrace_set_threads(struct sr_stacktrace *stacktrace, struct sr_thread *th
 void
 sr_stacktrace_free(struct sr_stacktrace *stacktrace)
 {
-    DISPATCH(dtable, stacktrace->type, free)(stacktrace);
+    if (!stacktrace)
+        return;
+
+    DISPATCH(dtable, stacktrace->type, stacktrace_free)(stacktrace);
 }
 
 char *

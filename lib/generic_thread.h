@@ -33,6 +33,10 @@ typedef struct sr_thread* (*next_thread_fn_t)(struct sr_thread*);
 typedef void (*set_next_thread_fn_t)(struct sr_thread*, struct sr_thread*);
 typedef void (*thread_append_bthash_text_fn_t)(struct sr_thread*, enum sr_bthash_flags,
                                                struct sr_strbuf*);
+typedef void (*thread_free_fn_t)(struct sr_thread*);
+typedef bool (*remove_frame_fn_t)(struct sr_thread*, struct sr_frame*);
+typedef bool (*remove_frames_above_fn_t)(struct sr_thread*, struct sr_frame*);
+typedef struct sr_thread* (*thread_dup_fn_t)(struct sr_thread*);
 
 struct thread_methods
 {
@@ -43,6 +47,10 @@ struct thread_methods
     next_thread_fn_t next;
     set_next_thread_fn_t set_next;
     thread_append_bthash_text_fn_t thread_append_bthash_text;
+    thread_free_fn_t thread_free;
+    remove_frame_fn_t remove_frame;
+    remove_frames_above_fn_t remove_frames_above;
+    thread_dup_fn_t thread_dup;
 };
 
 extern struct thread_methods core_thread_methods, python_thread_methods,
@@ -55,8 +63,22 @@ extern struct thread_methods core_thread_methods, python_thread_methods,
 #define DEFINE_SET_FRAMES_FUNC(name, concrete_t) \
     DEFINE_SETTER(name, frames, struct sr_thread, concrete_t, struct sr_frame)
 
+/* _dup wrapper for thread fucntions that accept 'sibling' argument */
+#define DEFINE_DUP_WRAPPER_FUNC(name, concrete_t, wrappee) \
+    static concrete_t *                                    \
+    name(concrete_t *thread)                               \
+    {                                                      \
+      return wrappee(thread, false);                       \
+    }
+
 int
 thread_frame_count(struct sr_thread *thread);
+
+bool
+thread_remove_frame(struct sr_thread *thread, struct sr_frame *frame);
+
+bool
+thread_remove_frames_above(struct sr_thread *thread, struct sr_frame *frame);
 
 struct sr_thread *
 thread_no_next_thread(struct sr_thread *thread);

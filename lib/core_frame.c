@@ -44,6 +44,7 @@ struct frame_methods core_frame_methods =
     .cmp_distance = (frame_cmp_fn_t) sr_core_frame_cmp_distance,
     .frame_append_bthash_text =
         (frame_append_bthash_text_fn_t) core_append_bthash_text,
+    .frame_free = (frame_free_fn_t) sr_core_frame_free,
 };
 
 /* Public functions */

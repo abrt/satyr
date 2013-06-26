@@ -60,7 +60,7 @@ struct stacktrace_methods gdb_stacktrace_methods =
         (find_crash_thread_fn_t) sr_gdb_stacktrace_find_crash_thread,
     .threads = (threads_fn_t) gdb_threads,
     .set_threads = (set_threads_fn_t) gdb_set_threads,
-    .free = (free_fn_t) sr_gdb_stacktrace_free,
+    .stacktrace_free = (stacktrace_free_fn_t) sr_gdb_stacktrace_free,
     .stacktrace_append_bthash_text =
         (stacktrace_append_bthash_text_fn_t) gdb_append_bthash_text,
 };

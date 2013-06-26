@@ -77,6 +77,9 @@ sr_frame_cmp(struct sr_frame *t1, struct sr_frame *t2);
 int
 sr_frame_cmp_distance(struct sr_frame *t1, struct sr_frame *t2);
 
+void
+sr_frame_free(struct sr_frame *frame);
+
 #ifdef __cplusplus
 }
 #endif

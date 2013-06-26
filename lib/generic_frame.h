@@ -30,6 +30,7 @@ typedef void (*set_next_frame_fn_t)(struct sr_frame *, struct sr_frame *);
 typedef int (*frame_cmp_fn_t)(struct sr_frame *, struct sr_frame *);
 typedef void (*frame_append_bthash_text_fn_t)(struct sr_frame*, enum sr_bthash_flags,
                                               struct sr_strbuf*);
+typedef void (*frame_free_fn_t)(struct sr_frame*);
 
 struct frame_methods
 {
@@ -39,6 +40,7 @@ struct frame_methods
     frame_cmp_fn_t cmp;
     frame_cmp_fn_t cmp_distance;
     frame_append_bthash_text_fn_t frame_append_bthash_text;
+    frame_free_fn_t frame_free;
 };
 
 extern struct frame_methods core_frame_methods, python_frame_methods,
