@@ -27,6 +27,7 @@
     stored in memory. It runs at 22 cycles per byte on a Pentium P4 processor
 */
 #include "sha1.h"
+#include "utils.h"
 
 #if defined(__BIG_ENDIAN__) && __BIG_ENDIAN__
 # define SHA1_BIG_ENDIAN 1
@@ -235,4 +236,19 @@ common64_end(struct sr_sha1_state *state,
             break;
         bufpos = 0;
     }
+}
+
+char *
+sr_sha1_hash_string(const char *str)
+{
+    struct sr_sha1_state ctx;
+    char bin_hash[SR_SHA1_RESULT_BIN_LEN];
+    char *hex_hash = sr_malloc(SR_SHA1_RESULT_LEN);
+
+    sr_sha1_begin(&ctx);
+    sr_sha1_hash(&ctx, str, strlen(str));
+    sr_sha1_end(&ctx, bin_hash);
+    sr_bin2hex(hex_hash, bin_hash, sizeof(bin_hash))[0] = '\0';
+
+    return hex_hash;
 }

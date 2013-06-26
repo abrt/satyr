@@ -562,15 +562,7 @@ hash_frame (struct sr_core_frame *frame)
     if (!frame->fingerprint)
         return;
 
-    struct sr_sha1_state ctx;
-    char bin_hash[SR_SHA1_RESULT_BIN_LEN];
-    char *hash = sr_malloc(SR_SHA1_RESULT_LEN);
-
-    sr_sha1_begin(&ctx);
-    sr_sha1_hash(&ctx, frame->fingerprint, strlen(frame->fingerprint));
-    sr_sha1_end(&ctx, bin_hash);
-    sr_bin2hex(hash, bin_hash, sizeof(bin_hash))[0] = '\0';
-
+    char *hash = sr_sha1_hash_string(frame->fingerprint);
     free(frame->fingerprint);
     frame->fingerprint = hash;
     frame->fingerprint_hashed = true;

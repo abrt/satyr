@@ -76,6 +76,11 @@ sr_sha1_hash(struct sr_sha1_state *state,
 void
 sr_sha1_end(struct sr_sha1_state *state, void *resbuf);
 
+/* High level function that hashes C string and returns hexadecimal encoding of
+ * the hash. */
+char *
+sr_sha1_hash_string(const char *str);
+
 #ifdef __cplusplus
 }
 #endif
