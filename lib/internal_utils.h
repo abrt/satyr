@@ -18,6 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <stddef.h>
 #include <assert.h>
 
 #define DISPATCH(table, type, method) \
@@ -43,3 +44,12 @@
 
 /* beware the side effects */
 #define OR_UNKNOWN(s) ((s) ? (s) : "<unknown>")
+
+/* kerneloops taint flag structure and global table declaration */
+struct sr_taint_flag
+{
+    char letter;
+    size_t member_offset;
+    char *name;
+};
+extern struct sr_taint_flag sr_flags[];

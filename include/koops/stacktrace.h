@@ -160,15 +160,6 @@ char *
 sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace);
 
 
-/* TODO: this needs to go in a _private_ header and should not be exported */
-struct sr_taint_flag
-{
-    char letter;
-    size_t member_offset;
-    char *name;
-};
-extern struct sr_taint_flag sr_flags[];
-
 #ifdef __cplusplus
 }
 #endif

@@ -8,6 +8,7 @@
 #include "location.h"
 #include "normalize.h"
 #include "stacktrace.h"
+#include "internal_utils.h"
 
 #define stacktrace_doc "satyr.Kerneloops - class representing a kerneloops stacktrace\n" \
                       "Usage:\n" \
