@@ -17,6 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+#ifndef SATYR_INTERNAL_UTILS_H
+#define SATYR_INTERNAL_UTILS_H
 
 #include <stddef.h>
 #include <assert.h>
@@ -53,3 +55,5 @@ struct sr_taint_flag
     char *name;
 };
 extern struct sr_taint_flag sr_flags[];
+
+#endif

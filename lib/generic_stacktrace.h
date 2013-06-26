@@ -17,6 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+#ifndef SATYR_GENERIC_STACKTRACE_H
+#define SATYR_GENERIC_STACKTRACE_H
 
 #include "stacktrace.h"
 #include "thread.h"
@@ -74,3 +76,5 @@ stacktrace_to_short_text(struct sr_stacktrace *stacktrace, int max_frames);
 
 struct sr_thread *
 stacktrace_one_thread_only(struct sr_stacktrace *stacktrace);
+
+#endif

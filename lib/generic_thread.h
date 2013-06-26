@@ -17,6 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+#ifndef SATYR_GENERIC_THREAD_H
+#define SATYR_GENERIC_THREAD_H
 
 #include "thread.h"
 #include "internal_utils.h"
@@ -67,3 +69,5 @@ thread_no_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
 void
 thread_append_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
                           struct sr_strbuf *strbuf);
+
+#endif

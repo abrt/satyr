@@ -17,6 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+#ifndef SATYR_GENERIC_FRAME_H
+#define SATYR_GENERIC_FRAME_H
 
 #include "frame.h"
 
@@ -45,3 +47,5 @@ extern struct frame_methods core_frame_methods, python_frame_methods,
 void
 frame_append_bthash_text(struct sr_frame *frame, enum sr_bthash_flags flags,
                          struct sr_strbuf *strbuf);
+
+#endif
