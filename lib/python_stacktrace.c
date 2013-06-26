@@ -36,6 +36,7 @@
 
 DEFINE_FRAMES_FUNC(python_frames, struct sr_python_stacktrace)
 DEFINE_SET_FRAMES_FUNC(python_set_frames, struct sr_python_stacktrace)
+DEFINE_PARSE_WRAPPER_FUNC(python_parse, SR_REPORT_PYTHON)
 
 struct thread_methods python_thread_methods =
 {
@@ -49,7 +50,7 @@ struct thread_methods python_thread_methods =
 
 struct stacktrace_methods python_stacktrace_methods =
 {
-    .parse = (parse_fn_t) stacktrace_parse_wrapper,
+    .parse = (parse_fn_t) python_parse,
     .parse_location = (parse_location_fn_t) sr_python_stacktrace_parse,
     .to_short_text = (to_short_text_fn_t) stacktrace_to_short_text,
     .to_json = (to_json_fn_t) sr_python_stacktrace_to_json,

@@ -33,10 +33,11 @@
 
 DEFINE_THREADS_FUNC(java_threads, struct sr_java_stacktrace)
 DEFINE_SET_THREADS_FUNC(java_set_threads, struct sr_java_stacktrace)
+DEFINE_PARSE_WRAPPER_FUNC(java_parse, SR_REPORT_JAVA)
 
 struct stacktrace_methods java_stacktrace_methods =
 {
-    .parse = (parse_fn_t) stacktrace_parse_wrapper,
+    .parse = (parse_fn_t) java_parse,
     .parse_location = (parse_location_fn_t) sr_java_stacktrace_parse,
     .to_short_text = (to_short_text_fn_t) stacktrace_to_short_text,
     .to_json = (to_json_fn_t) sr_java_stacktrace_to_json,

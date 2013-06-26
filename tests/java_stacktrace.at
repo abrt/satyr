@@ -80,6 +80,7 @@ AT_TESTFUN([sr_java_stacktrace_parse],
 #include "java/thread.h"
 #include "java/frame.h"
 #include "location.h"
+#include "stacktrace.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -102,6 +103,19 @@ check(char *input,
   {
     assert(*input == '\0');
     assert(0 == sr_java_stacktrace_cmp(stacktrace, expected_stacktrace));
+
+    /* check sr_stacktrace_parse */
+    char *error;
+    input = old_input;
+    struct sr_stacktrace *stacktrace2 = sr_stacktrace_parse(SR_REPORT_JAVA, &input, &error);
+    assert(stacktrace2);
+    char *json1 = sr_stacktrace_to_json(stacktrace);
+    char *json2 = sr_stacktrace_to_json(stacktrace2);
+    assert(json1 && json2 && 0 == strcmp(json1, json2));
+    free(json1);
+    free(json2);
+    sr_stacktrace_free(stacktrace2);
+
     sr_java_stacktrace_free(stacktrace);
   }
   else

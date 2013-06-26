@@ -58,6 +58,7 @@ struct sr_taint_flag sr_flags[] = {
 
 DEFINE_FRAMES_FUNC(koops_frames, struct sr_koops_stacktrace)
 DEFINE_SET_FRAMES_FUNC(koops_set_frames, struct sr_koops_stacktrace)
+DEFINE_PARSE_WRAPPER_FUNC(koops_parse, SR_REPORT_KERNELOOPS)
 
 struct thread_methods koops_thread_methods =
 {
@@ -71,7 +72,7 @@ struct thread_methods koops_thread_methods =
 
 struct stacktrace_methods koops_stacktrace_methods =
 {
-    .parse = (parse_fn_t) stacktrace_parse_wrapper,
+    .parse = (parse_fn_t) koops_parse,
     .parse_location = (parse_location_fn_t) sr_koops_stacktrace_parse,
     .to_short_text = (to_short_text_fn_t) stacktrace_to_short_text,
     .to_json = (to_json_fn_t) sr_koops_stacktrace_to_json,

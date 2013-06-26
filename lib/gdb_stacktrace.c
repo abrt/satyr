@@ -43,10 +43,11 @@ gdb_return_null(struct sr_stacktrace *stacktrace)
 
 DEFINE_THREADS_FUNC(gdb_threads, struct sr_gdb_stacktrace)
 DEFINE_SET_THREADS_FUNC(gdb_set_threads, struct sr_gdb_stacktrace)
+DEFINE_PARSE_WRAPPER_FUNC(gdb_parse, SR_REPORT_GDB)
 
 struct stacktrace_methods gdb_stacktrace_methods =
 {
-    .parse = (parse_fn_t) stacktrace_parse_wrapper,
+    .parse = (parse_fn_t) gdb_parse,
     .parse_location = (parse_location_fn_t) sr_gdb_stacktrace_parse,
     .to_short_text = (to_short_text_fn_t) sr_gdb_stacktrace_to_short_text,
     .to_json = (to_json_fn_t) gdb_return_null,

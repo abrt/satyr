@@ -101,6 +101,7 @@ AT_TESTFUN([sr_koops_stacktrace_parse],
 #include "location.h"
 #include "utils.h"
 #include "thread.h"
+#include "stacktrace.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -176,6 +177,22 @@ check(const char *path,
     actual_module_count++;
   }
   assert(actual_module_count == module_count);
+
+  /* test parsing via sr_stacktrace_parse */
+  input = full_input;
+  char *error;
+  struct sr_stacktrace *stacktrace2 = sr_stacktrace_parse(SR_REPORT_KERNELOOPS, &input, &error);
+
+  assert(stacktrace2);
+  reason = sr_stacktrace_get_reason(stacktrace);
+  reason2 = sr_stacktrace_get_reason(stacktrace2);
+
+  assert(reason && reason2);
+  assert(0 == strcmp(reason, reason2));
+
+  free(reason);
+  free(reason2);
+  sr_stacktrace_free(stacktrace2);
 
   sr_koops_stacktrace_free(stacktrace);
   free(full_input);

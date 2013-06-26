@@ -54,7 +54,14 @@ extern struct stacktrace_methods core_stacktrace_methods, python_stacktrace_meth
 #define DEFINE_SET_THREADS_FUNC(name, concrete_t) \
     DEFINE_SETTER(name, threads, struct sr_stacktrace, concrete_t, struct sr_thread)
 
-/* XXX generic functions */
+#define DEFINE_PARSE_WRAPPER_FUNC(name, type)                        \
+    static struct sr_stacktrace *                                    \
+    name(const char **input, char **error_message)                   \
+    {                                                                \
+        return stacktrace_parse_wrapper(type, input, error_message); \
+    }
+
+/* generic functions */
 struct sr_stacktrace *
 stacktrace_parse_wrapper(enum sr_report_type type, const char **input, char **error_message);
 
@@ -63,6 +70,3 @@ stacktrace_to_short_text(struct sr_stacktrace *stacktrace, int max_frames);
 
 struct sr_thread *
 stacktrace_one_thread_only(struct sr_stacktrace *stacktrace);
-
-struct sr_stacktrace *
-stacktrace_parse_wrapper(enum sr_report_type type, const char **input, char **error_message);
