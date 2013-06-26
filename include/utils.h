@@ -106,6 +106,13 @@ int
 sr_strcmp0(const char *s1, const char *s2);
 
 /**
+ * A wrapper around sr_strcmp0 that takes pointers to strings. Can be used as a
+ * paramter to qsort or bsearch.
+ */
+int
+sr_ptrstrcmp(const void *s1, const void *s2);
+
+/**
  * A strchr() variant providing line and column in the string s
  * indicating where the char c was found.
  * @param line

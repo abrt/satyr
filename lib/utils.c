@@ -157,6 +157,12 @@ sr_strcmp0(const char *s1, const char *s2)
         return s2 ? -1 : 0;
 }
 
+int
+sr_ptrstrcmp(const void *s1, const void *s2)
+{
+    return sr_strcmp0(*(const char**)s1, *(const char**)s2);
+}
+
 char *
 sr_strchr_location(const char *s, int c, int *line, int *column)
 {

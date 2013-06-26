@@ -380,12 +380,6 @@ sr_normalize_gdb_stacktrace(struct sr_gdb_stacktrace *stacktrace)
     }
 }
 
-static int
-ptrstrcmp(const void *s1, const void *s2)
-{
-    return sr_strcmp0(*(const char**)s1, *(const char**)s2);
-}
-
 void
 sr_normalize_koops_stacktrace(struct sr_koops_stacktrace *stacktrace)
 {
@@ -433,7 +427,7 @@ sr_normalize_koops_stacktrace(struct sr_koops_stacktrace *stacktrace)
                                     blacklist,
                                     sizeof(blacklist) / sizeof(blacklist[0]),
                                     sizeof(blacklist[0]),
-                                    ptrstrcmp);
+                                    sr_ptrstrcmp);
 
         /* do not drop frames belonging to a module */
         if (!frame->module_name && in_blacklist)

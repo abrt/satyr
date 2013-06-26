@@ -280,12 +280,6 @@ get_libcalls(char ***symbol_list,
     return true;
 }
 
-static int
-strcmp_wrapper(const char **s1, const char **s2)
-{
-    return strcmp(*s1, *s2);
-}
-
 static bool
 fp_libcalls(struct sr_strbuf *fingerprint,
             uint64_t function_start_address,
@@ -310,7 +304,7 @@ fp_libcalls(struct sr_strbuf *fingerprint,
         return false;
 
     qsort(symbol_list, symbol_list_size,
-          sizeof(char*), (comparison_fn_t)strcmp_wrapper);
+          sizeof(char*), (comparison_fn_t)sr_ptrstrcmp);
 
     /* Make it unique. */
     sr_struniq(symbol_list, &symbol_list_size);
@@ -349,7 +343,7 @@ fp_calltree_leaves(struct sr_strbuf *fingerprint,
         return false;
 
     qsort(symbol_list, symbol_list_size,
-          sizeof(char*), (comparison_fn_t)strcmp_wrapper);
+          sizeof(char*), (comparison_fn_t)sr_ptrstrcmp);
 
     /* Make it unique. */
     sr_struniq(symbol_list, &symbol_list_size);
