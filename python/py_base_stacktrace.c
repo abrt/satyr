@@ -31,12 +31,17 @@
                           "Returns short text representation of the stacktrace. If max_frames is\n" \
                           "specified, the result includes only that much topmost frames.\n"
 
+#define get_bthash_doc "Usage: stacktrace.get_bthash([flags])\n" \
+                       "Returns: string - hash of the stacktrace\n" \
+                       "flags: integer - bitwise sum of flags (BTHASH_NORMAL, BTHASH_NOHASH)"
+
 #define threads_doc "A list containing the objects representing threads in the stacktrace."
 
 static PyMethodDef
 single_methods[] =
 {
     { "to_short_text", sr_py_single_stacktrace_to_short_text, METH_VARARGS, to_short_text_doc },
+    { "get_bthash",    sr_py_single_stacktrace_get_bthash,    METH_VARARGS, get_bthash_doc    },
     { NULL },
 };
 
@@ -100,6 +105,7 @@ static PyMethodDef
 multi_methods[] =
 {
     { "to_short_text", sr_py_multi_stacktrace_to_short_text, METH_VARARGS, to_short_text_doc },
+    { "get_bthash",    sr_py_multi_stacktrace_get_bthash,    METH_VARARGS, get_bthash_doc    },
     { NULL },
 };
 
@@ -289,5 +295,55 @@ sr_py_multi_stacktrace_to_short_text(PyObject *self, PyObject *args)
     PyObject *result = PyString_FromString(text);
 
     free(text);
+    return result;
+}
+
+/* TODO: these two functions (and the two above) are almost the same - there
+ * should be a way to not repeat the code */
+PyObject *
+sr_py_single_stacktrace_get_bthash(PyObject *self, PyObject *args)
+{
+    int flags = 0;
+    if (!PyArg_ParseTuple(args, "|i", &flags))
+        return NULL;
+
+    struct sr_py_base_thread *this =
+        (struct sr_py_base_thread *)self;
+    if (frames_prepare_linked_list(this) < 0)
+        return NULL;
+
+    char *hash = sr_stacktrace_get_bthash((struct sr_stacktrace *)this->thread, flags);
+    if (!hash)
+    {
+        PyErr_SetString(PyExc_RuntimeError, "cannot obtain bthash");
+        return NULL;
+    }
+
+    PyObject *result = PyString_FromString(hash);
+    free(hash);
+    return result;
+}
+
+PyObject *
+sr_py_multi_stacktrace_get_bthash(PyObject *self, PyObject *args)
+{
+    int flags = 0;
+    if (!PyArg_ParseTuple(args, "|i", &flags))
+        return NULL;
+
+    struct sr_py_multi_stacktrace *this =
+        (struct sr_py_multi_stacktrace *)self;
+    if (threads_prepare_linked_list(this) < 0)
+        return NULL;
+
+    char *hash = sr_stacktrace_get_bthash((struct sr_stacktrace *)this->stacktrace, flags);
+    if (!hash)
+    {
+        PyErr_SetString(PyExc_RuntimeError, "cannot obtain bthash");
+        return NULL;
+    }
+
+    PyObject *result = PyString_FromString(hash);
+    free(hash);
     return result;
 }

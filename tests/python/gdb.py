@@ -61,6 +61,9 @@ class TestGdbStacktrace(BindingsTestCase):
     def test_to_short_text(self):
         self.assertEqual(self.trace.to_short_text(5), expected_short_text)
 
+    def test_bthash(self):
+        self.assertEqual(self.trace.get_bthash(), 'd0fcdc87161ccb093f7efeff12218321d8fd5298')
+
 class TestGdbThread(BindingsTestCase):
     def setUp(self):
         self.thread = satyr.GdbStacktrace(contents).threads[0]

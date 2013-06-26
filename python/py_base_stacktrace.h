@@ -56,6 +56,8 @@ PyObject *threads_to_python_list(struct sr_stacktrace *stacktrace,
 /* methods */
 PyObject *sr_py_single_stacktrace_to_short_text(PyObject *self, PyObject *args);
 PyObject *sr_py_multi_stacktrace_to_short_text(PyObject *self, PyObject *args);
+PyObject *sr_py_single_stacktrace_get_bthash(PyObject *self, PyObject *args);
+PyObject *sr_py_multi_stacktrace_get_bthash(PyObject *self, PyObject *args);
 
 #ifdef __cplusplus
 }

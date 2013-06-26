@@ -67,6 +67,9 @@ class TestKerneloops(BindingsTestCase):
     def test_to_short_text(self):
         self.assertEqual(self.koops.to_short_text(7), expected_short_text)
 
+    def test_bthash(self):
+        self.assertEqual(self.koops.get_bthash(), '73c7ce83d5ba90a1acbcc7915a62595914321f97')
+
 class TestKoopsFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.Kerneloops(contents).frames[0]

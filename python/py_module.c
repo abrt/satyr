@@ -17,6 +17,7 @@
 #include "py_metrics.h"
 
 #include "distance.h"
+#include "stacktrace.h"
 #include "gdb/sharedlib.h"
 
 static PyMethodDef
@@ -157,6 +158,9 @@ init_satyr()
     Py_INCREF(&sr_py_multi_stacktrace_type);
     PyModule_AddObject(module, "MultiThreadStacktrace",
                        (PyObject *)&sr_py_multi_stacktrace_type);
+
+    PyModule_AddIntConstant(module, "BTHASH_NORMAL", SR_BTHASH_NORMAL);
+    PyModule_AddIntConstant(module, "BTHASH_NOHASH", SR_BTHASH_NOHASH);
 
     Py_INCREF(&sr_py_gdb_frame_type);
     PyModule_AddObject(module, "GdbFrame",

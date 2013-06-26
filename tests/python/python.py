@@ -84,6 +84,9 @@ class TestPythonStacktrace(BindingsTestCase):
     def test_to_short_text(self):
         self.assertEqual(self.trace.to_short_text(6), expected_short_text)
 
+    def test_bthash(self):
+        self.assertEqual(self.trace.get_bthash(), 'fa0a7ff4b65f18661a6ce102eb787ff0d77ff12f')
+
 class TestPythonFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.PythonStacktrace(contents).frames[-1]

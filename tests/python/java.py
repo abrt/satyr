@@ -57,6 +57,8 @@ class TestJavaStacktrace(BindingsTestCase):
     def test_to_short_text(self):
         self.assertEqual(self.trace.to_short_text(8), expected_short_text)
 
+    def test_bthash(self):
+        self.assertEqual(self.trace.get_bthash(), '184370433901aa9f14bfc85c29576e24ebca2c2e')
 
 class TestJavaThread(BindingsTestCase):
     def setUp(self):
