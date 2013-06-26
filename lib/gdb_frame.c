@@ -1101,29 +1101,6 @@ sr_gdb_frame_parse_header(const char **input,
     return imframe;
 }
 
-void
-sr_gdb_frame_remove_func_prefix(struct sr_gdb_frame *frame,
-                                const char *prefix,
-                                int num)
-{
-    int prefix_len, func_len;
-
-    if (!frame->function_name || !frame->source_file)
-        return;
-
-    prefix_len = strlen(prefix);
-
-    if (strncmp(frame->function_name, prefix, prefix_len))
-        return;
-
-    func_len = strlen(frame->function_name);
-    if (num > func_len)
-        num = func_len;
-
-    memmove(frame->function_name, frame->function_name + num,
-            func_len - num + 1);
-}
-
 static void
 gdb_append_bthash_text(struct sr_gdb_frame *frame, enum sr_bthash_flags flags,
                        struct sr_strbuf *strbuf)

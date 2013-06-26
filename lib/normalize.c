@@ -21,6 +21,9 @@
 #include "gdb/frame.h"
 #include "gdb/thread.h"
 #include "gdb/stacktrace.h"
+#include "core/frame.h"
+#include "core/thread.h"
+#include "thread.h"
 #include "utils.h"
 #include <string.h>
 #include <assert.h>
@@ -227,6 +230,26 @@ find_new_function_name_glibc(const char *function_name,
         return NULL;
 }
 
+static void
+remove_func_prefix(char *function_name, const char *prefix, int num)
+{
+    int prefix_len, func_len;
+
+    if (!function_name)
+        return;
+
+    prefix_len = strlen(prefix);
+
+    if (strncmp(function_name, prefix, prefix_len))
+        return;
+
+    func_len = strlen(function_name);
+    if (num > func_len)
+        num = func_len;
+
+    memmove(function_name, function_name + num, func_len - num + 1);
+}
+
 void
 sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
 {
@@ -246,13 +269,16 @@ sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
     struct sr_gdb_frame *frame = thread->frames;
     while (frame)
     {
-        /* Remove IA__ prefix used in GLib, GTK and GDK. */
-        sr_gdb_frame_remove_func_prefix(frame, "IA__gdk", strlen("IA__"));
-        sr_gdb_frame_remove_func_prefix(frame, "IA__g_", strlen("IA__"));
-        sr_gdb_frame_remove_func_prefix(frame, "IA__gtk", strlen("IA__"));
+        if (frame->source_file)
+        {
+            /* Remove IA__ prefix used in GLib, GTK and GDK. */
+            remove_func_prefix(frame->function_name, "IA__gdk", strlen("IA__"));
+            remove_func_prefix(frame->function_name, "IA__g_", strlen("IA__"));
+            remove_func_prefix(frame->function_name, "IA__gtk", strlen("IA__"));
 
-        /* Remove __GI_ (glibc internal) prefix. */
-        sr_gdb_frame_remove_func_prefix(frame, "__GI_", strlen("__GI_"));
+            /* Remove __GI_ (glibc internal) prefix. */
+            remove_func_prefix(frame->function_name, "__GI_", strlen("__GI_"));
+        }
 
         frame = frame->next;
     }
@@ -365,6 +391,149 @@ sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
         prev_frame = curr_frame;
         curr_frame = curr_frame->next;
     }
+}
+
+void
+sr_normalize_core_thread(struct sr_core_thread *thread)
+{
+    /* Find the exit frame and remove everything above it. */
+    struct sr_core_frame *exit_frame = sr_core_thread_find_exit_frame(thread);
+    if (exit_frame)
+    {
+        bool success = sr_thread_remove_frames_above((struct sr_thread *)thread,
+                                                     (struct sr_frame *)exit_frame);
+        assert(success); /* if this fails, some code become broken */
+        success = sr_thread_remove_frame((struct sr_thread *)thread,
+                                         (struct sr_frame *)exit_frame);
+        assert(success); /* if this fails, some code become broken */
+    }
+
+    /* Normalize function names by removing various prefixes that
+     * occur only in some cases.
+     */
+    struct sr_core_frame *frame = thread->frames;
+    while (frame)
+    {
+        /* Remove IA__ prefix used in GLib, GTK and GDK. */
+        remove_func_prefix(frame->function_name, "IA__gdk", strlen("IA__"));
+        remove_func_prefix(frame->function_name, "IA__g_", strlen("IA__"));
+        remove_func_prefix(frame->function_name, "IA__gtk", strlen("IA__"));
+
+        /* Remove __GI_ (glibc internal) prefix. */
+        remove_func_prefix(frame->function_name, "__GI_", strlen("__GI_"));
+
+        frame = frame->next;
+    }
+
+    /* Unify some functions by renaming them.
+     */
+    frame = thread->frames;
+    while (frame)
+    {
+        char *new_function_name =
+            find_new_function_name_glibc(frame->function_name, frame->file_name);
+
+        if (new_function_name)
+        {
+            free(frame->function_name);
+            frame->function_name = new_function_name;
+        }
+
+        frame = frame->next;
+    }
+
+    /* Remove redundant frames from the thread.
+     */
+    frame = thread->frames;
+    while (frame)
+    {
+        struct sr_core_frame *next_frame = frame->next;
+
+        /* Remove frames which are not a cause of the crash. */
+        bool removable =
+            is_removable_dbus(frame->function_name, frame->file_name) ||
+            is_removable_gdk(frame->function_name, frame->file_name) ||
+            is_removable_glib(frame->function_name, frame->file_name) ||
+            is_removable_glibc(frame->function_name, frame->file_name) ||
+            is_removable_libstdcpp(frame->function_name, frame->file_name) ||
+            is_removable_linux(frame->function_name, frame->file_name) ||
+            is_removable_xorg(frame->function_name, frame->file_name);
+
+        bool removable_with_above =
+            is_removable_glibc_with_above(frame->function_name, frame->file_name);
+
+        if (removable_with_above)
+        {
+            bool success = sr_thread_remove_frames_above((struct sr_thread *)thread,
+                                                         (struct sr_frame *)frame);
+            assert(success);
+        }
+
+        if (removable || removable_with_above)
+            sr_thread_remove_frame((struct sr_thread *)thread, (struct sr_frame *)frame);
+
+        frame = next_frame;
+    }
+
+    /* If the first frame has address 0x0000 and its name is '??', it
+     * is a dereferenced null, and we remove it. This frame is not
+     * really invalid, but it affects stacktrace quality rating. See
+     * Red Hat Bugzilla bug #639038.
+     * @code
+     * #0  0x0000000000000000 in ?? ()
+     * No symbol table info available.
+     * #1  0x0000000000422648 in main (argc=1, argv=0x7fffa57cf0d8) at totem.c:242
+     *       error = 0x0
+     *       totem = 0xdee070 [TotemObject]
+     * @endcode
+     */
+    if (thread->frames &&
+        thread->frames->address == 0x0000 &&
+        !thread->frames->function_name)
+    {
+        sr_thread_remove_frame((struct sr_thread *)thread,
+                               (struct sr_frame *)thread->frames);
+    }
+
+    /* If the last frame has address 0x0000 and its name is '??',
+     * remove it. This frame is not really invalid, but it affects
+     * stacktrace quality rating. See Red Hat Bugzilla bug #592523.
+     * @code
+     * #2  0x00007f4dcebbd62d in clone ()
+     * at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+     * No locals.
+     * #3  0x0000000000000000 in ?? ()
+     * @endcode
+     */
+    struct sr_core_frame *last = thread->frames;
+    while (last && last->next)
+        last = last->next;
+    if (last &&
+        last->address == 0x0000 &&
+        !last->function_name)
+    {
+        sr_thread_remove_frame((struct sr_thread *)thread, (struct sr_frame *)last);
+    }
+
+    /* Merge recursively called functions into single frame */
+    struct sr_core_frame *curr_frame = thread->frames;
+    struct sr_core_frame *prev_frame = NULL;
+    while (curr_frame)
+    {
+        if (prev_frame &&
+            prev_frame->function_name &&
+            0 == sr_strcmp0(prev_frame->function_name, curr_frame->function_name))
+        {
+            prev_frame->next = curr_frame->next;
+            sr_core_frame_free(curr_frame);
+            curr_frame = prev_frame->next;
+            continue;
+        }
+
+        prev_frame = curr_frame;
+        curr_frame = curr_frame->next;
+    }
+
 }
 
 void

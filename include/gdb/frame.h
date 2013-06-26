@@ -452,15 +452,6 @@ struct sr_gdb_frame *
 sr_gdb_frame_parse_header(const char **input,
                           struct sr_location *location);
 
-/**
- * Removes first num chars from function name in the frame if it begins
- * with the prefix.
- */
-void
-sr_gdb_frame_remove_func_prefix(struct sr_gdb_frame *frame,
-                                const char *prefix,
-                                int num);
-
 #ifdef __cplusplus
 }
 #endif
