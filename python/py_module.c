@@ -17,6 +17,7 @@
 #include "py_metrics.h"
 
 #include "distance.h"
+#include "thread.h"
 #include "stacktrace.h"
 #include "gdb/sharedlib.h"
 
@@ -150,6 +151,10 @@ init_satyr()
     Py_INCREF(&sr_py_base_thread_type);
     PyModule_AddObject(module, "BaseThread",
                        (PyObject *)&sr_py_base_thread_type);
+
+    PyModule_AddIntConstant(module, "DUPHASH_NORMAL", SR_DUPHASH_NORMAL);
+    PyModule_AddIntConstant(module, "DUPHASH_NOHASH", SR_DUPHASH_NOHASH);
+    PyModule_AddIntConstant(module, "DUPHASH_NONORMALIZE", SR_DUPHASH_NONORMALIZE);
 
     Py_INCREF(&sr_py_single_stacktrace_type);
     PyModule_AddObject(module, "SingleThreadStacktrace",

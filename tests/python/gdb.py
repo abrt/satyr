@@ -78,6 +78,11 @@ class TestGdbThread(BindingsTestCase):
         dup.number = 9000
         self.assertNotEqual(self.thread, dup)
 
+    def test_duphash(self):
+        expected_plain = 'Thread\n  write\n  virNetSocketWriteWire\n  virNetSocketWrite\n'
+        self.assertEqual(self.thread.get_duphash(flags=satyr.DUPHASH_NOHASH, frames=3), expected_plain)
+        self.assertEqual(self.thread.get_duphash(), '4ff2e92d89425e18e82b94c214c7ccfec8b31793')
+
 class TestGdbSharedlib(BindingsTestCase):
     def setUp(self):
         self.shlib = satyr.GdbStacktrace(contents).libs[0]

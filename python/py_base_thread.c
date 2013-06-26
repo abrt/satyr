@@ -34,11 +34,19 @@
                      "                      DISTANCE_JACCARD or DISTANCE_DAMERAU_LEVENSHTEIN\n"\
                      "Returns: positive float - distance between the two threads"
 
+#define get_duphash_doc "Usage: thread.get_duphash(frames=0, flags=DUPHASH_NORMAL, prefix='')\n"\
+                        "Returns: string - thread's duplication hash\n"\
+                        "frames: integer - number of frames to use (default 0 means use all)\n"\
+                        "flags: integer - bitwise sum of flags (DUPHASH_NORMAL, DUPHASH_NOHASH,\n"\
+                        "                 DUPHASH_NONORMALIZE)\n"\
+                        "prefix: string - string to be prepended in front of the text before hashing"
+
 static PyMethodDef
 thread_methods[] =
 {
     /* methods */
-    { "distance", (PyCFunction)sr_py_base_thread_distance, METH_VARARGS|METH_KEYWORDS, distance_doc },
+    { "distance",    (PyCFunction)sr_py_base_thread_distance,    METH_VARARGS|METH_KEYWORDS, distance_doc    },
+    { "get_duphash", (PyCFunction)sr_py_base_thread_get_duphash, METH_VARARGS|METH_KEYWORDS, get_duphash_doc },
     { NULL },
 };
 
@@ -241,4 +249,33 @@ sr_py_base_thread_distance(PyObject *self, PyObject *args, PyObject *kwds)
 
     float dist = sr_distance(dist_type, t1->thread, t2->thread);
     return PyFloat_FromDouble((double)dist);
+}
+
+PyObject *
+sr_py_base_thread_get_duphash(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    const char *prefix = NULL;
+    int frames = 0, flags = 0;
+
+    static const char *kwlist[] = { "frames", "flags", "prefix", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iis", (char **)kwlist,
+                                     &frames, &flags, &prefix))
+        return NULL;
+
+    struct sr_py_base_thread *this =
+        (struct sr_py_base_thread *)self;
+    if (frames_prepare_linked_list(this) < 0)
+        return NULL;
+
+    char *hash = sr_thread_get_duphash((struct sr_thread *)this->thread,
+                                       frames, (char *)prefix, flags);
+    if (!hash)
+    {
+        PyErr_SetString(PyExc_RuntimeError, "cannot obtain duphash");
+        return NULL;
+    }
+
+    PyObject *result = PyString_FromString(hash);
+    free(hash);
+    return result;
 }

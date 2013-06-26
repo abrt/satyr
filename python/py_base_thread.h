@@ -51,6 +51,7 @@ int sr_py_base_thread_cmp(struct sr_py_base_thread *self, struct sr_py_base_thre
 
 /* methods */
 PyObject *sr_py_base_thread_distance(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject *sr_py_base_thread_get_duphash(PyObject *self, PyObject *args, PyObject *kwds);
 
 #ifdef __cplusplus
 }

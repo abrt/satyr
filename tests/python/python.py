@@ -87,6 +87,15 @@ class TestPythonStacktrace(BindingsTestCase):
     def test_bthash(self):
         self.assertEqual(self.trace.get_bthash(), 'fa0a7ff4b65f18661a6ce102eb787ff0d77ff12f')
 
+    def test_duphash(self):
+        expected_plain = '''Thread
+/usr/share/PackageKit/helpers/yum/yumBackend.py:2534
+/usr/share/PackageKit/helpers/yum/yumBackend.py:2593
+/usr/share/PackageKit/helpers/yum/yumBackend.py:2551
+'''
+        self.assertEqual(self.trace.get_duphash(flags=satyr.DUPHASH_NOHASH, frames=3), expected_plain)
+        self.assertEqual(self.trace.get_duphash(), '2c8e509a33966a08df1dd8b2348e850d1bc5b776')
+
 class TestPythonFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.PythonStacktrace(contents).frames[-1]
