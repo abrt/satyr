@@ -180,21 +180,33 @@ int
 sr_core_frame_cmp_distance(struct sr_core_frame *frame1,
                            struct sr_core_frame *frame2)
 {
-    /* TODO: we should not rely on function name and we definitely should use
-     * build id */
-    /* Function name. */
-    int function_name = sr_strcmp0(frame1->function_name,
-                                    frame2->function_name);
-    if (function_name != 0)
-        return function_name;
+    /* If both function names are present, compare those. */
+    if (frame1->function_name && frame2->function_name)
+        return strcmp(frame1->function_name, frame2->function_name);
 
-    /* Fingerprint. */
-    int fingerprint = sr_strcmp0(frame1->fingerprint,
-                                  frame2->fingerprint);
-    if (fingerprint != 0)
-        return fingerprint;
+    /* Try matching build ID and offset. */
+    int build_id = sr_strcmp0(frame1->build_id,
+                              frame2->build_id);
 
-    return 0;
+    int build_id_offset = frame1->build_id_offset - frame2->build_id_offset;
+
+    if (build_id == 0 && build_id_offset == 0)
+        return 0;
+
+    /* Build ID mismatch - this might still mean that the frames are the same
+     * but from a different build. Try falling back to fingerprints if those
+     * are present.
+     */
+    if (frame1->fingerprint && frame2->fingerprint)
+        return strcmp(frame1->fingerprint, frame2->fingerprint);
+
+    /* Fingerprints are not present, return the result of build ID and offset
+     * comparison.
+     */
+    if (build_id)
+        return build_id;
+
+    return build_id_offset;
 }
 
 struct sr_core_frame *
