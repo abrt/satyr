@@ -559,3 +559,63 @@ koops_append_bthash_text(struct sr_koops_stacktrace *stacktrace,
 
     sr_strbuf_append_char(strbuf, '\n');
 }
+
+void
+sr_normalize_koops_stacktrace(struct sr_koops_stacktrace *stacktrace)
+{
+    /* Normalize function names by removing the suffixes identified by
+     * the dot character.
+     */
+    struct sr_koops_frame *frame = stacktrace->frames;
+    while (frame)
+    {
+        if (frame->function_name)
+        {
+            char *dot = strchr(frame->function_name, '.');
+            if (dot)
+                *dot = '\0';
+        }
+
+        frame = frame->next;
+    }
+
+    /* Remove blacklisted frames. */
+    /* !!! MUST BE SORTED !!! */
+    const char *blacklist[] = {
+        "do_softirq",
+        "do_vfs_ioctl",
+        "flush_kthread_worker",
+        "gs_change",
+        "irq_exit",
+        "kernel_thread_helper",
+        "kthread",
+        "process_one_work",
+        "system_call_fastpath",
+        "warn_slowpath_common",
+        "warn_slowpath_fmt",
+        "warn_slowpath_fmt_taint",
+        "warn_slowpath_null",
+        "worker_thread"
+    };
+
+    frame = stacktrace->frames;
+    while (frame)
+    {
+        struct sr_koops_frame *next_frame = frame->next;
+
+        bool in_blacklist = bsearch(&frame->function_name,
+                                    blacklist,
+                                    sizeof(blacklist) / sizeof(blacklist[0]),
+                                    sizeof(blacklist[0]),
+                                    sr_ptrstrcmp);
+
+        /* do not drop frames belonging to a module */
+        if (!frame->module_name && in_blacklist)
+        {
+            bool success = sr_koops_stacktrace_remove_frame(stacktrace, frame);
+            assert(success || !"failed to remove frame");
+        }
+
+        frame = next_frame;
+    }
+}

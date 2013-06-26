@@ -36,19 +36,12 @@ extern "C" {
 struct sr_gdb_frame;
 struct sr_gdb_thread;
 struct sr_gdb_stacktrace;
-struct sr_core_frame;
-struct sr_core_thread;
-struct sr_core_stacktrace;
-struct sr_koops_stacktrace;
 
 void
 sr_normalize_gdb_thread(struct sr_gdb_thread *thread);
 
 void
 sr_normalize_gdb_stacktrace(struct sr_gdb_stacktrace *stacktrace);
-
-void
-sr_normalize_koops_stacktrace(struct sr_koops_stacktrace *stacktrace);
 
 // TODO: move to gdb_stacktrace.h
 /**

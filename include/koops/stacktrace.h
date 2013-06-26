@@ -159,6 +159,9 @@ sr_koops_stacktrace_get_reason(struct sr_koops_stacktrace *stacktrace);
 char *
 sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace);
 
+void
+sr_normalize_koops_stacktrace(struct sr_koops_stacktrace *stacktrace);
+
 
 #ifdef __cplusplus
 }
