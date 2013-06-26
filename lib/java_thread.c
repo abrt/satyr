@@ -58,6 +58,7 @@ struct thread_methods java_thread_methods =
     .remove_frames_above =
         (remove_frames_above_fn_t) thread_remove_frames_above,
     .thread_dup = (thread_dup_fn_t) java_dup,
+    .normalize = (normalize_fn_t) thread_no_normalization,
 };
 
 /* Public functions */

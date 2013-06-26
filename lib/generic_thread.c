@@ -111,6 +111,12 @@ thread_no_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
     /* nop */
 }
 
+void
+thread_no_normalization(struct sr_thread *thread)
+{
+    /* nop */
+}
+
 /* Initialize dispatch table. */
 
 /* Table that maps type-specific functions to the corresponding report types.
@@ -200,4 +206,10 @@ struct sr_thread*
 sr_thread_dup(struct sr_thread *thread)
 {
     return DISPATCH(dtable, thread->type, thread_dup)(thread);
+}
+
+void
+sr_thread_normalize(struct sr_thread *thread)
+{
+    DISPATCH(dtable, thread->type, normalize)(thread);
 }

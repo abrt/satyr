@@ -25,6 +25,7 @@
 #include "generic_thread.h"
 #include "stacktrace.h"
 #include "internal_utils.h"
+#include "normalize.h"
 #include <string.h>
 
 /* Method table */
@@ -50,6 +51,7 @@ struct thread_methods core_thread_methods =
     .remove_frames_above =
         (remove_frames_above_fn_t) thread_remove_frames_above,
     .thread_dup = (thread_dup_fn_t) core_dup,
+    .normalize = (normalize_fn_t) sr_normalize_core_thread,
 };
 
 /* Public functions */

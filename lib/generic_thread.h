@@ -34,6 +34,7 @@ typedef void (*set_next_thread_fn_t)(struct sr_thread*, struct sr_thread*);
 typedef void (*thread_append_bthash_text_fn_t)(struct sr_thread*, enum sr_bthash_flags,
                                                struct sr_strbuf*);
 typedef void (*thread_free_fn_t)(struct sr_thread*);
+typedef void (*normalize_fn_t)(struct sr_thread*);
 typedef bool (*remove_frame_fn_t)(struct sr_thread*, struct sr_frame*);
 typedef bool (*remove_frames_above_fn_t)(struct sr_thread*, struct sr_frame*);
 typedef struct sr_thread* (*thread_dup_fn_t)(struct sr_thread*);
@@ -48,6 +49,7 @@ struct thread_methods
     set_next_thread_fn_t set_next;
     thread_append_bthash_text_fn_t thread_append_bthash_text;
     thread_free_fn_t thread_free;
+    normalize_fn_t normalize;
     remove_frame_fn_t remove_frame;
     remove_frames_above_fn_t remove_frames_above;
     thread_dup_fn_t thread_dup;
@@ -86,6 +88,9 @@ thread_no_next_thread(struct sr_thread *thread);
 void
 thread_no_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
                       struct sr_strbuf *strbuf);
+
+void
+thread_no_normalization(struct sr_thread *thread);
 
 /* Uses dispatch table but not intended for public use. */
 void

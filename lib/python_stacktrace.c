@@ -57,6 +57,7 @@ struct thread_methods python_thread_methods =
     .remove_frames_above =
         (remove_frames_above_fn_t) thread_remove_frames_above,
     .thread_dup = (thread_dup_fn_t) sr_python_stacktrace_dup,
+    .normalize = (normalize_fn_t) thread_no_normalization,
 };
 
 struct stacktrace_methods python_stacktrace_methods =

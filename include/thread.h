@@ -118,6 +118,13 @@ sr_thread_remove_frames_above(struct sr_thread *thread, struct sr_frame *frame);
 struct sr_thread *
 sr_thread_dup(struct sr_thread *thread);
 
+/**
+ * Normalizes thread for deduplication/clustering. The normalization consists
+ * of removing useless frames and changing names of others.
+ */
+void
+sr_thread_normalize(struct sr_thread *thread);
+
 #ifdef __cplusplus
 }
 #endif

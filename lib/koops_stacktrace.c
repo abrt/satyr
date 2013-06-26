@@ -78,6 +78,7 @@ struct thread_methods koops_thread_methods =
     .remove_frames_above =
         (remove_frames_above_fn_t) thread_remove_frames_above,
     .thread_dup = (thread_dup_fn_t) sr_koops_stacktrace_dup,
+    .normalize = (normalize_fn_t) sr_normalize_koops_stacktrace,
 };
 
 struct stacktrace_methods koops_stacktrace_methods =
