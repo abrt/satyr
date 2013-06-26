@@ -22,6 +22,7 @@
 #include "strbuf.h"
 #include "json.h"
 #include "generic_frame.h"
+#include "thread.h"
 #include "stacktrace.h"
 #include "internal_utils.h"
 #include <string.h>
@@ -31,6 +32,9 @@
 static void
 core_append_bthash_text(struct sr_core_frame *frame, enum sr_bthash_flags flags,
                         struct sr_strbuf *strbuf);
+static void
+core_append_duphash_text(struct sr_core_frame *frame, enum sr_duphash_flags flags,
+                         struct sr_strbuf *strbuf);
 
 DEFINE_NEXT_FUNC(core_next, struct sr_frame, struct sr_core_frame)
 DEFINE_SET_NEXT_FUNC(core_set_next, struct sr_frame, struct sr_core_frame)
@@ -44,6 +48,8 @@ struct frame_methods core_frame_methods =
     .cmp_distance = (frame_cmp_fn_t) sr_core_frame_cmp_distance,
     .frame_append_bthash_text =
         (frame_append_bthash_text_fn_t) core_append_bthash_text,
+    .frame_append_duphash_text =
+        (frame_append_duphash_text_fn_t) core_append_duphash_text,
     .frame_free = (frame_free_fn_t) sr_core_frame_free,
 };
 
@@ -427,4 +433,29 @@ core_append_bthash_text(struct sr_core_frame *frame, enum sr_bthash_flags flags,
                           frame->build_id_offset,
                           OR_UNKNOWN(frame->file_name),
                           OR_UNKNOWN(frame->fingerprint));
+}
+
+static void
+core_append_duphash_text(struct sr_core_frame *frame, enum sr_duphash_flags flags,
+                         struct sr_strbuf *strbuf)
+{
+    /* Build id should be the preferred deduplication mechanism. */
+    if (frame->build_id)
+        sr_strbuf_append_strf(strbuf, "%s+0x%"PRIx64"\n",
+                              frame->build_id,
+                              frame->build_id_offset);
+
+    /* If we don't have it, try the function name. */
+    else if (frame->function_name)
+        sr_strbuf_append_strf(strbuf, "  %s\n", frame->function_name);
+
+    /* Function fingerprint? */
+    else if (frame->fingerprint)
+        sr_strbuf_append_strf(strbuf, "%s+0x%"PRIx64"\n",
+                              frame->fingerprint,
+                              frame->build_id_offset);
+
+    /* Address should be better than nothing. */
+    else
+        sr_strbuf_append_strf(strbuf, "0x%"PRIx64"\n", frame->address);
 }

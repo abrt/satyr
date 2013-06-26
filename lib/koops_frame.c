@@ -22,6 +22,7 @@
 #include "strbuf.h"
 #include "json.h"
 #include "generic_frame.h"
+#include "thread.h"
 #include "stacktrace.h"
 #include "internal_utils.h"
 #include <stdlib.h>
@@ -34,6 +35,9 @@
 static void
 koops_append_bthash_text(struct sr_koops_frame *frame, enum sr_bthash_flags flags,
                          struct sr_strbuf *strbuf);
+static void
+koops_append_duphash_text(struct sr_koops_frame *frame, enum sr_duphash_flags flags,
+                          struct sr_strbuf *strbuf);
 
 DEFINE_NEXT_FUNC(koops_next, struct sr_frame, struct sr_koops_frame)
 DEFINE_SET_NEXT_FUNC(koops_set_next, struct sr_frame, struct sr_koops_frame)
@@ -47,6 +51,8 @@ struct frame_methods koops_frame_methods =
     .cmp_distance = (frame_cmp_fn_t) sr_koops_frame_cmp_distance,
     .frame_append_bthash_text =
         (frame_append_bthash_text_fn_t) koops_append_bthash_text,
+    .frame_append_duphash_text =
+        (frame_append_duphash_text_fn_t) koops_append_duphash_text,
     .frame_free = (frame_free_fn_t) sr_koops_frame_free,
 };
 
@@ -540,4 +546,14 @@ koops_append_bthash_text(struct sr_koops_frame *frame, enum sr_bthash_flags flag
                           frame->from_function_offset,
                           frame->from_function_length,
                           OR_UNKNOWN(frame->from_module_name));
+}
+
+static void
+koops_append_duphash_text(struct sr_koops_frame *frame, enum sr_duphash_flags flags,
+                         struct sr_strbuf *strbuf)
+{
+    if (frame->function_name)
+        sr_strbuf_append_strf(strbuf, "%s\n", frame->function_name);
+    else
+        sr_strbuf_append_strf(strbuf, "0x%"PRIx64"\n", frame->address);
 }

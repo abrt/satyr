@@ -23,6 +23,7 @@
 #include "strbuf.h"
 #include "json.h"
 #include "generic_frame.h"
+#include "thread.h"
 #include "stacktrace.h"
 #include "internal_utils.h"
 #include <string.h>
@@ -33,6 +34,9 @@
 static void
 python_append_bthash_text(struct sr_python_frame *frame, enum sr_bthash_flags flags,
                           struct sr_strbuf *strbuf);
+static void
+python_append_duphash_text(struct sr_python_frame *frame, enum sr_duphash_flags flags,
+                           struct sr_strbuf *strbuf);
 
 DEFINE_NEXT_FUNC(python_next, struct sr_frame, struct sr_python_frame)
 DEFINE_SET_NEXT_FUNC(python_set_next, struct sr_frame, struct sr_python_frame)
@@ -46,6 +50,8 @@ struct frame_methods python_frame_methods =
     .cmp_distance = (frame_cmp_fn_t) sr_python_frame_cmp_distance,
     .frame_append_bthash_text =
         (frame_append_bthash_text_fn_t) python_append_bthash_text,
+    .frame_append_duphash_text =
+        (frame_append_duphash_text_fn_t) python_append_duphash_text,
     .frame_free = (frame_free_fn_t) sr_python_frame_free,
 };
 
@@ -365,4 +371,14 @@ python_append_bthash_text(struct sr_python_frame *frame, enum sr_bthash_flags fl
                           OR_UNKNOWN(frame->function_name),
                           frame->special_function,
                           OR_UNKNOWN(frame->line_contents));
+}
+
+static void
+python_append_duphash_text(struct sr_python_frame *frame, enum sr_duphash_flags flags,
+                          struct sr_strbuf *strbuf)
+{
+    /* filename:line */
+    sr_strbuf_append_strf(strbuf, "%s:%"PRIu32"\n",
+                          OR_UNKNOWN(frame->file_name),
+                          frame->file_line);
 }

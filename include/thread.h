@@ -47,6 +47,24 @@ struct sr_thread
 };
 
 /**
+ * Flags that influence how the duphash is computed.
+ */
+enum sr_duphash_flags
+{
+    /* Default hashing process.
+     */
+    SR_DUPHASH_NORMAL = 1 << 0,
+
+    /* Return the plaintext that would be hashed. Useful mainly for debugging.
+     */
+    SR_DUPHASH_NOHASH = 1 << 1,
+
+    /* Do not perform stacktrace normalization.
+     */
+    SR_DUPHASH_NONORMALIZE = 1 << 2,
+};
+
+/**
  * Returns pointer to the first frame in thread.
  */
 struct sr_frame *
@@ -124,6 +142,22 @@ sr_thread_dup(struct sr_thread *thread);
  */
 void
 sr_thread_normalize(struct sr_thread *thread);
+
+/**
+ * Returns the duplication hash. Two threads resulting from the same crash
+ * should have the same duphash. The returned string is allocated by malloc().
+ *
+ * @param thread The thread to hash.
+ * @param frames Number of frames to include in the hash. If the value is 0,
+ *               all frames are used.
+ * @param prefix String that should be prefixed before the text from which the
+ *               hash is computed. ABRT/FAF used the crash component here. Can
+ *               be NULL.
+ * @param flags Bitwise OR of sr_duphash_flags.
+ */
+char *
+sr_thread_get_duphash(struct sr_thread *thread, int frames, char *prefix,
+                      enum sr_duphash_flags flags);
 
 #ifdef __cplusplus
 }

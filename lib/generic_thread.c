@@ -20,12 +20,15 @@
 
 #include "report_type.h"
 #include "internal_utils.h"
-#include "frame.h"
-#include "stacktrace.h"
+#include "generic_frame.h"
 #include "generic_thread.h"
+#include "stacktrace.h"
+#include "sha1.h"
+#include "strbuf.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 //XXX
 /* Note that python and koops do not have multiple threads, thus the functions
@@ -212,4 +215,55 @@ void
 sr_thread_normalize(struct sr_thread *thread)
 {
     DISPATCH(dtable, thread->type, normalize)(thread);
+}
+
+char *
+sr_thread_get_duphash(struct sr_thread *thread, int nframes, char *prefix,
+                      enum sr_duphash_flags flags)
+{
+    char *ret;
+    struct sr_strbuf *strbuf = sr_strbuf_new();
+
+    /* Normalization is destructive, we need to make a copy. */
+    thread = sr_thread_dup(thread);
+
+    if (!(flags & SR_DUPHASH_NONORMALIZE))
+        sr_thread_normalize(thread);
+
+    /* User supplied hash text prefix. */
+    if (prefix)
+        sr_strbuf_append_str(strbuf, prefix);
+
+    /* Here would be the place to append thread-specific information. However,
+     * no current problem type has any for duphash. So we just append
+     * "Thread\n" here because that is what btparser does, in order to produce
+     * compatible hashes at least for gdb problems. */
+    /*
+    DISPATCH(dtable, thread->type, thread_append_duphash_text)
+            (thread, flags, strbuf);
+    */
+    sr_strbuf_append_str(strbuf, "Thread\n");
+
+    /* Number of nframes, (almost) not limited if nframes = 0. */
+    if (nframes == 0)
+        nframes = INT_MAX;
+
+    for (struct sr_frame *frame = sr_thread_frames(thread);
+         frame && nframes > 0;
+         frame = sr_frame_next(frame), nframes--)
+    {
+        frame_append_duphash_text(frame, flags, strbuf);
+    }
+
+    if (flags & SR_DUPHASH_NOHASH)
+        ret = sr_strbuf_free_nobuf(strbuf);
+    else
+    {
+        ret = sr_sha1_hash_string(strbuf->buf);
+        sr_strbuf_free(strbuf);
+    }
+
+    sr_thread_free(thread);
+
+    return ret;
 }

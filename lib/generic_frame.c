@@ -23,6 +23,7 @@
 #include "report_type.h"
 #include "internal_utils.h"
 #include "generic_frame.h"
+#include "generic_thread.h"
 #include "stacktrace.h"
 
 /* Initialize dispatch table. */
@@ -77,6 +78,14 @@ frame_append_bthash_text(struct sr_frame *frame, enum sr_bthash_flags flags,
                          struct sr_strbuf *strbuf)
 {
     DISPATCH(dtable, frame->type, frame_append_bthash_text)
+            (frame, flags, strbuf);
+}
+
+void
+frame_append_duphash_text(struct sr_frame *frame, enum sr_duphash_flags flags,
+                          struct sr_strbuf *strbuf)
+{
+    DISPATCH(dtable, frame->type, frame_append_duphash_text)
             (frame, flags, strbuf);
 }
 

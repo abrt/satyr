@@ -24,6 +24,7 @@
 #include "utils.h"
 #include "json.h"
 #include "generic_frame.h"
+#include "thread.h"
 #include "stacktrace.h"
 #include "internal_utils.h"
 #include <string.h>
@@ -37,6 +38,9 @@
 static void
 java_append_bthash_text(struct sr_java_frame *frame, enum sr_bthash_flags flags,
                         struct sr_strbuf *strbuf);
+static void
+java_append_duphash_text(struct sr_java_frame *frame, enum sr_duphash_flags flags,
+                         struct sr_strbuf *strbuf);
 
 DEFINE_NEXT_FUNC(java_next, struct sr_frame, struct sr_java_frame)
 DEFINE_SET_NEXT_FUNC(java_set_next, struct sr_frame, struct sr_java_frame)
@@ -50,6 +54,8 @@ struct frame_methods java_frame_methods =
     .cmp_distance = (frame_cmp_fn_t) sr_java_frame_cmp_distance,
     .frame_append_bthash_text =
         (frame_append_bthash_text_fn_t) java_append_bthash_text,
+    .frame_append_duphash_text =
+        (frame_append_duphash_text_fn_t) java_append_duphash_text,
     .frame_free = (frame_free_fn_t) sr_java_frame_free,
 };
 
@@ -593,4 +599,17 @@ java_append_bthash_text(struct sr_java_frame *frame, enum sr_bthash_flags flags,
                           frame->is_native,
                           frame->is_exception,
                           OR_UNKNOWN(frame->message));
+}
+
+static void
+java_append_duphash_text(struct sr_java_frame *frame, enum sr_duphash_flags flags,
+                         struct sr_strbuf *strbuf)
+{
+    if (frame->name)
+        sr_strbuf_append_strf(strbuf, "%s\n", frame->name);
+    else
+        sr_strbuf_append_strf(strbuf, "%s/%s:%"PRIu32"\n",
+                              OR_UNKNOWN(frame->class_path),
+                              OR_UNKNOWN(frame->file_name),
+                              frame->file_line);
 }

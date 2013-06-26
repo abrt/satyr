@@ -22,6 +22,7 @@
 #include "strbuf.h"
 #include "location.h"
 #include "generic_frame.h"
+#include "thread.h"
 #include "stacktrace.h"
 #include "internal_utils.h"
 #include <stdlib.h>
@@ -35,6 +36,9 @@
 static void
 gdb_append_bthash_text(struct sr_gdb_frame *frame, enum sr_bthash_flags flags,
                        struct sr_strbuf *strbuf);
+static void
+gdb_append_duphash_text(struct sr_gdb_frame *frame, enum sr_duphash_flags flags,
+                        struct sr_strbuf *strbuf);
 
 DEFINE_NEXT_FUNC(gdb_next, struct sr_frame, struct sr_gdb_frame)
 DEFINE_SET_NEXT_FUNC(gdb_set_next, struct sr_frame, struct sr_gdb_frame)
@@ -54,6 +58,8 @@ struct frame_methods gdb_frame_methods =
     .cmp_distance = (frame_cmp_fn_t) sr_gdb_frame_cmp_distance,
     .frame_append_bthash_text =
         (frame_append_bthash_text_fn_t) gdb_append_bthash_text,
+    .frame_append_duphash_text =
+        (frame_append_duphash_text_fn_t) gdb_append_duphash_text,
     .frame_free = (frame_free_fn_t) sr_gdb_frame_free,
 };
 
@@ -1115,4 +1121,23 @@ gdb_append_bthash_text(struct sr_gdb_frame *frame, enum sr_bthash_flags flags,
                           frame->signal_handler_called,
                           frame->address,
                           OR_UNKNOWN(frame->library_name));
+}
+
+static void
+gdb_append_duphash_text(struct sr_gdb_frame *frame, enum sr_duphash_flags flags,
+                        struct sr_strbuf *strbuf)
+{
+    /* Taken from btparser. */
+    sr_strbuf_append_str(strbuf, " ");
+
+    if (frame->function_type)
+        sr_strbuf_append_strf(strbuf, " %s", frame->function_type);
+
+    if (frame->function_name)
+        sr_strbuf_append_strf(strbuf, " %s", frame->function_name);
+
+    if (frame->signal_handler_called)
+        sr_strbuf_append_str(strbuf, " <signal handler called>");
+
+    sr_strbuf_append_str(strbuf, "\n");
 }

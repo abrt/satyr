@@ -23,6 +23,7 @@
 #include "frame.h"
 
 enum sr_bthash_flags;
+enum sr_duphash_flags;
 
 typedef void (*append_to_str_fn_t)(struct sr_frame *, struct sr_strbuf *);
 typedef struct sr_frame* (*next_frame_fn_t)(struct sr_frame *);
@@ -30,6 +31,8 @@ typedef void (*set_next_frame_fn_t)(struct sr_frame *, struct sr_frame *);
 typedef int (*frame_cmp_fn_t)(struct sr_frame *, struct sr_frame *);
 typedef void (*frame_append_bthash_text_fn_t)(struct sr_frame*, enum sr_bthash_flags,
                                               struct sr_strbuf*);
+typedef void (*frame_append_duphash_text_fn_t)(struct sr_frame*, enum sr_duphash_flags,
+                                               struct sr_strbuf*);
 typedef void (*frame_free_fn_t)(struct sr_frame*);
 
 struct frame_methods
@@ -40,6 +43,7 @@ struct frame_methods
     frame_cmp_fn_t cmp;
     frame_cmp_fn_t cmp_distance;
     frame_append_bthash_text_fn_t frame_append_bthash_text;
+    frame_append_duphash_text_fn_t frame_append_duphash_text;
     frame_free_fn_t frame_free;
 };
 
@@ -49,5 +53,9 @@ extern struct frame_methods core_frame_methods, python_frame_methods,
 void
 frame_append_bthash_text(struct sr_frame *frame, enum sr_bthash_flags flags,
                          struct sr_strbuf *strbuf);
+
+void
+frame_append_duphash_text(struct sr_frame *frame, enum sr_duphash_flags flags,
+                          struct sr_strbuf *strbuf);
 
 #endif
