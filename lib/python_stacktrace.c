@@ -34,6 +34,10 @@
 
 /* Method tables */
 
+static void
+python_append_bthash_text(struct sr_python_stacktrace *stacktrace, enum sr_bthash_flags flags,
+                          struct sr_strbuf *strbuf);
+
 DEFINE_FRAMES_FUNC(python_frames, struct sr_python_stacktrace)
 DEFINE_SET_FRAMES_FUNC(python_set_frames, struct sr_python_stacktrace)
 DEFINE_PARSE_WRAPPER_FUNC(python_parse, SR_REPORT_PYTHON)
@@ -46,6 +50,8 @@ struct thread_methods python_thread_methods =
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) thread_no_next_thread,
     .set_next = (set_next_thread_fn_t) NULL,
+    .thread_append_bthash_text =
+        (thread_append_bthash_text_fn_t) thread_no_bthash_text,
 };
 
 struct stacktrace_methods python_stacktrace_methods =
@@ -59,6 +65,8 @@ struct stacktrace_methods python_stacktrace_methods =
     .threads = (threads_fn_t) stacktrace_one_thread_only,
     .set_threads = (set_threads_fn_t) NULL,
     .free = (free_fn_t) sr_python_stacktrace_free,
+    .stacktrace_append_bthash_text =
+        (stacktrace_append_bthash_text_fn_t) python_append_bthash_text,
 };
 
 /* Public functions */
@@ -235,4 +243,12 @@ sr_python_stacktrace_get_reason(struct sr_python_stacktrace *stacktrace)
         exc = stacktrace->exception_name;
 
     return sr_asprintf("%s in %s:%"PRIu32, exc, file, line);
+}
+
+static void
+python_append_bthash_text(struct sr_python_stacktrace *stacktrace, enum sr_bthash_flags flags,
+                          struct sr_strbuf *strbuf)
+{
+    sr_strbuf_append_strf(strbuf, "Exception: %s\n", OR_UNKNOWN(stacktrace->exception_name));
+    sr_strbuf_append_char(strbuf, '\n');
 }

@@ -42,6 +42,19 @@ struct sr_stacktrace
     enum sr_report_type type;
 };
 
+/* Flags that influence how the bthash is computed.
+ */
+enum sr_bthash_flags
+{
+    /* Default hashing process.
+     */
+    SR_BTHASH_NORMAL = 1 << 0,
+
+    /* Return the plaintext that would be hashed. Useful mainly for debugging.
+     */
+    SR_BTHASH_NOHASH = 1 << 1,
+};
+
 /**
  * Parses the stacktrace pointed to by input. You need to provide the correct
  * stacktrace type in the first parameter.
@@ -85,6 +98,15 @@ sr_stacktrace_to_json(struct sr_stacktrace *stacktrace);
  */
 char *
 sr_stacktrace_get_reason(struct sr_stacktrace *stacktrace);
+
+/**
+ * Returns hash of a backtrace. This is a hash in the usual sense that the same
+ * stacktraces always have the same hash while two distinct stacktraces have
+ * negligible probability of having the same hash. The string is allocated by
+ * malloc().
+ */
+char *
+sr_stacktrace_get_bthash(struct sr_stacktrace *stacktrace, enum sr_bthash_flags flags);
 
 /**
  * Releases all the memory associated with the stacktrace pointer.

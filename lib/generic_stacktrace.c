@@ -23,10 +23,13 @@
 #include "internal_utils.h"
 #include "strbuf.h"
 #include "location.h"
+#include "sha1.h"
 
 #include "frame.h"
 #include "thread.h"
 #include "generic_stacktrace.h"
+#include "generic_thread.h"
+#include "generic_frame.h"
 
 /* Initialize dispatch table. */
 static struct stacktrace_methods* dtable[SR_REPORT_NUM] =
@@ -136,4 +139,44 @@ void
 sr_stacktrace_free(struct sr_stacktrace *stacktrace)
 {
     DISPATCH(dtable, stacktrace->type, free)(stacktrace);
+}
+
+char *
+sr_stacktrace_get_bthash(struct sr_stacktrace *stacktrace, enum sr_bthash_flags flags)
+{
+    char *ret;
+    struct sr_strbuf *strbuf = sr_strbuf_new();
+
+    /* Append data contained in the stacktrace structure. */
+    DISPATCH(dtable, stacktrace->type, stacktrace_append_bthash_text)
+            (stacktrace, flags, strbuf);
+
+    for (struct sr_thread *thread = sr_stacktrace_threads(stacktrace);
+         thread;
+         thread = sr_thread_next(thread))
+    {
+        /* Data containted in the thread structure (if any). */
+        thread_append_bthash_text(thread, flags, strbuf);
+
+        for (struct sr_frame *frame = sr_thread_frames(thread);
+             frame;
+             frame = sr_frame_next(frame))
+        {
+            frame_append_bthash_text(frame, flags, strbuf);
+        }
+
+        /* Blank line in between threads. */
+        if (sr_thread_next(thread))
+            sr_strbuf_append_char(strbuf, '\n');
+    }
+
+    if (flags & SR_BTHASH_NOHASH)
+        ret = sr_strbuf_free_nobuf(strbuf);
+    else
+    {
+        ret = sr_sha1_hash_string(strbuf->buf);
+        sr_strbuf_free(strbuf);
+    }
+
+    return ret;
 }

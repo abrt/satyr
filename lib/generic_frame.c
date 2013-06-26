@@ -23,6 +23,7 @@
 #include "report_type.h"
 #include "internal_utils.h"
 #include "generic_frame.h"
+#include "stacktrace.h"
 
 /* Initialize dispatch table. */
 static struct frame_methods* dtable[SR_REPORT_NUM] =
@@ -69,4 +70,12 @@ sr_frame_cmp_distance(struct sr_frame *frame1, struct sr_frame *frame2)
         return frame1->type - frame2->type;
 
     return DISPATCH(dtable, frame1->type, cmp_distance)(frame1, frame2);
+}
+
+void
+frame_append_bthash_text(struct sr_frame *frame, enum sr_bthash_flags flags,
+                         struct sr_strbuf *strbuf)
+{
+    DISPATCH(dtable, frame->type, frame_append_bthash_text)
+            (frame, flags, strbuf);
 }

@@ -25,12 +25,17 @@
 #include "utils.h"
 #include "strbuf.h"
 #include "generic_thread.h"
+#include "stacktrace.h"
 #include "internal_utils.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
 /* Method table */
+
+static void
+gdb_append_bthash_text(struct sr_gdb_thread *thread, enum sr_bthash_flags flags,
+                       struct sr_strbuf *strbuf);
 
 DEFINE_FRAMES_FUNC(gdb_frames, struct sr_gdb_thread)
 DEFINE_SET_FRAMES_FUNC(gdb_set_frames, struct sr_gdb_thread)
@@ -45,6 +50,8 @@ struct thread_methods gdb_thread_methods =
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) gdb_next,
     .set_next = (set_next_thread_fn_t) gdb_set_next,
+    .thread_append_bthash_text =
+        (thread_append_bthash_text_fn_t) gdb_append_bthash_text,
 };
 
 /* Public functions */
@@ -549,4 +556,11 @@ sr_gdb_thread_get_optimized(struct sr_gdb_thread *thread,
         sr_gdb_thread_remove_frames_below_n(thread, max_frames);
 
     return thread;
+}
+
+static void
+gdb_append_bthash_text(struct sr_gdb_thread *thread, enum sr_bthash_flags flags,
+                       struct sr_strbuf *strbuf)
+{
+    sr_strbuf_append_strf(strbuf, "Thread %"PRIu32"\n", thread->number);
 }

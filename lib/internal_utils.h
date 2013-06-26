@@ -40,3 +40,6 @@
 
 #define DEFINE_NEXT_FUNC(name, abstract_t, concrete_t) DEFINE_GETTER(name, next, abstract_t, concrete_t, abstract_t)
 #define DEFINE_SET_NEXT_FUNC(name, abstract_t, concrete_t) DEFINE_SETTER(name, next, abstract_t, concrete_t, abstract_t)
+
+/* beware the side effects */
+#define OR_UNKNOWN(s) ((s) ? (s) : "<unknown>")

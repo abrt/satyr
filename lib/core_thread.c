@@ -23,6 +23,7 @@
 #include "strbuf.h"
 #include "json.h"
 #include "generic_thread.h"
+#include "stacktrace.h"
 #include "internal_utils.h"
 #include <string.h>
 
@@ -41,6 +42,8 @@ struct thread_methods core_thread_methods =
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) core_next,
     .set_next = (set_next_thread_fn_t) core_set_next,
+    .thread_append_bthash_text =
+        (thread_append_bthash_text_fn_t) thread_no_bthash_text,
 };
 
 /* Public functions */

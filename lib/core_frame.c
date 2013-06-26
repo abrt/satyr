@@ -22,10 +22,15 @@
 #include "strbuf.h"
 #include "json.h"
 #include "generic_frame.h"
+#include "stacktrace.h"
 #include "internal_utils.h"
 #include <string.h>
 
 /* Method table */
+
+static void
+core_append_bthash_text(struct sr_core_frame *frame, enum sr_bthash_flags flags,
+                        struct sr_strbuf *strbuf);
 
 DEFINE_NEXT_FUNC(core_next, struct sr_frame, struct sr_core_frame)
 DEFINE_SET_NEXT_FUNC(core_set_next, struct sr_frame, struct sr_core_frame)
@@ -37,6 +42,8 @@ struct frame_methods core_frame_methods =
     .set_next = (set_next_frame_fn_t) core_set_next,
     .cmp = (frame_cmp_fn_t) sr_core_frame_cmp,
     .cmp_distance = (frame_cmp_fn_t) sr_core_frame_cmp_distance,
+    .frame_append_bthash_text =
+        (frame_append_bthash_text_fn_t) core_append_bthash_text,
 };
 
 /* Public functions */
@@ -403,4 +410,20 @@ sr_core_frame_append_to_str(struct sr_core_frame *frame,
     {
         sr_strbuf_append_strf(dest, " in %s", frame->file_name);
     }
+}
+
+static void
+core_append_bthash_text(struct sr_core_frame *frame, enum sr_bthash_flags flags,
+                        struct sr_strbuf *strbuf)
+{
+    if (frame->address)
+        sr_strbuf_append_strf(strbuf, "0x%"PRIx64", ", frame->address);
+    else
+        sr_strbuf_append_str(strbuf, "<unknown>, ");
+
+    sr_strbuf_append_strf(strbuf, "%s+0x%"PRIx64", %s, %s\n",
+                          OR_UNKNOWN(frame->build_id),
+                          frame->build_id_offset,
+                          OR_UNKNOWN(frame->file_name),
+                          OR_UNKNOWN(frame->fingerprint));
 }

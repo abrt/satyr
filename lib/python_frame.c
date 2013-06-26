@@ -23,11 +23,16 @@
 #include "strbuf.h"
 #include "json.h"
 #include "generic_frame.h"
+#include "stacktrace.h"
 #include "internal_utils.h"
 #include <string.h>
 #include <inttypes.h>
 
 /* Method table */
+
+static void
+python_append_bthash_text(struct sr_python_frame *frame, enum sr_bthash_flags flags,
+                          struct sr_strbuf *strbuf);
 
 DEFINE_NEXT_FUNC(python_next, struct sr_frame, struct sr_python_frame)
 DEFINE_SET_NEXT_FUNC(python_set_next, struct sr_frame, struct sr_python_frame)
@@ -39,6 +44,8 @@ struct frame_methods python_frame_methods =
     .set_next = (set_next_frame_fn_t) python_set_next,
     .cmp = (frame_cmp_fn_t) sr_python_frame_cmp,
     .cmp_distance = (frame_cmp_fn_t) sr_python_frame_cmp_distance,
+    .frame_append_bthash_text =
+        (frame_append_bthash_text_fn_t) python_append_bthash_text,
 };
 
 /* Public functions */
@@ -343,4 +350,18 @@ sr_python_frame_append_to_str(struct sr_python_frame *frame,
             sr_strbuf_append_strf(dest, ":%d", frame->file_line);
         }
     }
+}
+
+static void
+python_append_bthash_text(struct sr_python_frame *frame, enum sr_bthash_flags flags,
+                          struct sr_strbuf *strbuf)
+{
+    sr_strbuf_append_strf(strbuf,
+                          "%s, %d, %"PRIu32", %s, %d, %s\n",
+                          OR_UNKNOWN(frame->file_name),
+                          frame->special_file,
+                          frame->file_line,
+                          OR_UNKNOWN(frame->function_name),
+                          frame->special_function,
+                          OR_UNKNOWN(frame->line_contents));
 }

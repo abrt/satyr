@@ -40,6 +40,10 @@
 
 /* Method table */
 
+static void
+core_append_bthash_text(struct sr_core_stacktrace *stacktrace, enum sr_bthash_flags flags,
+                        struct sr_strbuf *strbuf);
+
 DEFINE_THREADS_FUNC(core_threads, struct sr_core_stacktrace)
 DEFINE_SET_THREADS_FUNC(core_set_threads, struct sr_core_stacktrace)
 
@@ -56,6 +60,8 @@ struct stacktrace_methods core_stacktrace_methods =
     .threads = (threads_fn_t) core_threads,
     .set_threads = (set_threads_fn_t) core_set_threads,
     .free = (free_fn_t) sr_core_stacktrace_free,
+    .stacktrace_append_bthash_text =
+        (stacktrace_append_bthash_text_fn_t) core_append_bthash_text,
 };
 
 /* Public functions */
@@ -392,4 +398,13 @@ sr_core_stacktrace_get_reason(struct sr_core_stacktrace *stacktrace)
     char *prog = stacktrace->executable ? stacktrace->executable : "<unknown>";
 
     return sr_asprintf("Program %s was terminated by signal %"PRIu16, prog, stacktrace->signal);
+}
+
+static void
+core_append_bthash_text(struct sr_core_stacktrace *stacktrace, enum sr_bthash_flags flags,
+                        struct sr_strbuf *strbuf)
+{
+    sr_strbuf_append_strf(strbuf, "Executable: %s\n", OR_UNKNOWN(stacktrace->executable));
+    sr_strbuf_append_strf(strbuf, "Signal: %"PRIu16"\n", stacktrace->signal);
+    sr_strbuf_append_char(strbuf, '\n');
 }

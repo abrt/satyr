@@ -25,12 +25,17 @@
 #include "strbuf.h"
 #include "json.h"
 #include "generic_thread.h"
+#include "stacktrace.h"
 #include "internal_utils.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
 /* Method table */
+
+static void
+java_append_bthash_text(struct sr_java_thread *thread, enum sr_bthash_flags flags,
+                        struct sr_strbuf *strbuf);
 
 DEFINE_FRAMES_FUNC(java_frames, struct sr_java_thread)
 DEFINE_SET_FRAMES_FUNC(java_set_frames, struct sr_java_thread)
@@ -45,6 +50,8 @@ struct thread_methods java_thread_methods =
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) java_next,
     .set_next = (set_next_thread_fn_t) java_set_next,
+    .thread_append_bthash_text =
+        (thread_append_bthash_text_fn_t) java_append_bthash_text,
 };
 
 /* Public functions */
@@ -394,3 +401,9 @@ sr_java_thread_to_json(struct sr_java_thread *thread)
     return sr_strbuf_free_nobuf(strbuf);
 }
 
+static void
+java_append_bthash_text(struct sr_java_thread *thread, enum sr_bthash_flags flags,
+                        struct sr_strbuf *strbuf)
+{
+    sr_strbuf_append_strf(strbuf, "Thread %s\n", OR_UNKNOWN(thread->name));
+}

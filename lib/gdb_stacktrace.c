@@ -34,6 +34,10 @@
 
 /* Method table */
 
+static void
+gdb_append_bthash_text(struct sr_gdb_stacktrace *stacktrace, enum sr_bthash_flags flags,
+                       struct sr_strbuf *strbuf);
+
 /* for not used/implemented methods */
 static char *
 gdb_return_null(struct sr_stacktrace *stacktrace)
@@ -57,6 +61,8 @@ struct stacktrace_methods gdb_stacktrace_methods =
     .threads = (threads_fn_t) gdb_threads,
     .set_threads = (set_threads_fn_t) gdb_set_threads,
     .free = (free_fn_t) sr_gdb_stacktrace_free,
+    .stacktrace_append_bthash_text =
+        (stacktrace_append_bthash_text_fn_t) gdb_append_bthash_text,
 };
 
 /* Public functions */
@@ -527,4 +533,19 @@ sr_gdb_stacktrace_to_short_text(struct sr_gdb_stacktrace *stacktrace,
 
     sr_gdb_thread_free(optimized_thread);
     return sr_strbuf_free_nobuf(strbuf);
+}
+
+static void
+gdb_append_bthash_text(struct sr_gdb_stacktrace *stacktrace, enum sr_bthash_flags flags,
+                       struct sr_strbuf *strbuf)
+{
+    for (struct sr_gdb_sharedlib *lib = stacktrace->libs;
+         lib;
+         lib = lib->next)
+    {
+        sr_strbuf_append_strf(strbuf, "%"PRIx64"-%"PRIx64", %s\n", lib->from, lib->to,
+                              OR_UNKNOWN(lib->soname));
+    }
+
+    sr_strbuf_append_char(strbuf, '\n');
 }

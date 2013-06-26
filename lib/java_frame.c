@@ -24,6 +24,7 @@
 #include "utils.h"
 #include "json.h"
 #include "generic_frame.h"
+#include "stacktrace.h"
 #include "internal_utils.h"
 #include <string.h>
 #include <inttypes.h>
@@ -32,6 +33,10 @@
 #define SR_JF_MARK_UNKNOWN_SOURCE "Unknown Source"
 
 /* Method table */
+
+static void
+java_append_bthash_text(struct sr_java_frame *frame, enum sr_bthash_flags flags,
+                        struct sr_strbuf *strbuf);
 
 DEFINE_NEXT_FUNC(java_next, struct sr_frame, struct sr_java_frame)
 DEFINE_SET_NEXT_FUNC(java_set_next, struct sr_frame, struct sr_java_frame)
@@ -43,6 +48,8 @@ struct frame_methods java_frame_methods =
     .set_next = (set_next_frame_fn_t) java_set_next,
     .cmp = (frame_cmp_fn_t) sr_java_frame_cmp,
     .cmp_distance = (frame_cmp_fn_t) sr_java_frame_cmp_distance,
+    .frame_append_bthash_text =
+        (frame_append_bthash_text_fn_t) java_append_bthash_text,
 };
 
 /* Public functions */
@@ -570,4 +577,19 @@ sr_java_frame_to_json(struct sr_java_frame *frame)
     strbuf->buf[0] = '{';
     sr_strbuf_append_str(strbuf, "}");
     return sr_strbuf_free_nobuf(strbuf);
+}
+
+static void
+java_append_bthash_text(struct sr_java_frame *frame, enum sr_bthash_flags flags,
+                        struct sr_strbuf *strbuf)
+{
+    sr_strbuf_append_strf(strbuf,
+                          "%s, %s, %"PRIu32", %s, %d, %d, %s\n",
+                          OR_UNKNOWN(frame->name),
+                          OR_UNKNOWN(frame->file_name),
+                          frame->file_line,
+                          OR_UNKNOWN(frame->class_path),
+                          frame->is_native,
+                          frame->is_exception,
+                          OR_UNKNOWN(frame->message));
 }

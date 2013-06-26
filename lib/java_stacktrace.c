@@ -31,6 +31,13 @@
 
 /* Method table */
 
+static void
+java_append_bthash_text(struct sr_java_stacktrace *stacktrace, enum sr_bthash_flags flags,
+                        struct sr_strbuf *strbuf)
+{
+    /* nop */
+}
+
 DEFINE_THREADS_FUNC(java_threads, struct sr_java_stacktrace)
 DEFINE_SET_THREADS_FUNC(java_set_threads, struct sr_java_stacktrace)
 DEFINE_PARSE_WRAPPER_FUNC(java_parse, SR_REPORT_JAVA)
@@ -47,6 +54,8 @@ struct stacktrace_methods java_stacktrace_methods =
     .threads = (threads_fn_t) java_threads,
     .set_threads = (set_threads_fn_t) java_set_threads,
     .free = (free_fn_t) sr_java_stacktrace_free,
+    .stacktrace_append_bthash_text =
+        (stacktrace_append_bthash_text_fn_t) java_append_bthash_text,
 };
 
 /* Public functions */

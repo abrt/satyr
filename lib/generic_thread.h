@@ -21,12 +21,16 @@
 #include "thread.h"
 #include "internal_utils.h"
 
+enum sr_bthash_flags;
+
 typedef struct sr_frame* (*frames_fn_t)(struct sr_thread*);
 typedef void (*set_frames_fn_t)(struct sr_thread*, struct sr_frame*);
 typedef int (*thread_cmp_fn_t)(struct sr_thread*, struct sr_thread*);
 typedef int (*frame_count_fn_t)(struct sr_thread*);
 typedef struct sr_thread* (*next_thread_fn_t)(struct sr_thread*);
 typedef void (*set_next_thread_fn_t)(struct sr_thread*, struct sr_thread*);
+typedef void (*thread_append_bthash_text_fn_t)(struct sr_thread*, enum sr_bthash_flags,
+                                               struct sr_strbuf*);
 
 struct thread_methods
 {
@@ -36,6 +40,7 @@ struct thread_methods
     frame_count_fn_t frame_count;
     next_thread_fn_t next;
     set_next_thread_fn_t set_next;
+    thread_append_bthash_text_fn_t thread_append_bthash_text;
 };
 
 extern struct thread_methods core_thread_methods, python_thread_methods,
@@ -53,3 +58,12 @@ thread_frame_count(struct sr_thread *thread);
 
 struct sr_thread *
 thread_no_next_thread(struct sr_thread *thread);
+
+void
+thread_no_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
+                      struct sr_strbuf *strbuf);
+
+/* Uses dispatch table but not intended for public use. */
+void
+thread_append_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
+                          struct sr_strbuf *strbuf);

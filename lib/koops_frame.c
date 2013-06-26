@@ -22,6 +22,7 @@
 #include "strbuf.h"
 #include "json.h"
 #include "generic_frame.h"
+#include "stacktrace.h"
 #include "internal_utils.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -29,6 +30,10 @@
 #include <inttypes.h>
 
 /* Method table */
+
+static void
+koops_append_bthash_text(struct sr_koops_frame *frame, enum sr_bthash_flags flags,
+                         struct sr_strbuf *strbuf);
 
 DEFINE_NEXT_FUNC(koops_next, struct sr_frame, struct sr_koops_frame)
 DEFINE_SET_NEXT_FUNC(koops_set_next, struct sr_frame, struct sr_koops_frame)
@@ -40,6 +45,8 @@ struct frame_methods koops_frame_methods =
     .set_next = (set_next_frame_fn_t) koops_set_next,
     .cmp = (frame_cmp_fn_t) sr_koops_frame_cmp,
     .cmp_distance = (frame_cmp_fn_t) sr_koops_frame_cmp_distance,
+    .frame_append_bthash_text =
+        (frame_append_bthash_text_fn_t) koops_append_bthash_text,
 };
 
 /* Public functions */
@@ -512,4 +519,24 @@ sr_koops_frame_append_to_str(struct sr_koops_frame *frame,
 
     if (frame->module_name)
         sr_strbuf_append_strf(str, " in %s", frame->module_name);
+}
+
+static void
+koops_append_bthash_text(struct sr_koops_frame *frame, enum sr_bthash_flags flags,
+                         struct sr_strbuf *strbuf)
+{
+    sr_strbuf_append_strf(strbuf,
+                          "0x%"PRIx64", %d, %s, 0x%"PRIx64", 0x%"PRIx64", %s, "
+                          "0x%"PRIx64", %s, 0x%"PRIx64", 0x%"PRIx64", %s\n",
+                          frame->address,
+                          frame->reliable,
+                          OR_UNKNOWN(frame->function_name),
+                          frame->function_offset,
+                          frame->function_length,
+                          OR_UNKNOWN(frame->module_name),
+                          frame->from_address,
+                          OR_UNKNOWN(frame->from_function_name),
+                          frame->from_function_offset,
+                          frame->from_function_length,
+                          OR_UNKNOWN(frame->from_module_name));
 }

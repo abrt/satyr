@@ -20,6 +20,7 @@
 
 #include "stacktrace.h"
 #include "thread.h"
+#include "strbuf.h"
 
 typedef struct sr_stacktrace* (*parse_fn_t)(const char **, char **);
 typedef struct sr_stacktrace* (*parse_location_fn_t)(const char **, struct sr_location *);
@@ -30,6 +31,8 @@ typedef struct sr_thread* (*find_crash_thread_fn_t)(struct sr_stacktrace *);
 typedef struct sr_thread* (*threads_fn_t)(struct sr_stacktrace *);
 typedef void (*set_threads_fn_t)(struct sr_stacktrace *, struct sr_thread *);
 typedef void (*free_fn_t)(struct sr_stacktrace *);
+typedef void (*stacktrace_append_bthash_text_fn_t)(struct sr_stacktrace *, enum sr_bthash_flags,
+                                                   struct sr_strbuf *);
 
 struct stacktrace_methods
 {
@@ -42,6 +45,7 @@ struct stacktrace_methods
     threads_fn_t threads;
     set_threads_fn_t set_threads;
     free_fn_t free;
+    stacktrace_append_bthash_text_fn_t stacktrace_append_bthash_text;
 };
 
 extern struct stacktrace_methods core_stacktrace_methods, python_stacktrace_methods,

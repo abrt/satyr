@@ -56,6 +56,10 @@ struct sr_taint_flag sr_flags[] = {
 
 /* Method tables */
 
+static void
+koops_append_bthash_text(struct sr_koops_stacktrace *stacktrace,
+                         enum sr_bthash_flags flags, struct sr_strbuf *strbuf);
+
 DEFINE_FRAMES_FUNC(koops_frames, struct sr_koops_stacktrace)
 DEFINE_SET_FRAMES_FUNC(koops_set_frames, struct sr_koops_stacktrace)
 DEFINE_PARSE_WRAPPER_FUNC(koops_parse, SR_REPORT_KERNELOOPS)
@@ -68,6 +72,7 @@ struct thread_methods koops_thread_methods =
     .frame_count = (frame_count_fn_t) thread_frame_count,
     .next = (next_thread_fn_t) thread_no_next_thread,
     .set_next = (set_next_thread_fn_t) NULL,
+    .thread_append_bthash_text = (thread_append_bthash_text_fn_t) thread_no_bthash_text,
 };
 
 struct stacktrace_methods koops_stacktrace_methods =
@@ -81,6 +86,8 @@ struct stacktrace_methods koops_stacktrace_methods =
     .threads = (threads_fn_t) stacktrace_one_thread_only,
     .set_threads = (set_threads_fn_t) NULL,
     .free = (free_fn_t) sr_koops_stacktrace_free,
+    .stacktrace_append_bthash_text =
+        (stacktrace_append_bthash_text_fn_t) koops_append_bthash_text,
 };
 
 /* Public functions */
@@ -524,4 +531,31 @@ sr_koops_stacktrace_get_reason(struct sr_koops_stacktrace *stacktrace)
     sr_koops_stacktrace_free(copy);
 
     return result;
+}
+
+static void
+koops_append_bthash_text(struct sr_koops_stacktrace *stacktrace,
+                         enum sr_bthash_flags flags, struct sr_strbuf *strbuf)
+{
+    sr_strbuf_append_strf(strbuf, "Version: %s\n", OR_UNKNOWN(stacktrace->version));
+
+    sr_strbuf_append_str(strbuf, "Flags: ");
+    for (struct sr_taint_flag *f = sr_flags; f->letter; f++)
+    {
+        bool val = *(bool *)((void *)stacktrace + f->member_offset);
+        if (val == false)
+            continue;
+    }
+    sr_strbuf_append_char(strbuf, '\n');
+
+    sr_strbuf_append_str(strbuf, "Modules: ");
+    for (char **mod = stacktrace->modules; mod && *mod; mod++)
+    {
+        sr_strbuf_append_str(strbuf, *mod);
+        if (*(mod+1))
+            sr_strbuf_append_str(strbuf, ", ");
+    }
+    sr_strbuf_append_char(strbuf, '\n');
+
+    sr_strbuf_append_char(strbuf, '\n');
 }

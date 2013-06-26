@@ -21,6 +21,7 @@
 #include "report_type.h"
 #include "internal_utils.h"
 #include "frame.h"
+#include "stacktrace.h"
 #include "generic_thread.h"
 
 #include <stdio.h>
@@ -48,6 +49,13 @@ struct sr_thread *
 thread_no_next_thread(struct sr_thread *thread)
 {
     return NULL;
+}
+
+void
+thread_no_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
+                      struct sr_strbuf *strbuf)
+{
+    /* nop */
 }
 
 /* Initialize dispatch table. */
@@ -102,4 +110,12 @@ sr_thread_set_next(struct sr_thread *cur, struct sr_thread *next)
 {
     assert(next == NULL || cur->type == next->type);
     DISPATCH(dtable, cur->type, set_next)(cur, next);
+}
+
+void
+thread_append_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
+                          struct sr_strbuf *strbuf)
+{
+    DISPATCH(dtable, thread->type, thread_append_bthash_text)
+            (thread, flags, strbuf);
 }
