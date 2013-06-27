@@ -24,7 +24,7 @@
 #include "thread.h"
 #include "strbuf.h"
 
-typedef struct sr_stacktrace* (*parse_fn_t)(const char **, char **);
+typedef struct sr_stacktrace* (*parse_fn_t)(const char *, char **);
 typedef struct sr_stacktrace* (*parse_location_fn_t)(const char **, struct sr_location *);
 typedef char* (*to_short_text_fn_t)(struct sr_stacktrace*, int);
 typedef char* (*to_json_fn_t)(struct sr_stacktrace *);
@@ -62,14 +62,14 @@ extern struct stacktrace_methods core_stacktrace_methods, python_stacktrace_meth
 
 #define DEFINE_PARSE_WRAPPER_FUNC(name, type)                        \
     static struct sr_stacktrace *                                    \
-    name(const char **input, char **error_message)                   \
+    name(const char *input, char **error_message)                    \
     {                                                                \
         return stacktrace_parse_wrapper(type, input, error_message); \
     }
 
 /* generic functions */
 struct sr_stacktrace *
-stacktrace_parse_wrapper(enum sr_report_type type, const char **input, char **error_message);
+stacktrace_parse_wrapper(enum sr_report_type type, const char *input, char **error_message);
 
 char *
 stacktrace_to_short_text(struct sr_stacktrace *stacktrace, int max_frames);

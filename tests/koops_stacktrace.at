@@ -181,7 +181,7 @@ check(const char *path,
   /* test parsing via sr_stacktrace_parse */
   input = full_input;
   char *error;
-  struct sr_stacktrace *stacktrace2 = sr_stacktrace_parse(SR_REPORT_KERNELOOPS, &input, &error);
+  struct sr_stacktrace *stacktrace2 = sr_stacktrace_parse(SR_REPORT_KERNELOOPS, input, &error);
 
   assert(stacktrace2);
   reason = sr_stacktrace_get_reason(stacktrace);

@@ -60,7 +60,7 @@ enum sr_bthash_flags
  * stacktrace type in the first parameter.
  */
 struct sr_stacktrace *
-sr_stacktrace_parse(enum sr_report_type type, const char **input, char **error_message);
+sr_stacktrace_parse(enum sr_report_type type, const char *input, char **error_message);
 
 /**
  * Returns short textual representation of given stacktrace. At most max_frames

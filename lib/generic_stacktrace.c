@@ -75,12 +75,12 @@ stacktrace_to_short_text(struct sr_stacktrace *stacktrace, int max_frames)
 
 /* Uses the dispatch table but should not be exposed to library users directly. */
 struct sr_stacktrace *
-stacktrace_parse_wrapper(enum sr_report_type type, const char **input, char **error_message)
+stacktrace_parse_wrapper(enum sr_report_type type, const char *input, char **error_message)
 {
     struct sr_location location;
     sr_location_init(&location);
 
-    struct sr_stacktrace *result = DISPATCH(dtable, type, parse_location)(input, &location);
+    struct sr_stacktrace *result = DISPATCH(dtable, type, parse_location)(&input, &location);
 
     if (!result)
     {
@@ -93,7 +93,7 @@ stacktrace_parse_wrapper(enum sr_report_type type, const char **input, char **er
 
 /* Wrappers of polymorphic functions. */
 struct sr_stacktrace *
-sr_stacktrace_parse(enum sr_report_type type, const char **input, char **error_message)
+sr_stacktrace_parse(enum sr_report_type type, const char *input, char **error_message)
 {
     return DISPATCH(dtable, type, parse)(input, error_message);
 }
