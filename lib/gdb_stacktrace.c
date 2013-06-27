@@ -363,21 +363,6 @@ sr_gdb_stacktrace_get_crash_frame(struct sr_gdb_stacktrace *stacktrace)
     return crash_frame;
 }
 
-char *
-sr_gdb_stacktrace_get_duplication_hash(struct sr_gdb_stacktrace *stacktrace)
-{
-    stacktrace = sr_gdb_stacktrace_dup(stacktrace);
-    struct sr_gdb_thread *crash_thread = sr_gdb_stacktrace_find_crash_thread(stacktrace);
-    if (crash_thread)
-        sr_gdb_stacktrace_remove_threads_except_one(stacktrace, crash_thread);
-
-    sr_normalize_gdb_stacktrace(stacktrace);
-    sr_gdb_stacktrace_limit_frame_depth(stacktrace, 3);
-    char *hash = sr_gdb_stacktrace_to_text(stacktrace, false);
-    sr_gdb_stacktrace_free(stacktrace);
-    return hash;
-}
-
 struct sr_gdb_stacktrace *
 sr_gdb_stacktrace_parse(const char **input,
                         struct sr_location *location)

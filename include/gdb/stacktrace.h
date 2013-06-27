@@ -204,18 +204,6 @@ struct sr_gdb_frame *
 sr_gdb_stacktrace_get_crash_frame(struct sr_gdb_stacktrace *stacktrace);
 
 /**
- * Calculates the duplication hash string of the stacktrace.
- * @param stacktrace
- * It must be non-NULL pointer. It's not modified by calling this
- * function.
- * @returns
- * This function never returns NULL. The caller is responsible for
- * releasing the returned memory using function free().
- */
-char *
-sr_gdb_stacktrace_get_duplication_hash(struct sr_gdb_stacktrace *stacktrace);
-
-/**
  * Parses a textual stack trace and puts it into a structure.  If
  * parsing fails, the input parameter is not changed and NULL is
  * returned.

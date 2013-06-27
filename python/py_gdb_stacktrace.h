@@ -70,7 +70,6 @@ PyObject *sr_py_gdb_stacktrace_find_crash_thread(PyObject *self, PyObject *args)
 PyObject *sr_py_gdb_stacktrace_limit_frame_depth(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_stacktrace_quality_simple(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_stacktrace_quality_complex(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_stacktrace_get_duplication_hash(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_stacktrace_find_address(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_stacktrace_set_libnames(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_stacktrace_normalize(PyObject *self, PyObject *args);

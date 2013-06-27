@@ -44,10 +44,6 @@
                               "Computes the quality from stacktrace, crash thread and " \
                               "frames around the crash."
 
-#define b_get_duplication_hash_doc "Usage: stacktrace.get_duplication_hash()\n" \
-                                   "Returns: string - duplication hash\n" \
-                                   "Computes the duplication hash used to compare stacktraces."
-
 #define b_find_address_doc "Usage: stacktrace.find_address(address)\n" \
                            "address: long - address to find" \
                            "Returns: satyr.Sharedlib object or None if not found\n" \
@@ -87,7 +83,6 @@ gdb_stacktrace_methods[] =
     { "limit_frame_depth",    sr_py_gdb_stacktrace_limit_frame_depth,    METH_VARARGS, b_limit_frame_depth_doc    },
     { "quality_simple",       sr_py_gdb_stacktrace_quality_simple,       METH_NOARGS,  b_quality_simple_doc       },
     { "quality_complex",      sr_py_gdb_stacktrace_quality_complex,      METH_NOARGS,  b_quality_complex_doc      },
-    { "get_duplication_hash", sr_py_gdb_stacktrace_get_duplication_hash, METH_NOARGS,  b_get_duplication_hash_doc },
     { "find_address",         sr_py_gdb_stacktrace_find_address,         METH_VARARGS, b_find_address_doc         },
     { "set_libnames",         sr_py_gdb_stacktrace_set_libnames,         METH_NOARGS,  b_set_libnames_doc         },
     { "normalize",            sr_py_gdb_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc            },
@@ -568,21 +563,6 @@ sr_py_gdb_stacktrace_quality_complex(PyObject *self, PyObject *args)
     /* does not destroy the linked list */
     float result = sr_gdb_stacktrace_quality_complex(this->stacktrace);
     return Py_BuildValue("f", result);
-}
-
-PyObject *
-sr_py_gdb_stacktrace_get_duplication_hash(PyObject *self, PyObject *args)
-{
-    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
-    if (gdb_prepare_linked_lists(this) < 0)
-        return NULL;
-
-    /* does not destroy the linked list */
-    char *duphash = sr_gdb_stacktrace_get_duplication_hash(this->stacktrace);
-    PyObject *result = Py_BuildValue("s", duphash);
-    free(duphash);
-
-    return result;
 }
 
 PyObject *
