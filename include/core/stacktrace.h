@@ -29,7 +29,7 @@
 extern "C" {
 #endif
 
-#include "report_type.h"
+#include "../report_type.h"
 #include <inttypes.h>
 
 struct sr_core_thread;

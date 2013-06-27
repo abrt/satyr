@@ -30,7 +30,7 @@
 extern "C" {
 #endif
 
-#include "report_type.h"
+#include "../report_type.h"
 #include <stdbool.h>
 
 struct sr_gdb_thread;

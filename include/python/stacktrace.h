@@ -30,7 +30,7 @@
 extern "C" {
 #endif
 
-#include "report_type.h"
+#include "../report_type.h"
 #include <stdint.h>
 
 struct sr_python_frame;
