@@ -40,7 +40,7 @@ class TestKerneloops(BindingsTestCase):
         contents = load_input_contents('../kerneloopses/rhbz-827868-modified')
         tainted_koops = satyr.Kerneloops(contents)
 
-        true_flags = { f for (f, v) in tainted_koops.taint_flags.items() if v == True}
+        true_flags = set([f for (f, v) in tainted_koops.taint_flags.items() if v == True])
         self.assertEqual(true_flags,
             set(['module_proprietary', 'page_release', 'died_recently', 'module_out_of_tree']))
 
