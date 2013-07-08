@@ -10,9 +10,16 @@ URL: https://github.com/abrt/satyr
 Source0: https://fedorahosted.org/released/abrt/satyr-%{version}.tar.xz
 BuildRequires: python2-devel
 BuildRequires: elfutils-devel, elfutils-libelf-devel, binutils-devel
-# We're going to switch to elfutils unwinder once it's available
-BuildRequires: libunwind-devel >= 1.1
 BuildRequires: rpm-devel
+
+# We're going to switch to elfutils unwinder once it's available
+%if 0%{?rhel}
+%else
+# libunwind exists only on selected arches
+%ifarch %{arm} hppa ia64 mips ppc ppc64 %{ix86} x86_64
+BuildRequires: libunwind-devel >= 1.1
+%endif
+%endif
 
 %description
 Satyr is a library that can be used to create and process microreports.
@@ -74,7 +81,16 @@ make check
 %{python_sitearch}/%{name}/*
 
 %changelog
-* Mon Mar 18 2012 Martin Milata <mmilata@redhat.com> 0.2-1
+* Tue Apr 02 2013 Dan Horák <dan[at]danny.cz> 0.3-2
+- libunwind exists only on selected arches
+
+* Mon Mar 25 2013 Martin Milata <mmilata@redhat.com> 0.3-1
+- New upstream version
+  - Bug fixes
+  - Build fixes for older systems
+- Do not require libunwind on rhel
+
+* Mon Mar 18 2013 Martin Milata <mmilata@redhat.com> 0.2-1
 - Documentation and spec cleanup
 - Build fixes (build against RPM)
 
