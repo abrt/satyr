@@ -1,3 +1,8 @@
+satyr 0.4
+=========
+Added missing features needed by ABRT. Support for uReport2. Major changes in
+both C and Python API.
+
 satyr 0.3
 =========
 Bug fixes, build fixes for older systems.

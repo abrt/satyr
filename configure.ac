@@ -1,4 +1,4 @@
-AC_INIT([satyr], [0.3], [crash-catcher@fedorahosted.org])
+AC_INIT([satyr], [0.4], [crash-catcher@fedorahosted.org])
 AC_CANONICAL_TARGET
 AC_CONFIG_HEADERS([lib/config.h])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
