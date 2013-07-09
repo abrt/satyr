@@ -251,6 +251,7 @@ main(void)
 ## --------------------------- ##
 AT_TESTFUN([sr_koops_stacktrace_to_json],
 [[
+#include "stacktrace.h"
 #include "koops/stacktrace.h"
 #include "location.h"
 #include "utils.h"

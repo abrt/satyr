@@ -8,6 +8,7 @@ AT_BANNER([Core stacktraces])
 
 AT_TESTFUN([sr_core_stacktrace_to_json],
 [[
+#include "stacktrace.h"
 #include "core/stacktrace.h"
 #include "core/thread.h"
 #include "core/frame.h"
@@ -122,6 +123,7 @@ main(void)
 
 AT_TESTFUN([sr_core_stacktrace_from_json],
 [[
+#include "stacktrace.h"
 #include "core/stacktrace.h"
 #include "core/thread.h"
 #include "core/frame.h"

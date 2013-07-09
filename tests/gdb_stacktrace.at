@@ -61,6 +61,7 @@ main(void)
 ## ----------------------------------- ##
 AT_TESTFUN([sr_gdb_stacktrace_find_crash_thread],
 [
+#include "stacktrace.h"
 #include "gdb/stacktrace.h"
 #include "gdb/thread.h"
 #include "gdb/frame.h"
