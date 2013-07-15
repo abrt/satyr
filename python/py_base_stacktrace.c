@@ -205,23 +205,6 @@ threads_prepare_linked_list(struct sr_py_multi_stacktrace *stacktrace)
     return 0;
 }
 
-int
-threads_free_python_list(struct sr_py_multi_stacktrace *stacktrace)
-{
-    int i;
-    PyObject *item;
-    for (i = 0; i < PyList_Size(stacktrace->threads); ++i)
-    {
-        item = PyList_GetItem(stacktrace->threads, i);
-        if (!item)
-            return -1;
-        Py_DECREF(item);
-    }
-    Py_DECREF(stacktrace->threads);
-
-    return 0;
-}
-
 PyObject *
 threads_to_python_list(struct sr_stacktrace *stacktrace, PyTypeObject *thread_type, PyTypeObject *frame_type)
 {

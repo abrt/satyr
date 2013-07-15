@@ -151,7 +151,8 @@ void
 sr_py_python_stacktrace_free(PyObject *object)
 {
     struct sr_py_python_stacktrace *this = (struct sr_py_python_stacktrace*)object;
-    frames_free_python_list((struct sr_py_base_thread *)this);
+    /* the list will decref all of its elements */
+    Py_DECREF(this->frames);
     this->stacktrace->frames = NULL;
     sr_python_stacktrace_free(this->stacktrace);
     PyObject_Del(object);

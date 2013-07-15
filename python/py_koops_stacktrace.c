@@ -194,7 +194,8 @@ void
 sr_py_koops_stacktrace_free(PyObject *object)
 {
     struct sr_py_koops_stacktrace *this = (struct sr_py_koops_stacktrace*)object;
-    frames_free_python_list((struct sr_py_base_thread *)this);
+    /* the list will decref all of its elements */
+    Py_DECREF(this->frames);
     this->stacktrace->frames = NULL;
     sr_koops_stacktrace_free(this->stacktrace);
     PyObject_Del(object);
@@ -252,11 +253,8 @@ sr_py_koops_stacktrace_normalize(PyObject *self, PyObject *args)
     /* need to rebuild python list manually */
     struct sr_koops_stacktrace *tmp = sr_koops_stacktrace_dup(this->stacktrace);
     sr_normalize_koops_stacktrace(tmp);
-    if (frames_free_python_list((struct sr_py_base_thread *)this) < 0)
-    {
-        sr_koops_stacktrace_free(tmp);
-        return NULL;
-    }
+    /* the list will decref all of its elements */
+    Py_DECREF(this->frames);
 
     this->stacktrace->frames = tmp->frames;
     tmp->frames = NULL;

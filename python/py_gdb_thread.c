@@ -161,7 +161,8 @@ void
 sr_py_gdb_thread_free(PyObject *object)
 {
     struct sr_py_gdb_thread *this = (struct sr_py_gdb_thread *)object;
-    frames_free_python_list((struct sr_py_base_thread*) this);
+    /* the list will decref all of its elements */
+    Py_DECREF(this->frames);
     this->thread->frames = NULL;
     sr_gdb_thread_free(this->thread);
     PyObject_Del(object);

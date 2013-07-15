@@ -49,7 +49,6 @@ struct sr_py_multi_stacktrace
 
 /* helpers */
 int threads_prepare_linked_list(struct sr_py_multi_stacktrace *stacktrace);
-int threads_free_python_list(struct sr_py_multi_stacktrace *stacktrace);
 PyObject *threads_to_python_list(struct sr_stacktrace *stacktrace,
                                  PyTypeObject *thread_type, PyTypeObject *frame_type);
 

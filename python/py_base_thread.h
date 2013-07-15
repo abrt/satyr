@@ -44,7 +44,6 @@ struct sr_py_base_thread
 
 /* helpers */
 int frames_prepare_linked_list(struct sr_py_base_thread *thread);
-int frames_free_python_list(struct sr_py_base_thread *thread);
 PyObject *frames_to_python_list(struct sr_thread *thread, PyTypeObject *frame_type);
 
 int sr_py_base_thread_cmp(struct sr_py_base_thread *self, struct sr_py_base_thread *other);

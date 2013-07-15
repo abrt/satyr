@@ -135,7 +135,8 @@ void
 sr_py_java_stacktrace_free(PyObject *object)
 {
     struct sr_py_java_stacktrace *this = (struct sr_py_java_stacktrace*)object;
-    threads_free_python_list((struct sr_py_multi_stacktrace *)this);
+    /* the list will decref all of its elements */
+    Py_DECREF(this->threads);
     this->stacktrace->threads = NULL;
     sr_java_stacktrace_free(this->stacktrace);
     PyObject_Del(object);

@@ -194,41 +194,6 @@ gdb_prepare_linked_lists(struct sr_py_gdb_stacktrace *stacktrace)
     return 0;
 }
 
-int
-stacktrace_free_thread_python_list(struct sr_py_gdb_stacktrace *stacktrace)
-{
-    int i;
-    PyObject *item;
-    for (i = 0; i < PyList_Size(stacktrace->threads); ++i)
-    {
-        item = PyList_GetItem(stacktrace->threads, i);
-        if (!item)
-            return -1;
-        Py_DECREF(item);
-    }
-    Py_DECREF(stacktrace->threads);
-
-    return 0;
-}
-
-int
-stacktrace_free_sharedlib_python_list(struct sr_py_gdb_stacktrace *stacktrace)
-{
-    int i;
-    PyObject *item;
-
-    for (i = 0; i < PyList_Size(stacktrace->libs); ++i)
-    {
-        item = PyList_GetItem(stacktrace->libs, i);
-        if (!item)
-            return -1;
-        Py_DECREF(item);
-    }
-    Py_DECREF(stacktrace->libs);
-
-    return 0;
-}
-
 PyObject *
 thread_linked_list_to_python_list(struct sr_gdb_stacktrace *stacktrace)
 {
@@ -294,17 +259,10 @@ stacktrace_rebuild_thread_python_list(struct sr_py_gdb_stacktrace *stacktrace)
     struct sr_gdb_thread *newlinkedlist = sr_gdb_thread_dup(stacktrace->stacktrace->threads, true);
     if (!newlinkedlist)
         return -1;
-    if (stacktrace_free_thread_python_list(stacktrace) < 0)
-    {
-        struct sr_gdb_thread *next;
-        while (newlinkedlist)
-        {
-            next = newlinkedlist->next;
-            sr_gdb_thread_free(newlinkedlist);
-            newlinkedlist = next;
-        }
-        return -1;
-    }
+
+    /* the list will decref all of its elements */
+    Py_DECREF(stacktrace->threads);
+
     stacktrace->stacktrace->threads = newlinkedlist;
     stacktrace->threads = threads_to_python_list((struct sr_stacktrace *)stacktrace->stacktrace,
                                                  &sr_py_gdb_thread_type, &sr_py_gdb_frame_type);
@@ -317,17 +275,9 @@ stacktrace_rebuild_sharedlib_python_list(struct sr_py_gdb_stacktrace *stacktrace
     struct sr_gdb_sharedlib *newlinkedlist = sr_gdb_sharedlib_dup(stacktrace->stacktrace->libs, true);
     if (!newlinkedlist)
         return -1;
-    if (stacktrace_free_sharedlib_python_list(stacktrace) < 0)
-    {
-        struct sr_gdb_sharedlib *next;
-        while (newlinkedlist)
-        {
-            next = newlinkedlist->next;
-            sr_gdb_sharedlib_free(newlinkedlist);
-            newlinkedlist = next;
-        }
-        return -1;
-    }
+
+    /* the list will decref all of its elements */
+    Py_DECREF(stacktrace->libs);
     stacktrace->stacktrace->libs = newlinkedlist;
     stacktrace->libs = sharedlib_linked_list_to_python_list(stacktrace->stacktrace);
     return 0;
@@ -387,8 +337,9 @@ void
 sr_py_gdb_stacktrace_free(PyObject *object)
 {
     struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)object;
-    stacktrace_free_thread_python_list(this);
-    stacktrace_free_sharedlib_python_list(this);
+    /* the list will decref all of its elements */
+    Py_DECREF(this->threads);
+    Py_DECREF(this->libs);
     this->stacktrace->threads = NULL;
     this->stacktrace->libs = NULL;
     sr_gdb_stacktrace_free(this->stacktrace);
@@ -624,11 +575,8 @@ sr_py_gdb_stacktrace_normalize(PyObject *self, PyObject *args)
     /* need to rebuild python list manually */
     struct sr_gdb_stacktrace *tmp = sr_gdb_stacktrace_dup(this->stacktrace);
     sr_normalize_gdb_stacktrace(tmp);
-    if (stacktrace_free_thread_python_list(this) < 0)
-    {
-        sr_gdb_stacktrace_free(tmp);
-        return NULL;
-    }
+    /* the list will decref all of its elements */
+    Py_DECREF(this->threads);
 
     this->stacktrace->threads = tmp->threads;
     tmp->threads = NULL;

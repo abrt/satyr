@@ -152,24 +152,6 @@ frames_prepare_linked_list(struct sr_py_base_thread *thread)
     return 0;
 }
 
-int
-frames_free_python_list(struct sr_py_base_thread *thread)
-{
-    int i;
-    PyObject *item;
-
-    for (i = 0; i < PyList_Size(thread->frames); ++i)
-    {
-        item = PyList_GetItem(thread->frames, i);
-        if (!item)
-            return -1;
-        Py_DECREF(item);
-    }
-    Py_DECREF(thread->frames);
-
-    return 0;
-}
-
 PyObject *
 frames_to_python_list(struct sr_thread *thread, PyTypeObject *frame_type)
 {
