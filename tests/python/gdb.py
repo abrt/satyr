@@ -13,11 +13,11 @@ contents = load_input_contents('../gdb_stacktraces/rhbz-803600')
 threads_expected = 2
 frames_expected = 227
 expected_short_text = '''Thread no. 1 (5 frames)
- #0 validate_row at gtktreeview.c
- #1 validate_visible_area at gtktreeview.c
- #2 gtk_tree_view_bin_expose at gtktreeview.c
- #3 gtk_tree_view_expose at gtktreeview.c
- #4 _gtk_marshal_BOOLEAN__BOXED at gtkmarshalers.c
+ #0 validate_row at gtktreeview.c:5699
+ #1 validate_visible_area at gtktreeview.c:5898
+ #2 gtk_tree_view_bin_expose at gtktreeview.c:4253
+ #3 gtk_tree_view_expose at gtktreeview.c:4955
+ #4 _gtk_marshal_BOOLEAN__BOXED at gtkmarshalers.c:84
 '''
 
 class TestGdbStacktrace(BindingsTestCase):
