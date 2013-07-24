@@ -96,4 +96,7 @@ core_handle_free(struct core_handle *ch);
 struct sr_core_frame *
 resolve_frame(Dwfl *dwfl, Dwarf_Addr ip, bool minus_one);
 
+short
+get_signal_number(Elf *e, const char *elf_file);
+
 #endif /* SATYR_INTERNAL_UNWIND_H */

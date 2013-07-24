@@ -109,7 +109,7 @@ unwind_thread(struct UCD_info *ui,
 }
 
 static int
-get_signal_number(struct UCD_info *ui)
+get_signal_number_libunwind(struct UCD_info *ui)
 {
     int tnum, nthreads = _UCD_get_num_threads(ui);
     for (tnum = 0; tnum < nthreads; ++tnum)
@@ -191,7 +191,7 @@ sr_parse_coredump(const char *core_file,
     }
 
     stacktrace->executable = realpath(exe_file, NULL);
-    stacktrace->signal = get_signal_number(ui);
+    stacktrace->signal = get_signal_number_libunwind(ui);
     /* FIXME: is this the best we can do? */
     stacktrace->crash_thread = stacktrace->threads;
 

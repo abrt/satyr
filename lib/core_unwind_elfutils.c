@@ -28,7 +28,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <sys/procfs.h> /* struct elf_prstatus */
 
 static struct sr_core_thread *
 unwind_thread(Dwfl *dwfl, Dwfl_Frame_State *state, char **error_msg)
@@ -74,89 +73,6 @@ unwind_thread(Dwfl *dwfl, Dwfl_Frame_State *state, char **error_msg)
     thread->id = (int64_t)tid;
     thread->frames = head;
     return thread;
-}
-
-static short
-get_signal_number(Elf *e, const char *elf_file)
-{
-    const char NOTE_CORE[] = "CORE";
-
-    size_t nphdr;
-    if (elf_getphdrnum(e, &nphdr) != 0)
-    {
-        warn_elf("elf_getphdrnum");
-        return 0;
-    }
-
-    /* Go through phdrs, look for prstatus note */
-    int i;
-    for (i = 0; i < nphdr; i++)
-    {
-        GElf_Phdr phdr;
-        if (gelf_getphdr(e, i, &phdr) != &phdr)
-        {
-            warn_elf("gelf_getphdr");
-            continue;
-        }
-
-        if (phdr.p_type != PT_NOTE)
-        {
-            continue;
-        }
-
-        Elf_Data *data, *name_data, *desc_data;
-        GElf_Nhdr nhdr;
-        size_t note_offset = 0;
-        size_t name_offset, desc_offset;
-        /* Elf_Data buffers are freed when elf_end is called. */
-        data = elf_getdata_rawchunk(e, phdr.p_offset, phdr.p_filesz,
-                                    ELF_T_NHDR);
-        if (!data)
-        {
-            warn_elf("elf_getdata_rawchunk");
-            continue;
-        }
-
-        while ((note_offset = gelf_getnote(data, note_offset, &nhdr,
-                                           &name_offset, &desc_offset)) != 0)
-        {
-            /*
-            printf("Note: type:%x name:%x+%d desc:%x+%d\n", nhdr.n_type,
-                   name_offset, nhdr.n_namesz, desc_offset, nhdr.n_descsz);
-            */
-
-            if (nhdr.n_type != NT_PRSTATUS
-                || nhdr.n_namesz < sizeof(NOTE_CORE))
-                continue;
-
-            name_data = elf_getdata_rawchunk(e, phdr.p_offset + name_offset,
-                                             nhdr.n_namesz, ELF_T_BYTE);
-            desc_data = elf_getdata_rawchunk(e, phdr.p_offset + desc_offset,
-                                             nhdr.n_descsz, ELF_T_BYTE);
-            if (!(name_data && desc_data))
-                continue;
-
-            if (name_data->d_size < sizeof(NOTE_CORE))
-                continue;
-
-            if (strcmp(NOTE_CORE, name_data->d_buf))
-                continue;
-
-            if (desc_data->d_size != sizeof(struct elf_prstatus))
-            {
-                warn("PRSTATUS core note of size %zu found, expected size: %zu",
-                    desc_data->d_size, sizeof(struct elf_prstatus));
-                continue;
-            }
-
-            struct elf_prstatus *prstatus = (struct elf_prstatus*)desc_data->d_buf;
-            short signal = prstatus->pr_cursig;
-            if (signal)
-                return signal;
-        }
-    }
-
-    return 0;
 }
 
 struct sr_core_stacktrace *
