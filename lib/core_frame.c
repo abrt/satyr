@@ -359,9 +359,13 @@ char *
 sr_core_frame_to_json(struct sr_core_frame *frame)
 {
     struct sr_strbuf *strbuf = sr_strbuf_new();
-    sr_strbuf_append_strf(strbuf,
-                          "{   \"address\": %"PRIu64"\n",
-                          frame->address);
+
+    if (frame->address != -1)
+    {
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"address\": %"PRIu64"\n",
+                              frame->address);
+    }
 
     if (frame->build_id)
     {
@@ -370,9 +374,12 @@ sr_core_frame_to_json(struct sr_core_frame *frame)
         sr_strbuf_append_str(strbuf, "\n");
     }
 
-    sr_strbuf_append_strf(strbuf,
-                          ",   \"build_id_offset\": %"PRIu64"\n",
-                          frame->build_id_offset);
+    if (frame->build_id_offset != -1)
+    {
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"build_id_offset\": %"PRIu64"\n",
+                              frame->build_id_offset);
+    }
 
     if (frame->function_name)
     {
@@ -394,6 +401,11 @@ sr_core_frame_to_json(struct sr_core_frame *frame)
         sr_json_append_escaped(strbuf, frame->fingerprint);
         sr_strbuf_append_str(strbuf, "\n");
     }
+
+    if (strbuf->len > 0)
+        strbuf->buf[0] = '{';
+    else
+        sr_strbuf_append_char(strbuf, '{');
 
     sr_strbuf_append_char(strbuf, '}');
     return sr_strbuf_free_nobuf(strbuf);
