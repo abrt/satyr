@@ -62,10 +62,9 @@ sr_abrt_print_report_from_dir(const char *directory,
     return true;
 }
 
-bool
-sr_abrt_create_core_stacktrace(const char *directory,
-                               bool hash_fingerprints,
-                               char **error_message)
+static bool
+create_core_stacktrace(const char *directory, const char *gdb_output,
+                       bool hash_fingerprints, char **error_message)
 {
     char *executable_contents = file_contents(directory, "executable",
                                               error_message);
@@ -73,8 +72,15 @@ sr_abrt_create_core_stacktrace(const char *directory,
         return NULL;
 
     char *coredump_filename = sr_build_path(directory, "coredump", NULL);
-    struct sr_core_stacktrace *core_stacktrace = sr_parse_coredump(
-        coredump_filename, executable_contents, error_message);
+
+    struct sr_core_stacktrace *core_stacktrace;
+
+    if (gdb_output)
+        core_stacktrace = sr_core_stacktrace_from_gdb(gdb_output,
+                coredump_filename, executable_contents, error_message);
+    else
+        core_stacktrace = sr_parse_coredump(coredump_filename,
+                executable_contents, error_message);
 
     free(executable_contents);
     free(coredump_filename);
@@ -103,6 +109,31 @@ sr_abrt_create_core_stacktrace(const char *directory,
     free(json);
     sr_core_stacktrace_free(core_stacktrace);
     return success;
+}
+
+bool
+sr_abrt_create_core_stacktrace_from_gdb(const char *directory,
+                                        const char *gdb_output,
+                                        bool hash_fingerprints,
+                                        char **error_message)
+{
+    if (!gdb_output)
+    {
+        *error_message = strdup("GDB output cannot be NULL");
+        return false;
+    }
+
+    return create_core_stacktrace(directory, gdb_output, hash_fingerprints,
+                                  error_message);
+}
+
+bool
+sr_abrt_create_core_stacktrace(const char *directory,
+                               bool hash_fingerprints,
+                               char **error_message)
+{
+    return create_core_stacktrace(directory, NULL, hash_fingerprints,
+                                  error_message);
 }
 
 struct sr_rpm_package *

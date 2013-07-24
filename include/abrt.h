@@ -35,6 +35,11 @@ bool
 sr_abrt_create_core_stacktrace(const char *directory,
                                bool hash_fingerprints,
                                char **error_message);
+bool
+sr_abrt_create_core_stacktrace_from_gdb(const char *directory,
+                                        const char *gdb_output,
+                                        bool hash_fingerprints,
+                                        char **error_message);
 
 struct sr_rpm_package *
 sr_abrt_parse_dso_list(const char *text);
