@@ -33,7 +33,6 @@
 static struct sr_core_thread *
 unwind_thread(Dwfl *dwfl, Dwfl_Frame_State *state, char **error_msg)
 {
-    int ret;
     struct sr_core_frame *head = NULL, *tail = NULL;
     pid_t tid = 0;
 
@@ -44,46 +43,16 @@ unwind_thread(Dwfl *dwfl, Dwfl_Frame_State *state, char **error_msg)
 
     while (state)
     {
-        Dwarf_Addr pc, pc_adjusted;
+        Dwarf_Addr pc;
         bool minus_one;
         if (!dwfl_frame_state_pc(state, &pc, &minus_one))
         {
             warn("Failed to obtain PC: %s", dwfl_errmsg(-1));
             break;
         }
-        pc_adjusted = pc - (minus_one ? 1 : 0);
 
-        struct sr_core_frame *frame = sr_core_frame_new();
-        frame->address = frame->build_id_offset = (uint64_t)pc;
+        struct sr_core_frame *frame = resolve_frame(dwfl, pc, minus_one);
         list_append(head, tail, frame);
-
-        Dwfl_Module *mod = dwfl_addrmodule(dwfl, (Dwarf_Addr)pc_adjusted);
-        if (mod)
-        {
-            const unsigned char *build_id_bits;
-            const char *filename, *funcname;
-            GElf_Addr bid_addr;
-            Dwarf_Addr start;
-
-            ret = dwfl_module_build_id(mod, &build_id_bits, &bid_addr);
-            if (ret > 0)
-            {
-                frame->build_id = sr_mallocz(2*ret + 1);
-                sr_bin2hex(frame->build_id, (const char *)build_id_bits, ret);
-            }
-
-            if (dwfl_module_info(mod, NULL, &start, NULL, NULL, NULL,
-                                 &filename, NULL) != NULL)
-            {
-                frame->build_id_offset = (Dwarf_Addr)pc - start;
-                if (filename)
-                    frame->file_name = sr_strdup(filename);
-            }
-
-            funcname = dwfl_module_addrname(mod, (GElf_Addr)pc_adjusted);
-            if (funcname)
-                frame->function_name = sr_strdup(funcname);
-        }
 
         /* Do not unwind below __libc_start_main. */
         if (0 == sr_strcmp0(frame->function_name, "__libc_start_main"))

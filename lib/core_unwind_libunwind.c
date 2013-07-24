@@ -61,38 +61,7 @@ unwind_thread(struct UCD_info *ui,
         if (ip == 0)
             break;
 
-        struct sr_core_frame *entry = sr_core_frame_new();
-        entry->address = entry->build_id_offset = ip;
-        entry->build_id = entry->file_name = NULL;
-        entry->function_name = NULL;
-
-        Dwfl_Module *mod = dwfl_addrmodule(dwfl, (Dwarf_Addr)ip);
-        if (mod)
-        {
-            const unsigned char *build_id_bits;
-            const char *filename, *funcname;
-            GElf_Addr bid_addr;
-            Dwarf_Addr start;
-
-            ret = dwfl_module_build_id(mod, &build_id_bits, &bid_addr);
-            if (ret > 0)
-            {
-                entry->build_id = sr_mallocz(2 * ret + 1);
-                sr_bin2hex(entry->build_id, (const char *)build_id_bits, ret);
-            }
-
-            if (dwfl_module_info(mod, NULL, &start, NULL, NULL, NULL,
-                                 &filename, NULL) != NULL)
-            {
-                entry->build_id_offset = (Dwarf_Addr)ip - start;
-                if (filename)
-                    entry->file_name = sr_strdup(filename);
-            }
-
-            funcname = dwfl_module_addrname(mod, (GElf_Addr)ip);
-            if (funcname)
-                entry->function_name = sr_strdup(funcname);
-        }
+        struct sr_core_frame *entry = resolve_frame(dwfl, ip, false);
 
         if (!entry->function_name)
         {

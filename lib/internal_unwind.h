@@ -92,4 +92,8 @@ open_coredump(const char *elf_file, const char *exe_file, char **error_msg);
 
 void
 core_handle_free(struct core_handle *ch);
+
+struct sr_core_frame *
+resolve_frame(Dwfl *dwfl, Dwarf_Addr ip, bool minus_one);
+
 #endif /* SATYR_INTERNAL_UNWIND_H */

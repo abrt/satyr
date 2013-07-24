@@ -252,4 +252,45 @@ fail_free:
     return NULL;
 }
 
+struct sr_core_frame *
+resolve_frame(Dwfl *dwfl, Dwarf_Addr ip, bool minus_one)
+{
+    struct sr_core_frame *frame = sr_core_frame_new();
+    frame->address = frame->build_id_offset = (uint64_t)ip;
+
+    /* see dwfl_frame_state_pc for meaning of this parameter */
+    Dwarf_Addr ip_adjusted = ip - (minus_one ? 1 : 0);
+
+    Dwfl_Module *mod = dwfl_addrmodule(dwfl, ip_adjusted);
+    if (mod)
+    {
+        int ret;
+        const unsigned char *build_id_bits;
+        const char *filename, *funcname;
+        GElf_Addr bid_addr;
+        Dwarf_Addr start;
+
+        ret = dwfl_module_build_id(mod, &build_id_bits, &bid_addr);
+        if (ret > 0)
+        {
+            frame->build_id = sr_mallocz(2*ret + 1);
+            sr_bin2hex(frame->build_id, (const char *)build_id_bits, ret);
+        }
+
+        if (dwfl_module_info(mod, NULL, &start, NULL, NULL, NULL,
+                             &filename, NULL) != NULL)
+        {
+            frame->build_id_offset = ip - start;
+            if (filename)
+                frame->file_name = sr_strdup(filename);
+        }
+
+        funcname = dwfl_module_addrname(mod, (GElf_Addr)ip_adjusted);
+        if (funcname)
+            frame->function_name = sr_strdup(funcname);
+    }
+
+    return frame;
+}
+
 #endif /* !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND */
