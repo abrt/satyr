@@ -31,6 +31,7 @@ libsatyr_la_SOURCES = \
 	gdb_sharedlib.c \
 	gdb_thread.c \
 	internal_utils.h \
+	internal_unwind.h \
 	java_frame.c \
 	java_thread.c \
 	java_stacktrace.c \
