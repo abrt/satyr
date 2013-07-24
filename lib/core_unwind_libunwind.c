@@ -494,9 +494,14 @@ sr_parse_coredump(const char *core_file,
     {
         if (_UCD_add_backing_file_at_vaddr(ui, s->start, s->filename) < 0)
         {
-            set_error("Can't add backing file '%s' at addr 0x%jx",
-                      s->filename, (uintmax_t)s->start);
-            goto fail_destroy_ui;
+            /* Sometimes produces:
+             * >_UCD_add_backing_file_at_segment:
+             * Error reading from '/usr/lib/modules/3.6.9-2.fc17.x86_64/vdso/vdso.so'
+             * Ignore errors for now & fail later.
+             */
+            warn("Can't add backing file '%s' at addr 0x%jx", s->filename,
+                 (uintmax_t)s->start);
+            /* goto fail_destroy_ui; */
         }
     }
 
@@ -523,7 +528,6 @@ sr_parse_coredump(const char *core_file,
     /* FIXME: is this the best we can do? */
     stacktrace->crash_thread = stacktrace->threads;
 
-fail_destroy_ui:
     _UCD_destroy(ui);
 fail_destroy_as:
     unw_destroy_addr_space(as);
