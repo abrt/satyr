@@ -25,11 +25,18 @@ extern "C" {
 #endif
 
 struct sr_core_stacktrace;
+struct sr_gdb_stacktrace;
 
 struct sr_core_stacktrace *
 sr_parse_coredump(const char *coredump_filename,
                   const char *executable_filename,
                   char **error_message);
+
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_gdb(const char *gdb_output,
+                            const char *coredump_filename,
+                            const char *executable_filename,
+                            char **error_message);
 
 #ifdef __cplusplus
 }

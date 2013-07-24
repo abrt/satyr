@@ -30,6 +30,14 @@
 #include "core/unwind.h"
 #include "internal_unwind.h"
 
+#include "location.h"
+#include "gdb/frame.h"
+#include "gdb/thread.h"
+#include "gdb/stacktrace.h"
+#include "core/frame.h"
+#include "core/thread.h"
+#include "core/stacktrace.h"
+
 #if !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND
 
 struct sr_core_stacktrace *
@@ -375,6 +383,66 @@ get_signal_number(Elf *e, const char *elf_file)
     }
 
     return 0;
+}
+
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_gdb(const char *gdb_output, const char *core_file,
+                            const char *exe_file, char **error_msg)
+{
+    /* Initialize error_msg to 'no error'. */
+    if (error_msg)
+        *error_msg = NULL;
+
+    struct core_handle *ch = open_coredump(core_file, exe_file, error_msg);
+    if (*error_msg)
+        return NULL;
+
+    struct sr_gdb_stacktrace *gdb_stacktrace;
+    struct sr_location location;
+    sr_location_init(&location);
+
+    gdb_stacktrace = sr_gdb_stacktrace_parse(&gdb_output, &location);
+    if (!gdb_stacktrace)
+    {
+        *error_msg = sr_location_to_string(&location);
+        core_handle_free(ch);
+        return NULL;
+    }
+
+    struct sr_core_stacktrace *core_stacktrace = sr_core_stacktrace_new();
+
+    for (struct sr_gdb_thread *gdb_thread = gdb_stacktrace->threads;
+         gdb_thread;
+         gdb_thread = gdb_thread->next)
+    {
+        struct sr_core_thread *core_thread = sr_core_thread_new();
+
+        for (struct sr_gdb_frame *gdb_frame = gdb_thread->frames;
+             gdb_frame;
+             gdb_frame = gdb_frame->next)
+        {
+            struct sr_core_frame *core_frame = resolve_frame(ch->dwfl,
+                    gdb_frame->address, false);
+
+            core_thread->frames = sr_core_frame_append(core_thread->frames,
+                    core_frame);
+        }
+
+        if (sr_gdb_stacktrace_find_crash_thread(gdb_stacktrace) == gdb_thread)
+        {
+            core_stacktrace->crash_thread = core_thread;
+        }
+
+        core_stacktrace->threads = sr_core_thread_append(
+                core_stacktrace->threads, core_thread);
+    }
+
+    core_stacktrace->signal = get_signal_number(ch->eh, core_file);
+    core_stacktrace->executable = realpath(exe_file, NULL);
+
+    core_handle_free(ch);
+    sr_gdb_stacktrace_free(gdb_stacktrace);
+    return core_stacktrace;
 }
 
 #endif /* !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND */
