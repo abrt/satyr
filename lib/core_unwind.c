@@ -49,7 +49,7 @@ sr_parse_coredump(const char *coredump_filename,
     return NULL;
 }
 
-#else /* !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND */
+#endif /* !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND */
 
 /* FIXME: is there another way to pass the executable name to the find_elf
  * callback? */
@@ -444,5 +444,3 @@ sr_core_stacktrace_from_gdb(const char *gdb_output, const char *core_file,
     sr_gdb_stacktrace_free(gdb_stacktrace);
     return core_stacktrace;
 }
-
-#endif /* !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND */
