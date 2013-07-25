@@ -1,3 +1,7 @@
+satyr 0.5
+=========
+Added function that creates core stacktrace from GDB output. Several bugfixes.
+
 satyr 0.4
 =========
 Added missing features needed by ABRT. Support for uReport2. Major changes in
