@@ -51,7 +51,7 @@ libsatyr_la_SOURCES = \
 	utils.c
 
 libsatyr_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE -I$(top_srcdir)/include $(GLIB_CFLAGS)
-libsatyr_la_LDFLAGS = -version-info 1:0:0 $(GLIB_LIBS)
+libsatyr_la_LDFLAGS = -version-info 1:0:0 -export-symbols-regex '^sr_' $(GLIB_LIBS)
 
 if HAVE_LIBOPCODES
 # Conditional link is required to avoid linking to a library without
