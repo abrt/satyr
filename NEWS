@@ -1,3 +1,7 @@
+satyr 0.6
+=========
+Do not export internal function symbols.
+
 satyr 0.5
 =========
 Added function that creates core stacktrace from GDB output. Several bugfixes.
