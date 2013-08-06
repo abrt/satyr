@@ -12,15 +12,6 @@ BuildRequires: python2-devel
 BuildRequires: elfutils-devel, elfutils-libelf-devel, binutils-devel
 BuildRequires: rpm-devel
 
-# We're going to switch to elfutils unwinder once it's available
-%if 0%{?rhel}
-%else
-# libunwind exists only on selected arches
-%ifarch %{arm} hppa ia64 mips ppc ppc64 %{ix86} x86_64
-BuildRequires: libunwind-devel >= 1.1
-%endif
-%endif
-
 %description
 Satyr is a library that can be used to create and process microreports.
 Microreports consist of structured data suitable to be analyzed in a fully
@@ -81,6 +72,26 @@ make check
 %{python_sitearch}/%{name}/*
 
 %changelog
+* Mon Jul 29 2013 Martin Milata <mmilata@redhat.com> 0.6-1
+- New upstream version
+  - Do not export internal function symbols.
+
+* Thu Jul 25 2013 Martin Milata <mmilata@redhat.com> 0.5-2
+- Remove libunwind dependency altogether, always use GDB for unwinding.
+
+* Thu Jul 25 2013 Jakub Filak <jfilak@redhat.com> 0.5-1
+- Added function that creates core stacktrace from GDB output. Several bugfixes.
+
+* Tue Jul 09 2013 Martin Milata <mmilata@redhat.com> 0.4-2
+- Fix failing tests (failure manifests only on s390x)
+
+* Mon Jul 08 2013 Martin Milata <mmilata@redhat.com> 0.4-1
+- New upstream version
+  - Added features needed by ABRT
+  - Support for uReport2
+  - Major C and Python API changes
+- Patch for python-2.6 compatibility
+
 * Tue Apr 02 2013 Dan Horák <dan[at]danny.cz> 0.3-2
 - libunwind exists only on selected arches
 
