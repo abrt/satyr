@@ -11,8 +11,7 @@
 #define thread_doc "satyr.JavaThread - class representing a thread in a stacktrace\n" \
                    "Usage:\n" \
                    "satyr.JavaThread() - creates an empty thread\n" \
-                   "satyr.JavaThread(str) - parses str and fills the thread object\n" \
-                   "satyr.JavaThread(str, only_funs=True) - parses list of function names"
+                   "satyr.JavaThread(str) - parses str and fills the thread object"
 
 #define t_dup_doc "Usage: thread.dup()\n" \
                   "Returns: satyr.JavaThread - a new clone of thread\n" \
@@ -31,9 +30,6 @@
 
 #define t_format_funs_doc "Usage: thread.format_funs()\n" \
                       "Returns: string"
-
-#define t_frames_doc (char *)"A list containing satyr.JavaFrame objects representing " \
-                     "frames in a thread."
 
 static PyMethodDef
 java_thread_methods[] =

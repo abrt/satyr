@@ -75,10 +75,6 @@ org.hibernate.exception.JDBCExceptionHelper.convert
         self.assertEqual(self.thread.get_duphash(flags=satyr.DUPHASH_NOHASH, frames=3), expected_plain)
         self.assertEqual(self.thread.get_duphash(), '81450a80a9d9307624b08e80dc244beb63d91138')
 
-class TestJavaSharedlib(BindingsTestCase):
-    def setUp(self):
-        self.shlib = satyr.JavaStacktrace(contents).libs[0]
-
 class TestJavaFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.JavaStacktrace(contents).threads[0].frames[0]

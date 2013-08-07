@@ -6,7 +6,6 @@
 #include "java/stacktrace.h"
 #include "java/thread.h"
 #include "location.h"
-#include "normalize.h"
 #include "stacktrace.h"
 
 #define stacktrace_doc "satyr.JavaStacktrace - class representing a java stacktrace\n" \
@@ -19,19 +18,11 @@
                   "Clones the stacktrace object. All new structures are independent " \
                   "on the original object."
 
-#define b_to_short_text "Usage: stacktrace.to_short_text([max_frames])\n" \
-                        "Returns short text representation of the stacktrace. If max_frames is\n" \
-                        "specified, the result includes only that much topmost frames.\n"
-
-#define b_normalize_doc "Usage: stacktrace.normalize()\n" \
-                        "Normalizes all threads in the stacktrace."
-
 static PyMethodDef
 java_stacktrace_methods[] =
 {
     /* methods */
     { "dup",                  sr_py_java_stacktrace_dup,                  METH_NOARGS,  b_dup_doc                  },
-//    { "normalize",            sr_py_java_stacktrace_normalize,            METH_NOARGS,  b_normalize_doc            },
     { NULL },
 };
 
@@ -185,33 +176,3 @@ sr_py_java_stacktrace_dup(PyObject *self, PyObject *args)
 
     return (PyObject*)bo;
 }
-
-/*
- * Normalization not yet implemente for java stacktraces
- *
-PyObject *
-sr_py_java_stacktrace_normalize(PyObject *self, PyObject *args)
-{
-    struct sr_py_java_stacktrace *this = (struct sr_py_java_stacktrace*)self;
-    if (threads_prepare_linked_list((struct sr_py_multi_stacktrace *)this) < 0)
-        return NULL;
-
-    struct sr_java_stacktrace *tmp = sr_java_stacktrace_dup(this->stacktrace);
-    sr_normalize_java_stacktrace(tmp);
-    if (java_stacktrace_free_thread_python_list(this) < 0)
-    {
-        sr_java_stacktrace_free(tmp);
-        return NULL;
-    }
-
-    this->stacktrace->threads = tmp->threads;
-    tmp->threads = NULL;
-    sr_java_stacktrace_free(tmp);
-
-    this->threads = java_thread_linked_list_to_python_list(this->stacktrace);
-    if (!this->threads)
-        return NULL;
-
-    Py_RETURN_NONE;
-}
-*/
