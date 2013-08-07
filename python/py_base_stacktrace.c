@@ -35,6 +35,8 @@
                        "Returns: string - hash of the stacktrace\n" \
                        "flags: integer - bitwise sum of flags (BTHASH_NORMAL, BTHASH_NOHASH)"
 
+#define crash_thread_doc "Reference to the thread that caused the crash, if known"
+
 #define threads_doc "A list containing the objects representing threads in the stacktrace."
 
 static PyMethodDef
@@ -42,6 +44,13 @@ single_methods[] =
 {
     { "to_short_text", sr_py_single_stacktrace_to_short_text, METH_VARARGS, to_short_text_doc },
     { "get_bthash",    sr_py_single_stacktrace_get_bthash,    METH_VARARGS, get_bthash_doc    },
+    { NULL },
+};
+
+static PyGetSetDef
+single_getset[] =
+{
+    { (char *)"crash_thread", sr_py_single_stacktrace_get_crash, sr_py_single_stacktrace_set_crash, (char *)crash_thread_doc, NULL },
     { NULL },
 };
 
@@ -76,7 +85,7 @@ PyTypeObject sr_py_single_stacktrace_type = {
     NULL,                           /* tp_iternext */
     single_methods,                 /* tp_methods */
     NULL,                           /* tp_members */
-    NULL,                           /* tp_getset */
+    single_getset,                  /* tp_getset */
     &sr_py_base_thread_type,        /* tp_base */
     NULL,                           /* tp_dict */
     NULL,                           /* tp_descr_get */
@@ -106,6 +115,13 @@ multi_methods[] =
 {
     { "to_short_text", sr_py_multi_stacktrace_to_short_text, METH_VARARGS, to_short_text_doc },
     { "get_bthash",    sr_py_multi_stacktrace_get_bthash,    METH_VARARGS, get_bthash_doc    },
+    { NULL },
+};
+
+static PyGetSetDef
+multi_getset[] =
+{
+    { (char *)"crash_thread", sr_py_multi_stacktrace_get_crash, sr_py_multi_stacktrace_set_crash, (char *)crash_thread_doc, NULL },
     { NULL },
 };
 
@@ -140,7 +156,7 @@ PyTypeObject sr_py_multi_stacktrace_type = {
     NULL,                           /* tp_iternext */
     multi_methods,                  /* tp_methods */
     multi_members,                  /* tp_members */
-    NULL,                           /* tp_getset */
+    multi_getset,                   /* tp_getset */
     NULL,                           /* tp_base */
     NULL,                           /* tp_dict */
     NULL,                           /* tp_descr_get */
@@ -329,4 +345,71 @@ sr_py_multi_stacktrace_get_bthash(PyObject *self, PyObject *args)
     PyObject *result = PyString_FromString(hash);
     free(hash);
     return result;
+}
+
+PyObject *
+sr_py_single_stacktrace_get_crash(PyObject *self, void *unused)
+{
+    return self;
+}
+
+int
+sr_py_single_stacktrace_set_crash(PyObject *self, PyObject *value, void *unused)
+{
+    PyErr_SetString(PyExc_AttributeError,
+                    "Cannot set crash thread of single threaded stacktrace.");
+    return -1;
+}
+
+PyObject *
+sr_py_multi_stacktrace_get_crash(PyObject *self, void *unused)
+{
+    struct sr_py_multi_stacktrace *this = (struct sr_py_multi_stacktrace *)self;
+
+    if (threads_prepare_linked_list(this) < 0)
+        return NULL;
+
+    struct sr_thread *crash_thread = sr_stacktrace_find_crash_thread(this->stacktrace);
+    if (crash_thread == NULL)
+        Py_RETURN_NONE;
+
+    if (!PyList_Check(this->threads))
+    {
+        PyErr_SetString(PyExc_TypeError, "Attribute 'threads' is not a list.");
+        return NULL;
+    }
+
+    int i;
+    PyObject *item;
+    for (i = 0; i < PyList_Size(this->threads); ++i)
+    {
+        item = PyList_GetItem(this->threads, i);
+        if (!item)
+            return NULL;
+
+        if (!PyObject_TypeCheck(item, this->thread_type))
+        {
+            PyErr_SetString(PyExc_TypeError,
+                            "List of threads contains object that is not a thread.");
+            return NULL;
+        }
+
+        struct sr_py_base_thread *thread = (struct sr_py_base_thread *)item;
+        if (thread->thread == crash_thread)
+        {
+            /* TODO incref? */
+            return item;
+        }
+    }
+
+    /* Something went wrong - sr_stacktrace_find_crash_thread returned non-NULL
+     * but we don't have such thread in the list. */
+    Py_RETURN_NONE;
+}
+
+int
+sr_py_multi_stacktrace_set_crash(PyObject *self, PyObject *value, void *unused)
+{
+    PyErr_SetString(PyExc_NotImplementedError, "Setting crash thread is not implemented.");
+    return -1;
 }

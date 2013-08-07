@@ -26,11 +26,6 @@
                                "Finds crash frame in the stacktrace. Also sets the " \
                                "stacktrace.crashframe field."
 
-#define b_find_crash_thread_doc "Usage: stacktrace.find_crash_thread()\n" \
-                                "Returns: satyr.Thread - crash thread\n" \
-                                "Finds crash thread in the stacktrace. Also sets the " \
-                                "stacktrace.crashthread field."
-
 #define b_limit_frame_depth_doc "Usage: stacktrace.limit_frame_depth(N)\n" \
                                 "N: positive integer - frame depth\n" \
                                 "Crops all threads to only contain first N frames."
@@ -63,10 +58,6 @@
                          "calling the find_crash_frame method, a reference to " \
                          "satyr.Frame object is stored into the field."
 
-#define b_crashthread_doc (char *)"Readonly. By default the field contains None. After " \
-                          "calling the find_crash_thread method, a reference to " \
-                          "satyr.Thread object is stored into the field."
-
 #define b_threads_doc (char *)"A list containing the satyr.Thread objects " \
                       "representing threads in the stacktrace."
 
@@ -79,7 +70,6 @@ gdb_stacktrace_methods[] =
     /* methods */
     { "dup",                  sr_py_gdb_stacktrace_dup,                  METH_NOARGS,  b_dup_doc                  },
     { "find_crash_frame",     sr_py_gdb_stacktrace_find_crash_frame,     METH_NOARGS,  b_find_crash_frame_doc     },
-    { "find_crash_thread",    sr_py_gdb_stacktrace_find_crash_thread,    METH_NOARGS,  b_find_crash_thread_doc    },
     { "limit_frame_depth",    sr_py_gdb_stacktrace_limit_frame_depth,    METH_VARARGS, b_limit_frame_depth_doc    },
     { "quality_simple",       sr_py_gdb_stacktrace_quality_simple,       METH_NOARGS,  b_quality_simple_doc       },
     { "quality_complex",      sr_py_gdb_stacktrace_quality_complex,      METH_NOARGS,  b_quality_complex_doc      },
@@ -94,7 +84,6 @@ static PyMemberDef
 gdb_stacktrace_members[] =
 {
     { (char *)"crashframe",  T_OBJECT_EX, offsetof(struct sr_py_gdb_stacktrace, crashframe),  READONLY, b_crashframe_doc  },
-    { (char *)"crashthread", T_OBJECT_EX, offsetof(struct sr_py_gdb_stacktrace, crashthread), READONLY, b_crashthread_doc },
     { (char *)"libs",        T_OBJECT_EX, offsetof(struct sr_py_gdb_stacktrace, libs),        0,        b_libs_doc        },
     { NULL },
 };
@@ -303,7 +292,6 @@ sr_py_gdb_stacktrace_new(PyTypeObject *object,
     bo->thread_type = &sr_py_gdb_thread_type;
     bo->frame_type = &sr_py_gdb_frame_type;
     bo->crashframe = (struct sr_py_gdb_frame*)Py_None;
-    bo->crashthread = (struct sr_py_gdb_thread*)Py_None;
     if (str)
     {
         /* ToDo parse */
@@ -389,15 +377,6 @@ sr_py_gdb_stacktrace_dup(PyObject *self, PyObject *args)
     if (!bo->libs)
         return NULL;
 
-    if (PyObject_TypeCheck(this->crashthread, &sr_py_gdb_thread_type))
-    {
-        bo->crashthread = (struct sr_py_gdb_thread *)sr_py_gdb_thread_dup((PyObject*)this->crashthread, PyTuple_New(0));
-        if (!bo->crashthread)
-            return NULL;
-    }
-    else
-        bo->crashthread = (struct sr_py_gdb_thread*)Py_None;
-
     if (PyObject_TypeCheck(this->crashframe, &sr_py_gdb_frame_type))
     {
         bo->crashframe = (struct sr_py_gdb_frame*)sr_py_gdb_thread_dup((PyObject*)this->crashframe, PyTuple_New(0));
@@ -433,39 +412,6 @@ sr_py_gdb_stacktrace_find_crash_frame(PyObject *self, PyObject *args)
 
     result->frame = frame;
     this->crashframe = result;
-
-    if (stacktrace_rebuild_thread_python_list(this) < 0)
-        return NULL;
-
-    return (PyObject *)result;
-}
-
-PyObject *
-sr_py_gdb_stacktrace_find_crash_thread(PyObject *self, PyObject *args)
-{
-    struct sr_py_gdb_stacktrace *this = (struct sr_py_gdb_stacktrace*)self;
-    if (gdb_prepare_linked_lists(this) < 0)
-        return NULL;
-
-    /* destroys linked list - need to rebuild python list */
-    struct sr_gdb_thread *thread = sr_gdb_stacktrace_find_crash_thread(this->stacktrace);
-    if (!thread)
-    {
-        PyErr_SetString(PyExc_LookupError, "Crash thread not found");
-        return NULL;
-    }
-
-    struct sr_py_gdb_thread *result = (struct sr_py_gdb_thread*)
-        PyObject_New(struct sr_py_gdb_thread, &sr_py_gdb_thread_type);
-
-    if (!result)
-        return PyErr_NoMemory();
-
-    result->frame_type = &sr_py_gdb_frame_type;
-    result->thread = sr_gdb_thread_dup(thread, false);
-    result->frames = frames_to_python_list((struct sr_thread *)result->thread,
-                                           result->frame_type);
-    this->crashthread = result;
 
     if (stacktrace_rebuild_thread_python_list(this) < 0)
         return NULL;

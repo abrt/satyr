@@ -58,6 +58,11 @@ PyObject *sr_py_multi_stacktrace_to_short_text(PyObject *self, PyObject *args);
 PyObject *sr_py_single_stacktrace_get_bthash(PyObject *self, PyObject *args);
 PyObject *sr_py_multi_stacktrace_get_bthash(PyObject *self, PyObject *args);
 
+PyObject *sr_py_single_stacktrace_get_crash(PyObject *self, void *unused);
+int sr_py_single_stacktrace_set_crash(PyObject *self, PyObject *value, void *unused);
+PyObject *sr_py_multi_stacktrace_get_crash(PyObject *self, void *unused);
+int sr_py_multi_stacktrace_set_crash(PyObject *self, PyObject *value, void *unused);
+
 #ifdef __cplusplus
 }
 #endif

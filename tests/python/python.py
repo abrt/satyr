@@ -87,6 +87,9 @@ class TestPythonStacktrace(BindingsTestCase):
         self.assertEqual(self.trace.get_duphash(flags=satyr.DUPHASH_NOHASH, frames=3), expected_plain)
         self.assertEqual(self.trace.get_duphash(), '2c8e509a33966a08df1dd8b2348e850d1bc5b776')
 
+    def test_crash_thread(self):
+        self.assertTrue(self.trace.crash_thread is self.trace)
+
 class TestPythonFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.PythonStacktrace(contents).frames[-1]

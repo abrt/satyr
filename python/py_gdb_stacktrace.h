@@ -48,7 +48,6 @@ struct sr_py_gdb_stacktrace
     PyTypeObject *thread_type;
     PyTypeObject *frame_type;
     struct sr_py_gdb_frame *crashframe;
-    struct sr_py_gdb_thread *crashthread;
     PyObject *libs;
 };
 
@@ -66,7 +65,6 @@ PyObject *sr_py_gdb_stacktrace_str(PyObject *self);
 /* methods */
 PyObject *sr_py_gdb_stacktrace_dup(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_stacktrace_find_crash_frame(PyObject *self, PyObject *args);
-PyObject *sr_py_gdb_stacktrace_find_crash_thread(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_stacktrace_limit_frame_depth(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_stacktrace_quality_simple(PyObject *self, PyObject *args);
 PyObject *sr_py_gdb_stacktrace_quality_complex(PyObject *self, PyObject *args);
