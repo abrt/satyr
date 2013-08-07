@@ -14,6 +14,12 @@ _satyr_la_SOURCES = \
     py_base_thread.c \
     py_base_stacktrace.h \
     py_base_stacktrace.c \
+    py_core_frame.h \
+    py_core_frame.c \
+    py_core_thread.h \
+    py_core_thread.c \
+    py_core_stacktrace.h \
+    py_core_stacktrace.c \
     py_gdb_frame.h \
     py_gdb_frame.c \
     py_gdb_sharedlib.h \

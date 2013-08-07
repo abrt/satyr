@@ -14,6 +14,9 @@
 #include "py_java_frame.h"
 #include "py_java_thread.h"
 #include "py_java_stacktrace.h"
+#include "py_core_frame.h"
+#include "py_core_thread.h"
+#include "py_core_stacktrace.h"
 #include "py_metrics.h"
 
 #include "distance.h"
@@ -136,6 +139,24 @@ init_satyr()
         return;
     }
 
+    if (PyType_Ready(&sr_py_core_frame_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_core_frame_type) < 0");
+        return;
+    }
+
+    if (PyType_Ready(&sr_py_core_thread_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_core_thread_type) < 0");
+        return;
+    }
+
+    if (PyType_Ready(&sr_py_core_stacktrace_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_core_stacktrace_type) < 0");
+        return;
+    }
+
 
     PyObject *module = Py_InitModule("_satyr", module_methods);
     if (!module)
@@ -230,5 +251,17 @@ init_satyr()
     Py_INCREF(&sr_py_java_stacktrace_type);
     PyModule_AddObject(module, "JavaStacktrace",
                        (PyObject *)&sr_py_java_stacktrace_type);
+
+    Py_INCREF(&sr_py_core_frame_type);
+    PyModule_AddObject(module, "CoreFrame",
+                       (PyObject *)&sr_py_core_frame_type);
+
+    Py_INCREF(&sr_py_core_thread_type);
+    PyModule_AddObject(module, "CoreThread",
+                       (PyObject *)&sr_py_core_thread_type);
+
+    Py_INCREF(&sr_py_core_stacktrace_type);
+    PyModule_AddObject(module, "CoreStacktrace",
+                       (PyObject *)&sr_py_core_stacktrace_type);
 
 }
