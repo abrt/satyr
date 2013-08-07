@@ -72,7 +72,7 @@ sr_core_frame_init(struct sr_core_frame *frame)
     frame->function_name = NULL;
     frame->file_name = NULL;
     frame->fingerprint = NULL;
-    frame->fingerprint_hashed = false;
+    frame->fingerprint_hashed = true;
     frame->next = NULL;
     frame->type = SR_REPORT_CORE;
 }
@@ -352,6 +352,23 @@ sr_core_frame_from_json(struct sr_json_value *root,
         break;
     }
 
+    /* Read fingerprint_hashed. */
+    for (unsigned i = 0; i < root->u.object.length; ++i)
+    {
+        if (0 != strcmp("fingerprint_hashed", root->u.object.values[i].name))
+            continue;
+
+        if (root->u.object.values[i].value->type != SR_JSON_BOOLEAN)
+        {
+            *error_message = sr_strdup("Invalid type of \"fingerprint_hashed\"; bool expected.");
+            sr_core_frame_free(result);
+            return NULL;
+        }
+
+        result->fingerprint_hashed = root->u.object.values[i].value->u.boolean;
+        break;
+    }
+
     return result;
 }
 
@@ -400,6 +417,9 @@ sr_core_frame_to_json(struct sr_core_frame *frame)
         sr_strbuf_append_str(strbuf, ",   \"fingerprint\": ");
         sr_json_append_escaped(strbuf, frame->fingerprint);
         sr_strbuf_append_str(strbuf, "\n");
+
+        if (frame->fingerprint_hashed == false)
+            sr_strbuf_append_str(strbuf, ",   \"fingerprint_hashed\": false\n");
     }
 
     if (strbuf->len > 0)

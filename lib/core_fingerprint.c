@@ -477,6 +477,7 @@ compute_fingerprint(struct sr_core_frame *frame,
     }
 
     frame->fingerprint = sr_strbuf_free_nobuf(fingerprint);
+    frame->fingerprint_hashed = false;
     sr_disasm_instructions_free(instructions);
     return true;
 }
