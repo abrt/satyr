@@ -62,6 +62,40 @@ sr_py_setter_string(PyObject *self, PyObject *rhs, void *data)
 }
 
 PyObject *
+sr_py_getter_uint16(PyObject *self, void *data)
+{
+    struct getset_offsets *gsoff = data;
+    uint16_t num = MEMB_T(uint16_t, MEMB(self, gsoff->c_struct_offset), gsoff->member_offset);
+    return PyInt_FromLong(num);
+}
+
+int
+sr_py_setter_uint16(PyObject *self, PyObject *rhs, void *data)
+{
+    if (rhs == NULL)
+    {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete this attribute.");
+        return -1;
+    }
+
+    struct getset_offsets *gsoff = data;
+
+    long newvalue = PyInt_AsLong(rhs);
+    if (PyErr_Occurred())
+        return -1;
+
+    if (newvalue < 0 || newvalue > UINT16_MAX)
+    {
+        PyErr_SetString(PyExc_ValueError, "Negative or too large value.");
+        return -1;
+    }
+
+    MEMB_T(uint16_t, MEMB(self, gsoff->c_struct_offset), gsoff->member_offset)
+        = (uint16_t)newvalue;
+    return 0;
+}
+
+PyObject *
 sr_py_getter_uint32(PyObject *self, void *data)
 {
     struct getset_offsets *gsoff = data;

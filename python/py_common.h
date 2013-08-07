@@ -91,6 +91,10 @@ struct getset_offsets
         { (char*)name, sr_py_getter_string, sr_py_setter_string, (char*)doc_str, &gsoff_ ## c_member }
 #define SR_ATTRIBUTE_STRING(c_member, doc_str) SR_ATTRIBUTE_STRING_R(#c_member, c_member, doc_str)
 
+#define SR_ATTRIBUTE_UINT16_R(name, c_member, doc_str) \
+        { (char*)name, sr_py_getter_uint16, sr_py_setter_uint16, (char*)doc_str, &gsoff_ ## c_member }
+#define SR_ATTRIBUTE_UINT16(c_member, doc_str) SR_ATTRIBUTE_UINT16_R(#c_member, c_member, doc_str)
+
 #define SR_ATTRIBUTE_UINT32_R(name, c_member, doc_str) \
         { (char*)name, sr_py_getter_uint32, sr_py_setter_uint32, (char*)doc_str, &gsoff_ ## c_member }
 #define SR_ATTRIBUTE_UINT32(c_member, doc_str) SR_ATTRIBUTE_UINT32_R(#c_member, c_member, doc_str)
@@ -109,6 +113,9 @@ struct getset_offsets
  */
 PyObject *sr_py_getter_string(PyObject *self, void *data);
 int sr_py_setter_string(PyObject *self, PyObject *rhs, void *data);
+
+PyObject *sr_py_getter_uint16(PyObject *self, void *data);
+int sr_py_setter_uint16(PyObject *self, PyObject *rhs, void *data);
 
 PyObject *sr_py_getter_uint32(PyObject *self, void *data);
 int sr_py_setter_uint32(PyObject *self, PyObject *rhs, void *data);
