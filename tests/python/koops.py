@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from test_helpers import BindingsTestCase, load_input_contents
-
-try:
-    import _satyr as satyr
-except ImportError:
-    import satyr
+from test_helpers import *
 
 contents = load_input_contents('../kerneloopses/rhbz-827868')
 frames_expected = 32

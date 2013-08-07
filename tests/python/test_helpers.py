@@ -1,6 +1,11 @@
 import os
 import unittest
 
+try:
+    import _satyr as satyr
+except ImportError:
+    import satyr
+
 class BindingsTestCase(unittest.TestCase):
     def assertGetSetCorrect(self, obj, attr, orig_val, new_val):
         '''
@@ -17,6 +22,12 @@ def load_input_contents(path):
 
     with file(path) as f:
         return f.read()
+
+def frame_count(trace):
+    if hasattr(trace, 'frames'):
+        return len(trace.frames)
+    else:
+        return sum(map(lambda x: len(x.frames), trace.threads))
 
 if __name__ == '__main__':
     import sys

@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-
-from test_helpers import load_input_contents
-
-try:
-    import _satyr as satyr
-except ImportError:
-    import satyr
+from test_helpers import *
 
 class TestDistances(unittest.TestCase):
     def setUp(self):

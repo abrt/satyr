@@ -51,3 +51,4 @@ satyr.1
 /tests/testsuite
 /tests/testsuite.log
 /tests/testsuite.dir
+/tests/python/test_helpers.pyc

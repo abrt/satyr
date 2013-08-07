@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from test_helpers import BindingsTestCase, load_input_contents
-
-try:
-    import _satyr as satyr
-except ImportError:
-    import satyr
+from test_helpers import *
 
 contents = load_input_contents('../java_stacktraces/java-02')
 threads_expected = 1
@@ -25,14 +20,11 @@ class TestJavaStacktrace(BindingsTestCase):
     def setUp(self):
         self.trace = satyr.JavaStacktrace(contents)
 
-    def frame_count(self, trace):
-        return sum(map(lambda x: len(x.frames), trace.threads))
-
     def test_correct_thread_count(self):
         self.assertEqual(len(self.trace.threads), threads_expected)
 
     def test_correct_frame_count(self):
-        self.assertEqual(self.frame_count(self.trace), frames_expected)
+        self.assertEqual(frame_count(self.trace), frames_expected)
 
     def test_dup(self):
         dup = self.trace.dup()

@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from test_helpers import BindingsTestCase, load_input_contents
-
-try:
-    import _satyr as satyr
-except ImportError:
-    import satyr
-
+from test_helpers import *
 
 contents = load_input_contents('../gdb_stacktraces/rhbz-803600')
 threads_expected = 2
@@ -24,14 +18,11 @@ class TestGdbStacktrace(BindingsTestCase):
     def setUp(self):
         self.trace = satyr.GdbStacktrace(contents)
 
-    def frame_count(self, trace):
-        return sum(map(lambda x: len(x.frames), trace.threads))
-
     def test_correct_thread_count(self):
         self.assertEqual(len(self.trace.threads), threads_expected)
 
     def test_correct_frame_count(self):
-        self.assertEqual(self.frame_count(self.trace), frames_expected)
+        self.assertEqual(frame_count(self.trace), frames_expected)
 
     def test_dup(self):
         dup = self.trace.dup()
@@ -52,7 +43,7 @@ class TestGdbStacktrace(BindingsTestCase):
     def test_normalize(self):
         dup = self.trace.dup()
         dup.normalize()
-        self.assertNotEqual(self.frame_count(dup), self.frame_count(self.trace))
+        self.assertNotEqual(frame_count(dup), frame_count(self.trace))
 
     def test_str(self):
         out = str(self.trace)

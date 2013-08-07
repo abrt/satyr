@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-
-from test_helpers import BindingsTestCase, load_input_contents
-
-try:
-    import _satyr as satyr
-except ImportError:
-    import satyr
+from test_helpers import *
 
 path = '../python_stacktraces/python-01'
 contents = load_input_contents(path)
@@ -24,11 +18,8 @@ class TestPythonStacktrace(BindingsTestCase):
     def setUp(self):
         self.trace = satyr.PythonStacktrace(contents)
 
-    def frame_count(self, trace):
-        return len(trace.frames)
-
     def test_correct_frame_count(self):
-        self.assertEqual(self.frame_count(self.trace), frames_expected)
+        self.assertEqual(frame_count(self.trace), frames_expected)
 
     def test_dup(self):
         dup = self.trace.dup()
