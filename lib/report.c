@@ -177,7 +177,7 @@ sr_report_to_json(struct sr_report *report)
     case SR_REPORT_INVALID:
     case SR_REPORT_GDB: /* gdb ureports are not supported */
         report_type = "invalid";
-        reason = "invalid";
+        reason = sr_strdup("invalid");
         break;
     case SR_REPORT_CORE:
         report_type = "core";
