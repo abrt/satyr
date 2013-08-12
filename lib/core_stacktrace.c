@@ -298,6 +298,10 @@ sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
             sr_strbuf_append_str(strbuf, "      , ");
 
         bool crash_thread = (thread == stacktrace->crash_thread);
+        /* If we don't know the crash thread, just take the first one. */
+        crash_thread |= (stacktrace->crash_thread == NULL
+                         && thread == stacktrace->threads);
+
         char *thread_json = sr_core_thread_to_json(thread, crash_thread);
         char *indented_thread_json = sr_indent_except_first_line(thread_json, 8);
 
