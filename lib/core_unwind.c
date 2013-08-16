@@ -421,6 +421,9 @@ sr_core_stacktrace_from_gdb(const char *gdb_output, const char *core_file,
              gdb_frame;
              gdb_frame = gdb_frame->next)
         {
+            if (gdb_frame->signal_handler_called)
+                continue;
+
             struct sr_core_frame *core_frame = resolve_frame(ch->dwfl,
                     gdb_frame->address, false);
 
