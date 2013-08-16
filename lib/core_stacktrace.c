@@ -131,6 +131,10 @@ sr_core_stacktrace_get_thread_count(struct sr_core_stacktrace *stacktrace)
 struct sr_core_thread *
 sr_core_stacktrace_find_crash_thread(struct sr_core_stacktrace *stacktrace)
 {
+    /* If the crash thread is already known return it immediately */
+    if (stacktrace->crash_thread)
+        return stacktrace->crash_thread;
+
     /* If there is no thread, be silent and report NULL. */
     if (!stacktrace->threads)
         return NULL;
