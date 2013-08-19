@@ -123,7 +123,9 @@ int sr_py_setter_uint32(PyObject *self, PyObject *rhs, void *data);
 PyObject *sr_py_getter_bool(PyObject *self, void *data);
 int sr_py_setter_bool(PyObject *self, PyObject *rhs, void *data);
 
+/* NOTE: if the attribute is UINT64_MAX, None object is returned */
 PyObject *sr_py_getter_uint64(PyObject *self, void *data);
+/* NOTE: when rhs is None, the attribute is set to UINT64_MAX */
 int sr_py_setter_uint64(PyObject *self, PyObject *rhs, void *data);
 
 /*

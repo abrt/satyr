@@ -113,9 +113,9 @@ class TestCoreStacktrace(BindingsTestCase):
         self.assertEqual(trace.threads[0].frames[0].fingerprint, '1234123412341234123412341234')
         self.assertTrue(trace.threads[0].frames[0].fingerprint_hashed)
 
-        self.assertEqual(trace.threads[0].frames[1].address, 18446744073709551615L) # !!! FIXME
+        self.assertEqual(trace.threads[0].frames[1].address, None)
         self.assertEqual(trace.threads[0].frames[1].build_id, None)
-        self.assertEqual(trace.threads[0].frames[1].build_id_offset, 18446744073709551615L) # !!!
+        self.assertEqual(trace.threads[0].frames[1].build_id_offset, None)
         self.assertEqual(trace.threads[0].frames[1].function_name, None)
         self.assertEqual(trace.threads[0].frames[1].file_name, None)
         self.assertEqual(trace.threads[0].frames[1].fingerprint, None)
@@ -123,7 +123,7 @@ class TestCoreStacktrace(BindingsTestCase):
 
         self.assertEqual(trace.threads[0].frames[2].address, 2)
         self.assertEqual(trace.threads[0].frames[2].build_id, None)
-        self.assertEqual(trace.threads[0].frames[2].build_id_offset, 18446744073709551615L) # !!!
+        self.assertEqual(trace.threads[0].frames[2].build_id_offset, None)
         self.assertEqual(trace.threads[0].frames[2].function_name, None)
         self.assertEqual(trace.threads[0].frames[2].file_name, None)
         self.assertEqual(trace.threads[0].frames[2].fingerprint, 'a b c d')

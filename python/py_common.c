@@ -162,6 +162,11 @@ sr_py_getter_uint64(PyObject *self, void *data)
 
     uint64_t num
         = MEMB_T(uint64_t, MEMB(self, gsoff->c_struct_offset), gsoff->member_offset);
+
+    /* If the attribute is UINT64_MAX, return None. */
+    if (num == -1)
+        Py_RETURN_NONE;
+
     return PyLong_FromUnsignedLongLong(num);
 }
 
@@ -174,12 +179,21 @@ sr_py_setter_uint64(PyObject *self, PyObject *rhs, void *data)
         return -1;
     }
 
+    uint64_t newvalue;
+
+    /* If rhs is None, set the attribute to UINT64_MAX. */
+    if (rhs == Py_None)
+    {
+        newvalue = -1;
+    }
+    else
+    {
+        newvalue = (uint64_t)PyInt_AsUnsignedLongLongMask(rhs);
+        if (PyErr_Occurred())
+            return -1;
+    }
+
     struct getset_offsets *gsoff = data;
-
-    unsigned long long newvalue = PyInt_AsUnsignedLongLongMask(rhs);
-    if (PyErr_Occurred())
-        return -1;
-
     MEMB_T(uint64_t, MEMB(self, gsoff->c_struct_offset), gsoff->member_offset) = newvalue;
     return 0;
 }
