@@ -32,6 +32,7 @@ struct sr_operating_system
     char *name;
     char *version;
     char *architecture;
+    char *cpe;
     /* Uptime in seconds. */
     uint64_t uptime;
 };

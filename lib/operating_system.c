@@ -42,6 +42,7 @@ sr_operating_system_init(struct sr_operating_system *operating_system)
     operating_system->name = NULL;
     operating_system->version = NULL;
     operating_system->architecture = NULL;
+    operating_system->cpe = NULL;
     operating_system->uptime = 0;
 }
 
@@ -54,6 +55,7 @@ sr_operating_system_free(struct sr_operating_system *operating_system)
     free(operating_system->name);
     free(operating_system->version);
     free(operating_system->architecture);
+    free(operating_system->cpe);
     free(operating_system);
 }
 
@@ -80,6 +82,13 @@ sr_operating_system_to_json(struct sr_operating_system *operating_system)
     {
         sr_strbuf_append_str(strbuf, ",   \"architecture\": ");
         sr_json_append_escaped(strbuf, operating_system->architecture);
+        sr_strbuf_append_str(strbuf, "\n");
+    }
+
+    if (operating_system->cpe)
+    {
+        sr_strbuf_append_str(strbuf, ",   \"cpe\": ");
+        sr_json_append_escaped(strbuf, operating_system->cpe);
         sr_strbuf_append_str(strbuf, "\n");
     }
 
@@ -157,6 +166,10 @@ os_release_callback(char *key, char *value, void *data)
             free(operating_system->version);
         operating_system->version = sr_strdup("rawhide");
         free(value);
+    }
+    else if (0 == strcmp(key, "CPE_NAME"))
+    {
+        operating_system->cpe = value;
     }
     else
     {
