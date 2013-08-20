@@ -147,7 +147,16 @@ os_release_callback(char *key, char *value, void *data)
     }
     else if (0 == strcmp(key, "VERSION_ID"))
     {
-        operating_system->version = value;
+        if (operating_system->version == NULL)
+            operating_system->version = value;
+    }
+    /* fedora rawhide workaround */
+    else if (0 == strcmp(key, "VERSION") && strstr(value, "(Rawhide)"))
+    {
+        if (operating_system->version)
+            free(operating_system->version);
+        operating_system->version = sr_strdup("rawhide");
+        free(value);
     }
     else
     {

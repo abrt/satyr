@@ -75,6 +75,19 @@ main(void)
 "ANSI_COLOR=\"0;34\"\n"
 "CPE_NAME=\"cpe:/o:fedoraproject:fedora:19\"\n";
 
+    char *raw =
+"NAME=Fedora\n"
+"VERSION=\"20 (Rawhide)\"\n"
+"ID=fedora\n"
+"VERSION_ID=20\n"
+"PRETTY_NAME=\"Fedora 20 (Rawhide)\"\n"
+"ANSI_COLOR=\"0;34\"\n"
+"CPE_NAME=\"cpe:/o:fedoraproject:fedora:20\"\n"
+"REDHAT_BUGZILLA_PRODUCT=\"Fedora\"\n"
+"REDHAT_BUGZILLA_PRODUCT_VERSION=Rawhide\n"
+"REDHAT_SUPPORT_PRODUCT=\"Fedora\"\n"
+"REDHAT_SUPPORT_PRODUCT_VERSION=Rawhide\n";
+
     char *el7 =
 "NAME=\"Red Hat Enterprise Linux Workstation\"\n"
 "VERSION=\"7.0 (Codename)\"\n"
@@ -90,6 +103,7 @@ main(void)
 "REDHAT_SUPPORT_PRODUCT_VERSION=7.0\n";
 
     check(f19, "fedora", "19");
+    check(raw, "fedora", "rawhide");
     check(el7, "rhel", "7.0");
 
     return 0;
