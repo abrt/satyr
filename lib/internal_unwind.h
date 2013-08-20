@@ -52,9 +52,6 @@
 void
 _set_error(char **error_msg, const char *fmt, ...) __sr_printf(2, 3);
 
-void
-warn(const char *fmt, ...) __sr_printf(1, 2);
-
 /* internal linked list manipulation */
 #define list_append(head,tail,item)          \
     do{                                      \

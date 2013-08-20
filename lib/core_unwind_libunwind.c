@@ -22,6 +22,7 @@
 #include "core/thread.h"
 #include "core/stacktrace.h"
 #include "internal_unwind.h"
+#include "internal_utils.h"
 
 #ifdef WITH_LIBUNWIND
 

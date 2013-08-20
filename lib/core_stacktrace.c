@@ -336,11 +336,8 @@ sr_core_stacktrace_create(const char *gdb_stacktrace_text,
 
     if (!gdb_stacktrace)
     {
-        if (sr_debug_parser)
-        {
-            fprintf(stderr, "Unable to parse stacktrace: %d:%d: %s\n",
-                    location.line, location.column, location.message);
-        }
+        warn("Unable to parse stacktrace: %d:%d: %s\n",
+             location.line, location.column, location.message);
 
         return NULL;
     }
@@ -349,8 +346,7 @@ sr_core_stacktrace_create(const char *gdb_stacktrace_text,
     struct sr_unstrip_entry *unstrip = sr_unstrip_parse(unstrip_text);
     if (!unstrip)
     {
-        if (sr_debug_parser)
-            fprintf(stderr, "Unable to parse unstrip output.");
+        warn("Unable to parse unstrip output.");
 
         return NULL;
     }

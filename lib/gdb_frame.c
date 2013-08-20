@@ -338,12 +338,9 @@ sr_gdb_frame_parse(const char **input,
         ++local_input;
     }
 
-    if (sr_debug_parser)
-    {
-        printf("frame #%u %s\n",
-               header->number,
-               header->function_name ? header->function_name : "signal handler called");
-    }
+    warn("frame #%u %s\n",
+         header->number,
+         header->function_name ? header->function_name : "signal handler called");
 
     *input = local_input;
     return header;

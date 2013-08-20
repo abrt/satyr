@@ -20,8 +20,12 @@
 #ifndef SATYR_INTERNAL_UTILS_H
 #define SATYR_INTERNAL_UTILS_H
 
+#include "utils.h"
 #include <stddef.h>
 #include <assert.h>
+
+void
+warn(const char *fmt, ...) __sr_printf(1, 2);
 
 #define DISPATCH(table, type, method) \
     (assert((type > SR_REPORT_INVALID) && (type) < SR_REPORT_NUM && table[type]->method), \

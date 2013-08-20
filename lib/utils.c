@@ -37,6 +37,21 @@ sr_debug_parser = false;
 static const char
 hexdigits_locase[] = "0123456789abcdef";
 
+void
+warn(const char *fmt, ...)
+{
+    va_list ap;
+
+    if (!sr_debug_parser)
+        return;
+
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    fprintf(stderr, "\n");
+    va_end(ap);
+
+}
+
 void *
 sr_malloc(size_t size)
 {

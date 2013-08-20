@@ -29,6 +29,7 @@
 #include "utils.h"
 #include "core/unwind.h"
 #include "internal_unwind.h"
+#include "internal_utils.h"
 
 #include "location.h"
 #include "gdb/frame.h"
@@ -66,21 +67,6 @@ _set_error(char **error_msg, const char *fmt, ...)
     va_start(ap, fmt);
     *error_msg = sr_vasprintf(fmt, ap);
     va_end(ap);
-}
-
-void
-warn(const char *fmt, ...)
-{
-    va_list ap;
-
-    if (!sr_debug_parser)
-        return;
-
-    va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
-    fprintf(stderr, "\n");
-    va_end(ap);
-
 }
 
 void
