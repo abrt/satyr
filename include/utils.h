@@ -381,6 +381,16 @@ sr_indent_except_first_line(const char *input, int spaces);
 char *
 sr_build_path(const char *first_element, ...);
 
+/**
+ * Parses /etc/os-release file, see
+ * http://www.freedesktop.org/software/systemd/man/os-release.html for more
+ * information. Calls callback for each key-value pair it reads from the file.
+ */
+void
+sr_parse_os_release(const char *input,
+                    void (*callback)(char*, char*, void*),
+                    void *data);
+
 #ifdef __cplusplus
 }
 #endif

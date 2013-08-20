@@ -706,3 +706,82 @@ sr_build_path(const char *first_element, ...)
     va_end(elements);
     return sr_strbuf_free_nobuf(strbuf);
 }
+
+static void
+unescape_osinfo_value(const char *source, char* dest)
+{
+    while (source[0] != '\0')
+    {
+        if (source[0] == '\\')
+        {   /* some characters may be escaped -> remove '\' */
+            ++source;
+            if (source[0] == '\0')
+                break;
+            *dest++ = *source++;
+        }
+        else if (source[0] == '\'' || source[0] == '"')
+        {   /* skip non escaped quotes and don't care where they are */
+            ++source;
+        }
+        else
+        {
+            *dest++ = *source++;
+        }
+    }
+    dest[0] = '\0';
+}
+
+void
+sr_parse_os_release(const char *input, void (*callback)(char*, char*, void*),
+                    void *data)
+{
+    const char *cursor = input;
+    unsigned line = 0;
+    while (cursor[0] != '\0')
+    {
+        ++line;
+        if (cursor[0] == '#')
+            goto skip_line;
+
+        const char *key_end = strchrnul(cursor, '=');
+        if (key_end[0] == '\0')
+        {
+            warn("os-release:%u: non empty last line", line);
+            break;
+        }
+
+        if (key_end - cursor == 0)
+        {
+            warn("os-release:%u: 0 length key", line);
+            goto skip_line;
+        }
+
+        const char *value_end = strchrnul(cursor, '\n');
+        if (key_end > value_end)
+        {
+            warn("os-release:%u: missing '='", line);
+            goto skip_line;
+        }
+
+        char *key = sr_strndup(cursor, key_end - cursor);
+        char *value = sr_strndup(key_end + 1, value_end - key_end - 1);
+        unescape_osinfo_value(value, value);
+
+        warn("os-release:%u: parsed line: '%s'='%s'", line, key, value);
+
+        callback(key, value, data);
+
+        cursor = value_end;
+        if (value_end[0] == '\0')
+        {
+            warn("os-release:%u: the last value is not terminated by newline", line);
+        }
+        else
+            ++cursor;
+
+        continue;
+  skip_line:
+        cursor = strchrnul(cursor, '\n');
+        cursor += (cursor[0] != '\0');
+    }
+}

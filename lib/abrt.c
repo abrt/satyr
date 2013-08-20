@@ -278,17 +278,30 @@ struct sr_operating_system *
 sr_abrt_operating_system_from_dir(const char *directory,
                                   char **error_message)
 {
-    char *release_contents = file_contents(directory, "os_release",
-                                           error_message);
-    if (!release_contents)
-        return NULL;
-
+    bool success = false;
     struct sr_operating_system *os = sr_operating_system_new();
-    bool success = sr_operating_system_parse_etc_system_release(release_contents,
-                                                                &os->name,
-                                                                &os->version);
 
-    free(release_contents);
+    char *osinfo_contents = file_contents(directory, "os_info", error_message);
+    if (osinfo_contents)
+    {
+        success = sr_operating_system_parse_etc_os_release(osinfo_contents, os);
+        free(osinfo_contents);
+    }
+
+    /* fall back to os_release if parsing os_info fails */
+    if (!success)
+    {
+        char *release_contents = file_contents(directory, "os_release",
+                                               error_message);
+        if (release_contents)
+        {
+            success = sr_operating_system_parse_etc_system_release(release_contents,
+                                                                   &os->name,
+                                                                   &os->version);
+            free(release_contents);
+        }
+    }
+
     if (!success)
     {
         sr_operating_system_free(os);

@@ -22,6 +22,7 @@
 #include "utils.h"
 #include "json.h"
 #include "strbuf.h"
+#include "internal_utils.h"
 #include <string.h>
 #include <ctype.h>
 #include <stddef.h>
@@ -132,4 +133,34 @@ sr_operating_system_parse_etc_system_release(const char *etc_system_release,
 
     *version = sr_strndup(version_begin, version_end - version_begin);
     return true;
+}
+
+static void
+os_release_callback(char *key, char *value, void *data)
+{
+    struct sr_operating_system *operating_system =
+        (struct sr_operating_system *)data;
+
+    if (0 == strcmp(key, "ID"))
+    {
+        operating_system->name = value;
+    }
+    else if (0 == strcmp(key, "VERSION_ID"))
+    {
+        operating_system->version = value;
+    }
+    else
+    {
+        free(value);
+    }
+    free(key);
+}
+
+bool
+sr_operating_system_parse_etc_os_release(const char *etc_os_release,
+                                         struct sr_operating_system *operating_system)
+{
+    sr_parse_os_release(etc_os_release, os_release_callback, (void*)operating_system);
+
+    return (operating_system->name && operating_system->version);
 }

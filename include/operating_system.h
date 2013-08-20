@@ -52,6 +52,9 @@ bool
 sr_operating_system_parse_etc_system_release(const char *etc_system_release,
                                              char **name,
                                              char **version);
+bool
+sr_operating_system_parse_etc_os_release(const char *etc_os_release,
+                                         struct sr_operating_system *operating_system);
 
 #ifdef __cplusplus
 }
