@@ -47,13 +47,15 @@ koops_stacktrace_methods[] =
 #define GSOFF_PY_MEMBER stacktrace
 #define GSOFF_C_STRUCT sr_koops_stacktrace
 GSOFF_START
-GSOFF_MEMBER(version)
+GSOFF_MEMBER(version),
+GSOFF_MEMBER(raw_oops)
 GSOFF_END
 
 static PyGetSetDef
 koops_stacktrace_getset[] =
 {
     SR_ATTRIBUTE_STRING(version, "Kernel version (string)"),
+    SR_ATTRIBUTE_STRING(raw_oops, "Original text of the kerneloops (string)"),
     { (char*)"modules", sr_py_koops_stacktrace_get_modules, sr_py_koops_stacktrace_set_modules, (char*)b_modules_doc, NULL },
     { (char*)"taint_flags", sr_py_koops_stacktrace_get_taint_flags, sr_py_koops_stacktrace_set_taint_flags, (char*)b_taint_flags_doc, NULL },
     { NULL },

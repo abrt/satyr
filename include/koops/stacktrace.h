@@ -76,6 +76,11 @@ struct sr_koops_stacktrace
     char **modules;
 
     /**
+     * @brief Raw kerneloops text.
+     */
+    char *raw_oops;
+
+    /**
      * @brief Call trace.  It might be NULL as it is not mandatory.
      */
     struct sr_koops_frame *frames;

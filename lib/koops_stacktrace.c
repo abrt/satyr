@@ -130,6 +130,7 @@ sr_koops_stacktrace_free(struct sr_koops_stacktrace *stacktrace)
     }
 
     free(stacktrace->version);
+    free(stacktrace->raw_oops);
     free(stacktrace);
 }
 
@@ -144,6 +145,9 @@ sr_koops_stacktrace_dup(struct sr_koops_stacktrace *stacktrace)
 
     if (result->version)
         result->version = sr_strdup(result->version);
+
+    if (result->raw_oops)
+        result->raw_oops = sr_strdup(result->raw_oops);
 
     return result;
 }
@@ -291,6 +295,9 @@ sr_koops_stacktrace_parse(const char **input,
     struct sr_koops_stacktrace *stacktrace = sr_koops_stacktrace_new();
     struct sr_koops_frame *frame;
     bool parsed_ip = false;
+
+    /* Include the raw kerneloops text */
+    stacktrace->raw_oops = sr_strdup(*input);
 
     /* Looks for the "Tainted: " line in the whole input */
     parse_taint_flags(local_input, stacktrace);
@@ -445,6 +452,14 @@ sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace)
 {
     struct sr_strbuf *strbuf = sr_strbuf_new();
 
+    /* Raw oops. */
+    if (stacktrace->raw_oops)
+    {
+        sr_strbuf_append_str(strbuf, ",   \"raw_oops\": ");
+        sr_json_append_escaped(strbuf, stacktrace->raw_oops);
+        sr_strbuf_append_str(strbuf, "\n");
+    }
+
     /* Kernel version. */
     if (stacktrace->version)
     {
@@ -525,6 +540,10 @@ sr_koops_stacktrace_from_json(struct sr_json_value *root, char **error_message)
 
     /* Kernel version. */
     if (!JSON_READ_STRING(root, "version", &result->version))
+        goto fail;
+
+    /* Raw oops text. */
+    if (!JSON_READ_STRING(root, "raw_oops", &result->raw_oops))
         goto fail;
 
     /* Kernel taint flags. */
