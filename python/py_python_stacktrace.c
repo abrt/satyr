@@ -105,45 +105,52 @@ PyTypeObject sr_py_python_stacktrace_type = {
     NULL,                           /* tp_weaklist */
 };
 
+PyObject *
+python_stacktrace_to_python_obj(struct sr_python_stacktrace *stacktrace)
+{
+    struct sr_py_python_stacktrace *bo = PyObject_New(struct sr_py_python_stacktrace,
+                                                      &sr_py_python_stacktrace_type);
+    if (!bo)
+        return PyErr_NoMemory();
+
+    bo->frame_type = &sr_py_python_frame_type;
+
+    bo->stacktrace = stacktrace;
+    bo->frames = frames_to_python_list((struct sr_thread *)bo->stacktrace,
+                                       bo->frame_type);
+    if (!bo->frames)
+        return NULL;
+
+    return (PyObject *)bo;
+}
+
 /* constructor */
 PyObject *
 sr_py_python_stacktrace_new(PyTypeObject *object,
                             PyObject *args,
                             PyObject *kwds)
 {
-    struct sr_py_python_stacktrace *bo = (struct sr_py_python_stacktrace*)
-        PyObject_New(struct sr_py_python_stacktrace,
-                     &sr_py_python_stacktrace_type);
-
-    if (!bo)
-        return PyErr_NoMemory();
-
-    bo->frame_type = &sr_py_python_frame_type;
-
     const char *str = NULL;
     if (!PyArg_ParseTuple(args, "|s", &str))
         return NULL;
+
+    struct sr_python_stacktrace *stacktrace;
 
     if (str)
     {
         struct sr_location location;
         sr_location_init(&location);
-        bo->stacktrace = sr_python_stacktrace_parse(&str, &location);
-        if (!bo->stacktrace)
+        stacktrace = sr_python_stacktrace_parse(&str, &location);
+        if (!stacktrace)
         {
             PyErr_SetString(PyExc_ValueError, location.message);
             return NULL;
         }
-
-        bo->frames = frames_to_python_list((struct sr_thread *)bo->stacktrace, bo->frame_type);
     }
     else
-    {
-        bo->stacktrace = sr_python_stacktrace_new();
-        bo->frames = PyList_New(0);
-    }
+        stacktrace = sr_python_stacktrace_new();
 
-    return (PyObject *)bo;
+    return python_stacktrace_to_python_obj(stacktrace);
 }
 
 /* destructor */
@@ -180,23 +187,11 @@ sr_py_python_stacktrace_dup(PyObject *self, PyObject *args)
     if (frames_prepare_linked_list((struct sr_py_base_thread *)this) < 0)
         return NULL;
 
-    struct sr_py_python_stacktrace *bo = (struct sr_py_python_stacktrace*)
-        PyObject_New(struct sr_py_python_stacktrace,
-                     &sr_py_python_stacktrace_type);
-
-    if (!bo)
-        return PyErr_NoMemory();
-
-    bo->frame_type = &sr_py_python_frame_type;
-    bo->stacktrace = sr_python_stacktrace_dup(this->stacktrace);
-    if (!bo->stacktrace)
+    struct sr_python_stacktrace *stacktrace = sr_python_stacktrace_dup(this->stacktrace);
+    if (!stacktrace)
         return NULL;
 
-    bo->frames =  frames_to_python_list((struct sr_thread *)bo->stacktrace, bo->frame_type);
-    if (!bo->frames)
-        return NULL;
-
-    return (PyObject*)bo;
+    return python_stacktrace_to_python_obj(stacktrace);
 }
 
 /*

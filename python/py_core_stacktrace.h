@@ -49,6 +49,9 @@ struct sr_py_core_stacktrace
     PyTypeObject *frame_type;
 };
 
+/* helpers */
+PyObject *core_stacktrace_to_python_obj(struct sr_core_stacktrace *stacktrace);
+
 /* constructor */
 PyObject *sr_py_core_stacktrace_new(PyTypeObject *object,
                                     PyObject *args,

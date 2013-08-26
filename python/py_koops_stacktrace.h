@@ -46,6 +46,9 @@ struct sr_py_koops_stacktrace
     PyObject *taint_flags;
 };
 
+/* helpers */
+PyObject *koops_stacktrace_to_python_obj(struct sr_koops_stacktrace *stacktrace);
+
 /* constructor */
 PyObject *sr_py_koops_stacktrace_new(PyTypeObject *object,
                                      PyObject *args,

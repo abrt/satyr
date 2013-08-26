@@ -76,49 +76,53 @@ PyTypeObject sr_py_java_stacktrace_type = {
     NULL,                           /* tp_weaklist */
 };
 
-/* constructor */
 PyObject *
-sr_py_java_stacktrace_new(PyTypeObject *object,
-                          PyObject *args,
-                          PyObject *kwds)
+java_stacktrace_to_python_obj(struct sr_java_stacktrace *stacktrace)
 {
-    struct sr_py_java_stacktrace *bo = (struct sr_py_java_stacktrace*)
-        PyObject_New(struct sr_py_java_stacktrace,
-                     &sr_py_java_stacktrace_type);
-
+    struct sr_py_java_stacktrace *bo = PyObject_New(struct sr_py_java_stacktrace,
+                                                    &sr_py_java_stacktrace_type);
     if (!bo)
         return PyErr_NoMemory();
 
     bo->thread_type = &sr_py_java_thread_type;
     bo->frame_type = &sr_py_java_frame_type;
 
+    bo->stacktrace = stacktrace;
+    bo->threads = threads_to_python_list((struct sr_stacktrace *)bo->stacktrace,
+                                         bo->thread_type, bo->frame_type);
+    if (!bo->threads)
+        return NULL;
+
+    return (PyObject *)bo;
+}
+
+/* constructor */
+PyObject *
+sr_py_java_stacktrace_new(PyTypeObject *object,
+                          PyObject *args,
+                          PyObject *kwds)
+{
     const char *str = NULL;
     if (!PyArg_ParseTuple(args, "|s", &str))
         return NULL;
 
+    struct sr_java_stacktrace *stacktrace;
+
     if (str)
     {
-        /* ToDo parse */
         struct sr_location location;
         sr_location_init(&location);
-        bo->stacktrace = sr_java_stacktrace_parse(&str, &location);
-        if (!bo->stacktrace)
+        stacktrace = sr_java_stacktrace_parse(&str, &location);
+        if (!stacktrace)
         {
             PyErr_SetString(PyExc_ValueError, location.message);
             return NULL;
         }
-        bo->threads = threads_to_python_list((struct sr_stacktrace *)bo->stacktrace,
-                                             bo->thread_type, bo->frame_type);
-        if (!bo->threads)
-            return NULL;
     }
     else
-    {
-        bo->threads = PyList_New(0);
-        bo->stacktrace = sr_java_stacktrace_new();
-    }
+        stacktrace = sr_java_stacktrace_new();
 
-    return (PyObject *)bo;
+    return java_stacktrace_to_python_obj(stacktrace);
 }
 
 /* destructor */
@@ -155,24 +159,9 @@ sr_py_java_stacktrace_dup(PyObject *self, PyObject *args)
     if (threads_prepare_linked_list((struct sr_py_multi_stacktrace *)this) < 0)
         return NULL;
 
-    struct sr_py_java_stacktrace *bo = (struct sr_py_java_stacktrace*)
-        PyObject_New(struct sr_py_java_stacktrace,
-                     &sr_py_java_stacktrace_type);
-
-    if (!bo)
-        return PyErr_NoMemory();
-
-    bo->thread_type = &sr_py_java_thread_type;
-    bo->frame_type = &sr_py_java_frame_type;
-
-    bo->stacktrace = sr_java_stacktrace_dup(this->stacktrace);
-    if (!bo->stacktrace)
+    struct sr_java_stacktrace *stacktrace = sr_java_stacktrace_dup(this->stacktrace);
+    if (!stacktrace)
         return NULL;
 
-    bo->threads = threads_to_python_list((struct sr_stacktrace *)bo->stacktrace,
-                                         bo->thread_type, bo->frame_type);
-    if (!bo->threads)
-        return NULL;
-
-    return (PyObject*)bo;
+    return java_stacktrace_to_python_obj(stacktrace);
 }
