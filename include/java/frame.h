@@ -135,6 +135,15 @@ void
 sr_java_frame_free_full(struct sr_java_frame *frame);
 
 /**
+ * Appends 'item' at the end of the list 'dest'.
+ * @returns
+ * This function returns the 'dest' frame.
+ */
+struct sr_java_frame *
+sr_java_frame_append(struct sr_java_frame *dest,
+                     struct sr_java_frame *item);
+
+/**
  * Gets a number of frame in list.
  * @param frame
  * If the frame is NULL, no operation is performed.

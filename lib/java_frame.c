@@ -194,6 +194,21 @@ sr_java_frame_cmp_distance(struct sr_java_frame *frame1,
     return 0;
 }
 
+struct sr_java_frame *
+sr_java_frame_append(struct sr_java_frame *dest,
+                     struct sr_java_frame *item)
+{
+    if (!dest)
+        return item;
+
+    struct sr_java_frame *dest_loop = dest;
+    while (dest_loop->next)
+        dest_loop = dest_loop->next;
+
+    dest_loop->next = item;
+    return dest;
+}
+
 void
 sr_java_frame_append_to_str(struct sr_java_frame *frame,
                             struct sr_strbuf *dest)
