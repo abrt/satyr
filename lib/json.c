@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <assert.h>
 
 typedef unsigned short json_uchar;
 
@@ -740,3 +741,67 @@ sr_json_append_escaped(struct sr_strbuf *strbuf, const char *str)
 
     return strbuf;
 }
+
+static char *type_names[] = {
+   [SR_JSON_NONE]    = "none",
+   [SR_JSON_OBJECT]  = "object",
+   [SR_JSON_ARRAY]   = "array",
+   [SR_JSON_INTEGER] = "integer",
+   [SR_JSON_DOUBLE]  = "double",
+   [SR_JSON_STRING]  = "string",
+   [SR_JSON_BOOLEAN] = "boolean",
+   [SR_JSON_NULL]    = "null",
+};
+bool
+json_check_type(struct sr_json_value *value, enum sr_json_type type,
+                const char *name, char **error_message)
+{
+    if (value->type == type)
+        return true;
+
+    assert(type >= SR_JSON_NONE && type <= SR_JSON_NULL);
+    char *type_str = type_names[type];
+
+    if (error_message)
+        *error_message = sr_asprintf("Invalid type of %s; %s expected", name, type_str);
+    return false;
+}
+
+struct sr_json_value *
+json_element(struct sr_json_value *object, const char *key_name)
+{
+    assert(object->type == SR_JSON_OBJECT);
+
+    for (unsigned i = 0; i < object->u.object.length; ++i)
+    {
+        if (0 == strcmp(key_name, object->u.object.values[i].name))
+            return object->u.object.values[i].value;
+    }
+
+    return NULL;
+}
+
+#define DEFINE_JSON_READ(name, c_type, json_type, json_member, conversion)                       \
+    bool                                                                                         \
+    name(struct sr_json_value *object, const char *key_name, c_type *dest, char **error_message) \
+    {                                                                                            \
+        struct sr_json_value *val = json_element(object, key_name);                              \
+                                                                                                 \
+        if (!val)                                                                                \
+            return true;                                                                         \
+                                                                                                 \
+        if (!json_check_type(val, json_type, key_name, error_message))                           \
+            return false;                                                                        \
+                                                                                                 \
+        *dest = conversion(val->json_member);                                                    \
+                                                                                                 \
+        return true;                                                                             \
+    }
+
+#define NOOP
+
+DEFINE_JSON_READ(json_read_uint64, uint64_t, SR_JSON_INTEGER, u.integer, NOOP)
+DEFINE_JSON_READ(json_read_uint32, uint32_t, SR_JSON_INTEGER, u.integer, NOOP)
+DEFINE_JSON_READ(json_read_uint16, uint16_t, SR_JSON_INTEGER, u.integer, NOOP)
+DEFINE_JSON_READ(json_read_string, char *, SR_JSON_STRING, u.string.ptr, sr_strdup)
+DEFINE_JSON_READ(json_read_bool, bool, SR_JSON_BOOLEAN, u.boolean, NOOP)
