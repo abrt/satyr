@@ -37,6 +37,14 @@ enum sr_report_type
     SR_REPORT_NUM
 };
 
+/* returns malloc()ed string representation of report_type */
+char *
+sr_report_type_to_string(enum sr_report_type report_type);
+
+/* inverse function */
+enum sr_report_type
+sr_report_type_from_string(const char *report_type_str);
+
 #ifdef __cplusplus
 }
 #endif

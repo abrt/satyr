@@ -55,6 +55,7 @@ TESTSUITE_AT =		\
   cluster.at  		\
   rpm.at		\
   abrt.at               \
+  report.at		\
   python_bindings.at
 
 EXTRA_DIST += $(TESTSUITE_AT)

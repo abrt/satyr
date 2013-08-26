@@ -33,6 +33,17 @@
 #include <string.h>
 #include <assert.h>
 
+static char *report_types[] =
+{
+    [SR_REPORT_INVALID] = "invalid",
+    [SR_REPORT_CORE] = "core",
+    [SR_REPORT_PYTHON] = "python",
+    [SR_REPORT_KERNELOOPS] = "kerneloops",
+    [SR_REPORT_JAVA] = "java",
+    [SR_REPORT_GDB] = "gdb",
+    NULL
+};
+
 struct sr_report *
 sr_report_new()
 {
@@ -256,21 +267,25 @@ sr_report_to_json(struct sr_report *report)
     return sr_strbuf_free_nobuf(strbuf);
 }
 
-static enum sr_report_type
-report_type_from_string(const char *report_type_str)
+enum sr_report_type
+sr_report_type_from_string(const char *report_type_str)
 {
-    assert(report_type_str);
+    for (int i = SR_REPORT_INVALID; i < SR_REPORT_NUM; i++)
+    {
+        if (0 == sr_strcmp0(report_types[i], report_type_str))
+            return i;
+    }
 
-    if (0 == strcmp("core", report_type_str))
-        return SR_REPORT_CORE;
-    else if (0 == strcmp("python", report_type_str))
-        return SR_REPORT_PYTHON;
-    else if (0 == strcmp("kerneloops", report_type_str))
-        return SR_REPORT_KERNELOOPS;
-    else if (0 == strcmp("java", report_type_str))
-        return SR_REPORT_JAVA;
-    else
-        return SR_REPORT_INVALID;
+    return SR_REPORT_INVALID;
+}
+
+char *
+sr_report_type_to_string(enum sr_report_type report_type)
+{
+    if (report_type < SR_REPORT_INVALID || report_type >= SR_REPORT_NUM)
+        return sr_strdup("invalid");
+
+    return sr_strdup(report_types[report_type]);
 }
 
 struct sr_report *
@@ -332,7 +347,7 @@ sr_report_from_json(struct sr_json_value *root, char **error_message)
         if (!success)
             goto fail;
 
-        report->report_type = report_type_from_string(report_type);
+        report->report_type = sr_report_type_from_string(report_type);
 
         /* User. */
         struct sr_json_value *user = json_element(root, "user");
