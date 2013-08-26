@@ -18,6 +18,7 @@
 #include "py_core_thread.h"
 #include "py_core_stacktrace.h"
 #include "py_metrics.h"
+#include "py_operating_system.h"
 
 #include "distance.h"
 #include "thread.h"
@@ -157,6 +158,12 @@ init_satyr()
         return;
     }
 
+    if (PyType_Ready(&sr_py_operating_system_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_operating_system_type) < 0");
+        return;
+    }
+
 
     PyObject *module = Py_InitModule("_satyr", module_methods);
     if (!module)
@@ -264,4 +271,7 @@ init_satyr()
     PyModule_AddObject(module, "CoreStacktrace",
                        (PyObject *)&sr_py_core_stacktrace_type);
 
+    Py_INCREF(&sr_py_operating_system_type);
+    PyModule_AddObject(module, "OperatingSystem",
+                       (PyObject *)&sr_py_operating_system_type);
 }
