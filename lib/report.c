@@ -22,6 +22,7 @@
 #include "config.h"
 #include "utils.h"
 #include "json.h"
+#include "stacktrace.h"
 #include "koops/stacktrace.h"
 #include "core/stacktrace.h"
 #include "python/stacktrace.h"
@@ -64,10 +65,7 @@ sr_report_init(struct sr_report *report)
     report->operating_system = NULL;
     report->component_name = NULL;
     report->rpm_packages = NULL;
-    report->python_stacktrace = NULL;
-    report->koops_stacktrace = NULL;
-    report->core_stacktrace = NULL;
-    report->java_stacktrace = NULL;
+    report->stacktrace = NULL;
 }
 
 void
@@ -76,10 +74,7 @@ sr_report_free(struct sr_report *report)
     free(report->component_name);
     sr_operating_system_free(report->operating_system);
     sr_rpm_package_free(report->rpm_packages, true);
-    sr_python_stacktrace_free(report->python_stacktrace);
-    sr_koops_stacktrace_free(report->koops_stacktrace);
-    sr_core_stacktrace_free(report->core_stacktrace);
-    sr_java_stacktrace_free(report->java_stacktrace);
+    sr_stacktrace_free(report->stacktrace);
     free(report);
 }
 
@@ -128,40 +123,11 @@ problem_object_string(struct sr_report *report, const char *report_type)
     }
 
     /* Stacktrace. */
-
-    /* Core stacktrace. */
-    if (report->core_stacktrace)
+    if (report->stacktrace)
     {
-        char *stacktrace = sr_core_stacktrace_to_json(report->core_stacktrace);
+        char *stacktrace = sr_stacktrace_to_json(report->stacktrace);
         dismantle_object(stacktrace);
         sr_strbuf_append_str(strbuf, stacktrace);
-        free(stacktrace);
-    }
-
-    /* Python stacktrace. */
-    if (report->python_stacktrace)
-    {
-        char *stacktrace = sr_python_stacktrace_to_json(report->python_stacktrace);
-        dismantle_object(stacktrace);
-        sr_strbuf_append_str(strbuf, stacktrace);
-        free(stacktrace);
-    }
-
-    /* Koops stacktrace. */
-    if (report->koops_stacktrace)
-    {
-        char *stacktrace = sr_koops_stacktrace_to_json(report->koops_stacktrace);
-        dismantle_object(stacktrace);
-        sr_strbuf_append_str(strbuf, stacktrace);
-        free(stacktrace);
-    }
-
-    /* Java stacktrace. */
-    if (report->java_stacktrace)
-    {
-        char *stacktrace = sr_java_stacktrace_to_json(report->java_stacktrace);
-        dismantle_object(stacktrace);
-        sr_strbuf_append_strf(strbuf, stacktrace);
         free(stacktrace);
     }
 
@@ -181,31 +147,22 @@ sr_report_to_json(struct sr_report *report)
                           report->report_version);
 
     /* Report type. */
-    const char *report_type;
+    char *report_type;
     char *reason;
     switch (report->report_type)
     {
     default:
     case SR_REPORT_INVALID:
     case SR_REPORT_GDB: /* gdb ureports are not supported */
-        report_type = "invalid";
+        report_type = sr_strdup("invalid");
         reason = sr_strdup("invalid");
         break;
     case SR_REPORT_CORE:
-        report_type = "core";
-        reason = sr_core_stacktrace_get_reason(report->core_stacktrace);
-        break;
     case SR_REPORT_PYTHON:
-        report_type = "python";
-        reason = sr_python_stacktrace_get_reason(report->python_stacktrace);
-        break;
     case SR_REPORT_KERNELOOPS:
-        report_type = "kerneloops";
-        reason = sr_koops_stacktrace_get_reason(report->koops_stacktrace);
-        break;
     case SR_REPORT_JAVA:
-        report_type = "java";
-        reason = sr_java_stacktrace_get_reason(report->java_stacktrace);
+        report_type = sr_report_type_to_string(report->report_type);
+        reason = sr_stacktrace_get_reason(report->stacktrace);
         break;
     }
 
@@ -245,6 +202,7 @@ sr_report_to_json(struct sr_report *report)
     char *problem = problem_object_string(report, report_type);
     char *problem_indented = sr_indent_except_first_line(problem, strlen(",   \"problem\": "));
     free(problem);
+    free(report_type);
     sr_strbuf_append_strf(strbuf,
                           ",   \"problem\": %s\n",
                           problem_indented);
@@ -366,16 +324,10 @@ sr_report_from_json(struct sr_json_value *root, char **error_message)
         switch (report->report_type)
         {
         case SR_REPORT_CORE:
-            report->core_stacktrace = sr_core_stacktrace_from_json(problem, error_message);
-            break;
         case SR_REPORT_PYTHON:
-            report->python_stacktrace = sr_python_stacktrace_from_json(problem, error_message);
-            break;
         case SR_REPORT_KERNELOOPS:
-            report->koops_stacktrace = sr_koops_stacktrace_from_json(problem, error_message);
-            break;
         case SR_REPORT_JAVA:
-            report->java_stacktrace = sr_java_stacktrace_from_json(problem, error_message);
+            report->stacktrace = sr_stacktrace_from_json(report->report_type, problem, error_message);
             break;
         default:
             /* Invalid report type -> no stacktrace. */

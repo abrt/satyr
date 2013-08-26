@@ -373,11 +373,11 @@ sr_abrt_report_from_dir(const char *directory,
             return NULL;
         }
 
-        report->core_stacktrace = sr_core_stacktrace_from_json_text(
+        report->stacktrace = (struct sr_stacktrace *)sr_core_stacktrace_from_json_text(
                 core_backtrace_contents, error_message);
 
         free(core_backtrace_contents);
-        if (!report->core_stacktrace)
+        if (!report->stacktrace)
         {
             sr_report_free(report);
             return NULL;
@@ -399,12 +399,12 @@ sr_abrt_report_from_dir(const char *directory,
         struct sr_location location;
         sr_location_init(&location);
         const char *contents_pointer = backtrace_contents;
-        report->python_stacktrace = sr_python_stacktrace_parse(
+        report->stacktrace = (struct sr_stacktrace *)sr_python_stacktrace_parse(
             &contents_pointer,
             &location);
 
         free(backtrace_contents);
-        if (!report->python_stacktrace)
+        if (!report->stacktrace)
         {
             *error_message = sr_location_to_string(&location);
             sr_report_free(report);
@@ -456,12 +456,12 @@ sr_abrt_report_from_dir(const char *directory,
         struct sr_location location;
         sr_location_init(&location);
         const char *contents_pointer = backtrace_contents;
-        report->koops_stacktrace = sr_koops_stacktrace_parse(
+        report->stacktrace = (struct sr_stacktrace *)sr_koops_stacktrace_parse(
             &contents_pointer,
             &location);
 
         free(backtrace_contents);
-        if (!report->koops_stacktrace)
+        if (!report->stacktrace)
         {
             *error_message = sr_location_to_string(&location);
             sr_report_free(report);
@@ -483,12 +483,12 @@ sr_abrt_report_from_dir(const char *directory,
         struct sr_location location;
         sr_location_init(&location);
         const char *contents_pointer = backtrace_contents;
-        report->java_stacktrace = sr_java_stacktrace_parse(
+        report->stacktrace = (struct sr_stacktrace *)sr_java_stacktrace_parse(
             &contents_pointer,
             &location);
 
         free(backtrace_contents);
-        if (!report->java_stacktrace)
+        if (!report->stacktrace)
         {
             *error_message = sr_location_to_string(&location);
             sr_report_free(report);

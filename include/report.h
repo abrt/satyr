@@ -29,6 +29,7 @@ extern "C" {
 #include <stdbool.h>
 
 struct sr_json_value;
+struct sr_stacktrace;
 
 struct sr_report
 {
@@ -47,10 +48,7 @@ struct sr_report
     char *component_name;
     struct sr_rpm_package *rpm_packages;
 
-    struct sr_python_stacktrace *python_stacktrace;
-    struct sr_koops_stacktrace *koops_stacktrace;
-    struct sr_core_stacktrace *core_stacktrace;
-    struct sr_java_stacktrace *java_stacktrace;
+    struct sr_stacktrace *stacktrace;
 };
 
 struct sr_report *
