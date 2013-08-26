@@ -42,6 +42,8 @@ _satyr_la_SOURCES = \
     py_java_thread.c \
     py_java_stacktrace.h \
     py_java_stacktrace.c \
+    py_rpm_package.h \
+    py_rpm_package.c \
     py_metrics.h \
     py_metrics.c \
     py_operating_system.h \

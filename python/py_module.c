@@ -17,6 +17,7 @@
 #include "py_core_frame.h"
 #include "py_core_thread.h"
 #include "py_core_stacktrace.h"
+#include "py_rpm_package.h"
 #include "py_metrics.h"
 #include "py_operating_system.h"
 
@@ -24,6 +25,7 @@
 #include "thread.h"
 #include "stacktrace.h"
 #include "gdb/sharedlib.h"
+#include "rpm.h"
 
 static PyMethodDef
 module_methods[]=
@@ -164,6 +166,12 @@ init_satyr()
         return;
     }
 
+    if (PyType_Ready(&sr_py_rpm_package_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_rpm_package_type) < 0");
+        return;
+    }
+
 
     PyObject *module = Py_InitModule("_satyr", module_methods);
     if (!module)
@@ -274,4 +282,11 @@ init_satyr()
     Py_INCREF(&sr_py_operating_system_type);
     PyModule_AddObject(module, "OperatingSystem",
                        (PyObject *)&sr_py_operating_system_type);
+
+    Py_INCREF(&sr_py_rpm_package_type);
+    PyModule_AddObject(module, "RpmPackage",
+                       (PyObject *)&sr_py_rpm_package_type);
+
+    PyModule_AddIntConstant(module, "ROLE_UNKNOWN", SR_ROLE_UNKNOWN);
+    PyModule_AddIntConstant(module, "ROLE_AFFECTED", SR_ROLE_AFFECTED);
 }
