@@ -42,9 +42,18 @@ koops_stacktrace_methods[] =
     { NULL },
 };
 
+/* See python/py_common.h and python/py_gdb_frame.c for generic getters/setters documentation. */
+#define GSOFF_PY_STRUCT sr_py_koops_stacktrace
+#define GSOFF_PY_MEMBER stacktrace
+#define GSOFF_C_STRUCT sr_koops_stacktrace
+GSOFF_START
+GSOFF_MEMBER(version)
+GSOFF_END
+
 static PyGetSetDef
 koops_stacktrace_getset[] =
 {
+    SR_ATTRIBUTE_STRING(version, "Kernel version (string)"),
     { (char*)"modules", sr_py_koops_stacktrace_get_modules, sr_py_koops_stacktrace_set_modules, (char*)b_modules_doc, NULL },
     { (char*)"taint_flags", sr_py_koops_stacktrace_get_taint_flags, sr_py_koops_stacktrace_set_taint_flags, (char*)b_taint_flags_doc, NULL },
     { NULL },
