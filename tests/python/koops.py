@@ -73,6 +73,86 @@ class TestKerneloops(BindingsTestCase):
     def test_crash_thread(self):
         self.assertTrue(self.koops.crash_thread is self.koops)
 
+    def test_from_json(self):
+        trace = satyr.Kerneloops.from_json('{}')
+        self.assertEqual(trace.frames, [])
+
+        json_text = '''
+        {
+            "version": "3.11.666",
+            "taint_flags": ["warning", "died_recently"],
+            "modules": ["not", "much", "modules", "loaded"],
+            "frames": [
+                {
+                    "address": 28,
+                    "reliable": true,
+                    "function_name": "f",
+                    "function_offset": 5,
+                    "function_length": 6,
+                    "module_name": "modularmodule",
+                    "from_address": 27,
+                    "from_function_name": "h",
+                    "from_function_offset": 3,
+                    "from_function_length": 9,
+                    "from_module_name": "nonmodularmodule",
+                    "byl": "jsem tady"
+                },
+                {
+                },
+                {
+                    "address": 23,
+                    "reliable": false,
+                    "function_name": "g",
+                    "module_name": "much",
+                }
+            ]
+        }
+'''
+        trace = satyr.Kerneloops.from_json(json_text)
+        print dir(trace)
+        self.assertEqual(trace.version, '3.11.666')
+        self.assertTrue(trace.taint_flags['warning'])
+        self.assertTrue(trace.taint_flags['died_recently'])
+        self.assertFalse(trace.taint_flags['module_out_of_tree'])
+        self.assertEqual(trace.modules, ['not', 'much', 'modules', 'loaded'])
+        self.assertEqual(len(trace.frames), 3)
+
+        self.assertEqual(trace.frames[0].address, 28)
+        self.assertTrue(trace.frames[0].reliable)
+        self.assertEqual(trace.frames[0].function_name, 'f')
+        self.assertEqual(trace.frames[0].function_offset, 5)
+        self.assertEqual(trace.frames[0].function_length, 6)
+        self.assertEqual(trace.frames[0].module_name, 'modularmodule')
+        self.assertEqual(trace.frames[0].from_address, 27)
+        self.assertEqual(trace.frames[0].from_function_name, 'h')
+        self.assertEqual(trace.frames[0].from_function_offset, 3)
+        self.assertEqual(trace.frames[0].from_function_length, 9)
+        self.assertEqual(trace.frames[0].from_module_name, 'nonmodularmodule')
+
+        self.assertEqual(trace.frames[1].address, 0)
+        self.assertFalse(trace.frames[1].reliable)
+        self.assertEqual(trace.frames[1].function_name, None)
+        self.assertEqual(trace.frames[1].function_offset, 0)
+        self.assertEqual(trace.frames[1].function_length, 0)
+        self.assertEqual(trace.frames[1].module_name, None)
+        self.assertEqual(trace.frames[1].from_address, 0)
+        self.assertEqual(trace.frames[1].from_function_name, None)
+        self.assertEqual(trace.frames[1].from_function_offset, 0)
+        self.assertEqual(trace.frames[1].from_function_length, 0)
+        self.assertEqual(trace.frames[1].from_module_name, None)
+
+        self.assertEqual(trace.frames[2].address, 23)
+        self.assertFalse(trace.frames[2].reliable)
+        self.assertEqual(trace.frames[2].function_name, 'g')
+        self.assertEqual(trace.frames[2].function_offset, 0)
+        self.assertEqual(trace.frames[2].function_length, 0)
+        self.assertEqual(trace.frames[2].module_name, 'much')
+        self.assertEqual(trace.frames[2].from_address, 0)
+        self.assertEqual(trace.frames[2].from_function_name, None)
+        self.assertEqual(trace.frames[2].from_function_offset, 0)
+        self.assertEqual(trace.frames[2].from_function_length, 0)
+        self.assertEqual(trace.frames[2].from_module_name, None)
+
 class TestKoopsFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.Kerneloops(contents).frames[0]

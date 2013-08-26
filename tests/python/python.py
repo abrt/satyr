@@ -90,6 +90,56 @@ class TestPythonStacktrace(BindingsTestCase):
     def test_crash_thread(self):
         self.assertTrue(self.trace.crash_thread is self.trace)
 
+    def test_from_json(self):
+        trace = satyr.PythonStacktrace.from_json('{}')
+        self.assertEqual(trace.frames, [])
+
+        json_text = '''
+        {
+            "exception_name": "NotImplementedError",
+            "stacktrace": [
+                {
+                    "file_name": "/usr/share/foobar/mod/file.py",
+                    "function_name": "do_nothing",
+                    "file_line": 42,
+                    "line_contents": "#this does nothing"
+                },
+                {
+                    "special_file": "stdin",
+                    "special_function": "module",
+                    "file_line": 451
+                },
+                {
+                    "unknown_key": 19876543
+                }
+            ]
+        }
+'''
+        trace = satyr.PythonStacktrace.from_json(json_text)
+        self.assertEqual(trace.exception_name, 'NotImplementedError')
+        self.assertEqual(len(trace.frames), 3)
+
+        self.assertEqual(trace.frames[0].file_name, '/usr/share/foobar/mod/file.py')
+        self.assertEqual(trace.frames[0].function_name, 'do_nothing')
+        self.assertEqual(trace.frames[0].file_line, 42)
+        self.assertEqual(trace.frames[0].line_contents, '#this does nothing')
+        self.assertFalse(trace.frames[0].special_file)
+        self.assertFalse(trace.frames[0].special_function)
+
+        self.assertEqual(trace.frames[1].file_name, 'stdin')
+        self.assertEqual(trace.frames[1].function_name, 'module')
+        self.assertEqual(trace.frames[1].file_line, 451)
+        self.assertEqual(trace.frames[1].line_contents, None)
+        self.assertTrue(trace.frames[1].special_file)
+        self.assertTrue(trace.frames[1].special_function)
+
+        self.assertEqual(trace.frames[2].file_name, None)
+        self.assertEqual(trace.frames[2].function_name, None)
+        self.assertEqual(trace.frames[2].file_line, 0)
+        self.assertEqual(trace.frames[2].line_contents, None)
+        self.assertFalse(trace.frames[2].special_file)
+        self.assertFalse(trace.frames[2].special_function)
+
 class TestPythonFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.PythonStacktrace(contents).frames[-1]

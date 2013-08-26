@@ -52,6 +52,86 @@ class TestJavaStacktrace(BindingsTestCase):
     def test_bthash(self):
         self.assertEqual(self.trace.get_bthash(), '184370433901aa9f14bfc85c29576e24ebca2c2e')
 
+    def test_from_json(self):
+        trace = satyr.JavaStacktrace.from_json('{}')
+        self.assertEqual(trace.threads, [])
+
+        json_text = '''
+        {
+            "threads": [
+                {
+                    "name": "ProbablySomeThreadOrSomethingImpl",
+                    "frames": [
+                        {
+                            "name": "julia",
+                            "file_name": "/u/b/f",
+                            "file_line": 9000,
+                            "class_path": "i don't know",
+                            "is_native": false,
+                            "is_exception": false,
+                            "message": "Hi!"
+                        },
+                        {},
+                        {
+                            "name": "helen",
+                            "is_exception": true
+                        }
+                    ],
+                    "what is": "this",
+                },
+                {
+                    "name": "TheOtherThread",
+                    "frames": [
+                        {
+                            "name": "tiffany",
+                            "file_name": "blahz",
+                            "is_native": true,
+                        }
+                    ]
+                }
+            ]
+        }
+'''
+        trace = satyr.JavaStacktrace.from_json(json_text)
+        self.assertEqual(len(trace.threads), 2)
+        self.assertEqual(len(trace.threads[0].frames), 3)
+        self.assertEqual(len(trace.threads[1].frames), 1)
+
+        self.assertEqual(trace.threads[0].name, 'ProbablySomeThreadOrSomethingImpl')
+        self.assertEqual(trace.threads[1].name, 'TheOtherThread')
+
+        self.assertEqual(trace.threads[0].frames[0].name, 'julia')
+        self.assertEqual(trace.threads[0].frames[0].file_name, '/u/b/f')
+        self.assertEqual(trace.threads[0].frames[0].file_line, 9000)
+        self.assertEqual(trace.threads[0].frames[0].class_path, 'i don\'t know')
+        self.assertFalse(trace.threads[0].frames[0].is_native)
+        self.assertFalse(trace.threads[0].frames[0].is_exception)
+        self.assertEqual(trace.threads[0].frames[0].message, 'Hi!')
+
+        self.assertEqual(trace.threads[0].frames[1].name, None)
+        self.assertEqual(trace.threads[0].frames[1].file_name, None)
+        self.assertEqual(trace.threads[0].frames[1].file_line, 0)
+        self.assertEqual(trace.threads[0].frames[1].class_path, None)
+        self.assertFalse(trace.threads[0].frames[1].is_native)
+        self.assertFalse(trace.threads[0].frames[1].is_exception)
+        self.assertEqual(trace.threads[0].frames[1].message, None)
+
+        self.assertEqual(trace.threads[0].frames[2].name, 'helen')
+        self.assertEqual(trace.threads[0].frames[2].file_name, None)
+        self.assertEqual(trace.threads[0].frames[2].file_line, 0)
+        self.assertEqual(trace.threads[0].frames[2].class_path, None)
+        self.assertFalse(trace.threads[0].frames[2].is_native)
+        self.assertTrue(trace.threads[0].frames[2].is_exception)
+        self.assertEqual(trace.threads[0].frames[2].message, None)
+
+        self.assertEqual(trace.threads[1].frames[0].name, 'tiffany')
+        self.assertEqual(trace.threads[1].frames[0].file_name, 'blahz')
+        self.assertEqual(trace.threads[1].frames[0].file_line, 0)
+        self.assertEqual(trace.threads[1].frames[0].class_path, None)
+        self.assertTrue(trace.threads[1].frames[0].is_native)
+        self.assertFalse(trace.threads[1].frames[0].is_exception)
+        self.assertEqual(trace.threads[1].frames[0].message, None)
+
 class TestJavaThread(BindingsTestCase):
     def setUp(self):
         self.thread = satyr.JavaStacktrace(contents).threads[0]

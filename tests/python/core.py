@@ -55,6 +55,88 @@ class TestCoreStacktrace(BindingsTestCase):
     def test_crash_thread(self):
         self.assertTrue(self.trace.crash_thread is self.trace.threads[1])
 
+    def test_from_json(self):
+        trace = satyr.CoreStacktrace.from_json('{}')
+        self.assertEqual(trace.threads, [])
+
+        json_text = '''
+        {
+            "signal": 9,
+            "executable": "C:\\\\porn.bat",
+            "stacktrace": [
+                {
+                    "frames": [
+                        {
+                            "address": 60100,
+                            "build_id": "aaaaaaaaaaaaaaaaaaaaaaaaAAAAAAAAAAA",
+                            "build_id_offset": 5,
+                            "function_name": "destroy_universe",
+                            "file_name": "del.exe",
+                            "fingerprint": "1234123412341234123412341234",
+                            "fingerprint_hashed": true,
+                        },
+                        {},
+                        {
+                            "address": 2,
+                            "fingerprint": "a b c d",
+                            "fingerprint_hashed": false,
+                        }
+                    ]
+                },
+                {
+                    "crash_thread": true,
+                    "bogus": "value",
+                    "frames": [
+                        {
+                            "address": 1,
+                            "build_id": "b",
+                            "build_id_offset": 5,
+                        }
+                    ]
+                }
+            ]
+        }
+'''
+        trace = satyr.CoreStacktrace.from_json(json_text)
+        self.assertEqual(trace.signal, 9)
+        self.assertEqual(trace.executable, 'C:\\porn.bat')
+
+        self.assertEqual(len(trace.threads), 2)
+        self.assertEqual(len(trace.threads[0].frames), 3)
+        self.assertEqual(len(trace.threads[1].frames), 1)
+
+        self.assertEqual(trace.threads[0].frames[0].address, 60100)
+        self.assertEqual(trace.threads[0].frames[0].build_id, 'aaaaaaaaaaaaaaaaaaaaaaaaAAAAAAAAAAA')
+        self.assertEqual(trace.threads[0].frames[0].build_id_offset, 5)
+        self.assertEqual(trace.threads[0].frames[0].function_name, 'destroy_universe')
+        self.assertEqual(trace.threads[0].frames[0].file_name, 'del.exe')
+        self.assertEqual(trace.threads[0].frames[0].fingerprint, '1234123412341234123412341234')
+        self.assertTrue(trace.threads[0].frames[0].fingerprint_hashed)
+
+        self.assertEqual(trace.threads[0].frames[1].address, 18446744073709551615L) # !!! FIXME
+        self.assertEqual(trace.threads[0].frames[1].build_id, None)
+        self.assertEqual(trace.threads[0].frames[1].build_id_offset, 18446744073709551615L) # !!!
+        self.assertEqual(trace.threads[0].frames[1].function_name, None)
+        self.assertEqual(trace.threads[0].frames[1].file_name, None)
+        self.assertEqual(trace.threads[0].frames[1].fingerprint, None)
+        self.assertTrue(trace.threads[0].frames[1].fingerprint_hashed)
+
+        self.assertEqual(trace.threads[0].frames[2].address, 2)
+        self.assertEqual(trace.threads[0].frames[2].build_id, None)
+        self.assertEqual(trace.threads[0].frames[2].build_id_offset, 18446744073709551615L) # !!!
+        self.assertEqual(trace.threads[0].frames[2].function_name, None)
+        self.assertEqual(trace.threads[0].frames[2].file_name, None)
+        self.assertEqual(trace.threads[0].frames[2].fingerprint, 'a b c d')
+        self.assertFalse(trace.threads[0].frames[2].fingerprint_hashed)
+
+        self.assertEqual(trace.threads[1].frames[0].address, 1)
+        self.assertEqual(trace.threads[1].frames[0].build_id, 'b')
+        self.assertEqual(trace.threads[1].frames[0].build_id_offset, 5)
+        self.assertEqual(trace.threads[1].frames[0].function_name, None)
+        self.assertEqual(trace.threads[1].frames[0].file_name, None)
+        self.assertEqual(trace.threads[1].frames[0].fingerprint, None)
+        self.assertTrue(trace.threads[1].frames[0].fingerprint_hashed)
+
 class TestCoreThread(BindingsTestCase):
     def setUp(self):
         self.thread = satyr.CoreStacktrace(contents).threads[0]
