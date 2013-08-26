@@ -35,6 +35,10 @@
                        "Returns: string - hash of the stacktrace\n" \
                        "flags: integer - bitwise sum of flags (BTHASH_NORMAL, BTHASH_NOHASH)"
 
+#define from_json_doc "Usage: SomeStacktrace.from_json(json_string) (class method)\n" \
+                      "Returns: stacktrace (of SomeStacktrace class) deserialized from json_string\n" \
+                      "json_string: string - json input"
+
 #define crash_thread_doc "Reference to the thread that caused the crash, if known"
 
 #define threads_doc "A list containing the objects representing threads in the stacktrace."
@@ -42,8 +46,9 @@
 static PyMethodDef
 single_methods[] =
 {
-    { "to_short_text", sr_py_single_stacktrace_to_short_text, METH_VARARGS, to_short_text_doc },
-    { "get_bthash",    sr_py_single_stacktrace_get_bthash,    METH_VARARGS, get_bthash_doc    },
+    { "to_short_text", sr_py_single_stacktrace_to_short_text, METH_VARARGS,            to_short_text_doc },
+    { "get_bthash",    sr_py_single_stacktrace_get_bthash,    METH_VARARGS,            get_bthash_doc    },
+    { "from_json",     sr_py_single_stacktrace_from_json,     METH_VARARGS|METH_CLASS, from_json_doc     },
     { NULL },
 };
 
@@ -113,8 +118,9 @@ multi_members[] =
 static PyMethodDef
 multi_methods[] =
 {
-    { "to_short_text", sr_py_multi_stacktrace_to_short_text, METH_VARARGS, to_short_text_doc },
-    { "get_bthash",    sr_py_multi_stacktrace_get_bthash,    METH_VARARGS, get_bthash_doc    },
+    { "to_short_text", sr_py_multi_stacktrace_to_short_text, METH_VARARGS,            to_short_text_doc },
+    { "get_bthash",    sr_py_multi_stacktrace_get_bthash,    METH_VARARGS,            get_bthash_doc    },
+    { "from_json",     sr_py_multi_stacktrace_from_json,     METH_VARARGS|METH_CLASS, from_json_doc     },
     { NULL },
 };
 
@@ -405,6 +411,72 @@ sr_py_multi_stacktrace_get_crash(PyObject *self, void *unused)
     /* Something went wrong - sr_stacktrace_find_crash_thread returned non-NULL
      * but we don't have such thread in the list. */
     Py_RETURN_NONE;
+}
+
+PyObject *
+sr_py_single_stacktrace_from_json(PyObject *class, PyObject *args)
+{
+    char *json_str, *error_message;
+    if (!PyArg_ParseTuple(args, "s", &json_str))
+        return NULL;
+
+    /* Create new stacktrace */
+    PyObject *noargs = PyTuple_New(0);
+    PyObject *result = PyObject_CallObject(class, noargs);
+    Py_DECREF(noargs);
+
+    /* Free the C structure and thread list */
+    struct sr_py_base_thread *this = (struct sr_py_base_thread*)result;
+    enum sr_report_type type = this->thread->type;
+    /* the list will decref all of its elements */
+    Py_DECREF(this->frames);
+    sr_thread_set_frames(this->thread, NULL);
+    sr_thread_free(this->thread);
+
+    /* Parse json */
+    this->thread = (struct sr_thread*)
+        sr_stacktrace_from_json_text(type, json_str, &error_message);
+
+    if (!this->thread)
+    {
+        PyErr_SetString(PyExc_ValueError, error_message);
+        return NULL;
+    }
+    this->frames = frames_to_python_list((struct sr_thread *)this->thread, this->frame_type);
+
+    return result;
+}
+
+PyObject *
+sr_py_multi_stacktrace_from_json(PyObject *class, PyObject *args)
+{
+    char *json_str, *error_message;
+    if (!PyArg_ParseTuple(args, "s", &json_str))
+        return NULL;
+
+    /* Create new stacktrace */
+    PyObject *noargs = PyTuple_New(0);
+    PyObject *result = PyObject_CallObject(class, noargs);
+    Py_DECREF(noargs);
+
+    /* Free the C structure and thread list */
+    struct sr_py_multi_stacktrace *this = (struct sr_py_multi_stacktrace*)result;
+    enum sr_report_type type = this->stacktrace->type;
+    /* the list will decref all of its elements */
+    Py_DECREF(this->threads);
+    sr_stacktrace_set_threads(this->stacktrace, NULL);
+    sr_stacktrace_free(this->stacktrace);
+
+    /* Parse json */
+    this->stacktrace = sr_stacktrace_from_json_text(type, json_str, &error_message);
+    if (!this->stacktrace)
+    {
+        PyErr_SetString(PyExc_ValueError, error_message);
+        return NULL;
+    }
+    this->threads = threads_to_python_list(this->stacktrace, this->thread_type, this->frame_type);
+
+    return result;
 }
 
 int
