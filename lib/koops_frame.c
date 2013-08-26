@@ -516,6 +516,36 @@ sr_koops_frame_to_json(struct sr_koops_frame *frame)
     return sr_strbuf_free_nobuf(strbuf);
 }
 
+struct sr_koops_frame *
+sr_koops_frame_from_json(struct sr_json_value *root, char **error_message)
+{
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "frame"))
+        return NULL;
+
+    struct sr_koops_frame *result = sr_koops_frame_new();
+
+    bool success =
+        JSON_READ_UINT64(root, "address", &result->address) &&
+        JSON_READ_BOOL(root, "reliable", &result->reliable) &&
+        JSON_READ_STRING(root, "function_name", &result->function_name) &&
+        JSON_READ_UINT64(root, "function_offset", &result->function_offset) &&
+        JSON_READ_UINT64(root, "function_length", &result->function_length) &&
+        JSON_READ_STRING(root, "module_name", &result->module_name) &&
+        JSON_READ_UINT64(root, "from_address", &result->from_address) &&
+        JSON_READ_STRING(root, "from_function_name", &result->from_function_name) &&
+        JSON_READ_UINT64(root, "from_function_offset", &result->from_function_offset) &&
+        JSON_READ_UINT64(root, "from_function_length", &result->from_function_length) &&
+        JSON_READ_STRING(root, "from_module_name", &result->from_module_name);
+
+    if (!success)
+    {
+        sr_koops_frame_free(result);
+        return NULL;
+    }
+
+    return result;
+}
+
 void
 sr_koops_frame_append_to_str(struct sr_koops_frame *frame,
                              struct sr_strbuf *str)

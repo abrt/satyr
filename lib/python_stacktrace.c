@@ -228,6 +228,45 @@ sr_python_stacktrace_to_json(struct sr_python_stacktrace *stacktrace)
     return sr_strbuf_free_nobuf(strbuf);
 }
 
+struct sr_python_stacktrace *
+sr_python_stacktrace_from_json(struct sr_json_value *root, char **error_message)
+{
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "stacktrace"))
+        return NULL;
+
+    struct sr_python_stacktrace *result = sr_python_stacktrace_new();
+
+    /* Exception name. */
+    if (!JSON_READ_STRING(root, "exception_name", &result->exception_name))
+        goto fail;
+
+    /* Frames. */
+    struct sr_json_value *stacktrace = json_element(root, "stacktrace");
+    if (stacktrace)
+    {
+        if (!JSON_CHECK_TYPE(stacktrace, SR_JSON_ARRAY, "stacktrace"))
+            goto fail;
+
+        struct sr_json_value *frame_json;
+        FOR_JSON_ARRAY(stacktrace, frame_json)
+        {
+            struct sr_python_frame *frame = sr_python_frame_from_json(frame_json,
+                error_message);
+
+            if (!frame)
+                goto fail;
+
+            result->frames = sr_python_frame_append(result->frames, frame);
+        }
+    }
+
+    return result;
+
+fail:
+    sr_python_stacktrace_free(result);
+    return NULL;
+}
+
 char *
 sr_python_stacktrace_get_reason(struct sr_python_stacktrace *stacktrace)
 {

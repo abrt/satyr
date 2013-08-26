@@ -242,131 +242,24 @@ struct sr_core_frame *
 sr_core_frame_from_json(struct sr_json_value *root,
                         char **error_message)
 {
-    if (root->type != SR_JSON_OBJECT)
-    {
-        *error_message = sr_strdup("Invalid type of root value; object expected.");
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "frame"))
         return NULL;
-    }
 
     struct sr_core_frame *result = sr_core_frame_new();
 
-    /* Read address. */
-    for (unsigned i = 0; i < root->u.object.length; ++i)
+    bool success =
+        JSON_READ_UINT64(root, "address", &result->address) &&
+        JSON_READ_STRING(root, "build_id", &result->build_id) &&
+        JSON_READ_UINT64(root, "build_id_offset", &result->build_id_offset) &&
+        JSON_READ_STRING(root, "function_name", &result->function_name) &&
+        JSON_READ_STRING(root, "file_name", &result->file_name) &&
+        JSON_READ_STRING(root, "fingerprint", &result->fingerprint) &&
+        JSON_READ_BOOL(root, "fingerprint_hashed", &result->fingerprint_hashed);
+
+    if (!success)
     {
-        if (0 != strcmp("address", root->u.object.values[i].name))
-            continue;
-
-        if (root->u.object.values[i].value->type != SR_JSON_INTEGER)
-        {
-            *error_message = sr_strdup("Invalid type of \"address\"; integer expected.");
-            sr_core_frame_free(result);
-            return NULL;
-        }
-
-        result->address = root->u.object.values[i].value->u.integer;
-        break;
-    }
-
-    /* Read build id. */
-    for (unsigned i = 0; i < root->u.object.length; ++i)
-    {
-        if (0 != strcmp("build_id", root->u.object.values[i].name))
-            continue;
-
-        if (root->u.object.values[i].value->type != SR_JSON_STRING)
-        {
-            *error_message = sr_strdup("Invalid type of \"build_id\"; string expected.");
-            sr_core_frame_free(result);
-            return NULL;
-        }
-
-        result->build_id = sr_strdup(root->u.object.values[i].value->u.string.ptr);
-        break;
-    }
-
-    /* Read build id offset. */
-    for (unsigned i = 0; i < root->u.object.length; ++i)
-    {
-        if (0 != strcmp("build_id_offset", root->u.object.values[i].name))
-            continue;
-
-        if (root->u.object.values[i].value->type != SR_JSON_INTEGER)
-        {
-            *error_message = sr_strdup("Invalid type of \"build_id_offset\"; integer expected.");
-            sr_core_frame_free(result);
-            return NULL;
-        }
-
-        result->build_id_offset = root->u.object.values[i].value->u.integer;
-        break;
-    }
-
-    /* Read function name. */
-    for (unsigned i = 0; i < root->u.object.length; ++i)
-    {
-        if (0 != strcmp("function_name", root->u.object.values[i].name))
-            continue;
-
-        if (root->u.object.values[i].value->type != SR_JSON_STRING)
-        {
-            *error_message = sr_strdup("Invalid type of \"function_name\"; string expected.");
-            sr_core_frame_free(result);
-            return NULL;
-        }
-
-        result->function_name = sr_strdup(root->u.object.values[i].value->u.string.ptr);
-        break;
-    }
-
-    /* Read file name. */
-    for (unsigned i = 0; i < root->u.object.length; ++i)
-    {
-        if (0 != strcmp("file_name", root->u.object.values[i].name))
-            continue;
-
-        if (root->u.object.values[i].value->type != SR_JSON_STRING)
-        {
-            *error_message = sr_strdup("Invalid type of \"file_name\"; string expected.");
-            sr_core_frame_free(result);
-            return NULL;
-        }
-
-        result->file_name = sr_strdup(root->u.object.values[i].value->u.string.ptr);
-        break;
-    }
-
-    /* Read fingerprint. */
-    for (unsigned i = 0; i < root->u.object.length; ++i)
-    {
-        if (0 != strcmp("fingerprint", root->u.object.values[i].name))
-            continue;
-
-        if (root->u.object.values[i].value->type != SR_JSON_STRING)
-        {
-            *error_message = sr_strdup("Invalid type of \"fingerprint\"; string expected.");
-            sr_core_frame_free(result);
-            return NULL;
-        }
-
-        result->fingerprint = sr_strdup(root->u.object.values[i].value->u.string.ptr);
-        break;
-    }
-
-    /* Read fingerprint_hashed. */
-    for (unsigned i = 0; i < root->u.object.length; ++i)
-    {
-        if (0 != strcmp("fingerprint_hashed", root->u.object.values[i].name))
-            continue;
-
-        if (root->u.object.values[i].value->type != SR_JSON_BOOLEAN)
-        {
-            *error_message = sr_strdup("Invalid type of \"fingerprint_hashed\"; bool expected.");
-            sr_core_frame_free(result);
-            return NULL;
-        }
-
-        result->fingerprint_hashed = root->u.object.values[i].value->u.boolean;
-        break;
+        sr_core_frame_free(result);
+        return NULL;
     }
 
     return result;

@@ -35,6 +35,7 @@ extern "C" {
 
 struct sr_python_frame;
 struct sr_location;
+struct sr_json_value;
 
 struct sr_python_stacktrace
 {
@@ -104,13 +105,25 @@ sr_python_stacktrace_get_reason(struct sr_python_stacktrace *stacktrace);
 
 /**
  * Serializes stacktrace to string.
- * @returnes
+ * @returns
  * Newly allocated memory containing the textual representation of the
  * provided stacktrace.  Caller should free the memory when it's no
  * longer needed.
  */
 char *
 sr_python_stacktrace_to_json(struct sr_python_stacktrace *stacktrace);
+
+/**
+ * Deserializes stacktrace from JSON representation.
+ * @param root
+ * JSON value to be deserialized.
+ * @param error_message
+ * On error, *error_message will contain the description of the error.
+ * @returns
+ * Resulting stacktrace, or NULL on error.
+ */
+struct sr_python_stacktrace *
+sr_python_stacktrace_from_json(struct sr_json_value *root, char **error_message);
 
 #ifdef __cplusplus
 }

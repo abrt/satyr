@@ -32,6 +32,7 @@ extern "C" {
 
 struct sr_java_thread;
 struct sr_location;
+struct sr_json_value;
 
 #include "../report_type.h"
 #include <stdint.h>
@@ -135,6 +136,18 @@ sr_java_stacktrace_get_reason(struct sr_java_stacktrace *stacktrace);
  */
 char *
 sr_java_stacktrace_to_json(struct sr_java_stacktrace *stacktrace);
+
+/**
+ * Deserializes stacktrace from JSON representation.
+ * @param root
+ * JSON value to be deserialized.
+ * @param error_message
+ * On error, *error_message will contain the description of the error.
+ * @returns
+ * Resulting stacktrace, or NULL on error.
+ */
+struct sr_java_stacktrace *
+sr_java_stacktrace_from_json(struct sr_json_value *root, char **error_message);
 
 struct sr_java_thread *
 sr_java_find_crash_thread(struct sr_java_stacktrace *stacktrace);

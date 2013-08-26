@@ -186,10 +186,6 @@ struct sr_core_frame *
 sr_core_frame_append(struct sr_core_frame *dest,
                      struct sr_core_frame *item);
 
-struct sr_core_frame *
-sr_core_frame_from_json(struct sr_json_value *root,
-                        char **error_message);
-
 /**
  * Returns a textual representation of the frame.
  * @param frame
@@ -198,6 +194,19 @@ sr_core_frame_from_json(struct sr_json_value *root,
  */
 char *
 sr_core_frame_to_json(struct sr_core_frame *frame);
+
+/**
+ * Deserializes frame structure from JSON representation.
+ * @param root
+ * JSON value to be deserialized.
+ * @param error_message
+ * On error, *error_message will contain the description of the error.
+ * @returns
+ * Resulting frame, or NULL on error.
+ */
+struct sr_core_frame *
+sr_core_frame_from_json(struct sr_json_value *root,
+                        char **error_message);
 
 /**
  * Appends textual representation of the frame to the string buffer dest.

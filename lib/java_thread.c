@@ -408,6 +408,44 @@ sr_java_thread_to_json(struct sr_java_thread *thread)
     return sr_strbuf_free_nobuf(strbuf);
 }
 
+struct sr_java_thread *
+sr_java_thread_from_json(struct sr_json_value *root, char **error_message)
+{
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "thread"))
+        return NULL;
+
+    struct sr_java_thread *result = sr_java_thread_new();
+
+    if (!JSON_READ_STRING(root, "name", &result->name))
+        goto fail;
+
+    /* Read frames. */
+    struct sr_json_value *frames = json_element(root, "frames");
+    if (frames)
+    {
+        if (!JSON_CHECK_TYPE(frames, SR_JSON_ARRAY, "frames"))
+            goto fail;
+
+        struct sr_json_value *frame_json;
+        FOR_JSON_ARRAY(frames, frame_json)
+        {
+            struct sr_java_frame *frame = sr_java_frame_from_json(frame_json,
+                    error_message);
+
+            if (!frame)
+                goto fail;
+
+            result->frames = sr_java_frame_append(result->frames, frame);
+        }
+    }
+
+    return result;
+
+fail:
+    sr_java_thread_free(result);
+    return NULL;
+}
+
 static void
 java_append_bthash_text(struct sr_java_thread *thread, enum sr_bthash_flags flags,
                         struct sr_strbuf *strbuf)

@@ -36,6 +36,7 @@ extern "C" {
 #include <stddef.h>
 
 struct sr_location;
+struct sr_json_value;
 
 struct sr_koops_stacktrace
 {
@@ -158,6 +159,18 @@ sr_koops_stacktrace_get_reason(struct sr_koops_stacktrace *stacktrace);
  */
 char *
 sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace);
+
+/**
+ * Deserializes stacktrace from JSON representation.
+ * @param root
+ * JSON value to be deserialized.
+ * @param error_message
+ * On error, *error_message will contain the description of the error.
+ * @returns
+ * Resulting stacktrace, or NULL on error.
+ */
+struct sr_koops_stacktrace *
+sr_koops_stacktrace_from_json(struct sr_json_value *root, char **error_message);
 
 void
 sr_normalize_koops_stacktrace(struct sr_koops_stacktrace *stacktrace);

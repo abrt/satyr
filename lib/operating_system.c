@@ -108,6 +108,29 @@ sr_operating_system_to_json(struct sr_operating_system *operating_system)
     return sr_strbuf_free_nobuf(strbuf);
 }
 
+struct sr_operating_system *
+sr_operating_system_from_json(struct sr_json_value *root, char **error_message)
+{
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "operating system"))
+        return NULL;
+
+    struct sr_operating_system *result = sr_operating_system_new();
+
+    bool success =
+        JSON_READ_STRING(root, "name", &result->name) &&
+        JSON_READ_STRING(root, "version", &result->version) &&
+        JSON_READ_STRING(root, "architecture", &result->architecture) &&
+        JSON_READ_UINT64(root, "uptime", &result->uptime);
+
+    if (!success)
+    {
+        sr_operating_system_free(result);
+        return NULL;
+    }
+
+    return result;
+}
+
 bool
 sr_operating_system_parse_etc_system_release(const char *etc_system_release,
                                              char **name,

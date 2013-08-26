@@ -35,6 +35,7 @@ extern "C" {
 #include <stdint.h>
 
 struct sr_strbuf;
+struct sr_json_value;
 
 /**
  * @brief Kernel oops stack frame.
@@ -218,6 +219,18 @@ sr_koops_parse_function(const char **input,
  */
 char *
 sr_koops_frame_to_json(struct sr_koops_frame *frame);
+
+/**
+ * Deserializes frame structure from JSON representation.
+ * @param root
+ * JSON value to be deserialized.
+ * @param error_message
+ * On error, *error_message will contain the description of the error.
+ * @returns
+ * Resulting frame, or NULL on error.
+ */
+struct sr_koops_frame *
+sr_koops_frame_from_json(struct sr_json_value *root, char **error_message);
 
 /**
  * Appends textual representation of the frame to the string buffer dest.

@@ -336,6 +336,65 @@ sr_python_frame_to_json(struct sr_python_frame *frame)
     return sr_strbuf_free_nobuf(strbuf);
 }
 
+struct sr_python_frame *
+sr_python_frame_from_json(struct sr_json_value *root, char **error_message)
+{
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "frame"))
+        return NULL;
+
+    struct sr_python_frame *result = sr_python_frame_new();
+    struct sr_json_value *val;
+
+    /* Source file name / special file */
+    if ((val = json_element(root, "file_name")))
+    {
+        if (!JSON_CHECK_TYPE(val, SR_JSON_STRING, "file_name"))
+            goto fail;
+
+        result->special_file = false;
+        result->file_name = sr_strdup(val->u.string.ptr);
+    }
+    else if ((val = json_element(root, "special_file")))
+    {
+        if (!JSON_CHECK_TYPE(val, SR_JSON_STRING, "special_file"))
+            goto fail;
+
+        result->special_file = true;
+        result->file_name = sr_strdup(val->u.string.ptr);
+    }
+
+    /* Function name / special function. */
+    if ((val = json_element(root, "function_name")))
+    {
+        if (!JSON_CHECK_TYPE(val, SR_JSON_STRING, "function_name"))
+            goto fail;
+
+        result->special_function = false;
+        result->function_name = sr_strdup(val->u.string.ptr);
+    }
+    else if ((val = json_element(root, "special_function")))
+    {
+        if (!JSON_CHECK_TYPE(val, SR_JSON_STRING, "special_function"))
+            goto fail;
+
+        result->special_function = true;
+        result->function_name = sr_strdup(val->u.string.ptr);
+    }
+
+    bool success =
+        JSON_READ_STRING(root, "line_contents", &result->line_contents) &&
+        JSON_READ_UINT32(root, "file_line", &result->file_line);
+
+    if (!success)
+        goto fail;
+
+    return result;
+
+fail:
+    sr_python_frame_free(result);
+    return NULL;
+}
+
 void
 sr_python_frame_append_to_str(struct sr_python_frame *frame,
                               struct sr_strbuf *dest)

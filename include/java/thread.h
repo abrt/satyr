@@ -37,6 +37,7 @@ extern "C" {
 struct sr_java_frame;
 struct sr_strbuf;
 struct sr_location;
+struct sr_json_value;
 
 /**
  * @brief A thread of execution of a JAVA-produced stack trace.
@@ -223,6 +224,18 @@ sr_java_thread_format_funs(struct sr_java_thread *thread);
 
 char *
 sr_java_thread_to_json(struct sr_java_thread *thread);
+
+/**
+ * Deserializes thread from JSON representation.
+ * @param root
+ * JSON value to be deserialized.
+ * @param error_message
+ * On error, *error_message will contain the description of the error.
+ * @returns
+ * Resulting thread, or NULL on error.
+ */
+struct sr_java_thread *
+sr_java_thread_from_json(struct sr_json_value *root, char **error_message);
 
 #ifdef __cplusplus
 }

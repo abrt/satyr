@@ -28,6 +28,7 @@
 #include "java/stacktrace.h"
 #include "operating_system.h"
 #include "rpm.h"
+#include "internal_utils.h"
 #include "strbuf.h"
 #include <string.h>
 #include <assert.h>
@@ -253,4 +254,124 @@ sr_report_to_json(struct sr_report *report)
 
     sr_strbuf_append_str(strbuf, "}");
     return sr_strbuf_free_nobuf(strbuf);
+}
+
+static enum sr_report_type
+report_type_from_string(const char *report_type_str)
+{
+    assert(report_type_str);
+
+    if (0 == strcmp("core", report_type_str))
+        return SR_REPORT_CORE;
+    else if (0 == strcmp("python", report_type_str))
+        return SR_REPORT_PYTHON;
+    else if (0 == strcmp("kerneloops", report_type_str))
+        return SR_REPORT_KERNELOOPS;
+    else if (0 == strcmp("java", report_type_str))
+        return SR_REPORT_JAVA;
+    else
+        return SR_REPORT_INVALID;
+}
+
+struct sr_report *
+sr_report_from_json(struct sr_json_value *root, char **error_message)
+{
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "root value"))
+        return NULL;
+
+    bool success;
+    struct sr_report *report = sr_report_new();
+
+    /* Report version. */
+    if (!JSON_READ_UINT32(root, "ureport_version", &report->report_version))
+        goto fail;
+
+    /* Reporter name and version. */
+    struct sr_json_value *reporter = json_element(root, "reporter");
+    if (reporter)
+    {
+        success =
+            JSON_CHECK_TYPE(reporter, SR_JSON_OBJECT, "reporter") &&
+            JSON_READ_STRING(reporter, "name", &report->reporter_name) &&
+            JSON_READ_STRING(reporter, "version", &report->reporter_version);
+
+        if (!success)
+            goto fail;
+    }
+
+    /* Operating system. */
+    struct sr_json_value *os = json_element(root, "os");
+    if (os)
+    {
+        report->operating_system = sr_operating_system_from_json(os, error_message);
+        if (!report->operating_system)
+            goto fail;
+    }
+
+    /* Packages. */
+    struct sr_json_value *packages = json_element(root, "packages");
+    if (packages)
+    {
+        /* In the future, we'll choose the parsing function according to OS here. */
+        report->rpm_packages = sr_rpm_package_from_json(packages, true, error_message);
+        if (!report->rpm_packages)
+            goto fail;
+    }
+
+    /* Problem. */
+    struct sr_json_value *problem = json_element(root, "problem");
+    if (problem)
+    {
+        char *report_type;
+
+        success =
+            JSON_CHECK_TYPE(problem, SR_JSON_OBJECT, "problem") &&
+            JSON_READ_STRING(problem, "type", &report_type) &&
+            JSON_READ_STRING(problem, "component", &report->component_name);
+
+        if (!success)
+            goto fail;
+
+        report->report_type = report_type_from_string(report_type);
+
+        /* User. */
+        struct sr_json_value *user = json_element(root, "user");
+        if (user)
+        {
+            success =
+                JSON_CHECK_TYPE(user, SR_JSON_OBJECT, "user") &&
+                JSON_READ_BOOL(user, "root", &report->user_root) &&
+                JSON_READ_BOOL(user, "local", &report->user_local);
+
+            if (!success)
+                goto fail;
+        }
+
+        /* Stacktrace. */
+        switch (report->report_type)
+        {
+        case SR_REPORT_CORE:
+            report->core_stacktrace = sr_core_stacktrace_from_json(problem, error_message);
+            break;
+        case SR_REPORT_PYTHON:
+            report->python_stacktrace = sr_python_stacktrace_from_json(problem, error_message);
+            break;
+        case SR_REPORT_KERNELOOPS:
+            report->koops_stacktrace = sr_koops_stacktrace_from_json(problem, error_message);
+            break;
+        case SR_REPORT_JAVA:
+            report->java_stacktrace = sr_java_stacktrace_from_json(problem, error_message);
+            break;
+        default:
+            /* Invalid report type -> no stacktrace. */
+            break;
+        }
+
+    }
+
+    return report;
+
+fail:
+    sr_report_free(report);
+    return NULL;
 }

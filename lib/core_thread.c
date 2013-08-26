@@ -181,46 +181,36 @@ struct sr_core_thread *
 sr_core_thread_from_json(struct sr_json_value *root,
                          char **error_message)
 {
-    if (root->type != SR_JSON_OBJECT)
-    {
-        *error_message = sr_strdup("Invalid type of root value; object expected.");
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "thread"))
         return NULL;
-    }
 
     struct sr_core_thread *result = sr_core_thread_new();
 
     /* Read frames. */
-    for (unsigned i = 0; i < root->u.object.length; ++i)
+    struct sr_json_value *frames = json_element(root, "frames");
+    if (frames)
     {
-        if (0 != strcmp("frames", root->u.object.values[i].name))
-            continue;
+        if (!JSON_CHECK_TYPE(frames, SR_JSON_ARRAY, "frames"))
+            goto fail;
 
-        if (root->u.object.values[i].value->type != SR_JSON_ARRAY)
+        struct sr_json_value *frame_json;
+        FOR_JSON_ARRAY(frames, frame_json)
         {
-            *error_message = sr_strdup("Invalid type of \"frames\"; array expected.");
-            sr_core_thread_free(result);
-            return NULL;
-        }
-
-        for (unsigned j = 0; j < root->u.object.values[i].value->u.array.length; ++j)
-        {
-            struct sr_core_frame *frame = sr_core_frame_from_json(
-                root->u.object.values[i].value->u.array.values[j],
-                error_message);
+            struct sr_core_frame *frame = sr_core_frame_from_json(frame_json,
+                    error_message);
 
             if (!frame)
-            {
-                sr_core_thread_free(result);
-                return NULL;
-            }
+                goto fail;
 
             result->frames = sr_core_frame_append(result->frames, frame);
         }
-
-        break;
     }
 
     return result;
+
+fail:
+    sr_core_thread_free(result);
+    return NULL;
 }
 
 char *

@@ -22,6 +22,7 @@
 #include "json.h"
 #include "strbuf.h"
 #include "config.h"
+#include "internal_utils.h"
 #include <errno.h>
 #ifdef HAVE_LIBRPM
 #include <rpm/rpmlib.h>
@@ -566,6 +567,84 @@ sr_rpm_package_to_json(struct sr_rpm_package *package,
     }
 
     return sr_strbuf_free_nobuf(strbuf);
+}
+
+static struct sr_rpm_package *
+single_rpm_pacakge_from_json(struct sr_json_value *root, char **error_message)
+{
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "package"))
+        return NULL;
+
+    struct sr_rpm_package *package = sr_rpm_package_new();
+
+    bool success =
+        JSON_READ_STRING(root, "name", &package->name) &&
+        JSON_READ_STRING(root, "version", &package->version) &&
+        JSON_READ_STRING(root, "release", &package->release) &&
+        JSON_READ_STRING(root, "architecture", &package->architecture) &&
+        JSON_READ_UINT32(root, "epoch", &package->epoch) &&
+        JSON_READ_UINT64(root, "install_time", &package->install_time);
+
+    if (!success)
+        goto fail;
+
+    struct sr_json_value *role_json = json_element(root, "package_role");
+    if (role_json)
+    {
+        if (!JSON_CHECK_TYPE(role_json, SR_JSON_STRING, "package_role"))
+            goto fail;
+
+        /* We only know "affected" so far. */
+        char *role = role_json->u.string.ptr;
+        if (0 != strcmp(role, "affected"))
+        {
+            if (error_message)
+                *error_message = sr_asprintf("Invalid package role %s", role);
+            return NULL;
+        }
+
+        package->role = SR_ROLE_AFFECTED;
+    }
+
+    return package;
+
+fail:
+    sr_rpm_package_free(package, true);
+    return NULL;
+}
+
+struct sr_rpm_package *
+sr_rpm_package_from_json(struct sr_json_value *json, bool recursive, char **error_message)
+{
+    if (!recursive)
+    {
+        return single_rpm_pacakge_from_json(json, error_message);
+    }
+    else
+    {
+        if (!JSON_CHECK_TYPE(json, SR_JSON_ARRAY, "package list"))
+            return NULL;
+
+        struct sr_rpm_package *result = NULL;
+
+        struct sr_json_value *pkg_json;
+        FOR_JSON_ARRAY(json, pkg_json)
+        {
+            struct sr_rpm_package *pkg = single_rpm_pacakge_from_json(pkg_json, error_message);
+            if (!pkg)
+                goto fail;
+
+            result = sr_rpm_package_append(result, pkg);
+        }
+
+        if (result == NULL && error_message)
+            *error_message = sr_strdup("No RPM packages present");
+        return result;
+
+fail:
+        sr_rpm_package_free(result, true);
+        return NULL;
+    }
 }
 
 bool

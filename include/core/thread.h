@@ -126,6 +126,15 @@ sr_core_thread_append(struct sr_core_thread *dest,
 struct sr_core_frame *
 sr_core_thread_find_exit_frame(struct sr_core_thread *thread);
 
+/**
+ * Deserializes thread from JSON representation.
+ * @param root
+ * JSON value to be deserialized.
+ * @param error_message
+ * On error, *error_message will contain the description of the error.
+ * @returns
+ * Resulting thread, or NULL on error.
+ */
 struct sr_core_thread *
 sr_core_thread_from_json(struct sr_json_value *root,
                          char **error_message);

@@ -159,99 +159,53 @@ struct sr_core_stacktrace *
 sr_core_stacktrace_from_json(struct sr_json_value *root,
                              char **error_message)
 {
-    if (root->type != SR_JSON_OBJECT)
-    {
-        *error_message = sr_strdup("Invalid type of root value; object expected.");
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "stacktrace"))
         return NULL;
-    }
 
     struct sr_core_stacktrace *result = sr_core_stacktrace_new();
 
-    /* Read signal. */
-    for (unsigned i = 0; i < root->u.object.length; ++i)
-    {
-        if (0 != strcmp("signal", root->u.object.values[i].name))
-            continue;
+    bool success =
+        JSON_READ_UINT16(root, "signal", &result->signal) &&
+        JSON_READ_STRING(root, "executable", &result->executable);
 
-        if (root->u.object.values[i].value->type != SR_JSON_INTEGER)
-        {
-            *error_message = sr_strdup("Invalid type of \"signal\"; integer expected.");
-            sr_core_stacktrace_free(result);
-            return NULL;
-        }
-
-        result->signal = root->u.object.values[i].value->u.integer;
-        break;
-    }
-
-    /* Read executable. */
-    for (unsigned i = 0; i < root->u.object.length; ++i)
-    {
-        if (0 != strcmp("executable", root->u.object.values[i].name))
-            continue;
-
-        if (root->u.object.values[i].value->type != SR_JSON_STRING)
-        {
-            *error_message = sr_strdup("Invalid type of \"executable\"; string expected.");
-            sr_core_stacktrace_free(result);
-            return NULL;
-        }
-
-        result->executable = sr_strdup(root->u.object.values[i].value->u.string.ptr);
-        break;
-    }
+    if (!success)
+        goto fail;
 
     /* Read threads. */
-    for (unsigned i = 0; i < root->u.object.length; ++i)
+    struct sr_json_value *stacktrace = json_element(root, "stacktrace");
+    if (stacktrace)
     {
-        if (0 != strcmp("stacktrace", root->u.object.values[i].name))
-            continue;
+        if (!JSON_CHECK_TYPE(stacktrace, SR_JSON_ARRAY, "stacktrace"))
+            goto fail;
 
-        if (root->u.object.values[i].value->type != SR_JSON_ARRAY)
+        struct sr_json_value *json_thread;
+        FOR_JSON_ARRAY(stacktrace, json_thread)
         {
-            *error_message = sr_strdup("Invalid type of \"stacktrace\"; array expected.");
-            sr_core_stacktrace_free(result);
-            return NULL;
-        }
-
-        for (unsigned j = 0; j < root->u.object.values[i].value->u.array.length; ++j)
-        {
-            struct sr_json_value *json_thread
-                = root->u.object.values[i].value->u.array.values[j];
-
             struct sr_core_thread *thread = sr_core_thread_from_json(json_thread,
                     error_message);
 
             if (!thread)
+                goto fail;
+
+            struct sr_json_value *crash_thread = json_element(json_thread, "crash_thread");
+            if (crash_thread)
             {
-                sr_core_stacktrace_free(result);
-                return NULL;
-            }
+                if (!JSON_CHECK_TYPE(crash_thread, SR_JSON_BOOLEAN, "crash_thread"))
+                    goto fail;
 
-            for (unsigned k = 0; k < json_thread->u.object.length; ++k)
-            {
-                if (0 != strcmp("crash_thread", json_thread->u.object.values[k].name))
-                    continue;
-
-                if (json_thread->u.object.values[k].value->type != SR_JSON_BOOLEAN)
-                {
-                    *error_message = sr_strdup(
-                            "Invalid type of \"crash_thread\"; boolean expected.");
-                    sr_core_stacktrace_free(result);
-                    return NULL;
-                }
-
-                if (json_thread->u.object.values[k].value->u.boolean)
+                if (crash_thread->u.boolean)
                     result->crash_thread = thread;
             }
 
             result->threads = sr_core_thread_append(result->threads, thread);
         }
-
-        break;
     }
 
     return result;
+
+fail:
+    sr_core_stacktrace_free(result);
+    return NULL;
 }
 
 struct sr_core_stacktrace *

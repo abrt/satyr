@@ -32,6 +32,8 @@ extern "C" {
 #include <stdbool.h>
 #include <inttypes.h>
 
+struct sr_json_value;
+
 /* XXX: Should be moved to separated header once we support more package types.
  */
 enum sr_package_role
@@ -170,6 +172,10 @@ sr_rpm_package_get_by_path(const char *path,
 char *
 sr_rpm_package_to_json(struct sr_rpm_package *package,
                        bool recursive);
+
+struct sr_rpm_package *
+sr_rpm_package_from_json(struct sr_json_value *list, bool recursive,
+                         char **error_message);
 
 bool
 sr_rpm_package_parse_nvr(const char *text,

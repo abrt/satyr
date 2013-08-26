@@ -36,6 +36,7 @@ extern "C" {
 
 struct sr_strbuf;
 struct sr_location;
+struct sr_json_value;
 
 struct sr_java_frame
 {
@@ -264,6 +265,18 @@ sr_java_frame_parse(const char **input,
  */
 char *
 sr_java_frame_to_json(struct sr_java_frame *frame);
+
+/**
+ * Deserializes frame structure from JSON representation.
+ * @param root
+ * JSON value to be deserialized.
+ * @param error_message
+ * On error, *error_message will contain the description of the error.
+ * @returns
+ * Resulting frame, or NULL on error.
+ */
+struct sr_java_frame *
+sr_java_frame_from_json(struct sr_json_value *root, char **error_message);
 
 #ifdef __cplusplus
 }

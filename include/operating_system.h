@@ -27,6 +27,8 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
+struct sr_json_value;
+
 struct sr_operating_system
 {
     char *name;
@@ -48,6 +50,9 @@ sr_operating_system_free(struct sr_operating_system *operating_system);
 
 char *
 sr_operating_system_to_json(struct sr_operating_system *operating_system);
+
+struct sr_operating_system *
+sr_operating_system_from_json(struct sr_json_value *root, char **error_message);
 
 bool
 sr_operating_system_parse_etc_system_release(const char *etc_system_release,

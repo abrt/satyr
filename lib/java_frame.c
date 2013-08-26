@@ -601,6 +601,32 @@ sr_java_frame_to_json(struct sr_java_frame *frame)
     return sr_strbuf_free_nobuf(strbuf);
 }
 
+struct sr_java_frame *
+sr_java_frame_from_json(struct sr_json_value *root, char **error_message)
+{
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "frame"))
+        return NULL;
+
+    struct sr_java_frame *result = sr_java_frame_new();
+
+    bool success =
+        JSON_READ_STRING(root, "name", &result->name) &&
+        JSON_READ_STRING(root, "file_name", &result->file_name) &&
+        JSON_READ_UINT32(root, "file_line", &result->file_line) &&
+        JSON_READ_STRING(root, "class_path", &result->class_path) &&
+        JSON_READ_BOOL(root, "is_native", &result->is_native) &&
+        JSON_READ_BOOL(root, "is_exception", &result->is_exception) &&
+        JSON_READ_STRING(root, "message", &result->message);
+
+    if (!success)
+    {
+        sr_java_frame_free(result);
+        return NULL;
+    }
+
+    return result;
+}
+
 static void
 java_append_bthash_text(struct sr_java_frame *frame, enum sr_bthash_flags flags,
                         struct sr_strbuf *strbuf)

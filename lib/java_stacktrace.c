@@ -23,6 +23,7 @@
 #include "java/frame.h"
 #include "utils.h"
 #include "strbuf.h"
+#include "json.h"
 #include "generic_stacktrace.h"
 #include "internal_utils.h"
 #include <stdio.h>
@@ -189,6 +190,39 @@ sr_java_stacktrace_to_json(struct sr_java_stacktrace *stacktrace)
     sr_strbuf_append_str(strbuf, " ]\n");
     sr_strbuf_append_char(strbuf, '}');
     return sr_strbuf_free_nobuf(strbuf);
+}
+
+struct sr_java_stacktrace *
+sr_java_stacktrace_from_json(struct sr_json_value *root, char **error_message)
+{
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "stacktrace"))
+        return NULL;
+
+    struct sr_java_stacktrace *result = sr_java_stacktrace_new();
+
+    struct sr_json_value *threads = json_element(root, "threads");
+    if (threads)
+    {
+        if (!JSON_CHECK_TYPE(threads, SR_JSON_ARRAY, "threads"))
+            goto fail;
+
+        struct sr_json_value *thread_json;
+        FOR_JSON_ARRAY(threads, thread_json)
+        {
+            struct sr_java_thread *thread = sr_java_thread_from_json(thread_json, error_message);
+
+            if (!thread)
+                goto fail;
+
+            result->threads = sr_java_thread_append(result->threads, thread);
+        }
+    }
+
+    return result;
+
+fail:
+    sr_java_stacktrace_free(result);
+    return NULL;
 }
 
 char *
