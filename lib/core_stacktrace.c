@@ -213,22 +213,15 @@ struct sr_core_stacktrace *
 sr_core_stacktrace_from_json_text(const char *text,
                                   char **error_message)
 {
-    struct sr_json_settings settings;
-    memset(&settings, 0, sizeof(struct sr_json_settings));
-    struct sr_location location;
-    sr_location_init(&location);
-    struct sr_json_value *json_root = sr_json_parse_ex(&settings,
-                                                        text,
-                                                        &location);
-
+    struct sr_json_value *json_root = sr_json_parse(text, error_message);
     if (!json_root)
-    {
-        *error_message = sr_location_to_string(&location);
         return NULL;
-    }
 
-    return sr_core_stacktrace_from_json(json_root,
-                                        error_message);
+    struct sr_core_stacktrace *stacktrace =
+        sr_core_stacktrace_from_json(json_root, error_message);
+
+    sr_json_value_free(json_root);
+    return stacktrace;
 }
 
 char *

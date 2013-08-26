@@ -108,7 +108,7 @@ struct sr_json_value
 };
 
 struct sr_json_value *
-sr_json_parse(const char *json);
+sr_json_parse(const char *json, char **error_message);
 
 struct sr_json_value *
 sr_json_parse_ex(struct sr_json_settings *settings,

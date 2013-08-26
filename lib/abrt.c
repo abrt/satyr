@@ -373,26 +373,10 @@ sr_abrt_report_from_dir(const char *directory,
             return NULL;
         }
 
-        struct sr_json_settings settings;
-        memset(&settings, 0, sizeof(struct sr_json_settings));
-        struct sr_location location;
-        sr_location_init(&location);
-        struct sr_json_value *json_root = sr_json_parse_ex(&settings,
-                                                           core_backtrace_contents,
-                                                           &location);
+        report->core_stacktrace = sr_core_stacktrace_from_json_text(
+                core_backtrace_contents, error_message);
 
         free(core_backtrace_contents);
-        if (!json_root)
-        {
-            *error_message = sr_location_to_string(&location);
-            sr_report_free(report);
-            return NULL;
-        }
-
-        report->core_stacktrace = sr_core_stacktrace_from_json(json_root,
-                                                               error_message);
-
-        sr_json_value_free(json_root);
         if (!report->core_stacktrace)
         {
             sr_report_free(report);

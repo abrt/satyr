@@ -108,19 +108,16 @@ sr_stacktrace_from_json(enum sr_report_type type, struct sr_json_value *root, ch
 struct sr_stacktrace *
 sr_stacktrace_from_json_text(enum sr_report_type type, const char *input, char **error_message)
 {
-    struct sr_json_settings settings;
-    memset(&settings, 0, sizeof(struct sr_json_settings));
-    struct sr_location location;
-    sr_location_init(&location);
-    struct sr_json_value *json_root = sr_json_parse_ex(&settings, input, &location);
+    struct sr_json_value *json_root = sr_json_parse(input, error_message);
 
     if (!json_root)
-    {
-        *error_message = sr_location_to_string(&location);
         return NULL;
-    }
 
-    return sr_stacktrace_from_json(type, json_root, error_message);
+    struct sr_stacktrace *stacktrace =
+        sr_stacktrace_from_json(type, json_root, error_message);
+
+    sr_json_value_free(json_root);
+    return stacktrace;
 }
 
 char *

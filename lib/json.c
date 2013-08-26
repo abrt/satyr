@@ -636,13 +636,19 @@ sr_json_parse_ex(struct sr_json_settings *settings,
 }
 
 struct sr_json_value *
-sr_json_parse(const char *json)
+sr_json_parse(const char *json, char **error_message)
 {
     struct sr_json_settings settings;
     memset(&settings, 0, sizeof(struct sr_json_settings));
     struct sr_location location;
     sr_location_init(&location);
-    return sr_json_parse_ex(&settings, json, &location);
+    struct sr_json_value *json_root = sr_json_parse_ex(&settings, json,
+                                                       &location);
+
+    if (!json_root)
+        *error_message = sr_location_to_string(&location);
+
+    return json_root;
 }
 
 void
