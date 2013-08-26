@@ -87,6 +87,7 @@ struct stacktrace_methods koops_stacktrace_methods =
     .parse_location = (parse_location_fn_t) sr_koops_stacktrace_parse,
     .to_short_text = (to_short_text_fn_t) stacktrace_to_short_text,
     .to_json = (to_json_fn_t) sr_koops_stacktrace_to_json,
+    .from_json = (from_json_fn_t) sr_koops_stacktrace_from_json,
     .get_reason = (get_reason_fn_t) sr_koops_stacktrace_get_reason,
     .find_crash_thread = (find_crash_thread_fn_t) stacktrace_one_thread_only,
     .threads = (threads_fn_t) stacktrace_one_thread_only,

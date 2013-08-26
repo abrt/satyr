@@ -54,6 +54,7 @@ struct stacktrace_methods core_stacktrace_methods =
     .parse_location = (parse_location_fn_t) NULL,
     .to_short_text = (to_short_text_fn_t) stacktrace_to_short_text,
     .to_json = (to_json_fn_t) sr_core_stacktrace_to_json,
+    .from_json = (from_json_fn_t) sr_core_stacktrace_from_json,
     .get_reason = (get_reason_fn_t) sr_core_stacktrace_get_reason,
     .find_crash_thread =
         (find_crash_thread_fn_t) sr_core_stacktrace_find_crash_thread,

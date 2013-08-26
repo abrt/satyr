@@ -27,6 +27,7 @@
 #include "normalize.h"
 #include "generic_stacktrace.h"
 #include "internal_utils.h"
+#include "json.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -45,6 +46,13 @@ gdb_return_null(struct sr_stacktrace *stacktrace)
     return NULL;
 }
 
+static struct sr_gdb_stacktrace *
+gdb_from_json(struct sr_json_value *root, char **error_message)
+{
+    *error_message = sr_strdup("Not implemented");
+    return NULL;
+}
+
 DEFINE_THREADS_FUNC(gdb_threads, struct sr_gdb_stacktrace)
 DEFINE_SET_THREADS_FUNC(gdb_set_threads, struct sr_gdb_stacktrace)
 DEFINE_PARSE_WRAPPER_FUNC(gdb_parse, SR_REPORT_GDB)
@@ -55,6 +63,7 @@ struct stacktrace_methods gdb_stacktrace_methods =
     .parse_location = (parse_location_fn_t) sr_gdb_stacktrace_parse,
     .to_short_text = (to_short_text_fn_t) sr_gdb_stacktrace_to_short_text,
     .to_json = (to_json_fn_t) gdb_return_null,
+    .from_json = (from_json_fn_t) gdb_from_json,
     .get_reason = (get_reason_fn_t) gdb_return_null,
     .find_crash_thread =
         (find_crash_thread_fn_t) sr_gdb_stacktrace_find_crash_thread,

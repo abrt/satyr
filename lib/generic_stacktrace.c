@@ -24,6 +24,7 @@
 #include "strbuf.h"
 #include "location.h"
 #include "sha1.h"
+#include "json.h"
 
 #include "frame.h"
 #include "thread.h"
@@ -96,6 +97,30 @@ struct sr_stacktrace *
 sr_stacktrace_parse(enum sr_report_type type, const char *input, char **error_message)
 {
     return DISPATCH(dtable, type, parse)(input, error_message);
+}
+
+struct sr_stacktrace *
+sr_stacktrace_from_json(enum sr_report_type type, struct sr_json_value *root, char **error_message)
+{
+    return DISPATCH(dtable, type, from_json)(root, error_message);
+}
+
+struct sr_stacktrace *
+sr_stacktrace_from_json_text(enum sr_report_type type, const char *input, char **error_message)
+{
+    struct sr_json_settings settings;
+    memset(&settings, 0, sizeof(struct sr_json_settings));
+    struct sr_location location;
+    sr_location_init(&location);
+    struct sr_json_value *json_root = sr_json_parse_ex(&settings, input, &location);
+
+    if (!json_root)
+    {
+        *error_message = sr_location_to_string(&location);
+        return NULL;
+    }
+
+    return sr_stacktrace_from_json(type, json_root, error_message);
 }
 
 char *
