@@ -128,6 +128,10 @@ PyObject *sr_py_getter_uint64(PyObject *self, void *data);
 /* NOTE: when rhs is None, the attribute is set to UINT64_MAX */
 int sr_py_setter_uint64(PyObject *self, PyObject *rhs, void *data);
 
+/* Just throws an exception. */
+int
+sr_py_setter_readonly(PyObject *self, PyObject *rhs, void *data);
+
 /*
  * Satyr's comparison functions return arbitrary numbers, while python
  * requires the result to be in {-1, 0, 1}.

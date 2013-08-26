@@ -199,6 +199,13 @@ sr_py_setter_uint64(PyObject *self, PyObject *rhs, void *data)
 }
 
 int
+sr_py_setter_readonly(PyObject *self, PyObject *rhs, void *data)
+{
+    PyErr_SetString(PyExc_AttributeError, "This attribute is read-only.");
+    return -1;
+}
+
+int
 normalize_cmp(int n)
 {
     if (n > 0)

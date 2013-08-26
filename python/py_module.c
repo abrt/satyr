@@ -20,6 +20,7 @@
 #include "py_rpm_package.h"
 #include "py_metrics.h"
 #include "py_operating_system.h"
+#include "py_report.h"
 
 #include "distance.h"
 #include "thread.h"
@@ -166,6 +167,12 @@ init_satyr()
         return;
     }
 
+    if (PyType_Ready(&sr_py_report_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_report_type) < 0");
+        return;
+    }
+
     if (PyType_Ready(&sr_py_rpm_package_type) < 0)
     {
         puts("PyType_Ready(&sr_py_rpm_package_type) < 0");
@@ -282,6 +289,9 @@ init_satyr()
     Py_INCREF(&sr_py_operating_system_type);
     PyModule_AddObject(module, "OperatingSystem",
                        (PyObject *)&sr_py_operating_system_type);
+
+    Py_INCREF(&sr_py_report_type);
+    PyModule_AddObject(module, "Report", (PyObject *)&sr_py_report_type);
 
     Py_INCREF(&sr_py_rpm_package_type);
     PyModule_AddObject(module, "RpmPackage",
