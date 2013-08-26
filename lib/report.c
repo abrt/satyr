@@ -375,3 +375,17 @@ fail:
     sr_report_free(report);
     return NULL;
 }
+
+struct sr_report *
+sr_report_from_json_text(const char *report, char **error_message)
+{
+    struct sr_json_value *json_root = sr_json_parse(report, error_message);
+
+    if (!json_root)
+        return NULL;
+
+    struct sr_report *result = sr_report_from_json(json_root, error_message);
+
+    sr_json_value_free(json_root);
+    return result;
+}

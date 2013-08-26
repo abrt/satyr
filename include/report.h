@@ -28,6 +28,8 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
+struct sr_json_value;
+
 struct sr_report
 {
     uint32_t report_version;
@@ -62,6 +64,12 @@ sr_report_free(struct sr_report *report);
 
 char *
 sr_report_to_json(struct sr_report *report);
+
+struct sr_report *
+sr_report_from_json(struct sr_json_value *root, char **error_message);
+
+struct sr_report *
+sr_report_from_json_text(const char *text, char **error_message);
 
 #ifdef __cplusplus
 }
