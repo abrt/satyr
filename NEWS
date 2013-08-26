@@ -1,3 +1,7 @@
+satyr 0.7
+=========
+Fix segmentation fault related to crash thread detection.
+
 satyr 0.6
 =========
 Do not export internal function symbols.

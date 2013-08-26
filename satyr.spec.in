@@ -72,6 +72,10 @@ make check
 %{python_sitearch}/%{name}/*
 
 %changelog
+* Mon Aug 26 2013 Martin Milata <mmilata@redhat.com> 0.7-1
+- New upstream version
+  - Fix couple of crashes (#997076, #994747)
+
 * Mon Jul 29 2013 Martin Milata <mmilata@redhat.com> 0.6-1
 - New upstream version
   - Do not export internal function symbols.
