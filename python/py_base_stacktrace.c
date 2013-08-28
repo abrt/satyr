@@ -27,16 +27,16 @@
 #define single_stacktrace_doc "satyr.SingleThreadStacktrace - base class for stacktrace with single thread"
 #define multi_stacktrace_doc "satyr.MultiThreadStacktrace - base class for stacktrace with multiple threads"
 
-#define to_short_text_doc "Usage: stacktrace.to_short_text([max_frames])\n" \
+#define to_short_text_doc "Usage: stacktrace.to_short_text([max_frames])\n\n" \
                           "Returns short text representation of the stacktrace. If max_frames is\n" \
-                          "specified, the result includes only that much topmost frames.\n"
+                          "specified, the result includes only that much topmost frames."
 
-#define get_bthash_doc "Usage: stacktrace.get_bthash([flags])\n" \
-                       "Returns: string - hash of the stacktrace\n" \
+#define get_bthash_doc "Usage: stacktrace.get_bthash([flags])\n\n" \
+                       "Returns: string - hash of the stacktrace\n\n" \
                        "flags: integer - bitwise sum of flags (BTHASH_NORMAL, BTHASH_NOHASH)"
 
-#define from_json_doc "Usage: SomeStacktrace.from_json(json_string) (class method)\n" \
-                      "Returns: stacktrace (of SomeStacktrace class) deserialized from json_string\n" \
+#define from_json_doc "Usage: SomeStacktrace.from_json(json_string) (class method)\n\n" \
+                      "Returns: stacktrace (of SomeStacktrace class) deserialized from json_string\n\n" \
                       "json_string: string - json input"
 
 #define crash_thread_doc "Reference to the thread that caused the crash, if known"

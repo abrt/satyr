@@ -8,28 +8,28 @@
 #include "location.h"
 #include "utils.h"
 
-#define thread_doc "satyr.JavaThread - class representing a thread in a stacktrace\n" \
-                   "Usage:\n" \
-                   "satyr.JavaThread() - creates an empty thread\n" \
+#define thread_doc "satyr.JavaThread - class representing a thread in a stacktrace\n\n" \
+                   "Usage:\n\n" \
+                   "satyr.JavaThread() - creates an empty thread\n\n" \
                    "satyr.JavaThread(str) - parses str and fills the thread object"
 
-#define t_dup_doc "Usage: thread.dup()\n" \
-                  "Returns: satyr.JavaThread - a new clone of thread\n" \
+#define t_dup_doc "Usage: thread.dup()\n\n" \
+                  "Returns: satyr.JavaThread - a new clone of thread\n\n" \
                   "Clones the thread object. All new structures are independent " \
-                  "on the original object."
+                  "of the original object."
 
-#define t_quality_counts_doc "Usage: thread.quality_counts()\n" \
+#define t_quality_counts_doc "Usage: thread.quality_counts()\n\n" \
                              "Returns: tuple (ok, all) - ok representing number of " \
-                             "'good' frames, all representing total number of frames\n" \
+                             "'good' frames, all representing total number of frames\n\n" \
                              "Counts the number of 'good' frames and the number of all " \
                              "frames. 'Good' means the function name is known (not just '?\?')."
 
-#define t_quality_doc "Usage: thread.quality()\n" \
-                      "Returns: float - 0..1, thread quality\n" \
+#define t_quality_doc "Usage: thread.quality()\n\n" \
+                      "Returns: float - 0..1, thread quality\n\n" \
                       "Computes the ratio #good / #all. See quality_counts method for more."
 
-#define t_format_funs_doc "Usage: thread.format_funs()\n" \
-                      "Returns: string"
+#define t_format_funs_doc "Usage: thread.format_funs()\n\n" \
+                          "Returns: string"
 
 static PyMethodDef
 java_thread_methods[] =

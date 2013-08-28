@@ -25,14 +25,13 @@
 #include "utils.h"
 #include "core/frame.h"
 
-#define frame_doc "satyr.CoreFrame - class representing a frame in a native executable\n" \
-                  "Usage:\n" \
-                  "satyr.CoreFrame() - creates an empty frame"
+#define frame_doc "satyr.CoreFrame - class representing a frame in a native executable\n\n" \
+                  "Usage: satyr.CoreFrame() - creates an empty frame"
 
-#define f_dup_doc "Usage: frame.dup()\n" \
-                  "Returns: satyr.CoreFrame - a new clone of frame\n" \
+#define f_dup_doc "Usage: frame.dup()\n\n" \
+                  "Returns: satyr.CoreFrame - a new clone of the frame\n\n" \
                   "Clones the frame object. All new structures are independent " \
-                  "on the original object."
+                  "of the original object."
 
 
 static PyMethodDef
@@ -67,7 +66,7 @@ frame_getset[] =
     SR_ATTRIBUTE_STRING(function_name,      "Function name (string)"                            ),
     SR_ATTRIBUTE_STRING(file_name,          "Name of the executable or shared library (string)" ),
     SR_ATTRIBUTE_STRING(fingerprint,        "Fingerprint of the current function (string)"      ),
-    SR_ATTRIBUTE_BOOL  (fingerprint_hashed, "True if fingerprint is already hasheed (bool)"     ),
+    SR_ATTRIBUTE_BOOL  (fingerprint_hashed, "True if fingerprint is already hashed (bool)"      ),
     { NULL }
 };
 

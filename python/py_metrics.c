@@ -3,27 +3,27 @@
 #include "strbuf.h"
 #include "distance.h"
 
-#define distances_doc "satyr.Distances - class representing distances between objects\n" \
-                      "Usage:\n" \
-                      "satyr.Distances(m, n) - creates an m-by-n distance matrix\n" \
-                      "satyr.Distances([threads], m, dist_type=DISTANCE_LEVENSHTEIN) \n"\
-                      "        - compares first m threads with others\n" \
-                      "dist_type (optional): DISTANCE_LEVENSHTEIN, DISTANCE_JACCARD \n"\
-                      "                      or DISTANCE_DAMERAU_LEVENSHTEIN\n"
+#define distances_doc "satyr.Distances - class representing distances between objects\n\n" \
+                      "Usage:\n\n" \
+                      "satyr.Distances(m, n) - creates an m-by-n distance matrix\n\n" \
+                      "satyr.Distances([threads], m, dist_type=DISTANCE_LEVENSHTEIN) "\
+                      "- compares first m threads with others\n\n" \
+                      "dist_type (optional): DISTANCE_LEVENSHTEIN, DISTANCE_JACCARD "\
+                      "or DISTANCE_DAMERAU_LEVENSHTEIN"
 
-#define di_get_size_doc "Usage: distances.get_size()\n" \
-                       "Returns: (m, n) - size of the distance matrix"
+#define di_get_size_doc "Usage: distances.get_size()\n\n" \
+                        "Returns: (m, n) - size of the distance matrix"
 
-#define di_get_distance_doc "Usage: distances.get_distance(i, j)\n" \
+#define di_get_distance_doc "Usage: distances.get_distance(i, j)\n\n" \
                             "Returns: positive float - distance between objects i and j"
 
-#define di_set_distance_doc "Usage: distances.set_distance(i, j, d)\n" \
+#define di_set_distance_doc "Usage: distances.set_distance(i, j, d)\n\n" \
                             "Sets distance between objects i and j to d"
 
-#define di_dup_doc "Usage: distances.dup()\n" \
-                   "Returns: satyr.Distances - a new clone of the distances\n" \
+#define di_dup_doc "Usage: distances.dup()\n\n" \
+                   "Returns: satyr.Distances - a new clone of the distances\n\n" \
                    "Clones the distances object. All new structures are independent\n" \
-                   "on the original object."
+                   "of the original object."
 
 static PyMethodDef
 distances_methods[] =

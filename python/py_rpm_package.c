@@ -24,9 +24,9 @@
 #include "rpm.h"
 #include "strbuf.h"
 
-#define rpm_package_doc "satyr.RpmPackage - RPM package representation\n" \
-                        "Usage:\n" \
-                        "satyr.RpmPackage() - creates an empty RPM package object\n" \
+#define rpm_package_doc "satyr.RpmPackage - RPM package representation\n\n" \
+                        "Usage:\n\n" \
+                        "satyr.RpmPackage() - creates an empty RPM package object\n\n" \
                         "satyr.RpmPackage(name, epoch, version, release, arch) - creates RPM package\n" \
                         "object with given properties"
 

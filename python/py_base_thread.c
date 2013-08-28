@@ -28,17 +28,17 @@
 #define thread_doc "satyr.BaseThread - base class for threads"
 #define frames_doc "A list containing objects representing frames in a thread."
 
-#define distance_doc "Usage: thread.distance(other, dist_type=DISTANCE_LEVENSHTEIN)\n"\
-                     "other: other thread\n"\
-                     "dist_type (optional): one of DISTANCE_LEVENSHTEIN, DISTANCE_JARO_WINKLER,\n"\
-                     "                      DISTANCE_JACCARD or DISTANCE_DAMERAU_LEVENSHTEIN\n"\
+#define distance_doc "Usage: thread.distance(other, dist_type=DISTANCE_LEVENSHTEIN)\n\n"\
+                     "other: other thread\n\n"\
+                     "dist_type (optional): one of DISTANCE_LEVENSHTEIN, DISTANCE_JARO_WINKLER, "\
+                     "DISTANCE_JACCARD or DISTANCE_DAMERAU_LEVENSHTEIN\n\n"\
                      "Returns: positive float - distance between the two threads"
 
-#define get_duphash_doc "Usage: thread.get_duphash(frames=0, flags=DUPHASH_NORMAL, prefix='')\n"\
-                        "Returns: string - thread's duplication hash\n"\
-                        "frames: integer - number of frames to use (default 0 means use all)\n"\
-                        "flags: integer - bitwise sum of flags (DUPHASH_NORMAL, DUPHASH_NOHASH,\n"\
-                        "                 DUPHASH_NONORMALIZE)\n"\
+#define get_duphash_doc "Usage: thread.get_duphash(frames=0, flags=DUPHASH_NORMAL, prefix='')\n\n"\
+                        "Returns: string - thread's duplication hash\n\n"\
+                        "frames: integer - number of frames to use (default 0 means use all)\n\n"\
+                        "flags: integer - bitwise sum of flags (DUPHASH_NORMAL, DUPHASH_NOHASH, \n"\
+                        "DUPHASH_NONORMALIZE)\n\n"\
                         "prefix: string - string to be prepended in front of the text before hashing"
 
 static PyMethodDef

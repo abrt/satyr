@@ -3,18 +3,19 @@
 #include "strbuf.h"
 #include "cluster.h"
 
-#define dendrogram_doc "satyr.Dendrogram - a dendrogram created by clustering algorithm\n"
+#define dendrogram_doc "satyr.Dendrogram - a dendrogram created by clustering algorithm\n\n" \
+                       "Usage: satyr.Dendrogram(distances) - creates new dendrogram from a distance matrix"
 
-#define de_get_size_doc "Usage: dendrogram.get_size()\n" \
+#define de_get_size_doc "Usage: dendrogram.get_size()\n\n" \
                         "Returns: integer - number of objects in the dendrogram"
 
-#define de_get_object_doc "Usage: dendrogram.get_object(i)\n" \
+#define de_get_object_doc "Usage: dendrogram.get_object(i)\n\n" \
                           "Returns: integer - index of the object at position i"
 
-#define de_get_merge_level_doc "Usage: dendrogram.get_merge_level(i)\n" \
+#define de_get_merge_level_doc "Usage: dendrogram.get_merge_level(i)\n\n" \
                                "Returns: float - merge level between clusters at positions i and i + 1"
 
-#define de_cut_doc "Usage: dendrogram.cut(level, min_size)\n" \
+#define de_cut_doc "Usage: dendrogram.cut(level, min_size)\n\n" \
                    "Returns: list of clusters (lists of objects) which have at least min_size objects\n" \
                    "and which were merged at most at the specified distance"
 

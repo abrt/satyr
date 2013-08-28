@@ -28,15 +28,15 @@
 #include "utils.h"
 #include "koops/frame.h"
 
-#define frame_doc "satyr.KerneloopsFrame - class representing a frame in a kerneloops\n" \
-                  "Usage:\n" \
-                  "satyr.KerneloopsFrame() - creates an empty frame\n" \
+#define frame_doc "satyr.KerneloopsFrame - class representing a frame in a kerneloops\n\n" \
+                  "Usage:\n\n" \
+                  "satyr.KerneloopsFrame() - creates an empty frame\n\n" \
                   "satyr.KerneloopsFrame(str) - parses str and fills the frame object"
 
-#define f_dup_doc "Usage: frame.dup()\n" \
-                  "Returns: satyr.KerneloopsFrame - a new clone of frame\n" \
+#define f_dup_doc "Usage: frame.dup()\n\n" \
+                  "Returns: satyr.KerneloopsFrame - a new clone of frame\n\n" \
                   "Clones the frame object. All new structures are independent " \
-                  "on the original object."
+                  "of the original object."
 
 
 static PyMethodDef

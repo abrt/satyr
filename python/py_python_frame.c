@@ -25,15 +25,15 @@
 #include "utils.h"
 #include "python/frame.h"
 
-#define frame_doc "satyr.PythonFrame - class representing a python frame\n" \
-                  "Usage:\n" \
-                  "satyr.PythonFrame() - creates an empty frame\n" \
+#define frame_doc "satyr.PythonFrame - class representing a python frame\n\n" \
+                  "Usage:\n\n" \
+                  "satyr.PythonFrame() - creates an empty frame\n\n" \
                   "satyr.PythonFrame(str) - parses str and fills the frame object"
 
-#define f_dup_doc "Usage: frame.dup()\n" \
-                  "Returns: satyr.PythonFrame - a new clone of frame\n" \
+#define f_dup_doc "Usage: frame.dup()\n\n" \
+                  "Returns: satyr.PythonFrame - a new clone of frame\n\n" \
                   "Clones the frame object. All new structures are independent " \
-                  "on the original object."
+                  "of the original object."
 
 
 static PyMethodDef

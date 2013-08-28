@@ -10,24 +10,19 @@
 #include "stacktrace.h"
 #include "internal_utils.h"
 
-#define stacktrace_doc "satyr.Kerneloops - class representing a kerneloops stacktrace\n" \
-                      "Usage:\n" \
-                      "satyr.Kerneloops() - creates an empty kerneloops stacktrace\n" \
+#define stacktrace_doc "satyr.Kerneloops - class representing a kerneloops stacktrace\n\n" \
+                      "Usage:\n\n" \
+                      "satyr.Kerneloops() - creates an empty kerneloops stacktrace\n\n" \
                       "satyr.Kerneloops(str) - parses str and fills the kerneloops stacktrace object"
 
-#define b_dup_doc "Usage: stacktrace.dup()\n" \
-                  "Returns: satyr.Kerneloops - a new clone of kerneloops stacktrace\n" \
+#define b_dup_doc "Usage: stacktrace.dup()\n\n" \
+                  "Returns: satyr.Kerneloops - a new clone of kerneloops stacktrace\n\n" \
                   "Clones the kerneloops object. All new structures are independent " \
-                  "on the original object."
+                  "of the original object."
 
-#define b_normalize_doc "Usage: stacktrace.normalize()\n" \
+#define b_normalize_doc "Usage: stacktrace.normalize()\n\n" \
                         "Normalizes the stacktrace."
 
-#define b_to_short_text "Usage: stacktrace.to_short_text([max_frames])\n" \
-                        "Returns short text representation of the stacktrace. If max_frames is\n" \
-                        "specified, the result includes only that much topmost frames.\n"
-
-#define b_frames_doc "A list containing frames"
 #define b_taint_flags_doc "Dictionary of kernel taint flags. Keys are the flag names,\n" \
                           "values are booleans indicating whether the flag is set."
 #define b_modules_doc "Modules loaded at the time of the event (list of strings)"

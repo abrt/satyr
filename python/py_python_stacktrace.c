@@ -10,26 +10,18 @@
 #include "normalize.h"
 #include "stacktrace.h"
 
-#define stacktrace_doc "satyr.PythonStacktrace - class representing a python stacktrace\n" \
-                      "Usage:\n" \
-                      "satyr.PythonStacktrace() - creates an empty python stacktrace\n" \
-                      "satyr.PythonStacktrace(str) - parses str and fills the python stacktrace object"
+#define stacktrace_doc "satyr.PythonStacktrace - class representing a python stacktrace\n\n" \
+                       "Usage:\n\n" \
+                       "satyr.PythonStacktrace() - creates an empty python stacktrace\n\n" \
+                       "satyr.PythonStacktrace(str) - parses str and fills the python stacktrace object"
 
-#define f_dup_doc "Usage: stacktrace.dup()\n" \
-                  "Returns: satyr.PythonStacktrace - a new clone of python stacktrace\n" \
+#define f_dup_doc "Usage: stacktrace.dup()\n\n" \
+                  "Returns: satyr.PythonStacktrace - a new clone of python stacktrace\n\n" \
                   "Clones the PythonStacktrace object. All new structures are independent " \
-                  "on the original object."
+                  "of the original object."
 
-#define f_to_short_text "Usage: stacktrace.to_short_text([max_frames])\n" \
-                        "Returns short text representation of the stacktrace. If max_frames is\n" \
-                        "specified, the result includes only that much topmost frames.\n"
-
-#define f_normalize_doc "Usage: stacktrace.normalize()\n" \
+#define f_normalize_doc "Usage: stacktrace.normalize()\n\n" \
                         "Normalizes the stacktrace."
-
-#define f_frames_doc "A list containing frames"
-#define f_get_modules_doc "Usage: stacktrace.get_modules()\n" \
-                        "Returns: list of strings - loaded modules at time of the event"
 
 
 static PyMethodDef

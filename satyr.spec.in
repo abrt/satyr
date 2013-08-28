@@ -11,6 +11,7 @@ Source0: https://fedorahosted.org/released/abrt/satyr-%{version}.tar.xz
 BuildRequires: python2-devel
 BuildRequires: elfutils-devel, elfutils-libelf-devel, binutils-devel
 BuildRequires: rpm-devel
+BuildRequires: python-sphinx
 
 %description
 Satyr is a library that can be used to create and process microreports.
@@ -70,6 +71,7 @@ make check
 %files python
 %dir %{python_sitearch}/%{name}
 %{python_sitearch}/%{name}/*
+%{_mandir}/man3/satyr-python.3*
 
 %changelog
 * Wed Aug 28 2013 Richard Marko<rmarko@redhat.com> 0.8-1

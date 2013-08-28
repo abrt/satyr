@@ -8,15 +8,15 @@
 #include "location.h"
 #include "stacktrace.h"
 
-#define stacktrace_doc "satyr.JavaStacktrace - class representing a java stacktrace\n" \
-                      "Usage:\n" \
-                      "satyr.JavaStacktrace() - creates an empty stacktrace\n" \
+#define stacktrace_doc "satyr.JavaStacktrace - class representing a java stacktrace\n\n" \
+                      "Usage:\n\n" \
+                      "satyr.JavaStacktrace() - creates an empty stacktrace\n\n" \
                       "satyr.JavaStacktrace(str) - parses str and fills the stacktrace object"
 
-#define b_dup_doc "Usage: stacktrace.dup()\n" \
-                  "Returns: satyr.JavaStacktrace - a new clone of java stacktrace\n" \
+#define b_dup_doc "Usage: stacktrace.dup()\n\n" \
+                  "Returns: satyr.JavaStacktrace - a new clone of java stacktrace\n\n" \
                   "Clones the stacktrace object. All new structures are independent " \
-                  "on the original object."
+                  "of the original object."
 
 static PyMethodDef
 java_stacktrace_methods[] =

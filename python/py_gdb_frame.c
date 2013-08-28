@@ -28,26 +28,26 @@
 #include "utils.h"
 #include "gdb/frame.h"
 
-#define frame_doc "satyr.GdbFrame - class representing a frame in a thread\n" \
-                  "Usage:\n" \
-                  "satyr.GdbFrame() - creates an empty frame\n" \
+#define frame_doc "satyr.GdbFrame - class representing a frame in a thread\n\n" \
+                  "Usage:\n\n" \
+                  "satyr.GdbFrame() - creates an empty frame\n\n" \
                   "satyr.GdbFrame(str) - parses str and fills the frame object"
 
-#define f_dup_doc "Usage: frame.dup()\n" \
-                  "Returns: satyr.GdbFrame - a new clone of frame\n" \
+#define f_dup_doc "Usage: frame.dup()\n\n" \
+                  "Returns: satyr.GdbFrame - a new clone of the frame\n\n" \
                   "Clones the frame object. All new structures are independent " \
-                  "on the original object."
+                  "of the original object."
 
-#define f_calls_func_doc "Usage: frame.calls_func(name)\n" \
-                         "name: string - function name\n" \
-                         "Returns: integer - 0 = False, 1 = True\n" \
+#define f_calls_func_doc "Usage: frame.calls_func(name)\n\n" \
+                         "name: string - function name\n\n" \
+                         "Returns: integer - 0 = False, 1 = True\n\n" \
                          "Checks whether the frame represents a call to " \
                          "a function with given name."
 
-#define f_calls_func_in_file_doc "Usage: frame.calls_func_in_file(name, filename)\n" \
-                                 "name: string - function name\n" \
-                                 "filename: string - file name\n" \
-                                 "Returns: integer - 0 = False, 1 = True\n" \
+#define f_calls_func_in_file_doc "Usage: frame.calls_func_in_file(name, filename)\n\n" \
+                                 "name: string - function name\n\n" \
+                                 "filename: string - file name\n\n" \
+                                 "Returns: integer - 0 = False, 1 = True\n\n" \
                                  "Checks whether the frame represents a call to " \
                                  "a function with given name from a given file."
 

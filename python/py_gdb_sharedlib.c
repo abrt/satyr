@@ -5,9 +5,9 @@
 
 #define sharedlib_doc "satyr.GdbSharedlib - class representing a shared library loaded at the moment of crash"
 
-#define s_symbols_doc "Symbol state (satyr.SYMS_OK / satyr.SYMS_NOT_FOUND / satyr.SYMS_WRONG)\n"         \
-                      "SYMS_OK:        Debug symbols for the library were loaded successfully.\n"        \
-                      "SYMS_WRONG:     Debug symbols for the library were present, but did not match.\n" \
+#define s_symbols_doc "Symbol state (satyr.SYMS_OK / satyr.SYMS_NOT_FOUND / satyr.SYMS_WRONG)\n\n"         \
+                      "SYMS_OK:        Debug symbols for the library were loaded successfully.\n\n"        \
+                      "SYMS_WRONG:     Debug symbols for the library were present, but did not match.\n\n" \
                       "SYMS_NOT_FOUND: Debug symbols for the library were not found."
 
 /* See python/py_common.h and python/py_gdb_frame.c for generic getters/setters documentation. */

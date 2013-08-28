@@ -105,6 +105,7 @@ AC_CONFIG_FILES([
 	Makefile
 	lib/Makefile
 	python/Makefile
+	python/doc/Makefile
 	tests/Makefile
 	include/Makefile
 	tests/atlocal

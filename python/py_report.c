@@ -34,12 +34,12 @@
 #include "strbuf.h"
 #include "rpm.h"
 
-#define report_doc "satyr.Report - report containing all data relevant to a software problem\n" \
-                   "Usage:\n" \
-                   "satyr.Report() - creates an empty report object\n" \
+#define report_doc "satyr.Report - report containing all data relevant to a software problem\n\n" \
+                   "Usage:\n\n" \
+                   "satyr.Report() - creates an empty report object\n\n" \
                    "satyr.Report(json_string) - creates a report from its JSON representation"
 
-#define to_json_doc "Usage: report.to_json()\n" \
+#define to_json_doc "Usage: report.to_json()\n\n" \
                     "Returns: string - the report serialized as JSON"
 
 /* See python/py_common.h and python/py_gdb_frame.c for generic getters/setters documentation. */
@@ -70,9 +70,12 @@ report_getset[] =
 static PyMemberDef
 report_members[] =
 {
-    { (char*)"stacktrace", T_OBJECT_EX, offsetof(struct sr_py_report, stacktrace), 0, (char*)"Problem stacktrace" },
-    { (char*)"operating_system", T_OBJECT_EX, offsetof(struct sr_py_report, operating_system), 0, (char *)"Operating system" },
-    { (char*)"packages", T_OBJECT_EX, offsetof(struct sr_py_report, packages), 0, (char *)"List of packages" },
+    { (char*)"stacktrace", T_OBJECT_EX, offsetof(struct sr_py_report, stacktrace), 0,
+      (char*)"Problem stacktrace (:class:`SingleThreadStacktrace` or :class:`MultiThreadStacktrace` object)" },
+    { (char*)"operating_system", T_OBJECT_EX, offsetof(struct sr_py_report, operating_system), 0,
+      (char *)"Operating system (:class:`OperatingSystem` object)" },
+    { (char*)"packages", T_OBJECT_EX, offsetof(struct sr_py_report, packages), 0,
+      (char *)"List of packages (currently a list of :class:`RpmPackage` objects)" },
     { NULL },
 };
 

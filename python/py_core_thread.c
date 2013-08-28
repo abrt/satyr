@@ -26,14 +26,13 @@
 #include "core/frame.h"
 #include "utils.h"
 
-#define thread_doc "satyr.CoreThread - class representing a thread in a stacktrace\n" \
-                   "Usage:\n" \
-                   "satyr.CoreThread() - creates an empty thread"
+#define thread_doc "satyr.CoreThread - class representing a thread in a stacktrace\n\n" \
+                   "Usage: satyr.CoreThread() - creates an empty thread"
 
-#define t_dup_doc "Usage: thread.dup()\n" \
-                  "Returns: satyr.CoreThread - a new clone of thread\n" \
+#define t_dup_doc "Usage: thread.dup()\n\n" \
+                  "Returns: satyr.CoreThread - a new clone of thread\n\n" \
                   "Clones the thread object. All new structures are independent " \
-                  "on the original object."
+                  "of the original object."
 
 static PyMethodDef
 core_thread_methods[] =

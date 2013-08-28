@@ -27,15 +27,15 @@
 #include "core/thread.h"
 #include "stacktrace.h"
 
-#define stacktrace_doc "satyr.CoreStacktrace - class representing a core stacktrace\n" \
-                       "Usage:\n" \
-                       "satyr.CoreStacktrace() - creates an empty stacktrace\n" \
+#define stacktrace_doc "satyr.CoreStacktrace - class representing a core stacktrace\n\n" \
+                       "Usage:\n\n" \
+                       "satyr.CoreStacktrace() - creates an empty stacktrace\n\n" \
                        "satyr.CoreStacktrace(json) - creates stacktrace object from JSON string"
 
-#define b_dup_doc "Usage: stacktrace.dup()\n" \
-                  "Returns: satyr.CoreStacktrace - a new clone of core stacktrace\n" \
+#define b_dup_doc "Usage: stacktrace.dup()\n\n" \
+                  "Returns: satyr.CoreStacktrace - a new clone of core stacktrace\n\n" \
                   "Clones the stacktrace object. All new structures are independent " \
-                  "on the original object."
+                  "of the original object."
 
 static PyMethodDef
 core_stacktrace_methods[] =

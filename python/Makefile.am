@@ -1,3 +1,5 @@
+SUBDIRS = . doc
+
 clientexecdir = $(pyexecdir)/satyr
 
 clientexec_PYTHON = \

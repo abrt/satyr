@@ -25,15 +25,15 @@
 #include "utils.h"
 #include "java/frame.h"
 
-#define frame_doc "satyr.JavaFrame - class representing a java frame\n" \
-                  "Usage:\n" \
-                  "satyr.JavaFrame() - creates an empty frame\n" \
+#define frame_doc "satyr.JavaFrame - class representing a java frame\n\n" \
+                  "Usage:\n\n" \
+                  "satyr.JavaFrame() - creates an empty frame\n\n" \
                   "satyr.JavaFrame(str) - parses str and fills the frame object"
 
-#define f_dup_doc "Usage: frame.dup()\n" \
-                  "Returns: satyr.JavaFrame - a new clone of frame\n" \
+#define f_dup_doc "Usage: frame.dup()\n\n" \
+                  "Returns: satyr.JavaFrame - a new clone of frame\n\n" \
                   "Clones the frame object. All new structures are independent " \
-                  "on the original object."
+                  "of the original object."
 
 
 static PyMethodDef

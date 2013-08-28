@@ -11,57 +11,57 @@
 #include "location.h"
 #include "normalize.h"
 
-#define stacktrace_doc "satyr.GdbStacktrace - class representing a stacktrace\n" \
-                      "Usage:\n" \
-                      "satyr.GdbStacktrace() - creates an empty stacktrace\n" \
+#define stacktrace_doc "satyr.GdbStacktrace - class representing a stacktrace\n\n" \
+                      "Usage:\n\n" \
+                      "satyr.GdbStacktrace() - creates an empty stacktrace\n\n" \
                       "satyr.GdbStacktrace(str) - parses str and fills the stacktrace object"
 
-#define b_dup_doc "Usage: stacktrace.dup()\n" \
-                  "Returns: satyr.GdbStacktrace - a new clone of stacktrace\n" \
+#define b_dup_doc "Usage: stacktrace.dup()\n\n" \
+                  "Returns: satyr.GdbStacktrace - a new clone of stacktrace\n\n" \
                   "Clones the stacktrace object. All new structures are independent " \
-                  "on the original object."
+                  "of the original object."
 
-#define b_find_crash_frame_doc "Usage: stacktrace.find_crash_frame()\n" \
-                               "Returns: satyr.Frame - crash frame\n" \
+#define b_find_crash_frame_doc "Usage: stacktrace.find_crash_frame()\n\n" \
+                               "Returns: satyr.Frame - crash frame\n\n" \
                                "Finds crash frame in the stacktrace. Also sets the " \
                                "stacktrace.crashframe field."
 
-#define b_limit_frame_depth_doc "Usage: stacktrace.limit_frame_depth(N)\n" \
-                                "N: positive integer - frame depth\n" \
+#define b_limit_frame_depth_doc "Usage: stacktrace.limit_frame_depth(N)\n\n" \
+                                "N: positive integer - frame depth\n\n" \
                                 "Crops all threads to only contain first N frames."
 
-#define b_quality_simple_doc "Usage: stacktrace.quality_simple()\n" \
-                             "Returns: float - 0..1, stacktrace quality\n" \
+#define b_quality_simple_doc "Usage: stacktrace.quality_simple()\n\n" \
+                             "Returns: float - 0..1, stacktrace quality\n\n" \
                              "Computes the quality from stacktrace itself."
 
-#define b_quality_complex_doc "Usage: stacktrace.quality_complex()\n" \
-                              "Returns: float - 0..1, stacktrace quality\n" \
+#define b_quality_complex_doc "Usage: stacktrace.quality_complex()\n\n" \
+                              "Returns: float - 0..1, stacktrace quality\n\n" \
                               "Computes the quality from stacktrace, crash thread and " \
                               "frames around the crash."
 
-#define b_find_address_doc "Usage: stacktrace.find_address(address)\n" \
-                           "address: long - address to find" \
-                           "Returns: satyr.Sharedlib object or None if not found\n" \
+#define b_find_address_doc "Usage: stacktrace.find_address(address)\n\n" \
+                           "address: long - address to find\n\n" \
+                           "Returns: satyr.Sharedlib object or None if not found\n\n" \
                            "Looks whether the given address belongs to a shared library."
 
-#define b_set_libnames_doc "Usage: stacktrace.set_libnames()\n" \
+#define b_set_libnames_doc "Usage: stacktrace.set_libnames()\n\n" \
                            "Sets library names according to sharedlibs data."
 
-#define b_normalize_doc "Usage: stacktrace.normalize()\n" \
+#define b_normalize_doc "Usage: stacktrace.normalize()\n\n" \
                         "Normalizes all threads in the stacktrace."
 
-#define b_to_short_text "Usage: stacktrace.to_short_text([max_frames])\n" \
+#define b_to_short_text "Usage: stacktrace.to_short_text([max_frames])\n\n" \
                         "Returns short text representation of the crash thread. If max_frames is\n" \
-                        "specified, the result includes only that much topmost frames.\n"
+                        "specified, the result includes only that much topmost frames."
 
-#define b_crashframe_doc (char *)"Readonly. By default the field contains None. After " \
-                         "calling the find_crash_frame method, a reference to " \
+#define b_crashframe_doc (char *)"Readonly. By default the field contains None. After\n" \
+                         "calling the find_crash_frame method, a reference to\n" \
                          "satyr.Frame object is stored into the field."
 
-#define b_threads_doc (char *)"A list containing the satyr.Thread objects " \
+#define b_threads_doc (char *)"A list containing the satyr.Thread objects\n" \
                       "representing threads in the stacktrace."
 
-#define b_libs_doc (char *)"A list containing the satyr.Sharedlib objects " \
+#define b_libs_doc (char *)"A list containing the satyr.Sharedlib objects\n" \
                    "representing shared libraries loaded at the moment of crash."
 
 static PyMethodDef

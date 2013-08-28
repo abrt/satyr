@@ -27,7 +27,7 @@
 
 #define frame_doc "satyr.BaseFrame - base class for call frames"
 
-#define f_short_string_doc "Usage: frame.short_string()\n" \
+#define f_short_string_doc "Usage: frame.short_string()\n\n" \
                            "Returns: string - brief textual representation of the frame"
 
 static PyMethodDef

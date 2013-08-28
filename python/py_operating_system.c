@@ -24,9 +24,9 @@
 #include "operating_system.h"
 #include "strbuf.h"
 
-#define operating_system_doc "satyr.OperatingSystem - describes an operating system\n" \
-                             "Usage:\n" \
-                             "satyr.OperatingSystem() - creates an empty operating system object\n" \
+#define operating_system_doc "satyr.OperatingSystem - describes an operating system\n\n" \
+                             "Usage:\n\n" \
+                             "satyr.OperatingSystem() - creates an empty operating system object\n\n" \
                              "satyr.OperatingSystem(name, version, arch) - creates an operating system\n" \
                              "object with given properties (all arguments are strings or None)"
 
