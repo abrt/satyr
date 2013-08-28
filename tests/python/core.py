@@ -55,6 +55,14 @@ class TestCoreStacktrace(BindingsTestCase):
     def test_crash_thread(self):
         self.assertTrue(self.trace.crash_thread is self.trace.threads[1])
 
+    def test_crash_thread_refcount(self):
+        c = self.trace.crash_thread
+        del c
+        c = self.trace.crash_thread
+        del c
+        # segfault in revision 6f91aba95397e56c665c420f574d73adb64df832
+        f = self.trace.crash_thread.frames[0]
+
     def test_from_json(self):
         trace = satyr.CoreStacktrace.from_json('{}')
         self.assertEqual(trace.threads, [])

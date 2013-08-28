@@ -356,6 +356,7 @@ sr_py_multi_stacktrace_get_bthash(PyObject *self, PyObject *args)
 PyObject *
 sr_py_single_stacktrace_get_crash(PyObject *self, void *unused)
 {
+    Py_INCREF(self);
     return self;
 }
 
@@ -403,7 +404,7 @@ sr_py_multi_stacktrace_get_crash(PyObject *self, void *unused)
         struct sr_py_base_thread *thread = (struct sr_py_base_thread *)item;
         if (thread->thread == crash_thread)
         {
-            /* TODO incref? */
+            Py_INCREF(item);
             return item;
         }
     }
