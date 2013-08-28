@@ -1,4 +1,4 @@
-Releasing a new version of btparser
+Releasing a new version of satyr
 -----------------------------------
 
 1. Check that all changes from all work computers are commited.  Then
@@ -14,12 +14,12 @@ and document this change in the ChangeLog:
 
 
 3. Check all the changes in the ChangeLog since the last release, and
-if any change modifies the btparser library interface, increase the
+if any change modifies the satyr library interface, increase the
 CURRENT number in lib/Makefile.am:
-libbtparser_la_LDFLAGS = -version-info 2:1:0
+libsatyr_la_LDFLAGS = -version-info 2:1:0
                                        ^
 Document this change in the ChangeLog:
-* lib/Makefile.am (libbtparser_la_LDFLAGS): Increase CURRENT
+* lib/Makefile.am (libsatyr_la_LDFLAGS): Increase CURRENT
 library version number, as the library interface changed since the
 last release.
 
@@ -42,7 +42,7 @@ with the code. Document changes in the ChangeLog.
 7. Run ./autogen.sh and the ./configure to update all generated files.
 
 
-8. Run `make dist` to create btparser-x.y.tar.gz. Check that its
+8. Run `make dist` to create satyr-x.y.tar.gz. Check that its
 contents is ok, and every file is in place.
 
 

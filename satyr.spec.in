@@ -72,6 +72,11 @@ make check
 %{python_sitearch}/%{name}/*
 
 %changelog
+* Wed Aug 28 2013 Richard Marko<rmarko@redhat.com> 0.8-1
+- New upstream version
+  - Added support for json de/serialization of reports and stacktraces.
+  - Library version number increased, as the interface changed since the last release
+
 * Mon Aug 26 2013 Martin Milata <mmilata@redhat.com> 0.7-1
 - New upstream version
   - Fix couple of crashes (#997076, #994747)

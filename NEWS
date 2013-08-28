@@ -1,3 +1,7 @@
+satyr 0.8
+=========
+Added support for json de/serialization of reports and stacktraces.
+
 satyr 0.7
 =========
 Fix segmentation fault related to crash thread detection.
