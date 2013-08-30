@@ -342,7 +342,10 @@ module_list_continues(const char *input)
         return false;
 
     /* See tests/kerneloopses/rhbz-865695-2-notime */
-    if (sr_skip_string(&input, "CPU ") && sr_skip_char_span(&input, "0123456789"))
+    /* and tests/kerneloopses/github-102 */
+    if (sr_skip_string(&input, "CPU") &&
+        sr_skip_char_span(&input, " :") &&
+        sr_skip_char_span(&input, "0123456789"))
         return false;
 
     /* Other conditions may need to be added */

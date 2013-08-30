@@ -1,0 +1,26 @@
+WARNING: at include/linux/mm.h:283 putback_inactive_pages+0x2cc/0x360()
+Modules linked in: vboxpci(OF) vboxnetadp(OF) vboxnetflt(OF) vboxdrv(OF) fuse ebtable_nat ipt_MASQUERADE nf_conntrack_netbios_ns nf_conntrack_broadcast bnep bluetooth rfkill ip6table_mangle ip6t_REJECT nf_conntrack_ipv6 nf_defrag_ipv6 iptable_nat nf_nat_ipv4 nf_nat iptable_mangle nf_conntrack_ipv4 nf_defrag_ipv4 xt_conntrack nf_conntrack ebtable_filter ebtables ip6table_filter ip6_tables be2iscsi iscsi_boot_sysfs bnx2i cnic uio cxgb4i cxgb4 cxgb3i cxgb3 mdio libcxgbi ib_iser rdma_cm ib_addr iw_cm ib_cm ib_sa ib_mad ib_core iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi snd_hda_codec_hdmi snd_usb_audio snd_hda_codec_realtek snd_usbmidi_lib snd_hda_intel snd_hda_codec uvcvideo snd_rawmidi snd_hwdep snd_seq snd_seq_device snd_pcm snd_page_alloc snd_timer iTCO_wdt videobuf2_vmalloc videobuf2_memops fglrx(POF) acpi_cpufreq mperf coretemp videobuf2_core
+ videodev joydev iTCO_vendor_support snd ppdev hid_logitech_dj i2c_i801 media i2c_core lpc_ich mfd_core parport_pc parport amd_iommu_v2 microcode serio_raw soundcore vhost_net tun macvtap macvlan kvm_intel kvm binfmt_misc uinput ata_generic pata_acpi r8169 mii pata_jmicron sunrpc
+CPU: 1 PID: 42 Comm: kswapd0 Tainted: PF   B   WC O 3.10.4-100.fc18.x86_64 #1
+Hardware name: Gigabyte Technology Co., Ltd. EP45-UD3L/EP45-UD3L, BIOS F4 02/24/2009
+ 0000000000000009 ffff88022259da58 ffffffff816606a8 ffff88022259da98
+ ffffffff8105d660 ffff88022259dba0 ffff880227014410 ffff88022259dba8
+ 0000000000000000 ffffea0004018020 0000000000000200 ffff88022259daa8
+Call Trace:
+ [<ffffffff816606a8>] dump_stack+0x19/0x1b
+ [<ffffffff8105d660>] warn_slowpath_common+0x70/0xa0
+ [<ffffffff8105d6aa>] warn_slowpath_null+0x1a/0x20
+ [<ffffffff8114545c>] putback_inactive_pages+0x2cc/0x360
+ [<ffffffff8114567b>] shrink_inactive_list+0x18b/0x410
+ [<ffffffff81145e91>] shrink_lruvec+0x231/0x4f0
+ [<ffffffff8119fdc2>] ? drop_super+0x22/0x30
+ [<ffffffff811461b6>] shrink_zone+0x66/0x1a0
+ [<ffffffff811474fc>] balance_pgdat+0x48c/0x5c0
+ [<ffffffff811477a4>] kswapd+0x174/0x440
+ [<ffffffff81083260>] ? wake_up_bit+0x40/0x40
+ [<ffffffff81147630>] ? balance_pgdat+0x5c0/0x5c0
+ [<ffffffff81082a80>] kthread+0xc0/0xd0
+ [<ffffffff81010000>] ? perf_trace_xen_mmu_flush_tlb_others+0xa0/0x110
+ [<ffffffff810829c0>] ? kthread_create_on_node+0x120/0x120
+ [<ffffffff8166ec6c>] ret_from_fork+0x7c/0xb0
+ [<ffffffff810829c0>] ? kthread_create_on_node+0x120/0x120
