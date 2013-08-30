@@ -133,6 +133,8 @@ EXTRA_DIST = \
 	stacktrace.rst \
 	clustering.rst
 
-man3_MANS = _build/man/satyr-python.3
+if ENABLE_PYTHON_MANPAGE
+    man3_MANS = _build/man/satyr-python.3
+endif
 
 _build/man/satyr-python.3: conf.py man

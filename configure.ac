@@ -38,6 +38,13 @@ PKG_CHECK_MODULES([PYTHON], [python2],,[
     PYTHON_CFLAGS='-I/usr/include/python2.6'
 ])
 
+AC_ARG_ENABLE([python-manpage],
+              [AS_HELP_STRING([--disable-python-manpage],
+                              [Disable python bindings manpage build])],
+              [enable_python_manpage=$enableval],
+              [enable_python_manpage=yes])
+AM_CONDITIONAL(ENABLE_PYTHON_MANPAGE, [test $enable_python_manpage = yes])
+
 AC_CHECK_LIB([opcodes], [main], [have_libopcodes=yes], [have_libopcodes=no])
 [if test "$have_libopcodes" = "no" -a "$target_cpu" = "x86_64"; then]
     [echo "The libopcodes library was not found in the search path. The core stacktrace support "]
