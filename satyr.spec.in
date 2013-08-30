@@ -1,5 +1,12 @@
 %{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
+# rhel6's python-sphinx cannot build manual pages
+%if 0%{?rhel} && 0%{?rhel} <= 6
+  %define enable_python_manpage 0
+%else
+  %define enable_python_manpage 1
+%endif
+
 Name: satyr
 Version: @PACKAGE_VERSION@
 Release: 1%{?dist}
@@ -11,7 +18,10 @@ Source0: https://fedorahosted.org/released/abrt/satyr-%{version}.tar.xz
 BuildRequires: python2-devel
 BuildRequires: elfutils-devel, elfutils-libelf-devel, binutils-devel
 BuildRequires: rpm-devel
+
+%if %{?enable_python_manpage}
 BuildRequires: python-sphinx
+%endif
 
 %description
 Satyr is a library that can be used to create and process microreports.
@@ -42,7 +52,12 @@ Python bindings for %{name}.
 %setup -q
 
 %build
-%configure --disable-static
+%configure \
+%if ! %{?enable_python_manpage}
+        --disable-python-manpage \
+%endif
+        --disable-static
+
 make %{?_smp_mflags}
 
 %install
@@ -71,7 +86,10 @@ make check
 %files python
 %dir %{python_sitearch}/%{name}
 %{python_sitearch}/%{name}/*
+
+%if %{?enable_python_manpage}
 %{_mandir}/man3/satyr-python.3*
+%endif
 
 %changelog
 * Wed Aug 28 2013 Richard Marko<rmarko@redhat.com> 0.8-1
