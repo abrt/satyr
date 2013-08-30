@@ -707,6 +707,7 @@ sr_normalize_koops_stacktrace(struct sr_koops_stacktrace *stacktrace)
     const char *blacklist[] = {
         "do_softirq",
         "do_vfs_ioctl",
+        "dump_stack",
         "flush_kthread_worker",
         "gs_change",
         "irq_exit",
