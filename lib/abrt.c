@@ -456,9 +456,12 @@ sr_abrt_report_from_dir(const char *directory,
         struct sr_location location;
         sr_location_init(&location);
         const char *contents_pointer = backtrace_contents;
-        report->stacktrace = (struct sr_stacktrace *)sr_koops_stacktrace_parse(
+        struct sr_koops_stacktrace *stacktrace = sr_koops_stacktrace_parse(
             &contents_pointer,
             &location);
+
+        stacktrace->version = kernel_contents;
+        report->stacktrace = (struct sr_stacktrace *)stacktrace;
 
         free(backtrace_contents);
         if (!report->stacktrace)
