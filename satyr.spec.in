@@ -92,6 +92,11 @@ make check
 %endif
 
 %changelog
+* Wed Sep 11 2013 Jakub Filak <jfilak@redhat.com> 0.9-1
+- New upstream version
+  - Enrich koops uReport data with koops text and kernel version.
+  - Improve koops modules handling.
+
 * Wed Aug 28 2013 Richard Marko<rmarko@redhat.com> 0.8-1
 - New upstream version
   - Added support for json de/serialization of reports and stacktraces.
