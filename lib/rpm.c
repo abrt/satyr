@@ -256,8 +256,8 @@ sr_rpm_package_uniq(struct sr_rpm_package *packages)
             }
             merged->next = loop->next->next;
 
-            sr_rpm_package_free(loop, false);
             sr_rpm_package_free(loop->next, false);
+            sr_rpm_package_free(loop, false);
 
             loop = merged;
         }
