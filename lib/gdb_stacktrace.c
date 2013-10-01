@@ -503,17 +503,17 @@ sr_gdb_stacktrace_parse_header(const char **input,
         }
         else
         {
-	    /* Uncommon case (caused by some kernel bug) where the
+            /* Uncommon case (caused by some kernel bug) where the
              * frame is missing from the header.  The stacktrace
              * contains just threads.  We silently skip the header and
              * return true.
              */
-  	    *input = first_thread;
+            *input = first_thread;
             sr_location_add(location,
                             first_thread_line,
                             first_thread_column);
             *frame = NULL;
-	    return true;
+            return true;
         }
     }
     else if (first_frame)

@@ -22,23 +22,23 @@ check(bool success,
 
     if (modules)
     {
-	int offset = 0;
-	while (modules[offset])
+        int offset = 0;
+        while (modules[offset])
         {
             assert(expected_modules[offset]);
-	    assert(0 == strcmp(modules[offset], expected_modules[offset]));
-	    ++offset;
+            assert(0 == strcmp(modules[offset], expected_modules[offset]));
+            ++offset;
         }
-	assert(!expected_modules[offset]);
+        assert(!expected_modules[offset]);
 
-	offset = 0;
-	while (modules[offset])
+        offset = 0;
+        while (modules[offset])
         {
-    	    free(modules[offset]);
-	    ++offset;
-	}
+            free(modules[offset]);
+            ++offset;
+        }
 
-	free(modules);
+        free(modules);
     }
     else
     {
@@ -53,7 +53,7 @@ main(void)
     char *modules[] = { "vfat", "fat", "usb_storage", NULL };
     check(true,
           "[110417.280431] Modules linked in: vfat fat usb_storage",
-	  modules);
+          modules);
 
     check(true,
           "[110417.280431] Modules linked in: vfat fat usb_storage [last unloaded: scsi_wait_scan]\n",

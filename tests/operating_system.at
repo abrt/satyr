@@ -14,14 +14,14 @@ AT_TESTFUN([sr_operating_system_parse_etc_system_release],
 
 void check(const char *etc_system_release,
            const char *expected_name,
-	   const char *expected_version)
+           const char *expected_version)
 {
     printf("Testing %s.\n", etc_system_release);
     char *name, *version;
     bool success = sr_operating_system_parse_etc_system_release(
         etc_system_release,
-	&name,
-	&version);
+        &name,
+        &version);
 
     assert(success);
     assert(0 == strcmp(name, expected_name));

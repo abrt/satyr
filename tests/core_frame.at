@@ -81,13 +81,13 @@ main(void)
 
   char *json = sr_core_frame_to_json(frame);
   assert(0 == strcmp(json,
-  	   "{   \"address\": 68719476721\n"
-	   ",   \"build_id\": \"aabbccddeeff1\"\n"
-	   ",   \"build_id_offset\": 2561\n"
-	   ",   \"function_name\": \"test1\"\n"
-	   ",   \"file_name\": \"executable1\"\n"
-	   ",   \"fingerprint\": \"ab\"\n"
-	   "}"));
+           "{   \"address\": 68719476721\n"
+           ",   \"build_id\": \"aabbccddeeff1\"\n"
+           ",   \"build_id_offset\": 2561\n"
+           ",   \"function_name\": \"test1\"\n"
+           ",   \"file_name\": \"executable1\"\n"
+           ",   \"fingerprint\": \"ab\"\n"
+           "}"));
 
   sr_core_frame_free(frame);
   return 0;

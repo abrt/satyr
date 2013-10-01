@@ -112,8 +112,8 @@ int main(void)
   int line, column;
   size_t count = sr_strspn_location("test string",
                                      "tes ",
-				     &line,
-				     &column);
+                                     &line,
+                                     &column);
   assert(7 == count);
   assert(1 == line);
   assert(7 == column);
@@ -121,8 +121,8 @@ int main(void)
   /* With some newlines. */
   count = sr_strspn_location("te\nst \nstring",
                               "tes \n",
-			      &line,
-			      &column);
+                              &line,
+                              &column);
   assert(9 == count);
   assert(3 == line);
   assert(2 == column);

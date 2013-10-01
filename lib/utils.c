@@ -264,8 +264,8 @@ sr_file_to_string(const char *filename,
                                      filename,
                                      strerror(errno));
 
-	close(fd);
-	return NULL;
+        close(fd);
+        return NULL;
     }
 
     lseek(fd, 0, SEEK_SET); /* No reason to fail. */
@@ -611,20 +611,20 @@ sr_parse_hexadecimal_0xuint64(const char **input, uint64_t *result)
 char *
 sr_skip_whitespace(const char *s)
 {
-	/* NB: isspace('\0') returns 0 */
-	while (isspace(*s))
+    /* NB: isspace('\0') returns 0 */
+    while (isspace(*s))
             ++s;
 
-	return (char *) s;
+    return (char *) s;
 }
 
 char *
 sr_skip_non_whitespace(const char *s)
 {
-	while (*s && !isspace(*s))
+    while (*s && !isspace(*s))
             ++s;
 
-	return (char *) s;
+    return (char *) s;
 }
 
 char *

@@ -117,7 +117,7 @@ fp_shift(struct sr_strbuf *fingerprint,
 
 static void
 fp_has_cycle(struct sr_strbuf *fingerprint,
-	     char **instructions,
+             char **instructions,
              uint64_t function_start_address,
              uint64_t function_end_address)
 {

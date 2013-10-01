@@ -178,9 +178,9 @@ check(bool success, char *input)
   struct sr_location location;
   sr_location_init(&location);
   assert(success == sr_gdb_frame_parse_function_name(&input_with_space,
-						  &function_name,
-						  &function_type,
-						  &location));
+                                                     &function_name,
+                                                     &function_type,
+                                                     &location));
 
   if (success)
   {
@@ -250,7 +250,7 @@ main(void)
   /* newline */
   check(true, "(\n"
               "page=0x7f186003e280, \n"
-	      "cairo=0x7f18600efd10, printing=0)");
+              "cairo=0x7f18600efd10, printing=0)");
   /* value optimized out */
   check(true, "(this=0x7f1860023400, DPI=<value optimized out>)");
   /* string */
@@ -284,7 +284,7 @@ check(bool success,
   sr_location_init(&location);
   assert(success == sr_gdb_frame_parse_function_call(&input,
                                                   &function_name,
-						  &function_type,
+                                                  &function_type,
                                                   &location));
   if (success)
   {
@@ -318,12 +318,12 @@ main(void)
   /* C++ */
   check(true,
         "osgText::Font::GlyphTexture::apply(osg::State&) const ()",
-  	"osgText::Font::GlyphTexture::apply(osg::State&) const",
+        "osgText::Font::GlyphTexture::apply(osg::State&) const",
         NULL);
   check(true,
         "osgUtil::RenderStage::drawInner(osg::RenderInfo&, osgUtil::RenderLeaf*&, bool&) ()",
         "osgUtil::RenderStage::drawInner(osg::RenderInfo&, osgUtil::RenderLeaf*&, bool&)",
-	NULL);
+        NULL);
   check(true,
         "nsRegion::RgnRect::operator new ()",
         "nsRegion::RgnRect::operator new",
@@ -338,30 +338,30 @@ main(void)
         NULL);
   /* C++ operator< and templates */
   check(true,
-	"operator< <char, std::char_traits<char>, std::allocator<char> > (__s1=<value optimized out>)",
+        "operator< <char, std::char_traits<char>, std::allocator<char> > (__s1=<value optimized out>)",
         "operator< <char, std::char_traits<char>, std::allocator<char> >",
-	NULL);
+        NULL);
   /* C++ plain operator-> */
   check(true, "operator-> ()", "operator->", NULL);
   /* Not an operator, but includes the keyword 'operator' (Red Hat Bugzilla bug #542445) */
   check(true,
-	"cairo_set_operator (cr=0x0, op=CAIRO_OPERATOR_OVER)",
-	"cairo_set_operator",
-	NULL);
+        "cairo_set_operator (cr=0x0, op=CAIRO_OPERATOR_OVER)",
+        "cairo_set_operator",
+        NULL);
   /* type included */
   #define TYPE "void"
   #define FUNCTION "boost::throw_exception<"                          \
-  	  	   "boost::filesystem::basic_filesystem_error<"       \
-		   "boost::filesystem::basic_path<"                   \
-		   "std::basic_string<"                               \
-		   "char, std::char_traits<char>, "                   \
-		   "std::allocator<char> >, "                         \
-		   "boost::filesystem::path_traits> > >"              \
-		   "(boost::filesystem::basic_filesystem_error<"      \
-		   "boost::filesystem::basic_path<"                   \
-		   "std::basic_string<char, std::char_traits<char>, " \
-	           "std::allocator<char> >, "                         \
-		   "boost::filesystem::path_traits> > const&)"
+                   "boost::filesystem::basic_filesystem_error<"       \
+                   "boost::filesystem::basic_path<"                   \
+                   "std::basic_string<"                               \
+                   "char, std::char_traits<char>, "                   \
+                   "std::allocator<char> >, "                         \
+                   "boost::filesystem::path_traits> > >"              \
+                   "(boost::filesystem::basic_filesystem_error<"      \
+                   "boost::filesystem::basic_path<"                   \
+                   "std::basic_string<char, std::char_traits<char>, " \
+                   "std::allocator<char> >, "                         \
+                   "boost::filesystem::path_traits> > const&)"
   #define ARGS "()"
   #define FUNCALL TYPE " " FUNCTION " " ARGS
   check(true, FUNCALL, FUNCTION, TYPE);
@@ -480,13 +480,13 @@ main(void)
   check(true,
         " at ../sysdeps/unix/syscall-template.S:82",
         "../sysdeps/unix/syscall-template.S",
-	82);
+        82);
 
   /* A file name starting with an underscore: Red Hat Bugzilla bug #530678. */
   check(true,
         " at _polkitauthenticationagent.c:885",
         "_polkitauthenticationagent.c",
-	885);
+        885);
 
   return 0;
 }
@@ -509,7 +509,7 @@ check(char *input,
 {
   printf("=================================================\n"
          "Testing %s\n",
-	 input);
+         input);
 
   char *old_input = input;
   struct sr_location location;
