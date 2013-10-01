@@ -30,7 +30,10 @@ BuildRequires: %{libdw_devel}
 BuildRequires: %{libelf_devel}
 BuildRequires: binutils-devel
 BuildRequires: rpm-devel
-
+BuildRequires: libtool
+BuildRequires: pkgconfig
+BuildRequires: automake
+BuildRequires: gcc-c++
 %if %{?enable_python_manpage}
 BuildRequires: python-sphinx
 %endif
