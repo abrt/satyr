@@ -220,6 +220,14 @@ sr_abrt_parse_dso_list(const char *text)
     return packages;
 }
 
+static void
+strip_newline(char *str)
+{
+    char *n = strchr(str, '\n');
+    if (n)
+        *n = '\0';
+}
+
 struct sr_rpm_package *
 sr_abrt_rpm_packages_from_dir(const char *directory,
                               char **error_message)
@@ -253,6 +261,13 @@ sr_abrt_rpm_packages_from_dir(const char *directory,
         sr_rpm_package_free(packages, false);
         return NULL;
     }
+
+    /* Workaround abrt-action-save-kernel-data appending trailing \n for
+     * koopses. */
+    strip_newline(packages->name);
+    strip_newline(packages->version);
+    strip_newline(packages->release);
+    strip_newline(packages->architecture);
 
     char *dso_list_contents = file_contents(directory, "dso_list",
                                             error_message);
@@ -350,16 +365,13 @@ sr_abrt_report_from_dir(const char *directory,
     report->component_name = file_contents(directory, "component", error_message);
 
     /* RPM packages. */
-    if (report->report_type != SR_REPORT_KERNELOOPS)
-    {
-        report->rpm_packages = sr_abrt_rpm_packages_from_dir(
-            directory, error_message);
+    report->rpm_packages = sr_abrt_rpm_packages_from_dir(
+        directory, error_message);
 
-        if (!report->rpm_packages)
-        {
-            sr_report_free(report);
-            return NULL;
-        }
+    if (!report->rpm_packages)
+    {
+        sr_report_free(report);
+        return NULL;
     }
 
     /* Core stacktrace. */
@@ -423,26 +435,6 @@ sr_abrt_report_from_dir(const char *directory,
             sr_report_free(report);
             return NULL;
         }
-
-        char *kernel_nevra = sr_asprintf("kernel-%s", kernel_contents);
-        struct sr_rpm_package *package = sr_rpm_package_new();
-        bool success = sr_rpm_package_parse_nevra(kernel_nevra,
-                                                  &package->name,
-                                                  &package->epoch,
-                                                  &package->version,
-                                                  &package->release,
-                                                  &package->architecture);
-        package->role = SR_ROLE_AFFECTED;
-        if (!success)
-        {
-            sr_rpm_package_free(package, true);
-            *error_message = sr_asprintf("Failed to parse \"%s\".",
-                                         kernel_nevra);
-
-            sr_report_free(report);
-            return NULL;
-        }
-        report->rpm_packages = package;
 
         /* Load the Kerneloops stacktrace */
         char *backtrace_contents = file_contents(directory, "backtrace", error_message);
