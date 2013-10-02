@@ -283,8 +283,15 @@ sr_koops_frame_parse(const char **input)
                                      &frame->from_function_length,
                                      &frame->from_module_name))
         {
-            sr_koops_frame_free(frame);
-            return NULL;
+            uint64_t unused;
+            /* there may bu just an address, see kerneloopses/gitlog-09 */
+            if (!sr_skip_char(&local_input, '(') ||
+                !sr_parse_hexadecimal_0xuint64(&local_input, &unused) ||
+                !sr_skip_char(&local_input, ')'))
+            {
+                sr_koops_frame_free(frame);
+                return NULL;
+            }
         }
 
         sr_skip_char_span(&local_input, " \t");
@@ -390,7 +397,7 @@ sr_koops_parse_function(const char **input,
     const char *local_input = *input;
     bool parenthesis = sr_skip_char(&local_input, '(');
 
-    if (!sr_parse_char_cspan(&local_input, " \t)+",
+    if (!sr_parse_char_cspan(&local_input, " \t\n)+",
                              function_name))
     {
         return false;
@@ -413,8 +420,7 @@ sr_koops_parse_function(const char **input,
     }
     else
     {
-        *function_offset = -1;
-        *function_length = -1;
+        return false;
     }
 
     sr_skip_char_span(&local_input, " \t");
