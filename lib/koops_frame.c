@@ -234,10 +234,6 @@ sr_koops_frame_parse(const char **input)
     const char *local_input = *input;
     sr_skip_char_span(&local_input, " \t");
 
-    /* Skip timestamp if it's present. */
-    sr_koops_skip_timestamp(&local_input);
-    sr_skip_char_span(&local_input, " \t");
-
     struct sr_koops_frame *frame = sr_koops_frame_new();
 
     if (!sr_koops_parse_address(&local_input, &frame->address))

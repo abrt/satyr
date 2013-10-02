@@ -51,40 +51,32 @@ int
 main(void)
 {
     char *modules[] = { "vfat", "fat", "usb_storage", NULL };
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat usb_storage",
+    check(true, "Modules linked in: vfat fat usb_storage", modules);
+
+    check(true, "Modules linked in: vfat fat usb_storage [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true, "Modules linked in: vfat fat usb_storage \n[last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true, " Modules linked in: vfat fat usb_storage\n [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true, "Modules linked in: vfat fat usb_st\norage [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true, "Modules linked in: vfat fat \nusb_storage [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true, "Modules linked in: vfat fat\n usb_storage [last unloaded: scsi_wait_scan]\n",
           modules);
 
     check(true,
-          "[110417.280431] Modules linked in: vfat fat usb_storage [last unloaded: scsi_wait_scan]\n",
-          modules);
-
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat usb_storage \n[last unloaded: scsi_wait_scan]\n",
-          modules);
-
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat usb_storage\n [last unloaded: scsi_wait_scan]\n",
-          modules);
-
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat usb_st\norage [last unloaded: scsi_wait_scan]\n",
-          modules);
-
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat \nusb_storage [last unloaded: scsi_wait_scan]\n",
-          modules);
-
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat\n usb_storage [last unloaded: scsi_wait_scan]\n",
-          modules);
-
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat usb_storage\n"
+          "Modules linked in: vfat fat usb_storage\n"
           "Pid: 31337, comm: ksoftirqd/2\n",
           modules);
 
-    check(false, "[110417.280434] I hate autotest", modules);
+    check(false, "I hate autotest", modules);
 
     return 0;
 }
