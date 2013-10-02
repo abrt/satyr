@@ -282,6 +282,42 @@ parse_IP(const char **input)
     return frame;
 }
 
+static bool
+parse_alt_stack_end(const char **input)
+{
+    const char *local_input = *input;
+    sr_skip_char_span(&local_input, " \t");
+
+    /* Multiple '<' because of "<<EOE>>" */
+    if (!sr_skip_char_span(&local_input, "<") ||
+        !sr_skip_string(&local_input, "EO") ||
+        !sr_skip_char_span(&local_input, "IE") ||
+        !sr_skip_char_span(&local_input, ">"))
+        return false;
+
+    *input = local_input;
+    return true;
+}
+
+static char *
+parse_alt_stack_start(const char **input)
+{
+    char *stack_label = NULL;
+    const char *local_input = *input;
+    sr_skip_char_span(&local_input, " \t");
+
+    if (!sr_skip_char(&local_input, '<') ||
+        !sr_parse_char_cspan(&local_input, "> \t\n", &stack_label) ||
+        !sr_skip_char(&local_input, '>'))
+    {
+        free(stack_label);
+        return NULL;
+    }
+
+    *input = local_input;
+    return stack_label;
+}
+
 struct sr_koops_stacktrace *
 sr_koops_stacktrace_parse(const char **input,
                           struct sr_location *location)
@@ -291,6 +327,7 @@ sr_koops_stacktrace_parse(const char **input,
     struct sr_koops_stacktrace *stacktrace = sr_koops_stacktrace_new();
     struct sr_koops_frame *frame;
     bool parsed_ip = false;
+    char *alt_stack = NULL;
 
     /* Include the raw kerneloops text */
     stacktrace->raw_oops = sr_strdup(*input);
@@ -307,23 +344,44 @@ sr_koops_stacktrace_parse(const char **input,
 
         if (!stacktrace->modules &&
             (stacktrace->modules = sr_koops_stacktrace_parse_modules(&local_input)))
-        {
-        }
-        else if (!parsed_ip &&
-                 (frame = parse_IP(&local_input)))
+            goto next_line;
+
+        if (!parsed_ip &&
+            (frame = parse_IP(&local_input)))
         {
             /* this is the very first frame (even though for i386 it's at the
              * end), we need to prepend it */
             stacktrace->frames = sr_koops_frame_prepend(stacktrace->frames, frame);
             parsed_ip = true;
+            goto next_line;
         }
-        else if((frame = sr_koops_frame_parse(&local_input)))
-        {
-            stacktrace->frames = sr_koops_frame_append(stacktrace->frames, frame);
-        }
-        else
-            sr_skip_char_cspan(&local_input, "\n");
 
+        /* <IRQ>, <NMI>, ... */
+        if (parse_alt_stack_end(&local_input))
+        {
+            free(alt_stack);
+            alt_stack = NULL;
+        }
+
+        /* <EOI>, <<EOE>> */
+        char *new_alt_stack = parse_alt_stack_start(&local_input);
+        if (new_alt_stack)
+        {
+            alt_stack = new_alt_stack;
+        }
+
+        if((frame = sr_koops_frame_parse(&local_input)))
+        {
+            if (alt_stack)
+                frame->special_stack = sr_strdup(alt_stack);
+
+            stacktrace->frames = sr_koops_frame_append(stacktrace->frames, frame);
+            goto next_line;
+        }
+
+        sr_skip_char_cspan(&local_input, "\n");
+
+next_line:
         sr_skip_char(&local_input, '\n');
     }
 

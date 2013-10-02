@@ -85,6 +85,7 @@ sr_koops_frame_free(struct sr_koops_frame *frame)
     free(frame->module_name);
     free(frame->from_function_name);
     free(frame->from_module_name);
+    free(frame->special_stack);
     free(frame);
 }
 
@@ -115,6 +116,9 @@ sr_koops_frame_dup(struct sr_koops_frame *frame, bool siblings)
 
     if (result->from_module_name)
         result->from_module_name = sr_strdup(result->from_module_name);
+
+    if (result->special_stack)
+        result->special_stack = sr_strdup(result->special_stack);
 
     return result;
 }
@@ -185,6 +189,13 @@ sr_koops_frame_cmp(struct sr_koops_frame *frame1,
 
     if (from_module_name != 0)
         return from_module_name;
+
+    /* Special stack. */
+    int special_stack = sr_strcmp0(frame1->special_stack,
+                                   frame2->special_stack);
+
+    if (special_stack != 0)
+        return special_stack;
 
     return 0;
 }
@@ -397,7 +408,7 @@ sr_koops_parse_function(const char **input,
     const char *local_input = *input;
     bool parenthesis = sr_skip_char(&local_input, '(');
 
-    if (!sr_parse_char_cspan(&local_input, " \t\n)+",
+    if (!sr_parse_char_cspan(&local_input, " \t\n)+<",
                              function_name))
     {
         return false;
@@ -514,6 +525,13 @@ sr_koops_frame_to_json(struct sr_koops_frame *frame)
         sr_strbuf_append_str(strbuf, "\n");
     }
 
+    if (frame->special_stack)
+    {
+        sr_strbuf_append_str(strbuf, ",   \"special_stack\": ");
+        sr_json_append_escaped(strbuf, frame->special_stack);
+        sr_strbuf_append_str(strbuf, "\n");
+    }
+
     sr_strbuf_append_str(strbuf, "}");
     return sr_strbuf_free_nobuf(strbuf);
 }
@@ -537,7 +555,8 @@ sr_koops_frame_from_json(struct sr_json_value *root, char **error_message)
         JSON_READ_STRING(root, "from_function_name", &result->from_function_name) &&
         JSON_READ_UINT64(root, "from_function_offset", &result->from_function_offset) &&
         JSON_READ_UINT64(root, "from_function_length", &result->from_function_length) &&
-        JSON_READ_STRING(root, "from_module_name", &result->from_module_name);
+        JSON_READ_STRING(root, "from_module_name", &result->from_module_name) &&
+        JSON_READ_STRING(root, "special_stack", &result->special_stack);
 
     if (!success)
     {
@@ -552,6 +571,9 @@ void
 sr_koops_frame_append_to_str(struct sr_koops_frame *frame,
                              struct sr_strbuf *str)
 {
+    if (frame->special_stack)
+        sr_strbuf_append_strf(str, "[%s] ", frame->special_stack);
+
     sr_strbuf_append_strf(str, "%s%s",
                           (frame->reliable ? "" : "? "),
                           (frame->function_name ? frame->function_name : "??"));

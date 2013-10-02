@@ -90,6 +90,17 @@ struct sr_koops_frame
      */
     char *from_module_name;
 
+    /**
+     * On x86_64, koops stacktrace may contain frames from multiple stacks.
+     * This string denotes the stack this frame belongs to such as "IRQ" or
+     * "NMI", it is NULL for the main thread stack.
+     * See arch/x86/kernel/dumpstack_64.c and
+     * Documentation/x86/x86_64/kernel-stacks for more info.
+     */
+    /* XXX: we should probably have each stack as a separate thread ... in
+     * uReport3 ? */
+    char *special_stack;
+
     struct sr_koops_frame *next;
 };
 
