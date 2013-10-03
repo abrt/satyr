@@ -537,12 +537,12 @@ sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace)
     if (stacktrace->modules)
     {
         sr_strbuf_append_strf(strbuf, ",   \"modules\":\n");
+        sr_strbuf_append_str(strbuf, "      [ ");
+
         char **module = stacktrace->modules;
         while (*module)
         {
-            if (module == stacktrace->modules)
-                sr_strbuf_append_str(strbuf, "      [ ");
-            else
+            if (module != stacktrace->modules)
                 sr_strbuf_append_str(strbuf, "      , ");
 
             sr_json_append_escaped(strbuf, *module);
