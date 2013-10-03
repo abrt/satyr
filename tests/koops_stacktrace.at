@@ -51,40 +51,32 @@ int
 main(void)
 {
     char *modules[] = { "vfat", "fat", "usb_storage", NULL };
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat usb_storage",
+    check(true, "Modules linked in: vfat fat usb_storage", modules);
+
+    check(true, "Modules linked in: vfat fat usb_storage [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true, "Modules linked in: vfat fat usb_storage \n[last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true, " Modules linked in: vfat fat usb_storage\n [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true, "Modules linked in: vfat fat usb_st\norage [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true, "Modules linked in: vfat fat \nusb_storage [last unloaded: scsi_wait_scan]\n",
+          modules);
+
+    check(true, "Modules linked in: vfat fat\n usb_storage [last unloaded: scsi_wait_scan]\n",
           modules);
 
     check(true,
-          "[110417.280431] Modules linked in: vfat fat usb_storage [last unloaded: scsi_wait_scan]\n",
-          modules);
-
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat usb_storage \n[last unloaded: scsi_wait_scan]\n",
-          modules);
-
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat usb_storage\n [last unloaded: scsi_wait_scan]\n",
-          modules);
-
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat usb_st\norage [last unloaded: scsi_wait_scan]\n",
-          modules);
-
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat \nusb_storage [last unloaded: scsi_wait_scan]\n",
-          modules);
-
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat\n usb_storage [last unloaded: scsi_wait_scan]\n",
-          modules);
-
-    check(true,
-          "[110417.280431] Modules linked in: vfat fat usb_storage\n"
+          "Modules linked in: vfat fat usb_storage\n"
           "Pid: 31337, comm: ksoftirqd/2\n",
           modules);
 
-    check(false, "[110417.280434] I hate autotest", modules);
+    check(false, "I hate autotest", modules);
 
     return 0;
 }
@@ -112,7 +104,9 @@ check(const char *path,
       const char *last_function_name,
       int frame_count,
       int taint_count,
-      int module_count)
+      int module_count,
+      char *first_frame_stack,
+      char *last_frame_stack)
 {
   char *error_message;
   char *full_input = sr_file_to_string(path, &error_message);
@@ -130,12 +124,14 @@ check(const char *path,
   if (stacktrace->frames)
   {
       assert(0 == sr_strcmp0(stacktrace->frames->function_name, first_function_name));
+      assert(0 == sr_strcmp0(stacktrace->frames->special_stack, first_frame_stack));
 
       struct sr_koops_frame *last = stacktrace->frames;
       while (last->next)
           last = last->next;
 
       assert(0 == sr_strcmp0(last->function_name, last_function_name));
+      assert(0 == sr_strcmp0(last->special_stack, last_frame_stack));
   }
   else
       assert(!first_function_name && !last_function_name && 0 == frame_count);
@@ -201,48 +197,50 @@ check(const char *path,
 int
 main(void)
 {
-  check("../../kerneloopses/gitlog-01", "unwind_backtrace", "kthread", 15, 0, 0);
-  check("../../kerneloopses/gitlog-02", "unwind_backtrace", "cpu_idle", 27, 0, 0);
-  check("../../kerneloopses/gitlog-03", "lockdep_rcu_suspicious", "system_call_fastpath", 19, 0, 0);
-  check("../../kerneloopses/gitlog-04", "lockdep_rcu_suspicious", "addrconf_forward_change", 7, 0, 0);
-  check("../../kerneloopses/gitlog-05", "mark_held_locks", "sysenter_do_call", 26, 1, 0);
-  check("../../kerneloopses/gitlog-06", "lock_acquire", "kernel_thread_helper", 23, 1, 0);
-  check("../../kerneloopses/gitlog-07", "__slab_alloc.isra.50.constprop.56", "sysenter_do_call", 14, 0, 0);
-  check("../../kerneloopses/gitlog-08", "unwind_backtrace", "sys_write", 13, 1, 0);
+  check("../../kerneloopses/gitlog-01", "unwind_backtrace", "kthread", 15, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-02", "unwind_backtrace", "cpu_idle", 27, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-03", "lockdep_rcu_suspicious", "system_call_fastpath", 19, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-04", "lockdep_rcu_suspicious", "addrconf_forward_change", 7, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-05", "mark_held_locks", "sysenter_do_call", 26, 1, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-06", "lock_acquire", "kernel_thread_helper", 23, 1, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-07", "__slab_alloc.isra.50.constprop.56", "sysenter_do_call", 14, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-08", "unwind_backtrace", "sys_write", 13, 1, 0, NULL, NULL);
 
-  check("../../kerneloopses/gitlog-09", "unwind_backtrace", "cpu_idle", 11, 1, 0);
-  check("../../kerneloopses/gitlog-10", NULL, NULL, 0, 0, 0);
-  check("../../kerneloopses/gitlog-11", "lockdep_rcu_suspicious", "out_of_memory", 12, 0, 0);
-  check("../../kerneloopses/gitlog-12", "unwind_backtrace", "regulator_get_voltage", 6, 1, 0);
+  check("../../kerneloopses/gitlog-09", "unwind_backtrace", "cpu_idle", 11, 1, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-10", NULL, NULL, 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-11", "lockdep_rcu_suspicious", "out_of_memory", 12, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-12", "unwind_backtrace", "regulator_get_voltage", 6, 1, 0, NULL, NULL);
 /*
-  check("../../kerneloopses/gitlog-13", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-14", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-15", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-16", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-17", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-18", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-19", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-20", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-21", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-22", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-23", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-24", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-25", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-26", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-27", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-28", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-29", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-30", "", "", 0, 0, 0);
-  check("../../kerneloopses/gitlog-31", "", "", 0, 0, 0);
+  check("../../kerneloopses/gitlog-13", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-14", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-15", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-16", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-17", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-18", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-19", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-20", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-21", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-22", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-23", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-24", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-25", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-26", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-27", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-28", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-29", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-30", "", "", 0, 0, 0, NULL, NULL);
+  check("../../kerneloopses/gitlog-31", "", "", 0, 0, 0, NULL, NULL);
 */
 
-  check("../../kerneloopses/rhbz-827868", "warn_slowpath_common", "gs_change", 32, 0, 119);
-  check("../../kerneloopses/rhbz-836206", "__might_sleep", "system_call_fastpath", 23, 0, 59);
-  check("../../kerneloopses/rhbz-865695-0", "wdev_priv.part.8", "sysenter_do_call", 25, 3, 56);
-  check("../../kerneloopses/rhbz-865695-2", "wdev_priv.part.8", "system_call_fastpath", 20, 2, 103);
-  check("../../kerneloopses/rhbz-865695-2-notime", "wdev_priv.part.8", "system_call_fastpath", 20, 2, 103);
+  check("../../kerneloopses/rhbz-827868", "warn_slowpath_common", "gs_change", 32, 0, 119, NULL, NULL);
+  check("../../kerneloopses/rhbz-836206", "__might_sleep", "system_call_fastpath", 23, 0, 59, NULL, NULL);
+  check("../../kerneloopses/rhbz-865695-0", "wdev_priv.part.8", "sysenter_do_call", 25, 3, 56, NULL, NULL);
+  check("../../kerneloopses/rhbz-865695-2", "wdev_priv.part.8", "system_call_fastpath", 20, 2, 103, NULL, NULL);
+  check("../../kerneloopses/rhbz-865695-2-notime", "wdev_priv.part.8", "system_call_fastpath", 20, 2, 103, NULL, NULL);
 
-  check("../../kerneloopses/github-102", "dump_stack", "kthread_create_on_node", 17, 6, 104);
+  check("../../kerneloopses/github-102", "dump_stack", "kthread_create_on_node", 17, 6, 104, NULL, NULL);
+  check("../../kerneloopses/github-73", "dump_stack", "common_interrupt", 33, 0, 100, "IRQ", "IRQ");
+  check("../../kerneloopses/github-73-modified", "dump_stack", "common_interrupt", 33, 0, 100, "NMI", NULL);
 
   return 0;
 }

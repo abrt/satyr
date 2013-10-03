@@ -1,0 +1,42 @@
+WARNING: at net/ipv4/tcp_input.c:2776 tcp_fastretrans_alert+0xc7a/0xd10()
+Modules linked in: fuse ebtable_nat ipt_MASQUERADE rfcomm nf_conntrack_netbios_ns nf_conntrack_broadcast ip6table_mangle ip6t_REJECT nf_conntrack_ipv6 nf_defrag_ipv6 iptable_nat nf_nat_ipv4 nf_nat iptable_mangle nf_conntrack_ipv4 nf_defrag_ipv4 xt_conntrack nf_conntrack ebtable_filter ebtables ip6table_filter ip6_tables bnep be2iscsi iscsi_boot_sysfs bnx2i cnic uio cxgb4i cxgb4 cxgb3i cxgb3 mdio libcxgbi ib_iser rdma_cm ib_addr iw_cm ib_cm ib_sa ib_mad ib_core iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi arc4 rt2800pci rt2800lib rt2x00pci snd_hda_codec_hdmi snd_hda_codec_idt rt2x00mmio rt2x00lib eeprom_93cx6 uvcvideo btusb mac80211 snd_hda_intel snd_hda_codec hp_wmi iTCO_wdt iTCO_vendor_support bluetooth acpi_cpufreq mperf cfg80211 coretemp crc_ccitt sparse_keymap snd_hwdep snd_seq snd_seq_device snd_pcm snd_page_alloc snd_timer snd rfkill r8169 mii lpc_ich mfd_core videobuf2_vmalloc videobuf2_memops videobuf2_core videodev media soundcore serio_raw microcode kvm uinput binfmt_misc i915 i2c_algo_bit drm_kms_helper drm i2c_core wmi video
+CPU: 1 PID: 1797 Comm: amule Not tainted 3.10.11-100.fc18.x86_64 #1
+Hardware name: Hewlett-Packard HP 620/1526, BIOS 68PVI Ver. F.0A 02/10/2011
+ 0000000000000009 ffff88013fc83778 ffffffff81656735 ffff88013fc837b8
+ ffffffff8105d670 ffff8801215fc270 ffff8801215fbf00 0000000000004120
+ 0000000000000001 0000000000000000 0000000000000009 ffff88013fc837c8
+Call Trace:
+ <IRQ>  [<ffffffff81656735>] dump_stack+0x19/0x1b
+ [<ffffffff8105d670>] warn_slowpath_common+0x70/0xa0
+ [<ffffffff8105d6ba>] warn_slowpath_null+0x1a/0x20
+ [<ffffffff8159d19a>] tcp_fastretrans_alert+0xc7a/0xd10
+ [<ffffffff8153f53f>] ? __kfree_skb+0x3f/0xa0
+ [<ffffffff8159dd18>] tcp_ack+0x9d8/0xec0
+ [<ffffffff8159e812>] tcp_rcv_established+0x292/0x8d0
+ [<ffffffff815a8bc4>] tcp_v4_do_rcv+0x2b4/0x4a0
+ [<ffffffff815aab45>] tcp_v4_rcv+0x685/0x7d0
+ [<ffffffff815848e0>] ? ip_rcv_finish+0x340/0x340
+ [<ffffffff8157ba14>] ? nf_hook_slow+0x74/0x130
+ [<ffffffff815848e0>] ? ip_rcv_finish+0x340/0x340
+ [<ffffffff815849b0>] ip_local_deliver_finish+0xd0/0x230
+ [<ffffffff81584ca7>] ip_local_deliver+0x47/0x80
+ [<ffffffff81584620>] ip_rcv_finish+0x80/0x340
+ [<ffffffff81584f19>] ip_rcv+0x239/0x390
+ [<ffffffff8154c8e2>] __netif_receive_skb_core+0x682/0x7f0
+ [<ffffffff8154ca71>] __netif_receive_skb+0x21/0x70
+ [<ffffffff8154cc73>] netif_receive_skb+0x33/0xb0
+ [<ffffffffa03c9273>] ieee80211_deliver_skb.isra.30+0xa3/0x210 [mac80211]
+ [<ffffffffa03ca531>] ieee80211_rx_handlers+0xb81/0x2330 [mac80211]
+ [<ffffffff815402fc>] ? __alloc_skb+0x7c/0x290
+ [<ffffffffa03cbe78>] ieee80211_prepare_and_rx_handle+0x198/0xaf0 [mac80211]
+ [<ffffffffa03ccacd>] ieee80211_rx+0x2fd/0x880 [mac80211]
+ [<ffffffffa0455c39>] rt2x00lib_rxdone+0x2a9/0x5b0 [rt2x00lib]
+ [<ffffffff81091279>] ? scheduler_tick+0x109/0x140
+ [<ffffffffa03120c6>] rt2x00mmio_rxdone+0x86/0xc0 [rt2x00mmio]
+ [<ffffffffa044ff36>] rt2800pci_rxdone_tasklet+0x16/0x90 [rt2800pci]
+ [<ffffffff81065f4a>] tasklet_action+0x6a/0xe0
+ [<ffffffff81065ab8>] __do_softirq+0xe8/0x230
+ [<ffffffff81065d95>] irq_exit+0xb5/0xc0
+ [<ffffffff81666a63>] do_IRQ+0x63/0xe0
+ [<ffffffff8165c86d>] common_interrupt+0x6d/0x6d
+ <EOI>

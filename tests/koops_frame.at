@@ -216,7 +216,7 @@ main(void)
   frame.function_offset = 0x1f0;
   frame.function_length = 0x1f0;
 
-  check(true, "[110417.280555]  [<ffffffff8151f860>] ? ip_forward_options+0x1f0/0x1f0", &frame);
+  check(true, "[<ffffffff8151f860>] ? ip_forward_options+0x1f0/0x1f0", &frame);
 
   sr_koops_frame_init(&frame);
   frame.address = 0xc02f671c;
@@ -230,7 +230,7 @@ main(void)
   frame.from_function_length = 0xdc;
   frame.from_module_name = "mxs_mmc";
 
-  check(true, "[   65.470000] [<c02f671c>] (_raw_spin_lock_irqsave+0x48/0x5c) from [<bf054120>] (mxs_mmc_enable_sdio_irq+0x18/0xdc [mxs_mmc])", &frame);
+  check(true, "[<c02f671c>] (_raw_spin_lock_irqsave+0x48/0x5c) from [<bf054120>] (mxs_mmc_enable_sdio_irq+0x18/0xdc [mxs_mmc])", &frame);
 
   sr_koops_frame_init(&frame);
   frame.reliable = true;
@@ -238,7 +238,7 @@ main(void)
   frame.function_offset = 0x11f;
   frame.function_length = 0x280;
 
-  check(true, "[   99.408443]  sys_delete_module+0x11f/0x280", &frame);
+  check(true, "sys_delete_module+0x11f/0x280", &frame);
   return 0;
 }
 ]])
