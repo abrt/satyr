@@ -109,7 +109,6 @@ class TestKerneloops(BindingsTestCase):
         }
 '''
         trace = satyr.Kerneloops.from_json(json_text)
-        print dir(trace)
         self.assertEqual(trace.version, '3.11.666')
         self.assertTrue(trace.taint_flags['warning'])
         self.assertTrue(trace.taint_flags['died_recently'])
@@ -152,6 +151,25 @@ class TestKerneloops(BindingsTestCase):
         self.assertEqual(trace.frames[2].from_function_offset, 0)
         self.assertEqual(trace.frames[2].from_function_length, 0)
         self.assertEqual(trace.frames[2].from_module_name, None)
+
+    def test_to_json(self):
+        import json
+
+        def check(filename):
+            contents = load_input_contents(filename)
+            trace = satyr.Kerneloops(contents)
+
+            report = satyr.Report()
+            report.report_type = "kerneloops"
+            report.stacktrace = trace
+            json_report = report.to_json()
+
+            # json parsing, should not raise an exception
+            j = json.loads(json_report)
+
+        check('../kerneloopses/github-113')
+        check('../kerneloopses/rhbz-827868-modified')
+
 
 class TestKoopsFrame(BindingsTestCase):
     def setUp(self):
