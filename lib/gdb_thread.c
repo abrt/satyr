@@ -310,94 +310,98 @@ sr_gdb_thread_parse(const char **input,
                     struct sr_location *location)
 {
     const char *local_input = *input;
+    struct sr_gdb_thread *imthread = sr_gdb_thread_new();
 
     /* Read the Thread keyword, which is mandatory. */
     int chars = sr_skip_string(&local_input, "Thread");
     location->column += chars;
-    if (0 == chars)
-    {
-        location->message = "\"Thread\" header expected";
-        return NULL;
-    }
-
-    /* Skip spaces, at least one space is mandatory. */
-    int spaces = sr_skip_char_sequence(&local_input, ' ');
-    location->column += spaces;
-    if (0 == spaces)
-    {
-        location->message = "Space expected after the \"Thread\" keyword.";
-        return NULL;
-    }
-
-    /* Read thread number. */
-    struct sr_gdb_thread *imthread = sr_gdb_thread_new();
-    int digits = sr_parse_uint32(&local_input, &imthread->number);
-    location->column += digits;
-    if (0 == digits)
-    {
-        location->message = "Thread number expected.";
-        sr_gdb_thread_free(imthread);
-        return NULL;
-    }
-
-    /* Skip spaces after the thread number and before parentheses. */
-    spaces = sr_skip_char_sequence(&local_input, ' ');
-    location->column += spaces;
-    if (0 == spaces)
-    {
-        location->message = "Space expected after the thread number.";
-        sr_gdb_thread_free(imthread);
-        return NULL;
-    }
-
-    /* Read the LWP section in parentheses, optional. */
-    location->column += sr_gdb_thread_skip_lwp(&local_input);
-
-    /* Read the Thread keyword in parentheses, optional. */
-    chars = sr_skip_string(&local_input, "(Thread ");
-    location->column += chars;
     if (0 != chars)
     {
-        /* Read the thread identification number. It can be either in
-         * decimal or hexadecimal form.
-         * Examples:
-         * "Thread 10 (Thread 2476):"
-         * "Thread 8 (Thread 0xb07fdb70 (LWP 6357)):"
-         */
-        digits = sr_skip_hexadecimal_0xuint(&local_input);
-        if (0 == digits)
-            digits = sr_skip_uint(&local_input);
+        /* Parse the rest of the Thread header */
+
+        /* Skip spaces, at least one space is mandatory. */
+        int spaces = sr_skip_char_sequence(&local_input, ' ');
+        location->column += spaces;
+        if (0 == spaces)
+        {
+            location->message = "Space expected after the \"Thread\" keyword.";
+            return NULL;
+        }
+
+        /* Read thread number. */
+        int digits = sr_parse_uint32(&local_input, &imthread->number);
         location->column += digits;
         if (0 == digits)
         {
-            location->message = "The thread identification number expected.";
+            location->message = "Thread number expected.";
             sr_gdb_thread_free(imthread);
             return NULL;
         }
 
-        /* Handle the optional " (LWP [0-9]+)" section. */
-        location->column += sr_skip_char_sequence(&local_input, ' ');
+        /* Skip spaces after the thread number and before parentheses. */
+        spaces = sr_skip_char_sequence(&local_input, ' ');
+        location->column += spaces;
+        if (0 == spaces)
+        {
+            location->message = "Space expected after the thread number.";
+            sr_gdb_thread_free(imthread);
+            return NULL;
+        }
+
+        /* Read the LWP section in parentheses, optional. */
         location->column += sr_gdb_thread_skip_lwp(&local_input);
 
-        /* Read the end of the parenthesis. */
-        if (!sr_skip_char(&local_input, ')'))
+        /* Read the Thread keyword in parentheses, optional. */
+        chars = sr_skip_string(&local_input, "(Thread ");
+        location->column += chars;
+        if (0 != chars)
         {
-            location->message = "Closing parenthesis for Thread expected.";
+            /* Read the thread identification number. It can be either in
+             * decimal or hexadecimal form.
+             * Examples:
+             * "Thread 10 (Thread 2476):"
+             * "Thread 8 (Thread 0xb07fdb70 (LWP 6357)):"
+             */
+            digits = sr_skip_hexadecimal_0xuint(&local_input);
+            if (0 == digits)
+                digits = sr_skip_uint(&local_input);
+            location->column += digits;
+            if (0 == digits)
+            {
+                location->message = "The thread identification number expected.";
+                sr_gdb_thread_free(imthread);
+                return NULL;
+            }
+
+            /* Handle the optional " (LWP [0-9]+)" section. */
+            location->column += sr_skip_char_sequence(&local_input, ' ');
+            location->column += sr_gdb_thread_skip_lwp(&local_input);
+
+            /* Read the end of the parenthesis. */
+            if (!sr_skip_char(&local_input, ')'))
+            {
+                location->message = "Closing parenthesis for Thread expected.";
+                sr_gdb_thread_free(imthread);
+                return NULL;
+            }
+        }
+
+        /* Read the end of the header line. */
+        chars = sr_skip_string(&local_input, ":\n");
+        if (0 == chars)
+        {
+            location->message = "Expected a colon followed by a newline ':\\n'.";
             sr_gdb_thread_free(imthread);
             return NULL;
         }
+        /* Add the newline from the last sr_skip_string. */
+        sr_location_add(location, 2, 0);
     }
-
-    /* Read the end of the header line. */
-    chars = sr_skip_string(&local_input, ":\n");
-    if (0 == chars)
+    else
     {
-        location->message = "Expected a colon followed by a newline ':\\n'.";
-        sr_gdb_thread_free(imthread);
-        return NULL;
+        /* No Thread header available, parse as one thread */
+        imthread->number = 0;
     }
-    /* Add the newline from the last sr_skip_string. */
-    sr_location_add(location, 2, 0);
 
     /* Read the frames. */
     struct sr_gdb_frame *frame, *prevframe = NULL;
