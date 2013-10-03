@@ -1,0 +1,29 @@
+WARNING: at drivers/iommu/intel_irq_remapping.c:533 intel_irq_remapping_supported+0x37/0x7a()
+This system BIOS has enabled interrupt remapping
+on a chipset that contains an erratum making that
+feature unstable.  To maintain system stability
+interrupt remapping is being disabled.  Please
+contact your BIOS vendor for an update
+Modules linked in:
+CPU: 0 PID: 1 Comm: swapper/0 Not tainted 3.10.12-100.fc18.x86_64 #1
+Hardware name: Hewlett-Packard HP Z600 Workstation/0B54h, BIOS 786G4 v03.19 03/11/2011
+ 000000000000000b ffff88030ec8fd48 ffffffff81656b45 ffff88030ec8fd88
+ ffffffff8105d670 ffffffff81529d1f 0000000000000000 0000000000000246
+ 00000000ffffffff 000000000000b020 000000000000001f ffff88030ec8fde8
+Call Trace:
+ [<ffffffff81656b45>] dump_stack+0x19/0x1b
+ [<ffffffff8105d670>] warn_slowpath_common+0x70/0xa0
+ [<ffffffff81529d1f>] ? kzalloc+0xf/0x20
+ [<ffffffff8105d6ff>] warn_slowpath_fmt_taint+0x3f/0x50
+ [<ffffffff8103883b>] ? ioapic_read_entry+0x4b/0x60
+ [<ffffffff81d59a57>] intel_irq_remapping_supported+0x37/0x7a
+ [<ffffffff8152cfbd>] irq_remapping_supported+0x2d/0x30
+ [<ffffffff81d1c318>] enable_IR+0xb/0x62
+ [<ffffffff81d1c654>] enable_IR_x2apic+0x8f/0x14b
+ [<ffffffff81d1e35c>] default_setup_apic_routing+0x12/0x6b
+ [<ffffffff81d1a319>] native_smp_prepare_cpus+0x2fc/0x336
+ [<ffffffff81d09f9c>] kernel_init_freeable+0x9f/0x1df
+ [<ffffffff81640df0>] ? rest_init+0x80/0x80
+ [<ffffffff81640dfe>] kernel_init+0xe/0xf0
+ [<ffffffff816650ec>] ret_from_fork+0x7c/0xb0
+ [<ffffffff81640df0>] ? rest_init+0x80/0x80
