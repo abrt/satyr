@@ -62,7 +62,8 @@ GSOFF_MEMBER(from_address),
 GSOFF_MEMBER(from_function_name),
 GSOFF_MEMBER(from_function_offset),
 GSOFF_MEMBER(from_function_length),
-GSOFF_MEMBER(from_module_name)
+GSOFF_MEMBER(from_module_name),
+GSOFF_MEMBER(special_stack)
 GSOFF_END
 
 static PyGetSetDef
@@ -79,6 +80,7 @@ frame_getset[] =
     SR_ATTRIBUTE_UINT64(from_function_offset, "Caller function offset (long)"                        ),
     SR_ATTRIBUTE_UINT64(from_function_length, "Caller function length (long)"                        ),
     SR_ATTRIBUTE_STRING(from_module_name,     "Module owning the caller function (string)"           ),
+    SR_ATTRIBUTE_STRING(special_stack,        "Identifier of x86_64 kernel stack (string)"           ),
     { NULL },
 };
 
@@ -172,6 +174,9 @@ sr_py_koops_frame_str(PyObject *self)
 {
     struct sr_py_koops_frame *this = (struct sr_py_koops_frame*)self;
     struct sr_strbuf *buf = sr_strbuf_new();
+    if (this->frame->special_stack)
+        sr_strbuf_append_strf(buf, "[%s] ", this->frame->special_stack);
+
     if (this->frame->address != 0)
         sr_strbuf_append_strf(buf, "[0x%016"PRIx64"] ", this->frame->address);
 
