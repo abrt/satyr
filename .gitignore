@@ -8,6 +8,8 @@ ar-lib
 compile
 satyr.1
 
+build/*
+
 /autom4te.cache
 /satyr
 /satyr.pc
