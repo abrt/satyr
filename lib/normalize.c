@@ -63,6 +63,15 @@ call_match(const char *function_name,
 }
 
 static bool
+is_removable_vim(const char *function_name,
+                 const char *source_file)
+{
+    return
+        call_match(function_name, source_file, "may_core_dump", "os_unix.c", NULL) ||
+        call_match(function_name, source_file, "mch_exit", "os_unix.c", NULL);
+}
+
+static bool
 is_removable_dbus(const char *function_name,
                   const char *source_file)
 {
@@ -315,7 +324,8 @@ sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
             is_removable_glibc(frame->function_name, frame->source_file) ||
             is_removable_libstdcpp(frame->function_name, frame->source_file) ||
             is_removable_linux(frame->function_name, frame->source_file) ||
-            is_removable_xorg(frame->function_name, frame->source_file);
+            is_removable_xorg(frame->function_name, frame->source_file) ||
+            is_removable_vim(frame->function_name, frame->source_file);
 
         bool removable_with_above =
             is_removable_glibc_with_above(frame->function_name, frame->source_file);
@@ -457,7 +467,8 @@ sr_normalize_core_thread(struct sr_core_thread *thread)
             is_removable_glibc(frame->function_name, frame->file_name) ||
             is_removable_libstdcpp(frame->function_name, frame->file_name) ||
             is_removable_linux(frame->function_name, frame->file_name) ||
-            is_removable_xorg(frame->function_name, frame->file_name);
+            is_removable_xorg(frame->function_name, frame->file_name) ||
+            is_removable_vim(frame->function_name, frame->file_name);
 
         bool removable_with_above =
             is_removable_glibc_with_above(frame->function_name, frame->file_name);
