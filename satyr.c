@@ -27,6 +27,8 @@
 #include "normalize.h"
 #include "report.h"
 #include "abrt.h"
+#include "thread.h"
+#include "stacktrace.h"
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -208,6 +210,71 @@ debug_normalize(int argc, char **argv)
 }
 
 static void
+debug_duphash(int argc, char **argv)
+{
+    if (argc < 2)
+    {
+        fprintf(stderr, "Usage: %s debug duphash TYPE FILE [COMPONENT]\n",
+                g_program_name);
+        short_usage_and_exit();
+    }
+
+    enum sr_report_type type = sr_report_type_from_string(argv[0]);
+
+    if (type == SR_REPORT_INVALID)
+    {
+        fprintf(stderr, "Invalid report type %s\n", argv[0]);
+        exit(1);
+    }
+
+    char *error_message;
+    char *text = sr_file_to_string(argv[1], &error_message);
+    if (!text)
+    {
+        fprintf(stderr, "%s\n", error_message);
+        exit(1);
+    }
+
+    struct sr_stacktrace *stacktrace = sr_stacktrace_parse(type, text,
+                                                           &error_message);
+    if (!stacktrace)
+    {
+        fprintf(stderr, "%s\n", error_message);
+        exit(1);
+    }
+
+    struct sr_thread *thread = sr_stacktrace_find_crash_thread(stacktrace);
+    if (!thread)
+    {
+        fprintf(stderr, "Cannot find crash thread\n");
+        exit(1);
+    }
+
+    char *component = argc >= 3 ? argv[2] : NULL;
+
+    char *duphash = sr_thread_get_duphash(thread, 3, component,
+                                          SR_DUPHASH_NOHASH);
+    if (duphash)
+        printf("Cleartext:\n%s\n", duphash);
+    else
+    {
+        fprintf(stderr, "Computing duphash failed\n");
+        exit(1);
+    }
+
+    free(duphash);
+    duphash = sr_thread_get_duphash(thread, 3, component,
+                                    SR_DUPHASH_NORMAL);
+    if (duphash)
+        printf("Hash: %s\n", duphash);
+    else
+    {
+        fprintf(stderr, "Computing duphash failed\n");
+        exit(1);
+    }
+}
+
+static void
 debug(int argc, char **argv)
 {
     /* Debug command requires a subcommand. */
@@ -219,6 +286,8 @@ debug(int argc, char **argv)
 
     if (0 == strcmp(argv[0], "normalize"))
         debug_normalize(argc - 1, argv + 1);
+    else if (0 == strcmp(argv[0], "duphash"))
+        debug_duphash(argc - 1, argv + 1);
     else
     {
         fprintf(stderr, "Unknown debug subcommand.\n");
