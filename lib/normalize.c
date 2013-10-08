@@ -51,7 +51,7 @@ call_match(const char *function_name,
             break;
 
         if (source_file &&
-            NULL != strstr(expected_source_file, source_file))
+            NULL != strstr(source_file, expected_source_file))
         {
             success = true;
             break;
