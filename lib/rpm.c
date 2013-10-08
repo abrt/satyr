@@ -600,7 +600,7 @@ single_rpm_pacakge_from_json(struct sr_json_value *root, char **error_message)
         {
             if (error_message)
                 *error_message = sr_asprintf("Invalid package role %s", role);
-            return NULL;
+            goto fail;
         }
 
         package->role = SR_ROLE_AFFECTED;
