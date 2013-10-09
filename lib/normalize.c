@@ -51,7 +51,7 @@ call_match(const char *function_name,
             break;
 
         if (source_file &&
-            NULL != strstr(expected_source_file, source_file))
+            NULL != strstr(source_file, expected_source_file))
         {
             success = true;
             break;
@@ -134,7 +134,9 @@ is_removable_libstdcpp(const char *function_name,
         call_match(function_name, source_file, "__gnu_cxx::__verbose_terminate_handler", "vterminate.cc", NULL) ||
         call_match(function_name, source_file, "__cxxabiv1::__terminate", "eh_terminate.cc", NULL) ||
         call_match(function_name, source_file, "std::terminate", "eh_terminate.cc", NULL) ||
-        call_match(function_name, source_file, "__cxxabiv1::__cxa_throw", "eh_throw.cc", NULL);
+        call_match(function_name, source_file, "__cxxabiv1::__cxa_throw", "eh_throw.cc", NULL) ||
+        call_match(function_name, source_file, "__cxxabiv1::__cxa_rethrow", "eh_throw.cc", NULL) ||
+        call_match(function_name, source_file, "__cxxabiv1::__cxa_pure_virtual", "pure.cc", NULL);
 }
 
 static bool

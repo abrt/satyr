@@ -75,7 +75,7 @@ class TestGdbThread(BindingsTestCase):
     def test_duphash(self):
         expected_plain = 'Thread\n  write\n  virNetSocketWriteWire\n  virNetSocketWrite\n'
         self.assertEqual(self.thread.get_duphash(flags=satyr.DUPHASH_NOHASH, frames=3), expected_plain)
-        self.assertEqual(self.thread.get_duphash(), '4ff2e92d89425e18e82b94c214c7ccfec8b31793')
+        self.assertEqual(self.thread.get_duphash(), '01d2a92281954a81dee9098dc4f8056ef5a5a5e1')
 
 class TestGdbSharedlib(BindingsTestCase):
     def setUp(self):
