@@ -16,6 +16,12 @@ class BindingsTestCase(unittest.TestCase):
         self.assertEqual(obj.__getattribute__(attr), new_val)
         self.assertRaises(TypeError, obj.__delattr__, attr)
 
+    def assertHashable(self, obj):
+        '''
+        Check whether obj is hashable.
+        '''
+        self.assertTrue(isinstance(hash(obj), int))
+
 def load_input_contents(path):
     if not os.path.isfile(path):
         path = '../' + path

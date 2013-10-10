@@ -42,7 +42,7 @@ class TestKerneloops(BindingsTestCase):
     def test_dup(self):
         dup = self.koops.dup()
         self.assertNotEqual(id(dup.frames), id(self.koops.frames))
-        self.assertEqual(dup.frames, self.koops.frames)
+        self.assertTrue(all(map(lambda t1, t2: t1.equals(t2), dup.frames, self.koops.frames)))
 
         dup.frames = dup.frames[:5]
         dup2 = dup.dup()
@@ -170,6 +170,9 @@ class TestKerneloops(BindingsTestCase):
         check('../kerneloopses/github-113')
         check('../kerneloopses/rhbz-827868-modified')
 
+    def test_hash(self):
+        self.assertHashable(self.koops)
+
 
 class TestKoopsFrame(BindingsTestCase):
     def setUp(self):
@@ -193,15 +196,12 @@ class TestKoopsFrame(BindingsTestCase):
 
     def test_cmp(self):
         dup = self.frame.dup()
-        self.assertEqual(dup, dup)
-        self.assertEqual(dup, self.frame)
-        self.assertEqual(dup, self.frame)
+        self.assertTrue(dup.equals(dup))
+        self.assertTrue(dup.equals(self.frame))
         self.assertNotEqual(id(dup), id(self.frame))
 
         dup.reliable = False
-        self.assertNotEqual(dup, self.frame)
-        self.assertTrue(dup > self.frame)
-        self.assertFalse(dup < self.frame)
+        self.assertFalse(dup.equals(self.frame))
 
     def test_getset(self):
         self.assertGetSetCorrect(self.frame, 'reliable', True, False)
@@ -215,6 +215,9 @@ class TestKoopsFrame(BindingsTestCase):
         self.assertGetSetCorrect(self.frame, 'from_function_offset', 0, 0x31337)
         self.assertGetSetCorrect(self.frame, 'from_function_length', 0, 1024)
         self.assertGetSetCorrect(self.frame, 'from_module_name', None, 'asdf')
+
+    def test_hash(self):
+        self.assertHashable(self.frame)
 
 if __name__ == '__main__':
     unittest.main()

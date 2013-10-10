@@ -24,7 +24,7 @@ class TestPythonStacktrace(BindingsTestCase):
     def test_dup(self):
         dup = self.trace.dup()
         self.assertNotEqual(id(dup.frames), id(self.trace.frames))
-        self.assertEqual(dup.frames, self.trace.frames)
+        self.assertTrue(all(map(lambda t1, t2: t1.equals(t2), dup.frames, self.trace.frames)))
 
         dup.frames = dup.frames[:5]
         dup2 = dup.dup()
@@ -140,6 +140,9 @@ class TestPythonStacktrace(BindingsTestCase):
         self.assertFalse(trace.frames[2].special_file)
         self.assertFalse(trace.frames[2].special_function)
 
+    def test_hash(self):
+        self.assertHashable(self.trace)
+
 class TestPythonFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.PythonStacktrace(contents).frames[-1]
@@ -161,13 +164,11 @@ class TestPythonFrame(BindingsTestCase):
 
     def test_cmp(self):
         dup = self.frame.dup()
-        self.assertEqual(dup, dup)
-        self.assertEqual(dup, self.frame)
-        self.assertEqual(dup, self.frame)
+        self.assertTrue(dup.equals(dup))
+        self.assertTrue(dup.equals(self.frame))
         self.assertNotEqual(id(dup), id(self.frame))
         dup.function_name = 'another'
-        self.assertNotEqual(dup, self.frame)
-        self.assertTrue(dup > self.frame)
+        self.assertFalse(dup.equals(self.frame))
 
     def test_getset(self):
         self.assertGetSetCorrect(self.frame, 'file_name', '/usr/share/PackageKit/helpers/yum/yumBackend.py', 'java.py')
@@ -176,6 +177,9 @@ class TestPythonFrame(BindingsTestCase):
         self.assertGetSetCorrect(self.frame, 'special_function', False, True)
         self.assertGetSetCorrect(self.frame, 'function_name', '_runYumTransaction', 'iiiiii')
         self.assertGetSetCorrect(self.frame, 'line_contents', 'rpmDisplay=rpmDisplay)', 'abcde')
+
+    def test_hash(self):
+        self.assertHashable(self.frame)
 
 if __name__ == '__main__':
     unittest.main()
