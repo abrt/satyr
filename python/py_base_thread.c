@@ -217,6 +217,12 @@ sr_py_base_thread_distance(PyObject *self, PyObject *args, PyObject *kwds)
     struct sr_py_base_thread *t1 = (struct sr_py_base_thread *)self;
     struct sr_py_base_thread *t2 = (struct sr_py_base_thread *)other;
 
+    if (frames_prepare_linked_list(t1) < 0)
+        return NULL;
+
+    if (frames_prepare_linked_list(t2) < 0)
+        return NULL;
+
     if (self->ob_type != other->ob_type)
     {
         PyErr_SetString(PyExc_TypeError, "Both threads must have the same type");
