@@ -104,7 +104,7 @@ AC_CHECK_LIB([elf], [main])
 AC_CHECK_LIB([dw], [main])
 AC_CHECK_LIB([dwfl], [main])
 AC_CHECK_LIB([dl], [main])
-AC_CHECK_FUNC(dwfl_frame_state_core, AC_DEFINE(HAVE_DWFL_FRAME_STATE_CORE, [], [Have function dwfl_frame_state_core for coredump unwinding]))
+AC_CHECK_FUNC(dwfl_getthreads, AC_DEFINE(HAVE_DWFL_NEXT_THREAD, [], [Have function dwfl_getthreads for coredump unwinding]))
 
 # libunwind
 AC_CHECK_HEADERS([libunwind-coredump.h])
