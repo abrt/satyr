@@ -40,7 +40,7 @@ struct sr_py_base_frame
     struct sr_frame *frame;
 };
 
-int sr_py_base_frame_cmp(struct sr_py_base_frame *self, struct sr_py_base_frame *other);
+PyObject *sr_py_base_frame_equals(PyObject *self, PyObject *args);
 
 PyObject *sr_py_base_frame_short_string(PyObject *self, PyObject *args);
 

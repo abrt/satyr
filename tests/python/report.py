@@ -17,6 +17,9 @@ class TestOperatingSystem(BindingsTestCase):
         self.assertGetSetCorrect(self.opsys, 'uptime', 0, 9000)
         self.assertGetSetCorrect(self.opsys, 'cpe', None, 'cpe:/o:fedoraproject:fedora:19')
 
+    def test_hash(self):
+        self.assertHashable(self.opsys)
+
 class TestRpmPackage(BindingsTestCase):
     def setUp(self):
         self.rpm = satyr.RpmPackage('emacs-filesystem', 1, '24.3', '11.fc19', 'noarch')
@@ -32,6 +35,9 @@ class TestRpmPackage(BindingsTestCase):
         self.assertGetSetCorrect(self.rpm, 'architecture', 'noarch', 'armv7hl')
         self.assertGetSetCorrect(self.rpm, 'install_time', 0, 1234565)
         self.assertGetSetCorrect(self.rpm, 'role', satyr.ROLE_UNKNOWN, satyr.ROLE_AFFECTED)
+
+    def test_hash(self):
+        self.assertHashable(self.rpm)
 
 class TestReport(BindingsTestCase):
     def setUp(self):
@@ -81,6 +87,9 @@ class TestReport(BindingsTestCase):
         self.assertTrue(len(self.report.packages) == 3)
         self.assertEqual(self.report.packages[0].name, 'coreutils')
         self.assertEqual(self.report.packages[0].role, satyr.ROLE_AFFECTED)
+
+    def test_hash(self):
+        self.assertHashable(self.report)
 
 
 if __name__ == '__main__':

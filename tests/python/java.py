@@ -29,7 +29,7 @@ class TestJavaStacktrace(BindingsTestCase):
     def test_dup(self):
         dup = self.trace.dup()
         self.assertNotEqual(id(dup.threads), id(self.trace.threads))
-        self.assertEqual(dup.threads, self.trace.threads)
+        self.assertTrue(all(map(lambda t1, t2: t1.equals(t2), dup.threads, self.trace.threads)))
 
         dup.threads = dup.threads[:5]
         dup2 = dup.dup()
@@ -132,6 +132,9 @@ class TestJavaStacktrace(BindingsTestCase):
         self.assertFalse(trace.threads[1].frames[0].is_exception)
         self.assertEqual(trace.threads[1].frames[0].message, None)
 
+    def test_hash(self):
+        self.assertHashable(self.trace)
+
 class TestJavaThread(BindingsTestCase):
     def setUp(self):
         self.thread = satyr.JavaStacktrace(contents).threads[0]
@@ -140,11 +143,11 @@ class TestJavaThread(BindingsTestCase):
         self.assertGetSetCorrect(self.thread, 'name', None, 'elvis')
 
     def test_cmp(self):
-        self.assertEqual(self.thread, self.thread)
+        self.assertTrue(self.thread.equals(self.thread))
         dup = self.thread.dup()
-        self.assertEqual(self.thread, dup)
+        self.assertTrue(self.thread.equals(dup))
         dup.name = ' 45678987\n\n\n\n'
-        self.assertNotEqual(self.thread, dup)
+        self.assertFalse(self.thread.equals(dup))
 
     def test_duphash(self):
         expected_plain = '''Thread
@@ -154,6 +157,9 @@ org.hibernate.exception.JDBCExceptionHelper.convert
 '''
         self.assertEqual(self.thread.get_duphash(flags=satyr.DUPHASH_NOHASH, frames=3), expected_plain)
         self.assertEqual(self.thread.get_duphash(), '81450a80a9d9307624b08e80dc244beb63d91138')
+
+    def test_hash(self):
+        self.assertHashable(self.thread)
 
 class TestJavaFrame(BindingsTestCase):
     def setUp(self):
@@ -176,14 +182,11 @@ class TestJavaFrame(BindingsTestCase):
 
     def test_cmp(self):
         dup = self.frame.dup()
-        self.assertEqual(dup, dup)
-        self.assertEqual(dup, self.frame)
-        self.assertEqual(dup, self.frame)
+        self.assertTrue(dup.equals(dup))
+        self.assertTrue(dup.equals(self.frame))
         self.assertNotEqual(id(dup), id(self.frame))
         dup.name = 'another'
-        self.assertNotEqual(dup, self.frame)
-        self.assertFalse(dup > self.frame)
-        self.assertTrue(dup < self.frame)
+        self.assertFalse(dup.equals(self.frame))
 
     def test_getset(self):
         self.assertGetSetCorrect(self.frame, 'name', 'org.hibernate.exception.ConstraintViolationException', 'long.name.is.Long')
@@ -194,6 +197,9 @@ class TestJavaFrame(BindingsTestCase):
         self.assertGetSetCorrect(self.frame, 'is_exception', False, 1)
         self.assertGetSetCorrect(self.frame, 'is_native', False, True)
         self.assertGetSetCorrect(self.frame, 'message', 'could not insert: [com.example.myproject.MyEntity]', 'printer on fire')
+
+    def test_hash(self):
+        self.assertHashable(self.frame)
 
 
 if __name__ == '__main__':

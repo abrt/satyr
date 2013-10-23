@@ -46,7 +46,7 @@ struct sr_py_base_thread
 int frames_prepare_linked_list(struct sr_py_base_thread *thread);
 PyObject *frames_to_python_list(struct sr_thread *thread, PyTypeObject *frame_type);
 
-int sr_py_base_thread_cmp(struct sr_py_base_thread *self, struct sr_py_base_thread *other);
+PyObject *sr_py_base_thread_equals(PyObject *self, PyObject *args);
 
 /* methods */
 PyObject *sr_py_base_thread_distance(PyObject *self, PyObject *args, PyObject *kwds);

@@ -25,7 +25,7 @@ class TestCoreStacktrace(BindingsTestCase):
     def test_dup(self):
         dup = self.trace.dup()
         self.assertNotEqual(id(dup.threads), id(self.trace.threads))
-        self.assertEqual(dup.threads, self.trace.threads)
+        self.assertTrue(all(map(lambda t1, t2: t1.equals(t2), dup.threads, self.trace.threads)))
 
         dup.threads = dup.threads[:5]
         dup2 = dup.dup()
@@ -145,6 +145,9 @@ class TestCoreStacktrace(BindingsTestCase):
         self.assertEqual(trace.threads[1].frames[0].fingerprint, None)
         self.assertTrue(trace.threads[1].frames[0].fingerprint_hashed)
 
+    def test_hash(self):
+        self.assertHashable(self.trace)
+
 class TestCoreThread(BindingsTestCase):
     def setUp(self):
         self.thread = satyr.CoreStacktrace(contents).threads[0]
@@ -152,9 +155,9 @@ class TestCoreThread(BindingsTestCase):
     def test_cmp(self):
         self.assertEqual(self.thread, self.thread)
         dup = self.thread.dup()
-        self.assertEqual(self.thread, dup)
+        self.assertTrue(self.thread.equals(dup))
         dup.frames[0].build_id = 'wut'
-        self.assertNotEqual(self.thread, dup)
+        self.assertFalse(self.thread.equals(dup))
 
     def test_duphash(self):
         expected_plain = '''Thread
@@ -163,6 +166,9 @@ class TestCoreThread(BindingsTestCase):
 '''
         self.assertEqual(self.thread.get_duphash(flags=satyr.DUPHASH_NOHASH, frames=3), expected_plain)
         self.assertEqual(self.thread.get_duphash(), 'ad8486fa45ff39ffed7a07f3b68b8f406ebe2550')
+
+    def test_hash(self):
+        self.assertHashable(self.thread)
 
 class TestCoreFrame(BindingsTestCase):
     def setUp(self):
@@ -176,21 +182,18 @@ class TestCoreFrame(BindingsTestCase):
 
     def test_dup(self):
         dup = self.frame.dup()
-        self.assertEqual(dup, self.frame)
+        self.assertTrue(dup.equals(self.frame))
 
         dup.function_name = 'other'
-        self.assertNotEqual(dup, self.frame)
+        self.assertFalse(dup.equals(self.frame))
 
     def test_cmp(self):
         dup = self.frame.dup()
-        self.assertEqual(dup, dup)
-        self.assertEqual(dup, self.frame)
-        self.assertEqual(dup, self.frame)
+        self.assertTrue(dup.equals(dup))
+        self.assertTrue(dup.equals(self.frame))
         self.assertNotEqual(id(dup), id(self.frame))
         dup.function_name = 'another'
-        self.assertNotEqual(dup, self.frame)
-        self.assertFalse(dup > self.frame)
-        self.assertTrue(dup < self.frame)
+        self.assertFalse(dup.equals(self.frame))
 
     def test_getset(self):
         self.assertGetSetCorrect(self.frame, 'address', 237190207797, 5000)
@@ -201,6 +204,8 @@ class TestCoreFrame(BindingsTestCase):
         self.assertGetSetCorrect(self.frame, 'fingerprint', 'f33186a4c862fb0751bca60701f553b829210477', 'xxx')
         self.assertGetSetCorrect(self.frame, 'fingerprint_hashed', True, False)
 
+    def test_hash(self):
+        self.assertHashable(self.frame)
 
 if __name__ == '__main__':
     unittest.main()

@@ -29,12 +29,15 @@
 
 #define f_short_string_doc "Usage: frame.short_string()\n\n" \
                            "Returns: string - brief textual representation of the frame"
+#define f_equals_doc "Usage: frame.equals(otherframe)\n\n" \
+                     "Returns: bool - True if frame has attributes equal to otherframe"
 
 static PyMethodDef
 frame_methods[] =
 {
     /* methods */
-    { "short_string", sr_py_base_frame_short_string, METH_NOARGS, f_short_string_doc },
+    { "short_string", sr_py_base_frame_short_string, METH_NOARGS,  f_short_string_doc },
+    { "equals",       sr_py_base_frame_equals,       METH_VARARGS, f_equals_doc },
     { NULL },
 };
 
@@ -50,7 +53,7 @@ sr_py_base_frame_type =
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
-    (cmpfunc)sr_py_base_frame_cmp, /* tp_compare */
+    NULL,                       /* tp_compare */
     NULL,                       /* tp_repr */
     NULL,                       /* tp_as_number */
     NULL,                       /* tp_as_sequence */
@@ -104,7 +107,7 @@ sr_py_base_frame_short_string(PyObject *self, PyObject *args)
     return result;
 }
 
-int
+static int
 sr_py_base_frame_cmp(struct sr_py_base_frame *self, struct sr_py_base_frame *other)
 {
     if (self->ob_type != other->ob_type)
@@ -114,4 +117,19 @@ sr_py_base_frame_cmp(struct sr_py_base_frame *self, struct sr_py_base_frame *oth
     }
 
     return normalize_cmp(sr_frame_cmp(self->frame, other->frame));
+}
+
+PyObject *
+sr_py_base_frame_equals(PyObject *self, PyObject *args)
+{
+    PyObject *other;
+
+    if (!PyArg_ParseTuple(args, "O!", &sr_py_base_frame_type, &other))
+        return NULL;
+
+    if (sr_py_base_frame_cmp((struct sr_py_base_frame *)self,
+                             (struct sr_py_base_frame *)other) == 0)
+        Py_RETURN_TRUE;
+    else
+        Py_RETURN_FALSE;
 }

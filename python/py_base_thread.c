@@ -41,12 +41,16 @@
                         "DUPHASH_NONORMALIZE)\n\n"\
                         "prefix: string - string to be prepended in front of the text before hashing"
 
+#define equals_doc "Usage: frame.equals(otherthread)\n\n" \
+                   "Returns: bool - True if thread has attributes equal to otherthread"
+
 static PyMethodDef
 thread_methods[] =
 {
     /* methods */
     { "distance",    (PyCFunction)sr_py_base_thread_distance,    METH_VARARGS|METH_KEYWORDS, distance_doc    },
     { "get_duphash", (PyCFunction)sr_py_base_thread_get_duphash, METH_VARARGS|METH_KEYWORDS, get_duphash_doc },
+    { "equals",      sr_py_base_thread_equals,                   METH_VARARGS,               equals_doc      },
     { NULL },
 };
 
@@ -69,7 +73,7 @@ sr_py_base_thread_type =
     NULL,                       /* tp_print */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
-    (cmpfunc)sr_py_base_thread_cmp, /* tp_compare */
+    NULL,                       /* tp_compare */
     NULL,                       /* tp_repr */
     NULL,                       /* tp_as_number */
     NULL,                       /* tp_as_sequence */
@@ -183,7 +187,7 @@ frames_to_python_list(struct sr_thread *thread, PyTypeObject *frame_type)
 }
 
 /* comparison */
-int
+static int
 sr_py_base_thread_cmp(struct sr_py_base_thread *self, struct sr_py_base_thread *other)
 {
     if (self->ob_type != other->ob_type)
@@ -200,6 +204,21 @@ sr_py_base_thread_cmp(struct sr_py_base_thread *self, struct sr_py_base_thread *
     }
 
     return normalize_cmp(sr_thread_cmp(self->thread, other->thread));
+}
+
+PyObject *
+sr_py_base_thread_equals(PyObject *self, PyObject *args)
+{
+    PyObject *other;
+
+    if (!PyArg_ParseTuple(args, "O!", &sr_py_base_thread_type, &other))
+        return NULL;
+
+    if (sr_py_base_thread_cmp((struct sr_py_base_thread *)self,
+                              (struct sr_py_base_thread *)other) == 0)
+        Py_RETURN_TRUE;
+    else
+        Py_RETURN_FALSE;
 }
 
 /* methods */

@@ -27,12 +27,12 @@ class TestGdbStacktrace(BindingsTestCase):
     def test_dup(self):
         dup = self.trace.dup()
         self.assertNotEqual(id(dup.threads), id(self.trace.threads))
-        self.assertEqual(dup.threads, self.trace.threads)
+        self.assertTrue(all(map(lambda t1, t2: t1.equals(t2), dup.threads, self.trace.threads)))
 
         dup.threads = dup.threads[:5]
         dup2 = dup.dup()
         self.assertNotEqual(id(dup.threads), id(dup2.threads))
-        self.assertEqual(dup.threads, dup2.threads)
+        self.assertTrue(all(map(lambda t1, t2: t1.equals(t2), dup.threads, dup2.threads)))
 
     def test_prepare_linked_list(self):
         dup = self.trace.dup()
@@ -58,6 +58,9 @@ class TestGdbStacktrace(BindingsTestCase):
     def test_crash_thread(self):
         self.assertTrue(self.trace.crash_thread is self.trace.threads[1])
 
+    def test_hash(self):
+        self.assertHashable(self.trace)
+
 class TestGdbThread(BindingsTestCase):
     def setUp(self):
         self.thread = satyr.GdbStacktrace(contents).threads[0]
@@ -65,17 +68,20 @@ class TestGdbThread(BindingsTestCase):
     def test_getset(self):
         self.assertGetSetCorrect(self.thread, 'number', 2, 9000)
 
-    def test_cmp(self):
-        self.assertEqual(self.thread, self.thread)
+    def test_equals(self):
+        self.assertTrue(self.thread.equals(self.thread))
         dup = self.thread.dup()
-        self.assertEqual(self.thread, dup)
+        self.assertTrue(self.thread.equals(dup))
         dup.number = 9000
-        self.assertNotEqual(self.thread, dup)
+        self.assertFalse(self.thread.equals(dup))
 
     def test_duphash(self):
         expected_plain = 'Thread\n  write\n  virNetSocketWriteWire\n  virNetSocketWrite\n'
         self.assertEqual(self.thread.get_duphash(flags=satyr.DUPHASH_NOHASH, frames=3), expected_plain)
         self.assertEqual(self.thread.get_duphash(), '01d2a92281954a81dee9098dc4f8056ef5a5a5e1')
+
+    def test_hash(self):
+        self.assertHashable(self.thread)
 
 class TestGdbSharedlib(BindingsTestCase):
     def setUp(self):
@@ -86,6 +92,9 @@ class TestGdbSharedlib(BindingsTestCase):
         self.assertGetSetCorrect(self.shlib, 'end_address', 0x3ecd71f0f8, 20)
         self.assertGetSetCorrect(self.shlib, 'symbols', satyr.SYMS_OK, satyr.SYMS_WRONG)
         self.assertGetSetCorrect(self.shlib, 'soname', '/usr/lib64/libpython2.6.so.1.0', '/dev/null')
+
+    def test_hash(self):
+        self.assertHashable(self.shlib)
 
 class TestGdbFrame(BindingsTestCase):
     def setUp(self):
@@ -108,10 +117,10 @@ class TestGdbFrame(BindingsTestCase):
 
     def test_cmp(self):
         dup = self.frame.dup()
-        self.assertEqual(dup, dup)
-        self.assertEqual(dup, self.frame)
+        self.assertTrue(dup.equals(dup))
+        self.assertTrue(dup.equals(self.frame))
         dup.function_name = 'another'
-        self.assertNotEqual(dup, self.frame)
+        self.assertFalse(dup.equals(self.frame))
 
     def test_getset(self):
         self.assertGetSetCorrect(self.frame, 'function_name', 'write', 'foo bar')
@@ -125,6 +134,9 @@ class TestGdbFrame(BindingsTestCase):
         ## 2^66, this is expected to fail
         #self.assertGetSetCorrect(self.frame, 'address', 4398046511104L, 73786976294838206464L)
         self.assertGetSetCorrect(self.frame, 'library_name', None, 'sowhat.so')
+
+    def test_hash(self):
+        self.assertHashable(self.frame)
 
 if __name__ == '__main__':
     unittest.main()
