@@ -92,6 +92,13 @@ make check
 %endif
 
 %changelog
+* Sat Oct 26 2013 Jakub Filak <jfilak@redhat.com> 0.11-1
+- New upstream version
+  - Make all python objects hashable
+  - Improve memory management in rpm module
+  - Extend the list of normalized functions
+  - Add command for debugging duphashes to satyr utility
+
 * Thu Oct 03 2013 Jakub Filak <jfilak@redhat.com> 0.10-1
 - New upstream version
   - Fix a segmentation fault in sr_rpm_package_uniq()
