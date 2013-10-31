@@ -166,6 +166,24 @@ sr_python_frame_cmp_distance(struct sr_python_frame *frame1,
     if (function_name != 0)
         return function_name;
 
+    /* file_name */
+    int file_name = sr_strcmp0(frame1->file_name,
+                               frame2->file_name);
+    if (file_name != 0)
+        return file_name;
+
+    /* special_function */
+    int special_function = frame1->special_function - frame2->special_function;
+
+    if (special_function != 0)
+        return special_function;
+
+    /* special_file */
+    int special_file = frame1->special_file - frame2->special_file;
+
+    if (special_file != 0)
+        return special_file;
+
     return 0;
 }
 
