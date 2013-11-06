@@ -157,3 +157,71 @@ main()
   return 0;
 }
 ])
+
+
+## ---------------------------------- ##
+## sr_normalize_gdb_thread_jvm_frames ##
+## ---------------------------------- ##
+# Checks that sr_gdb_normalize_thread removes removable JVM frames
+AT_TESTFUN([sr_normalize_gdb_thread_jvm_frames],
+[[
+#include "normalize.h"
+#include "gdb/frame.h"
+#include "gdb/thread.h"
+#include "utils.h"
+#include <assert.h>
+#include <stdlib.h>
+
+int
+main(void)
+{
+  struct sr_gdb_frame *frame3 = sr_gdb_frame_new();
+  frame3->function_name = sr_strdup("jthread_map_push");
+  frame3->number = 3;
+  frame3->source_file = sr_strdup("jthread_map.c");
+  frame3->source_line = 110;
+  frame3->address = 0x7fda9a03f920ULL;
+  frame3->next = NULL;
+
+  struct sr_gdb_frame *frame2 = sr_gdb_frame_new();
+  frame2->function_name = sr_strdup("JVM_handle_linux_signal");
+  frame2->number = 2;
+  frame2->source_file = sr_strdup("os_linux_x86.cpp");
+  frame2->source_line = 531;
+  frame2->address = 0x7fda9af3106fULL;
+  frame2->next = frame3;
+
+  struct sr_gdb_frame *frame1 = sr_gdb_frame_new();
+  frame1->function_name = sr_strdup("VMError::report_and_die");
+  frame1->number = 1;
+  frame1->source_file = sr_strdup("vmError.cpp");
+  frame1->source_line = 1053;
+  frame1->address = 0x7fda9b0a83efULL;
+  frame1->next = frame2;
+
+  struct sr_gdb_frame *frame0 = sr_gdb_frame_new();
+  frame0->function_name = sr_strdup("os::abort");
+  frame0->number = 0;
+  frame0->source_file = sr_strdup("os_linux.cpp");
+  frame0->source_line = 1594;
+  frame0->address = 0x7fda9af29259ULL;
+  frame0->next = frame1;
+
+  struct sr_gdb_thread thread;
+  sr_gdb_thread_init(&thread);
+  thread.number = 0;
+  thread.frames = frame0;
+
+  sr_normalize_gdb_thread(&thread);
+  sr_normalize_gdb_thread(&thread);
+  assert(thread.frames != frame0);
+  assert(thread.frames != frame1);
+  assert(thread.frames != frame2);
+  assert(thread.frames == frame3);
+  assert(thread.frames->next == NULL);
+
+  sr_gdb_frame_free(frame1);
+  return 0;
+}
+]])
+

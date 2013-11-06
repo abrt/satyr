@@ -72,6 +72,16 @@ is_removable_vim(const char *function_name,
 }
 
 static bool
+is_removable_jvm(const char *function_name,
+                 const char *source_file)
+{
+    return
+        call_match(function_name, source_file, "os::abort", "os_linux.cpp", NULL) ||
+        call_match(function_name, source_file, "VMError::report_and_die", "vmError.cpp", NULL) ||
+        call_match(function_name, source_file, "JVM_handle_linux_signal", "os_linux_x86.cpp", NULL);
+}
+
+static bool
 is_removable_dbus(const char *function_name,
                   const char *source_file)
 {
@@ -327,6 +337,7 @@ sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
             is_removable_libstdcpp(frame->function_name, frame->source_file) ||
             is_removable_linux(frame->function_name, frame->source_file) ||
             is_removable_xorg(frame->function_name, frame->source_file) ||
+            is_removable_jvm(frame->function_name, frame->source_file) ||
             is_removable_vim(frame->function_name, frame->source_file);
 
         bool removable_with_above =
