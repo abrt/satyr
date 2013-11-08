@@ -551,3 +551,31 @@ int main(void)
   return 0;
 }
 ]])
+
+## ------------------ ##
+## sr_demangle_symbol ##
+## ------------------ ##
+
+AT_TESTFUN([sr_demangle_symbol],
+[[
+#include "utils.h"
+#include <assert.h>
+#include <string.h>
+#include <stdio.h>
+
+int main(void)
+{
+    sr_debug_parser = true;
+
+    char *result = sr_demangle_symbol("_ZN3Job8WaitDoneEv");
+    assert(0 == strcmp(result, "Job::WaitDone()"));
+
+    result = sr_demangle_symbol("not_mangled");
+    assert(result == 0);
+
+    result = sr_demangle_symbol("f");
+    assert(result == 0);
+
+    return 0;
+}
+]])

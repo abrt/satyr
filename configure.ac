@@ -106,6 +106,9 @@ AC_CHECK_LIB([unwind-coredump], [main])
 # rpm
 AC_CHECK_LIB([rpm], [main])
 
+# c++ symbol demangling
+AC_CHECK_LIB([stdc++], [__cxa_demangle])
+
 AC_CONFIG_FILES([
 	satyr.spec
 	satyr.pc

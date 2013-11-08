@@ -27,10 +27,36 @@
 #include "stacktrace.h"
 #include "gdb/sharedlib.h"
 #include "rpm.h"
+#include "utils.h"
+
+/* XXX: if we export more standalone functions, move them to a separate file */
+static PyObject *
+sr_py_demangle_symbol(PyObject *self, PyObject *args)
+{
+    char *mangled;
+    PyObject *result;
+
+    if (!PyArg_ParseTuple(args, "s", &mangled))
+        return NULL;
+
+    char *demangled = sr_demangle_symbol(mangled);
+
+    if (demangled)
+    {
+        result = PyString_FromString(demangled);
+        free(demangled);
+    }
+    else
+        result = PyString_FromString(mangled);
+
+    return result;
+}
+
 
 static PyMethodDef
 module_methods[]=
 {
+    { "demangle_symbol", sr_py_demangle_symbol, METH_VARARGS, "Demangle C++ symbol." },
     { NULL },
 };
 
