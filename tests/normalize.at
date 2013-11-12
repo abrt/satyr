@@ -220,7 +220,7 @@ main(void)
   assert(thread.frames == frame3);
   assert(thread.frames->next == NULL);
 
-  sr_gdb_frame_free(frame1);
+  sr_gdb_frame_free(frame3);
   return 0;
 }
 ]])

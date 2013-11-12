@@ -481,6 +481,7 @@ sr_normalize_core_thread(struct sr_core_thread *thread)
             is_removable_libstdcpp(frame->function_name, frame->file_name) ||
             is_removable_linux(frame->function_name, frame->file_name) ||
             is_removable_xorg(frame->function_name, frame->file_name) ||
+            is_removable_jvm(frame->function_name, frame->file_name) ||
             is_removable_vim(frame->function_name, frame->file_name);
 
         bool removable_with_above =
