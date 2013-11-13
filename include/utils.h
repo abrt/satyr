@@ -391,6 +391,14 @@ sr_parse_os_release(const char *input,
                     void (*callback)(char*, char*, void*),
                     void *data);
 
+/**
+ * Demangles C++ symbol.
+ * @returns
+ * The demangled symbol (allocated by malloc), or NULL on failure.
+ */
+char *
+sr_demangle_symbol(const char *sym);
+
 #ifdef __cplusplus
 }
 #endif

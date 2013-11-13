@@ -31,6 +31,11 @@
 #include <fcntl.h>
 #include <ctype.h>
 
+/* The prototype is in C++ header cxxabi.h, let's just copypaste it here
+ * instead of fiddling with include directories */
+char* __cxa_demangle(const char* mangled_name, char* output_buffer,
+                     size_t* length, int* status);
+
 bool
 sr_debug_parser = false;
 
@@ -784,4 +789,22 @@ sr_parse_os_release(const char *input, void (*callback)(char*, char*, void*),
         cursor = strchrnul(cursor, '\n');
         cursor += (cursor[0] != '\0');
     }
+}
+
+char *
+sr_demangle_symbol(const char *sym)
+{
+    /* Prevent __cxa_demangle from demangling e.g. "f" to "float". */
+    if (0 != strncmp("_Z", sym, 2))
+        return NULL;
+
+    int status;
+    char *demangled = __cxa_demangle(sym, NULL, 0, &status);
+
+    /* -2 means 'mangled_name is not a valid name under the C++ ABI mangling
+     * rules' */
+    if (status != 0 && status != -2)
+        warn("__cxa_demangle failed on symbol '%s' with status %d", sym, status);
+
+    return demangled;
 }

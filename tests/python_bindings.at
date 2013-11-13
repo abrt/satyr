@@ -6,6 +6,7 @@ AT_CLEANUP])
 
 AT_BANNER([BINDINGS])
 
+AT_TEST_PYTHON([misc])
 AT_TEST_PYTHON([gdb])
 AT_TEST_PYTHON([koops])
 AT_TEST_PYTHON([python])

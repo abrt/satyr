@@ -282,7 +282,10 @@ resolve_frame(Dwfl *dwfl, Dwarf_Addr ip, bool minus_one)
 
         funcname = dwfl_module_addrname(mod, (GElf_Addr)ip_adjusted);
         if (funcname)
-            frame->function_name = sr_strdup(funcname);
+        {
+            char *demangled = sr_demangle_symbol(funcname);
+            frame->function_name = (demangled ? demangled : sr_strdup(funcname));
+        }
     }
 
     return frame;
