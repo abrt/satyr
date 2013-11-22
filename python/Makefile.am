@@ -68,5 +68,13 @@ _satyr_la_CPPFLAGS = \
 _satyr_la_LDFLAGS = \
     -module \
     -avoid-version \
-    -export-symbols-regex init_satyr \
-    ../lib/libsatyr.la
+    -export-symbols-regex init_satyr
+
+# Depending on the configure option, we either link libsatyr.so dynamically (as
+# is usual), or directly include the its object files (by including the
+# convenience library).
+if ENABLE_STATIC_PYTHON_MODULE
+_satyr_la_LIBADD = ../lib/libsatyr_conv.la
+else
+_satyr_la_LIBADD = ../lib/libsatyr.la
+endif

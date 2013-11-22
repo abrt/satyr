@@ -45,6 +45,15 @@ AC_ARG_ENABLE([python-manpage],
               [enable_python_manpage=yes])
 AM_CONDITIONAL(ENABLE_PYTHON_MANPAGE, [test $enable_python_manpage = yes])
 
+AC_ARG_ENABLE([static-python-module],
+              [AS_HELP_STRING([--enable-static-python-module],
+                              [Compile the python module so that it does not load libsatyr.so
+                               dynamically but includes the object files directly.
+                               Might be needed to use the module on OpenShift.])],
+              [enable_static_python_module=$enableval],
+              [enable_static_python_module=no])
+AM_CONDITIONAL(ENABLE_STATIC_PYTHON_MODULE, [test $enable_static_python_module = yes])
+
 AC_CHECK_LIB([opcodes], [main], [have_libopcodes=yes], [have_libopcodes=no])
 [if test "$have_libopcodes" = "no" -a "$target_cpu" = "x86_64"; then]
     [echo "The libopcodes library was not found in the search path. The core stacktrace support "]

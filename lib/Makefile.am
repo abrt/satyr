@@ -1,5 +1,17 @@
-lib_LTLIBRARIES = libsatyr.la
-libsatyr_la_SOURCES = \
+# NOTE: First, we build so-called 'convenience library' from all sources. IIUC,
+# convenience libraries are something like collection of object files and they
+# are only used at build time, never installed. We then use it to create
+# libsatyr.so (and possibly ../python/_satyr.so).
+#
+# This is needed in order to build satyr python module that does NOT load
+# libsatyr.so dynamically in order to circumvent OpenShift limitation.
+#
+# See following page for description of convenience libraries:
+# https://sourceware.org/autobook/autobook/autobook_92.html
+
+noinst_LTLIBRARIES = libsatyr_conv.la
+
+libsatyr_conv_la_SOURCES = \
 	callgraph.h \
 	cluster.h \
 	disasm.h \
@@ -50,14 +62,19 @@ libsatyr_la_SOURCES = \
 	unstrip.c \
 	utils.c
 
-libsatyr_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE -I$(top_srcdir)/include $(GLIB_CFLAGS)
-libsatyr_la_LDFLAGS = -version-info 2:0:0 -export-symbols-regex '^sr_' $(GLIB_LIBS)
+libsatyr_conv_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE -I$(top_srcdir)/include $(GLIB_CFLAGS)
+libsatyr_conv_la_LDFLAGS = $(GLIB_LIBS)
 
 if HAVE_LIBOPCODES
 # Conditional link is required to avoid linking to a library without
 # -fPIC.
-libsatyr_la_LIBADD = -lopcodes
+libsatyr_conv_la_LIBADD = -lopcodes
 endif
+
+lib_LTLIBRARIES = libsatyr.la
+libsatyr_la_SOURCES = 
+libsatyr_la_LIBADD = libsatyr_conv.la
+libsatyr_la_LDFLAGS = -version-info 2:0:0 -export-symbols-regex '^sr_'
 
 # From http://www.seul.org/docs/autotut/
 # Version consists 3 numbers: CURRENT, REVISION, AGE.
