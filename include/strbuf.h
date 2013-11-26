@@ -40,11 +40,11 @@ struct sr_strbuf
     /**
      * Size of the allocated buffer. Always > 0.
      */
-    int alloc;
+    size_t alloc;
     /**
      * Length of the string, without the ending \0.
      */
-    int len;
+    size_t len;
     char *buf;
 };
 
@@ -93,7 +93,7 @@ sr_strbuf_clear(struct sr_strbuf *strbuf);
  * without dealing with malloc/realloc.
  */
 void
-sr_strbuf_grow(struct sr_strbuf *strbuf, int num);
+sr_strbuf_grow(struct sr_strbuf *strbuf, size_t num);
 
 /**
  * The current content of the string buffer is extended by adding a

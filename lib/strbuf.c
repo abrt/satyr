@@ -19,6 +19,7 @@
 */
 #include "strbuf.h"
 #include "utils.h"
+#include "internal_utils.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -73,12 +74,21 @@ sr_strbuf_clear(struct sr_strbuf *strbuf)
  * without touching malloc/realloc.
  */
 void
-sr_strbuf_grow(struct sr_strbuf *strbuf, int num)
+sr_strbuf_grow(struct sr_strbuf *strbuf, size_t num)
 {
-    if (strbuf->len + num + 1 > strbuf->alloc)
+    /* unsigned integer overflow check */
+    SR_ASSERT(num <= SIZE_MAX - 1);
+    SR_ASSERT(strbuf->len <= SIZE_MAX - (num + 1));
+
+    size_t target_size = strbuf->len + num + 1;
+
+    /* do not overflow in the loop below */
+    SR_ASSERT(target_size <= SIZE_MAX / 2);
+
+    if (target_size > strbuf->alloc)
     {
-        while (strbuf->len + num + 1 > strbuf->alloc)
-            strbuf->alloc *= 2; /* huge grow = infinite loop */
+        while (target_size > strbuf->alloc)
+            strbuf->alloc *= 2;
 
         strbuf->buf = sr_realloc(strbuf->buf, strbuf->alloc);
     }
@@ -98,7 +108,7 @@ struct sr_strbuf *
 sr_strbuf_append_str(struct sr_strbuf *strbuf,
                      const char *str)
 {
-    int len = strlen(str);
+    size_t len = strlen(str);
     sr_strbuf_grow(strbuf, len);
     assert(strbuf->len + len < strbuf->alloc);
     strcpy(strbuf->buf + strbuf->len, str);
@@ -110,7 +120,7 @@ struct sr_strbuf *
 sr_strbuf_prepend_str(struct sr_strbuf *strbuf,
                       const char *str)
 {
-    int len = strlen(str);
+    size_t len = strlen(str);
     sr_strbuf_grow(strbuf, len);
     assert(strbuf->len + len < strbuf->alloc);
     memmove(strbuf->buf + len, strbuf->buf, strbuf->len + 1);
