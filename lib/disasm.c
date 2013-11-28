@@ -194,7 +194,7 @@ sr_disasm_get_function_instructions(struct sr_disasm_state *state,
         if (result_count + 2 == result_capacity)
         {
             result_capacity *= 2;
-            result = sr_realloc(result, result_capacity * sizeof(char*));
+            result = sr_realloc_array(result, result_capacity, sizeof(char*));
         }
 
         result[result_count] = sr_strbuf_free_nobuf(state->info.stream);

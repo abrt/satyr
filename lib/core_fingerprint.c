@@ -222,9 +222,10 @@ get_libcalls(char ***symbol_list,
                 return false;
             }
 
-            sub_symbol_list = sr_realloc(
+            sub_symbol_list = sr_realloc_array(
                 sub_symbol_list,
-                (sub_symbol_list_size + tmp_symbol_list_size) * sizeof(char*));
+                sub_symbol_list_size + tmp_symbol_list_size,
+                sizeof(char*));
 
             memcpy(sub_symbol_list + sub_symbol_list_size,
                    tmp_symbol_list,
@@ -253,8 +254,8 @@ get_libcalls(char ***symbol_list,
     }
 
     /* Obtain the symbol names for the current function. */
-    *symbol_list = sr_malloc(
-        (*symbol_list_size + sub_symbol_list_size) * sizeof(char*));
+    *symbol_list = sr_malloc_array(
+        *symbol_list_size + sub_symbol_list_size, sizeof(char*));
 
     char **item = *symbol_list;
     callees = current->callees;

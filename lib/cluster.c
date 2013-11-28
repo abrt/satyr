@@ -33,8 +33,9 @@ sr_dendrogram_new(int size)
     assert(size > 1);
 
     dendrogram->size = size;
-    dendrogram->order = sr_malloc(sizeof(*dendrogram->order) * size);
-    dendrogram->merge_levels = sr_malloc(sizeof(*dendrogram->merge_levels) * (size - 1));
+    dendrogram->order = sr_malloc_array(size, sizeof(*dendrogram->order));
+    dendrogram->merge_levels =
+        sr_malloc_array(size - 1, sizeof(*dendrogram->merge_levels));
 
     return dendrogram;
 }
@@ -76,8 +77,8 @@ cluster_add_index(struct cluster *cluster, int index)
     if (cluster->size >= cluster->alloced)
     {
         cluster->alloced = cluster->alloced >= 1 ? cluster->alloced * 2 : 1;
-        cluster->objects = sr_realloc(cluster->objects, sizeof (*cluster->objects)
-                * cluster->alloced);
+        cluster->objects = sr_realloc_array(cluster->objects, cluster->alloced,
+                                            sizeof(*cluster->objects));
     }
     cluster->objects[cluster->size++] = index;
 }
@@ -266,7 +267,7 @@ sr_cluster_new(int size)
     struct sr_cluster *cluster = sr_malloc(sizeof(struct sr_cluster));
 
     cluster->size = size;
-    cluster->objects = sr_malloc(sizeof(*cluster->objects) * size);
+    cluster->objects = sr_malloc_array(size, sizeof(*cluster->objects));
     cluster->next = NULL;
 
     return cluster;

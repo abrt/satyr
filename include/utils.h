@@ -69,7 +69,19 @@ sr_mallocz(size_t size);
  * Never returns NULL.
  */
 void *
+sr_malloc_array(size_t elems, size_t elem_size);
+
+/**
+ * Never returns NULL.
+ */
+void *
 sr_realloc(void *ptr, size_t size);
+
+/**
+ * Never returns NULL.
+ */
+void *
+sr_realloc_array(void *ptr, size_t elems, size_t elem_size);
 
 /**
  * Never returns NULL.

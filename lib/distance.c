@@ -23,6 +23,7 @@
 #include "normalize.h"
 #include "utils.h"
 #include "gdb/thread.h"
+#include "internal_utils.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -197,7 +198,10 @@ distance_levenshtein(struct sr_thread *thread1,
     int n = frame_count2 + 1;
 
     // store only two last rows and columns instead of whole 2D array
-    int dist[m + n + 1], dist1[m + n + 1];
+    SR_ASSERT(n <= SIZE_MAX - 1);
+    SR_ASSERT(m <= SIZE_MAX - (n + 1));
+    int *dist = sr_malloc_array(sizeof(int), m + n + 1);
+    int *dist1 = sr_malloc_array(sizeof(int), m + n + 1);
 
     // first row and column having distance equal to their position
     for (int i = m; i > 0; --i)
@@ -258,7 +262,11 @@ distance_levenshtein(struct sr_thread *thread1,
         curr_frame2 = sr_frame_next(curr_frame2);
     }
 
-    return (float)dist[n] / max_frame_count;
+    int result = dist[n];
+    free(dist);
+    free(dist1);
+
+    return (float)result / max_frame_count;
 }
 
 float
@@ -310,8 +318,10 @@ sr_distances_new(int m, int n)
 
     distances->m = m;
     distances->n = n;
-    distances->distances = sr_malloc(sizeof(*distances->distances) *
-                                      (get_distance_position(distances, m - 1, n - 1) + 1));
+    distances->distances = sr_malloc_array(
+                               get_distance_position(distances, m - 1, n - 1) + 1,
+                               sizeof(*distances->distances)
+                           );
 
     return distances;
 }

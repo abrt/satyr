@@ -369,7 +369,7 @@ sr_koops_stacktrace_parse_modules(const char **input)
     int ws = sr_skip_char_span(&local_input, " \t");
 
     int result_size = 20, result_offset = 0;
-    char **result = sr_malloc(result_size * sizeof(char*));
+    char **result = sr_malloc_array(result_size, sizeof(char*));
 
     char *module;
     while (true)
@@ -381,8 +381,7 @@ sr_koops_stacktrace_parse_modules(const char **input)
             if (result_offset == result_size - 1)
             {
                 result_size *= 2;
-                result = sr_realloc(result,
-                                    result_size * sizeof(char*));
+                result = sr_realloc_array(result, result_size, sizeof(char*));
             }
 
             result[result_offset] = module;
@@ -583,7 +582,7 @@ sr_koops_stacktrace_from_json(struct sr_json_value *root, char **error_message)
 
         unsigned i = 0;
         size_t allocated = 128;
-        result->modules = sr_malloc(sizeof(char*) * allocated);
+        result->modules = sr_malloc_array(allocated, sizeof(char*));
 
         struct sr_json_value *mod_json;
         FOR_JSON_ARRAY(modules, mod_json)
