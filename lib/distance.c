@@ -310,8 +310,10 @@ sr_distances_new(int m, int n)
 
     distances->m = m;
     distances->n = n;
-    distances->distances = sr_malloc(sizeof(*distances->distances) *
-                                      (get_distance_position(distances, m - 1, n - 1) + 1));
+    distances->distances = sr_malloc_array(
+                               get_distance_position(distances, m - 1, n - 1) + 1,
+                               sizeof(*distances->distances)
+                           );
 
     return distances;
 }
