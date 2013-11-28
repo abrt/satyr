@@ -121,4 +121,12 @@ json_read_bool(struct sr_json_value *object, const char *key_name, bool *dest,
         _j < json->u.array.length && (elem_var = json->u.array.values[_j]); \
         ++_j)
 
+/* assert that is never compiled out */
+#define SR_ASSERT(cond)                                                               \
+    if (!(cond))                                                                      \
+    {                                                                                 \
+        fprintf(stderr, "Assertion failed (%s:%d): %s\n", __FILE__, __LINE__, #cond); \
+        abort();                                                                      \
+    }
+
 #endif
