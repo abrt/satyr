@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 struct sr_json_value;
 enum sr_json_type;
