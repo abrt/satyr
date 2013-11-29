@@ -7,6 +7,16 @@
   %define enable_python_manpage 1
 %endif
 
+%if 0%{?suse_version}
+  %define python2_devel python-devel
+  %define libdw_devel libdw-devel
+  %define libelf_devel libelf-devel
+%else
+  %define python2_devel python2-devel
+  %define libdw_devel elfutils-devel
+  %define libelf_devel elfutils-libelf-devel
+%endif
+
 Name: satyr
 Version: @PACKAGE_VERSION@
 Release: 1%{?dist}
@@ -15,10 +25,15 @@ Group: System Environment/Libraries
 License: GPLv2+
 URL: https://github.com/abrt/satyr
 Source0: https://fedorahosted.org/released/abrt/satyr-%{version}.tar.xz
-BuildRequires: python2-devel
-BuildRequires: elfutils-devel, elfutils-libelf-devel, binutils-devel
+BuildRequires: %{python2_devel}
+BuildRequires: %{libdw_devel}
+BuildRequires: %{libelf_devel}
+BuildRequires: binutils-devel
 BuildRequires: rpm-devel
-
+BuildRequires: libtool
+BuildRequires: pkgconfig
+BuildRequires: automake
+BuildRequires: gcc-c++
 %if %{?enable_python_manpage}
 BuildRequires: python-sphinx
 %endif
