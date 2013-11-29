@@ -69,6 +69,23 @@ sr_malloc(size_t size)
     return ptr;
 }
 
+static void
+check_overflow_size_t(size_t a, size_t b)
+{
+    if (b && a > SIZE_MAX / b)
+    {
+        fprintf(stderr, "sr_{m,re}alloc_array: unsigned overflow detected");
+        exit(1);
+    }
+}
+
+void *
+sr_malloc_array(size_t elems, size_t elem_size)
+{
+    check_overflow_size_t(elems, elem_size);
+    return sr_malloc(elems * elem_size);
+}
+
 void *
 sr_mallocz(size_t size)
 {
@@ -88,6 +105,13 @@ sr_realloc(void *ptr, size_t size)
         exit(1);
     }
     return result;
+}
+
+void *
+sr_realloc_array(void *ptr, size_t elems, size_t elem_size)
+{
+    check_overflow_size_t(elems, elem_size);
+    return sr_realloc(ptr, elems * elem_size);
 }
 
 char *
