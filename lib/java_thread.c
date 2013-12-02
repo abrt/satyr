@@ -394,10 +394,7 @@ sr_java_thread_to_json(struct sr_java_thread *thread)
         }
 
         sr_strbuf_append_str(strbuf, " ]\n");
-        sr_strbuf_append_str(strbuf, "}");
     }
-    else
-        sr_strbuf_append_str(strbuf, "{}");
 
     if (strbuf->len > 0)
         strbuf->buf[0] = '{';

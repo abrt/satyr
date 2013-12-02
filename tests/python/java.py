@@ -132,6 +132,23 @@ class TestJavaStacktrace(BindingsTestCase):
         self.assertFalse(trace.threads[1].frames[0].is_exception)
         self.assertEqual(trace.threads[1].frames[0].message, None)
 
+    def test_to_json(self):
+        import json
+
+        def check(filename):
+            contents = load_input_contents(filename)
+            trace = satyr.JavaStacktrace(contents)
+
+            report = satyr.Report()
+            report.report_type = "java"
+            report.stacktrace = trace
+            json_report = report.to_json()
+
+            # json parsing, should not raise an exception
+            j = json.loads(json_report)
+
+        check('../java_stacktraces/java-02')
+
     def test_hash(self):
         self.assertHashable(self.trace)
 
