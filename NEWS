@@ -1,6 +1,13 @@
+satyr 0.12
+==========
+JVM frames normalization. C++ symbol demangling. Configure option to build
+python module with statically linked libsatyr. Improvements to openSUSE
+compatibility. Several bugfixes including malformed Java uReports.
+
 satyr 0.11
 ==========
-Make all python objects hashable and extend the list of normalized functions. Several bugfixes.
+Make all python objects hashable and extend the list of normalized functions.
+Several bugfixes.
 
 satyr 0.10
 ==========

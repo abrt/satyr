@@ -107,6 +107,13 @@ make check
 %endif
 
 %changelog
+* Tue Dec 10 2013 Martin Milata <mmilata@redhat.com> 0.12-1
+- New upstream version
+  - JVM frames normalization
+  - Add C++ symbol demangling
+  - Unsigned overflow bugfixes
+  - Fix malformed uReports for Java
+
 * Sat Oct 26 2013 Jakub Filak <jfilak@redhat.com> 0.11-1
 - New upstream version
   - Make all python objects hashable
