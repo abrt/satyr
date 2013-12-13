@@ -239,13 +239,66 @@ sr_koops_frame_prepend(struct sr_koops_frame *dest,
     return item;
 }
 
-struct sr_koops_frame *
-sr_koops_frame_parse(const char **input)
+static struct sr_koops_frame *
+koops_frame_parse_ppc(const char **input)
 {
     const char *local_input = *input;
     sr_skip_char_span(&local_input, " \t");
 
     struct sr_koops_frame *frame = sr_koops_frame_new();
+
+    uint64_t sp; /* unused */
+
+    if (!sr_koops_parse_address(&local_input, &sp))
+        goto fail;
+
+    sr_skip_char_span(&local_input, " \t");
+
+    if (!sr_koops_parse_address(&local_input, &frame->address))
+        goto fail;
+
+    sr_skip_char_span(&local_input, " \t");
+
+    /* strip the leading dots */
+    sr_skip_char(&local_input, '.');
+
+    if (!sr_koops_parse_function(&local_input,
+                                 &frame->function_name,
+                                 &frame->function_offset,
+                                 &frame->function_length,
+                                 &frame->module_name))
+        goto fail;
+
+    sr_skip_char_span(&local_input, " \t");
+
+    frame->reliable = (sr_skip_string(&local_input, "(unreliable)") == 0);
+
+    sr_skip_char_span(&local_input, " \t");
+
+    if (*local_input != '\0' && !sr_skip_char(&local_input, '\n'))
+        goto fail;
+
+    *input = local_input;
+    return frame;
+
+fail:
+    sr_koops_frame_free(frame);
+    return NULL;
+}
+
+struct sr_koops_frame *
+sr_koops_frame_parse(const char **input)
+{
+    struct sr_koops_frame *ppc_frame = koops_frame_parse_ppc(input);
+    if (ppc_frame)
+        return ppc_frame;
+
+    const char *local_input = *input;
+    sr_skip_char_span(&local_input, " \t");
+
+    struct sr_koops_frame *frame = sr_koops_frame_new();
+
+    bool parenthesis = sr_skip_char(&local_input, '(');
 
     if (!sr_koops_parse_address(&local_input, &frame->address))
     {
@@ -294,15 +347,8 @@ sr_koops_frame_parse(const char **input)
                                      &frame->from_function_length,
                                      &frame->from_module_name))
         {
-            uint64_t unused;
-            /* there may bu just an address, see kerneloopses/gitlog-09 */
-            if (!sr_skip_char(&local_input, '(') ||
-                !sr_parse_hexadecimal_0xuint64(&local_input, &unused) ||
-                !sr_skip_char(&local_input, ')'))
-            {
-                sr_koops_frame_free(frame);
-                return NULL;
-            }
+            sr_koops_frame_free(frame);
+            return NULL;
         }
 
         sr_skip_char_span(&local_input, " \t");
@@ -312,6 +358,17 @@ sr_koops_frame_parse(const char **input)
                                                           &frame->module_name))
     {
         sr_skip_char_span(&local_input, " \t");
+    }
+
+    if (parenthesis)
+    {
+        if (!sr_skip_char(&local_input, ')'))
+        {
+            sr_koops_frame_free(frame);
+            return NULL;
+        }
+        else
+            sr_skip_char_span(&local_input, " \t");
     }
 
 done:
@@ -358,14 +415,19 @@ sr_koops_parse_address(const char **input, uint64_t *address)
 {
     const char *local_input = *input;
 
-    if (!sr_skip_string(&local_input, "[<"))
+    if (!sr_skip_char(&local_input, '['))
         return false;
+
+    bool angle = sr_skip_char(&local_input, '<');
 
     int len = sr_parse_hexadecimal_uint64(&local_input, address);
     if (!len)
         return false;
 
-    if (!sr_skip_string(&local_input, ">]"))
+    if (angle && !sr_skip_char(&local_input, '>'))
+        return false;
+
+    if (!sr_skip_char(&local_input, ']'))
         return false;
 
     *input = local_input;
@@ -406,7 +468,20 @@ sr_koops_parse_function(const char **input,
                         char **module_name)
 {
     const char *local_input = *input;
+    uint64_t unused;
     bool parenthesis = sr_skip_char(&local_input, '(');
+
+    /* Might be just address - see e.g. kerneloopses/gitlog-09
+     * or rhbz-1040900-s390x-1.
+     */
+    if (sr_parse_hexadecimal_0xuint64(&local_input, &unused))
+    {
+        if (parenthesis && !sr_skip_char(&local_input, ')'))
+            return false;
+
+        *input = local_input;
+        return true;
+    }
 
     if (!sr_parse_char_cspan(&local_input, " \t\n)+<",
                              function_name))

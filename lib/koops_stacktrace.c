@@ -341,6 +341,17 @@ sr_koops_stacktrace_parse(const char **input,
 
         /* Skip timestamp if it's present. */
         sr_koops_skip_timestamp(&local_input);
+        sr_skip_char_span(&local_input, " \t");
+
+        /* Not sure what it means on s390x but i think it's at the end of the
+         * stack
+         */
+        if (sr_skip_string(&local_input, "Last Breaking-Event-Address:\n"))
+        {
+            while (*local_input)
+                local_input++;
+            break;
+        }
 
         if (!stacktrace->modules &&
             (stacktrace->modules = sr_koops_stacktrace_parse_modules(&local_input)))
