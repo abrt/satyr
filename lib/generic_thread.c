@@ -242,7 +242,8 @@ sr_thread_get_duphash(struct sr_thread *thread, int nframes, char *prefix,
     DISPATCH(dtable, thread->type, thread_append_duphash_text)
             (thread, flags, strbuf);
     */
-    sr_strbuf_append_str(strbuf, "Thread\n");
+    if (!(flags & SR_DUPHASH_KOOPS_COMPAT))
+        sr_strbuf_append_str(strbuf, "Thread\n");
 
     /* Number of nframes, (almost) not limited if nframes = 0. */
     if (nframes == 0)
@@ -250,9 +251,15 @@ sr_thread_get_duphash(struct sr_thread *thread, int nframes, char *prefix,
 
     for (struct sr_frame *frame = sr_thread_frames(thread);
          frame && nframes > 0;
-         frame = sr_frame_next(frame), nframes--)
+         frame = sr_frame_next(frame))
     {
+        size_t prev_len = strbuf->len;
+
         frame_append_duphash_text(frame, flags, strbuf);
+
+        /* Don't count the frame if nothing was appended. */
+        if (strbuf->len > prev_len)
+            nframes--;
     }
 
     if (flags & SR_DUPHASH_NOHASH)

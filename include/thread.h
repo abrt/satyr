@@ -62,6 +62,10 @@ enum sr_duphash_flags
     /* Do not perform stacktrace normalization.
      */
     SR_DUPHASH_NONORMALIZE = 1 << 2,
+
+    /* Hashing compatible with koops hashing in ABRT <= 2.1.10.
+     */
+    SR_DUPHASH_KOOPS_COMPAT = 1 << 3,
 };
 
 /**

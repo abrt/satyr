@@ -606,6 +606,10 @@ static void
 koops_append_duphash_text(struct sr_koops_frame *frame, enum sr_duphash_flags flags,
                          struct sr_strbuf *strbuf)
 {
+    /* ABRT's koops hashing skipped unreliable frames entirely */
+    if ((flags & SR_DUPHASH_KOOPS_COMPAT) && !frame->reliable)
+        return;
+
     if (frame->function_name)
         sr_strbuf_append_strf(strbuf, "%s\n", frame->function_name);
     else
