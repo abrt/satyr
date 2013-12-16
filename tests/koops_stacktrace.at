@@ -238,6 +238,10 @@ main(void)
   check("../../kerneloopses/rhbz-865695-2", "wdev_priv.part.8", "system_call_fastpath", 20, 2, 103, NULL, NULL);
   check("../../kerneloopses/rhbz-865695-2-notime", "wdev_priv.part.8", "system_call_fastpath", 20, 2, 103, NULL, NULL);
 
+  check("../../kerneloopses/rhbz-1040900-s390x-1", "will_oops_init", NULL, 6, 2, 24, NULL, NULL);
+  check("../../kerneloopses/rhbz-1040900-s390x-2", NULL, NULL, 17, 0, 2, NULL, NULL);
+  check("../../kerneloopses/rhbz-1040900-ppc64-1", "eeh_dev_check_failure", "syscall_exit", 20, 0, 13, NULL, NULL);
+
   check("../../kerneloopses/github-102", "dump_stack", "kthread_create_on_node", 17, 6, 104, NULL, NULL);
   check("../../kerneloopses/github-73", "dump_stack", "common_interrupt", 33, 0, 100, "IRQ", "IRQ");
   check("../../kerneloopses/github-73-modified", "dump_stack", "common_interrupt", 33, 0, 100, "NMI", NULL);
