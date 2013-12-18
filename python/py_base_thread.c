@@ -38,7 +38,7 @@
                         "Returns: string - thread's duplication hash\n\n"\
                         "frames: integer - number of frames to use (default 0 means use all)\n\n"\
                         "flags: integer - bitwise sum of flags (DUPHASH_NORMAL, DUPHASH_NOHASH, \n"\
-                        "DUPHASH_NONORMALIZE)\n\n"\
+                        "DUPHASH_NONORMALIZE, DUPHASH_KOOPS_COMPAT)\n\n"\
                         "prefix: string - string to be prepended in front of the text before hashing"
 
 #define equals_doc "Usage: frame.equals(otherthread)\n\n" \

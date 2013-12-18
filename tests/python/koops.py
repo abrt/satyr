@@ -69,6 +69,12 @@ class TestKerneloops(BindingsTestCase):
         expected_plain = 'Thread\n__alloc_pages_nodemask\nip_copy_metadata\nip_forward_options\n'
         self.assertEqual(self.koops.get_duphash(flags=satyr.DUPHASH_NOHASH, frames=3), expected_plain)
         self.assertEqual(self.koops.get_duphash(), '53f62f9d6f7de093f50653863d200f4789ace7ef')
+        compat_expected_plain = ('__alloc_pages_nodemask\nalloc_pages_current\n__get_free_pages\n' +
+                                 'kmalloc_order_trace\n__kmalloc\npskb_expand_head\n')
+        self.assertEqual(self.koops.get_duphash(flags=(satyr.DUPHASH_NOHASH|satyr.DUPHASH_KOOPS_COMPAT), frames=6),
+                         compat_expected_plain)
+        self.assertEqual(self.koops.get_duphash(flags=satyr.DUPHASH_KOOPS_COMPAT, frames=6),
+                         '5718b3a86c64e7bed5e8ead08ae3084e447ddbee')
 
     def test_crash_thread(self):
         self.assertTrue(self.koops.crash_thread is self.koops)

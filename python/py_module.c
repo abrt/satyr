@@ -224,6 +224,7 @@ init_satyr()
     PyModule_AddIntConstant(module, "DUPHASH_NORMAL", SR_DUPHASH_NORMAL);
     PyModule_AddIntConstant(module, "DUPHASH_NOHASH", SR_DUPHASH_NOHASH);
     PyModule_AddIntConstant(module, "DUPHASH_NONORMALIZE", SR_DUPHASH_NONORMALIZE);
+    PyModule_AddIntConstant(module, "DUPHASH_KOOPS_COMPAT", SR_DUPHASH_KOOPS_COMPAT);
 
     Py_INCREF(&sr_py_single_stacktrace_type);
     PyModule_AddObject(module, "SingleThreadStacktrace",
