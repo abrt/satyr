@@ -22,6 +22,7 @@
 #include "frame.h"
 #include "normalize.h"
 #include "utils.h"
+#include "sha1.h"
 #include "gdb/thread.h"
 #include "internal_utils.h"
 #include <stdlib.h>
@@ -465,4 +466,232 @@ sr_threads_compare(struct sr_thread **threads,
     }
 
     return distances;
+}
+
+struct sr_distances_part *
+sr_distances_part_new(int m, int n, enum sr_distance_type dist_type,
+                      int m_begin, int n_begin, size_t len)
+{
+    struct sr_distances_part *part = sr_mallocz(sizeof(*part));
+
+    part->m = m;
+    part->n = n;
+    part->m_begin = m_begin;
+    part->n_begin = n_begin;
+    part->len = len;
+    part->dist_type = dist_type;
+
+    return part;
+}
+
+/*
+ * int main(int argc, char *argv[])
+ * {
+ *     int m = atoi(argv[1]), n = atoi(argv[2]);
+ * 
+ *     printf("j\\i ");
+ *     for (int i = 0; i < m; i++) printf("%3d", i);
+ *     printf("\n");
+ * 
+ *     for (int j = 0; j < n; j++) {
+ *         printf("%2d: ", j);
+ *         for (int i = 0; i < m; i++) {
+ *             if (i < j) printf("%3d", get_distance_position_mn(m, n, i, j));
+ *             else printf("  .");
+ *         }
+ *         printf("\n");
+ *     }
+ * }
+ *
+ * $ ./a.out 3 8
+ * m = 3, n = 8
+ * j\i   0  1  2
+ *  0:   .  .  .
+ *  1:   0  .  .
+ *  2:   1  8  .
+ *  3:   2  9 15
+ *  4:   3 10 16
+ *  5:   4 11 17
+ *  6:   5 12 18
+ *  7:   6 13 19
+ */
+struct sr_distances_part *
+sr_distances_part_create(int m, int n, enum sr_distance_type dist_type,
+                         unsigned nparts)
+{
+    struct sr_distances_part *res = NULL;
+    struct sr_distances_part **tail = &res;
+
+    if (m >= n)
+        m = n - 1;
+
+    assert(m > 0 && n > 1 && m < n);
+
+    int triangle_twice = m * (m-1);
+    assert(triangle_twice % 2 == 0);
+
+    int nelems = triangle_twice / 2 + (m*(n-m));
+
+    int nelems_per_part = nelems / nparts;
+    /* First $leftover parts will be (nelems_per_part+1) long */
+    int leftover = nelems % nparts;
+    if (leftover)
+        nelems_per_part++;
+
+    /* There probably is a formula for this. This code just walks every element
+     * of the matrix instead ... */
+    int m_begin = 0;
+    int n_begin = 1;
+    /* How many items we've enountered that will go into the next part. */
+    int counter = 0;
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = i+1; j < n; j++)
+        {
+            counter++;
+            if (counter > nelems_per_part)
+            {
+                *tail = sr_distances_part_new(m, n, dist_type, m_begin,
+                                              n_begin, nelems_per_part);
+                tail = &((*tail)->next);
+
+                m_begin = i;
+                n_begin = j;
+                counter = 1;
+                if (leftover)
+                {
+                    leftover--;
+                    if (leftover == 0)
+                        nelems_per_part--;
+                }
+            }
+        }
+    }
+
+    assert(counter == nelems_per_part);
+    *tail = sr_distances_part_new(m, n, dist_type, m_begin, n_begin, counter);
+    tail = &((*tail)->next);
+
+    return res;
+}
+
+/* Take the lengths of all threads, compute SHA1 from them, take first four
+ * bytes. */
+static uint32_t
+thread_list_checksum(struct sr_thread **threads, size_t n)
+{
+    struct sr_sha1_state sha1;
+    int frame_count;
+    union
+    {
+        unsigned char hashbuf[SR_SHA1_RESULT_BIN_LEN];
+        uint32_t truncated;
+    } u;
+
+    sr_sha1_begin(&sha1);
+
+    for (size_t i = 0; i < n; i++)
+    {
+        frame_count = sr_thread_frame_count(threads[i]);
+        sr_sha1_hash(&sha1, &frame_count, sizeof(frame_count));
+    }
+
+    sr_sha1_end(&sha1, u.hashbuf);
+    return u.truncated;
+}
+
+void
+sr_distances_part_compute(struct sr_distances_part *part,
+                          struct sr_thread **threads)
+{
+    assert(part);
+
+    int i,j;
+    size_t dist_idx;
+    part->distances = sr_malloc_array(sizeof(float), part->len);
+
+    for (dist_idx = 0, i = part->m_begin, j = part->n_begin;
+         dist_idx < part->len;
+         dist_idx++)
+    {
+        assert(j > i);
+        assert(i < part->m && j < part->n);
+
+        part->distances[dist_idx]
+            = normalize_and_compare(threads[i], threads[j], part->dist_type);
+
+        j++;
+        if (j >= part->n)
+        {
+            i++;
+            j = i+1;
+        }
+    }
+
+    part->checksum = thread_list_checksum(threads, part->n);
+}
+
+struct sr_distances *
+sr_distances_part_merge(struct sr_distances_part *parts)
+{
+    if (!parts)
+        return NULL;
+
+    struct sr_distances *distances = sr_distances_new(parts->m, parts->n);
+
+    for (struct sr_distances_part *it = parts;
+         it != NULL;
+         it = it->next)
+    {
+        if (it->m != parts->m || it->n != parts->n
+            || it->distances == NULL
+            || it->checksum != parts->checksum)
+        {
+            goto error;
+        }
+
+        size_t dist_idx;
+        int i, j;
+
+        for (dist_idx = 0, i = it->m_begin, j = it->n_begin;
+             dist_idx < it->len;
+             dist_idx++)
+        {
+            if (j <= i || i >= it->m || j >= it->n)
+                goto error;
+
+            distances->distances[get_distance_position(distances, i, j)]
+                = it->distances[dist_idx];
+
+            j++;
+            if (j >= it->n)
+            {
+                i++;
+                j = i+1;
+            }
+        }
+
+    }
+
+    return distances;
+error:
+    sr_distances_free(distances);
+    return NULL;
+}
+
+void
+sr_distances_part_free(struct sr_distances_part *part, bool follow_links)
+{
+    if (!part)
+        return;
+
+    struct sr_distances_part *next = part->next;
+
+    if (part->distances)
+        free(part->distances);
+
+    free(part);
+
+    if (follow_links)
+        sr_distances_part_free(next, true);
 }
