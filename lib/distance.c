@@ -294,15 +294,21 @@ sr_distance(enum sr_distance_type distance_type,
 }
 
 static int
-get_distance_position(const struct sr_distances *distances, int i, int j)
+get_distance_position_mn(int m, int n, int i, int j)
 {
     /* The array holds only matrix entries (i, j) where i < j,
      * locate the position in the array. */
-    assert(i < j && i >= 0 && i < distances->m && j < distances->n);
+    assert(i < j && i >= 0 && i < m && j < n);
 
-    int h = distances->n, l = distances->n - i;
+    int h = n, l = n - i;
 
     return ((h * h - h) - (l * l - l)) / 2 + j - 1;
+}
+
+static int
+get_distance_position(const struct sr_distances *distances, int i, int j)
+{
+    return get_distance_position_mn(distances->m, distances->n, i, j);
 }
 
 struct sr_distances *
@@ -382,6 +388,49 @@ sr_distances_set_distance(struct sr_distances *distances,
     distances->distances[get_distance_position(distances, i, j)] = d;
 }
 
+static float
+normalize_and_compare(struct sr_thread *t1, struct sr_thread *t2,
+                      enum sr_distance_type dist_type)
+{
+    float dist;
+
+    /* XXX: GDB crashes have a special normalization step for
+     * clustering. If there's something similar for other types, we can
+     * generalize it -- meanwhile there's a separate case for GDB here
+     */
+    if (t1->type == SR_REPORT_GDB)
+    {
+        struct sr_gdb_thread *copy1 = (struct sr_gdb_thread*)t1,
+                             *copy2 = (struct sr_gdb_thread*)t2;
+        int ok = 0, all = 0;
+
+        sr_gdb_thread_quality_counts(copy1, &ok, &all);
+        sr_gdb_thread_quality_counts(copy2, &ok, &all);
+
+        if (ok != all)
+        {
+            /* There are some unknown function names, try to pair them, but
+             * the threads need to be copied first. */
+            copy1 = sr_gdb_thread_dup(copy1, false);
+            copy2 = sr_gdb_thread_dup(copy2, false);
+            sr_normalize_gdb_paired_unknown_function_names(copy1, copy2);
+        }
+
+        dist = sr_distance(dist_type, (struct sr_thread*)copy1,
+                           (struct sr_thread*)copy2);
+
+        if (ok != all)
+        {
+            sr_gdb_thread_free(copy1);
+            sr_gdb_thread_free(copy2);
+        }
+    }
+    else
+        dist = sr_distance(dist_type, t1, t2);
+
+    return dist;
+}
+
 struct sr_distances *
 sr_threads_compare(struct sr_thread **threads,
                    int m,
@@ -390,7 +439,6 @@ sr_threads_compare(struct sr_thread **threads,
 {
     struct sr_distances *distances;
     int i, j;
-    float dist;
 
     distances = sr_distances_new(m, n);
 
@@ -410,41 +458,9 @@ sr_threads_compare(struct sr_thread **threads,
     {
         for (j = i + 1; j < n; j++)
         {
-            /* XXX: GDB crashes have a special normalization step for
-             * clustering. If there's something similar for other types, we can
-             * generalize it -- meanwhile there's a separate case for GDB here
-             */
-            if (type == SR_REPORT_GDB)
-            {
-                struct sr_gdb_thread *thread1 = (struct sr_gdb_thread*)threads[i],
-                                     *thread2 = (struct sr_gdb_thread*)threads[j];
-                int ok = 0, all = 0;
 
-                sr_gdb_thread_quality_counts(thread1, &ok, &all);
-                sr_gdb_thread_quality_counts(thread2, &ok, &all);
-
-                if (ok != all)
-                {
-                    /* There are some unknown function names, try to pair them, but
-                     * the threads need to be copied first. */
-                    thread1 = sr_gdb_thread_dup(thread1, false);
-                    thread2 = sr_gdb_thread_dup(thread2, false);
-                    sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
-                }
-
-                dist = sr_distance(dist_type, (struct sr_thread*)thread1,
-                                   (struct sr_thread*)thread2);
-
-                if (ok != all)
-                {
-                    sr_gdb_thread_free(thread1);
-                    sr_gdb_thread_free(thread2);
-                }
-            }
-            else
-                dist = sr_distance(dist_type, threads[i], threads[j]);
-
-            distances->distances[get_distance_position(distances, i, j)] = dist;
+            distances->distances[get_distance_position(distances, i, j)]
+                = normalize_and_compare(threads[i], threads[j], dist_type);
         }
     }
 

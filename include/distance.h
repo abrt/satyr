@@ -174,9 +174,8 @@ sr_distances_set_distance(struct sr_distances *distances,
  * Compare first m threads from the array with other threads.
  * @param n
  * Number of threads in the passed array.
- * @param dist_func
- * Distance function which will be used to compare the threads. It's assumed to
- * be symmetric and return zero distance for equal threads.
+ * @param dist_type
+ * Type of distance to compute.
  * @returns
  * This function never returns NULL.
  */
