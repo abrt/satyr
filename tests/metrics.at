@@ -43,6 +43,21 @@ is_dist_equal(float x, float y)
   float epsilon = 1e-6;
   return x - epsilon <= y && x + epsilon >= y;
 }
+
+struct sr_gdb_thread *threads[[8]];
+static void
+prepare_threads()
+{
+  threads[[0]] = create_thread(4, "asd", "agd", "das", "??");
+  threads[[1]] = create_thread(3, "asd", "agd", "??");
+  threads[[2]] = create_thread(3, "asd", "agd", "??");
+  threads[[3]] = create_thread(3, "dg", "??", "??");
+
+  threads[[4]] = create_thread(2, "foo", "??");
+  threads[[5]] = create_thread(5, "bbb", "??", "foo", "bar", "baz");
+  threads[[6]] = create_thread(1, "dg");
+  threads[[7]] = create_thread(3, "bar", "das", "baz");
+}
 ])
 
 AT_TESTFUN([metrics_all_one_thread_empty],
@@ -357,11 +372,7 @@ UTILS
 int
 main()
 {
-  struct sr_gdb_thread *threads[[4]];
-  threads[[0]] = create_thread(4, "asd", "agd", "das", "??");
-  threads[[1]] = create_thread(3, "asd", "agd", "??");
-  threads[[2]] = create_thread(3, "asd", "agd", "??");
-  threads[[3]] = create_thread(3, "dg", "??", "??");
+  prepare_threads();
 
   struct sr_distances *distances = sr_threads_compare(threads, 3, 4, SR_DISTANCE_JACCARD);
   assert(is_dist_equal(0.6, sr_distances_get_distance(distances, 0, 1)));
