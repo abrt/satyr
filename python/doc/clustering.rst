@@ -10,6 +10,9 @@ Distance matrix
 .. autoclass:: Distances
    :members:
 
+.. autoclass:: DistancesPart
+   :members:
+
 Dendrogram
 ----------
 

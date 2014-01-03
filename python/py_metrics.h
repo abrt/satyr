@@ -33,6 +33,7 @@ extern "C" {
 #include <structmember.h>
 
 extern PyTypeObject sr_py_distances_type;
+extern PyTypeObject sr_py_distances_part_type;
 
 struct sr_py_distances
 {
@@ -58,6 +59,28 @@ PyObject *sr_py_distances_set_distance(PyObject *self, PyObject *args);
 
 /* methods */
 PyObject *sr_py_distances_dup(PyObject *self, PyObject *args);
+PyObject *sr_py_distances_merge_parts(PyObject *self, PyObject *args);
+
+struct sr_py_distances_part
+{
+    PyObject_HEAD
+    struct sr_distances_part *distances_part;
+};
+
+/* constructor */
+PyObject *sr_py_distances_part_new(PyTypeObject *object,
+                                   PyObject *args,
+                                   PyObject *kwds);
+
+/* destructor */
+void sr_py_distances_part_free(PyObject *object);
+
+/* str */
+PyObject *sr_py_distances_part_str(PyObject *self);
+
+/* methods */
+PyObject *sr_py_distances_part_create(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject *sr_py_distances_part_compute(PyObject *self, PyObject *args);
 
 #ifdef __cplusplus
 }
