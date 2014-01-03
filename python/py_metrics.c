@@ -87,6 +87,54 @@ sr_py_distances_type =
     NULL,                       /* tp_weaklist */
 };
 
+static bool
+validate_distance_params(int m, int n, int dist_type)
+{
+    if (m < 1 || n < 2)
+        PyErr_SetString(PyExc_ValueError, "Distance matrix must have at least 1 row and 2 columns");
+    else if (dist_type < 0 || dist_type >= SR_DISTANCE_NUM)
+        PyErr_SetString(PyExc_ValueError, "Invalid distance type");
+    else if (dist_type == SR_DISTANCE_JARO_WINKLER)
+        PyErr_SetString(PyExc_ValueError, "Cannot use DISTANCE_JARO_WINKLER as it is not a metric");
+    else
+        return true;
+
+    return false;
+}
+
+static bool
+prepare_thread_array(PyObject *thread_list, struct sr_thread *threads[], int n)
+{
+    int i;
+    PyTypeObject *thread_type = NULL;
+
+    for (i = 0; i < n; i++)
+    {
+        PyObject *obj = PyList_GetItem(thread_list, i);
+        if (!PyObject_TypeCheck(obj, &sr_py_base_thread_type))
+        {
+            PyErr_SetString(PyExc_TypeError, "Must be a list of satyr.BaseThread objects");
+            return false;
+        }
+
+        /* check that the type is the same as in the previous thread */
+        if (thread_type && obj->ob_type != thread_type)
+        {
+            PyErr_SetString(PyExc_TypeError, "All threads in the list must have the same type");
+            return false;
+        }
+        thread_type = obj->ob_type;
+
+        struct sr_py_base_thread *to = (struct sr_py_base_thread*)obj;
+        if (frames_prepare_linked_list(to) < 0)
+            return false;
+
+        threads[i] = (struct sr_thread*)to->thread;
+    }
+
+    return true;
+}
+
 /* constructor */
 PyObject *
 sr_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
@@ -97,8 +145,8 @@ sr_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
     if (!o)
         return PyErr_NoMemory();
 
-    PyObject * thread_list;
-    int i, m, n;
+    PyObject *thread_list;
+    int m, n;
     int dist_type = SR_DISTANCE_LEVENSHTEIN;
     static const char *kwlist[] = { "threads", "m", "dist_type", NULL };
 
@@ -107,49 +155,12 @@ sr_py_distances_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
     {
         n = PyList_Size(thread_list);
         struct sr_thread *threads[n];
-        PyTypeObject *thread_type = NULL;
 
-        for (i = 0; i < n; i++)
-        {
-            PyObject *obj = PyList_GetItem(thread_list, i);
-            if (!PyObject_TypeCheck(obj, &sr_py_base_thread_type))
-            {
-                PyErr_SetString(PyExc_TypeError, "Must be a list of satyr.BaseThread objects");
-                return NULL;
-            }
-
-            /* check that the type is the same as in the previous thread */
-            if (thread_type && obj->ob_type != thread_type)
-            {
-                PyErr_SetString(PyExc_TypeError, "All threads in the list must have the same type");
-                return NULL;
-            }
-            thread_type = obj->ob_type;
-
-            struct sr_py_base_thread *to = (struct sr_py_base_thread*)obj;
-            if (frames_prepare_linked_list(to) < 0)
-            {
-                return NULL;
-            }
-            threads[i] = (struct sr_thread*)to->thread;
-        }
-        if (m < 1 || n < 2)
-        {
-            PyErr_SetString(PyExc_ValueError, "Distance matrix must have at least 1 row and 2 columns");
+        if (!validate_distance_params(m, n, dist_type))
             return NULL;
-        }
 
-        if (dist_type < 0 || dist_type >= SR_DISTANCE_NUM)
-        {
-            PyErr_SetString(PyExc_ValueError, "Invalid distance type");
+        if (!prepare_thread_array(thread_list, threads, n))
             return NULL;
-        }
-
-        if (dist_type == SR_DISTANCE_JARO_WINKLER)
-        {
-            PyErr_SetString(PyExc_ValueError, "Cannot use DISTANCE_JARO_WINKLER as it is not a metric");
-            return NULL;
-        }
 
         o->distances = sr_threads_compare(threads, m, n, dist_type);
     }
