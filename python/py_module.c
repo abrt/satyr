@@ -131,6 +131,12 @@ MOD_INIT
         return MOD_ERROR_VAL;
     }
 
+    if (PyType_Ready(&sr_py_distances_part_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_distances_part_type) < 0");
+        return MOD_ERROR_VAL;
+    }
+
     if (PyType_Ready(&sr_py_dendrogram_type) < 0)
     {
         puts("PyType_Ready(&sr_py_dendrogram_type) < 0");
@@ -281,6 +287,10 @@ MOD_INIT
     Py_INCREF(&sr_py_distances_type);
     PyModule_AddObject(module, "Distances",
                        (PyObject *)&sr_py_distances_type);
+
+    Py_INCREF(&sr_py_distances_part_type);
+    PyModule_AddObject(module, "DistancesPart",
+                       (PyObject *)&sr_py_distances_part_type);
 
     PyModule_AddIntConstant(module, "DISTANCE_JARO_WINKLER",
                             SR_DISTANCE_JARO_WINKLER);

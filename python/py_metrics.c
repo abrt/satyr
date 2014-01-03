@@ -1,5 +1,6 @@
 #include "py_metrics.h"
 #include "py_base_thread.h"
+#include "py_common.h"
 #include "strbuf.h"
 #include "distance.h"
 
@@ -25,15 +26,44 @@
                    "Clones the distances object. All new structures are independent\n" \
                    "of the original object."
 
+#define di_merge_parts_doc "Usage: satyr.Distances.merge_parts([distance_parts])\n\n" \
+                           "Returns: new satyr.Distances object constructed from distance matrix parts " \
+                           "that were created by satyr.DistancesPart.create and their compute() method " \
+                           "has been called."
+
+#define distances_part_doc "satyr.DistancesPart - class representing a part of a distance matrix " \
+                           "that can be computed independent of other parts and later merged into " \
+                           "the full matrix.\n\n" \
+                           "This class does not have a constructor, use satyr.DistancePart.create " \
+                           "to create a list of distance matrix parts."
+
+#define dip_create "Usage: satyr.Distances.create(n, nparts, m=(n-1), dist_type=DISTANCE_LEVENSHTEIN)\n\n" \
+                   "Returns: list of at most nparts satyr.DistancesPart objects for m-by-n distance " \
+                   "matrix that is to be computed using dist_type metric." \
+
+#define dip_compute "Usage: distancespart.compute([threads])\n\n" \
+                    "Returns: None\n\n" \
+                    "Computes the part of the distance matrix. Make sure to pass the threads " \
+                    "list in the same order to every part."
+
 static PyMethodDef
 distances_methods[] =
 {
     /* getters & setters */
-    { "get_size",       sr_py_distances_get_size,     METH_NOARGS,  di_get_size_doc      },
-    { "get_distance",   sr_py_distances_get_distance, METH_VARARGS, di_get_distance_doc  },
-    { "set_distance",   sr_py_distances_set_distance, METH_VARARGS, di_set_distance_doc  },
+    { "get_size",       sr_py_distances_get_size,     METH_NOARGS,              di_get_size_doc     },
+    { "get_distance",   sr_py_distances_get_distance, METH_VARARGS,             di_get_distance_doc },
+    { "set_distance",   sr_py_distances_set_distance, METH_VARARGS,             di_set_distance_doc },
     /* methods */
-    { "dup",            sr_py_distances_dup,          METH_NOARGS,  di_dup_doc           },
+    { "dup",            sr_py_distances_dup,          METH_NOARGS,              di_dup_doc          },
+    { "merge_parts",    sr_py_distances_merge_parts,  METH_VARARGS|METH_STATIC, di_merge_parts_doc  },
+    { NULL },
+};
+
+static PyMethodDef
+distances_part_methods[] =
+{
+    { "create",  (PyCFunction)sr_py_distances_part_create,  METH_VARARGS|METH_KEYWORDS|METH_STATIC, dip_create  },
+    { "compute", sr_py_distances_part_compute,              METH_VARARGS,                           dip_compute },
     { NULL },
 };
 
@@ -78,6 +108,56 @@ sr_py_distances_type =
     NULL,                       /* tp_init */
     NULL,                       /* tp_alloc */
     sr_py_distances_new,        /* tp_new */
+    NULL,                       /* tp_free */
+    NULL,                       /* tp_is_gc */
+    NULL,                       /* tp_bases */
+    NULL,                       /* tp_mro */
+    NULL,                       /* tp_cache */
+    NULL,                       /* tp_subclasses */
+    NULL,                       /* tp_weaklist */
+};
+
+PyTypeObject
+sr_py_distances_part_type =
+{
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "satyr.DistancesPart",      /* tp_name */
+    sizeof(struct sr_py_distances_part), /* tp_basicsize */
+    0,                          /* tp_itemsize */
+    sr_py_distances_part_free,  /* tp_dealloc */
+    NULL,                       /* tp_print */
+    NULL,                       /* tp_getattr */
+    NULL,                       /* tp_setattr */
+    NULL,                       /* tp_compare */
+    NULL,                       /* tp_repr */
+    NULL,                       /* tp_as_number */
+    NULL,                       /* tp_as_sequence */
+    NULL,                       /* tp_as_mapping */
+    NULL,                       /* tp_hash */
+    NULL,                       /* tp_call */
+    sr_py_distances_part_str,   /* tp_str */
+    NULL,                       /* tp_getattro */
+    NULL,                       /* tp_setattro */
+    NULL,                       /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,         /* tp_flags */
+    distances_part_doc,         /* tp_doc */
+    NULL,                       /* tp_traverse */
+    NULL,                       /* tp_clear */
+    NULL,                       /* tp_richcompare */
+    0,                          /* tp_weaklistoffset */
+    NULL,                       /* tp_iter */
+    NULL,                       /* tp_iternext */
+    distances_part_methods,     /* tp_methods */
+    NULL,                       /* tp_members */
+    NULL,                       /* tp_getset */
+    NULL,                       /* tp_base */
+    NULL,                       /* tp_dict */
+    NULL,                       /* tp_descr_get */
+    NULL,                       /* tp_descr_set */
+    0,                          /* tp_dictoffset */
+    NULL,                       /* tp_init */
+    NULL,                       /* tp_alloc */
+    sr_py_distances_part_new,   /* tp_new */
     NULL,                       /* tp_free */
     NULL,                       /* tp_is_gc */
     NULL,                       /* tp_bases */
@@ -263,4 +343,176 @@ sr_py_distances_dup(PyObject *self, PyObject *args)
         return NULL;
 
     return (PyObject*)o;
+}
+
+static struct sr_distances_part*
+parts_prepare_linked_list(PyObject *part_list)
+{
+    int i;
+    PyObject *item;
+    struct sr_py_distances_part *current = NULL, *prev = NULL;
+
+    for (i = 0; i < PyList_Size(part_list); ++i)
+    {
+        item = PyList_GetItem(part_list, i);
+        if (!item)
+            return NULL;
+
+        Py_INCREF(item);
+
+        if (!PyObject_TypeCheck(item, &sr_py_distances_part_type))
+        {
+            Py_XDECREF(item);
+            Py_XDECREF(prev);
+            PyErr_SetString(PyExc_TypeError,
+                    "argument must be a list of satyr.DistancePart objects");
+            return NULL;
+        }
+
+        current = (struct sr_py_distances_part*)item;
+        if (i != 0)
+            prev->distances_part->next = current->distances_part;
+
+        Py_XDECREF(prev);
+        prev = current;
+    }
+
+    if (current)
+    {
+        current->distances_part->next = NULL;
+        Py_DECREF(current);
+    }
+
+    if (PyList_Size(part_list) > 0)
+        return ((struct sr_py_distances_part*)PyList_GetItem(part_list, 0))->distances_part;
+    else
+        return NULL;
+}
+
+PyObject *
+sr_py_distances_merge_parts(PyObject *self, PyObject *args)
+{
+    PyObject *part_list;
+    if (!PyArg_ParseTuple(args, "O!", &PyList_Type, &part_list))
+        return NULL;
+
+    struct sr_distances_part *parts = parts_prepare_linked_list(part_list);
+    if (!parts)
+        return NULL;
+
+    struct sr_distances *dist = sr_distances_part_merge(parts);
+    if (!dist)
+    {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to merge distance matrix parts");
+        return NULL;
+    }
+
+    struct sr_py_distances *o = PyObject_New(struct sr_py_distances, &sr_py_distances_type);
+    if (!o)
+        return PyErr_NoMemory();
+
+    o->distances = dist;
+    return (PyObject *)o;
+}
+
+/* constructor */
+PyObject *
+sr_py_distances_part_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
+{
+    /* do not call directly */
+    PyErr_SetString(PyExc_TypeError, "Do not use satyr.DistancesPart constructor directly, "
+                                     "use the create() method instead.");
+    return NULL;
+}
+
+/* destructor */
+void
+sr_py_distances_part_free(PyObject *object)
+{
+    struct sr_py_distances_part *this = (struct sr_py_distances_part *)object;
+    sr_distances_part_free(this->distances_part, false);
+    PyObject_Del(object);
+}
+
+PyObject *
+sr_py_distances_part_str(PyObject *self)
+{
+    struct sr_py_distances_part *this = (struct sr_py_distances_part *)self;
+    struct sr_distances_part *part = this->distances_part;
+    return PyString_FromFormat(
+        "%d-by-%d distance matrix part starting at (%d, %d) of length %zu, %scomputed",
+        part->m, part->n, part->m_begin, part->n_begin, part->len,
+        (part->distances ? "" : "not "));
+}
+
+/* methods */
+PyObject *
+sr_py_distances_part_create(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    int n, m = 0;
+    int dist_type = SR_DISTANCE_LEVENSHTEIN;
+    unsigned nparts;
+    static const char *kwlist[] = { "n", "nparts", "m", "dist_type", NULL };
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "iI|ii", (char**)kwlist,
+                                     &n, &nparts, &m, &dist_type))
+        return NULL;
+
+    if (m == 0)
+        m = n - 1;
+
+    if (!validate_distance_params(m, n, dist_type))
+        return NULL;
+
+    struct sr_distances_part *parts = sr_distances_part_create(m, n, dist_type, nparts);
+    if (parts == NULL)
+    {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to create distance matrix parts");
+        return NULL;
+    }
+
+    PyObject *part_list = PyList_New(0);
+    struct sr_distances_part *it;
+    for (it = parts; it != NULL; it = it->next)
+    {
+        struct sr_py_distances_part *py_part =
+            PyObject_New(struct sr_py_distances_part, &sr_py_distances_part_type);
+
+        py_part->distances_part = it;
+        if (PyList_Append(part_list, (PyObject*)py_part) != 0)
+        {
+            /* Decrementing list refcount should free all its elements. */
+            Py_XDECREF(part_list);
+            /* This ought to free unprocessed elements. */
+            sr_distances_part_free(it, true);
+            return NULL;
+        }
+    }
+
+    return part_list;
+}
+
+PyObject *
+sr_py_distances_part_compute(PyObject *self, PyObject *args)
+{
+    struct sr_py_distances_part *this = (struct sr_py_distances_part*)self;
+    PyObject *thread_list;
+
+    if (!PyArg_ParseTuple(args, "O!", &PyList_Type, &thread_list))
+        return NULL;
+
+    int n = PyList_Size(thread_list);
+    struct sr_thread *threads[n];
+
+    if (!prepare_thread_array(thread_list, threads, n))
+        return NULL;
+
+    if (n != this->distances_part->n)
+    {
+        PyErr_SetString(PyExc_ValueError, "Wrong number of threads provided");
+        return NULL;
+    }
+
+    sr_distances_part_compute(this->distances_part, threads);
+    Py_RETURN_NONE;
 }

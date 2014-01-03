@@ -5,7 +5,14 @@ from test_helpers import *
 
 class TestDistances(unittest.TestCase):
     def setUp(self):
-        pass
+        self.threads = [
+            satyr.GdbThread("f1 lib1\nf2 lib2\nf3 lib3\n", True),
+            satyr.GdbThread("f1 lib1\nf4 lib4\nf5 lib5\n", True),
+            satyr.GdbThread("f4 lib4\nf4 lib4\nf3 lib3\n", True),
+            satyr.GdbThread("f9 lib9\n", True),
+            satyr.GdbThread("f1 lib1\nf2 lib2\nf4 lib4\nf5 lib5\n", True),
+            satyr.GdbThread("f1 lib1\nf4 lib4\nf4 lib4\nf9 lib9\ng libg\n", True)
+        ]
 
     def test_constructor(self):
         """
@@ -86,6 +93,35 @@ class TestDistances(unittest.TestCase):
         self.assertAlmostEqual(
             thread1.distance(thread2, dist_type=satyr.DISTANCE_DAMERAU_LEVENSHTEIN),
             thread2.distance(thread1, dist_type=satyr.DISTANCE_DAMERAU_LEVENSHTEIN))
+
+    def assert_correct_matrix(self, dist_from_parts, threads):
+        dist_reference = satyr.Distances(threads, len(threads))
+
+        (m, n) = dist_reference.get_size()
+        self.assertEqual(dist_from_parts.get_size(), (m, n))
+        for i in range(m):
+            for j in range(n):
+                self.assertEqual(dist_from_parts.get_distance(i, j),
+                                 dist_reference.get_distance(i, j))
+
+    def test_distances_part_sequential(self):
+        def do_test(threads, nparts):
+            parts = satyr.DistancesPart.create(len(threads), nparts)
+            for p in parts:
+                p.compute(threads)
+
+            dist_from_parts = satyr.Distances.merge_parts(parts)
+            self.assert_correct_matrix(dist_from_parts, threads)
+
+        do_test(self.threads[:2], 1)
+        do_test(self.threads[:2], 2)
+        do_test(self.threads[:4], 1)
+        do_test(self.threads[:4], 2)
+        do_test(self.threads[:4], 3)
+        do_test(self.threads[:4], 4)
+        do_test(self.threads[:4], 42)
+        for n in [1, 2, 3, 4, 5, 6, 7, 8, 16, 32, 9000]:
+            do_test(self.threads, n)
 
 if __name__ == '__main__':
     unittest.main()
