@@ -46,6 +46,8 @@
                     "Computes the part of the distance matrix. Make sure to pass the threads " \
                     "list in the same order to every part."
 
+#define dip_reduce "Used for pickling."
+
 static PyMethodDef
 distances_methods[] =
 {
@@ -62,8 +64,9 @@ distances_methods[] =
 static PyMethodDef
 distances_part_methods[] =
 {
-    { "create",  (PyCFunction)sr_py_distances_part_create,  METH_VARARGS|METH_KEYWORDS|METH_STATIC, dip_create  },
-    { "compute", sr_py_distances_part_compute,              METH_VARARGS,                           dip_compute },
+    { "create",     (PyCFunction)sr_py_distances_part_create,  METH_VARARGS|METH_KEYWORDS|METH_STATIC, dip_create  },
+    { "compute",    sr_py_distances_part_compute,              METH_VARARGS,                           dip_compute },
+    { "__reduce__", sr_py_distances_part_reduce,               METH_VARARGS,                           dip_reduce  },
     { NULL },
 };
 
@@ -419,9 +422,50 @@ sr_py_distances_merge_parts(PyObject *self, PyObject *args)
 PyObject *
 sr_py_distances_part_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 {
-    /* do not call directly */
-    PyErr_SetString(PyExc_TypeError, "Do not use satyr.DistancesPart constructor directly, "
-                                     "use the create() method instead.");
+    int m, n, m_begin, n_begin;
+    unsigned long long len;
+    enum sr_distance_type dist_type;
+    unsigned long long checksum;
+    PyObject *dist_list;
+
+    if (!PyArg_ParseTuple(args, "iiiiKiKO", &m, &n, &m_begin, &n_begin, &len, &dist_type,
+                          &checksum, &dist_list))
+        return NULL;
+
+    struct sr_distances_part *part = sr_distances_part_new(m, n, dist_type, m_begin, n_begin,
+                                                           (size_t)len);
+    part->checksum = (uint32_t)checksum;
+
+    if (PyList_Check(dist_list))
+    {
+        part->distances = sr_malloc_array(sizeof(float), part->len);
+        int i;
+        for (i = 0; i < PyList_Size(dist_list); i++)
+        {
+            PyObject *item = PyList_GetItem(dist_list, i);
+            if (!item)
+                goto error;
+
+            double d = PyFloat_AsDouble(item);
+            if (PyErr_Occurred())
+                goto error;
+
+            part->distances[i] = (float)d;
+        }
+    }
+    else if (dist_list != Py_None)
+    {
+        PyErr_SetString(PyExc_TypeError, "distances must be list of floats or None");
+        goto error;
+    }
+
+    struct sr_py_distances_part *py_part =
+        PyObject_New(struct sr_py_distances_part, &sr_py_distances_part_type);
+    py_part->distances_part = part;
+
+    return (PyObject *)py_part;
+error:
+    sr_distances_part_free(part, false);
     return NULL;
 }
 
@@ -446,6 +490,48 @@ sr_py_distances_part_str(PyObject *self)
 }
 
 /* methods */
+PyObject *
+sr_py_distances_part_reduce(PyObject *self, PyObject *args)
+{
+    struct sr_py_distances_part *this = (struct sr_py_distances_part *)self;
+    struct sr_distances_part *part = this->distances_part;
+
+    PyObject *dist_list;
+    if (part->distances)
+    {
+        dist_list = PyList_New(0);
+        if (!dist_list)
+            return NULL;
+
+        int i;
+        for (i = 0; i < part->len; i++)
+        {
+            PyObject *f = PyFloat_FromDouble((double)part->distances[i]);
+            if (!f)
+            {
+                Py_XDECREF(dist_list);
+                return NULL;
+            }
+
+            if (PyList_Append(dist_list, f) != 0)
+            {
+                Py_XDECREF(f);
+                Py_XDECREF(dist_list);
+                return NULL;
+            }
+        }
+    }
+    else
+    {
+        Py_INCREF(Py_None);
+        dist_list = Py_None;
+    }
+
+    return Py_BuildValue("O(iiiiKiKN)", &sr_py_distances_part_type, part->m, part->n,
+                         part->m_begin, part->n_begin, (unsigned long long)part->len,
+                         part->dist_type, (unsigned long long)part->checksum, dist_list);
+}
+
 PyObject *
 sr_py_distances_part_create(PyObject *self, PyObject *args, PyObject *kwds)
 {
