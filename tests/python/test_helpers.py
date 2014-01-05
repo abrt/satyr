@@ -2,13 +2,8 @@ import os
 import sys
 import unittest
 
-try:
-    if sys.version_info[0] == 2:
-        import _satyr as satyr
-    else:
-        import _satyr3 as satyr
-except ImportError:
-    import satyr
+# should import satyr.py which imports ../../python/.libs/_satyr.so
+import satyr
 
 class BindingsTestCase(unittest.TestCase):
     def assertGetSetCorrect(self, obj, attr, orig_val, new_val):
