@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import unittest
+from multiprocessing import Process, Queue
+
 from test_helpers import *
 
 class TestDistances(unittest.TestCase):
@@ -109,6 +111,62 @@ class TestDistances(unittest.TestCase):
             parts = satyr.DistancesPart.create(len(threads), nparts)
             for p in parts:
                 p.compute(threads)
+
+            dist_from_parts = satyr.Distances.merge_parts(parts)
+            self.assert_correct_matrix(dist_from_parts, threads)
+
+        do_test(self.threads[:2], 1)
+        do_test(self.threads[:2], 2)
+        do_test(self.threads[:4], 1)
+        do_test(self.threads[:4], 2)
+        do_test(self.threads[:4], 3)
+        do_test(self.threads[:4], 4)
+        do_test(self.threads[:4], 42)
+        for n in [1, 2, 3, 4, 5, 6, 7, 8, 16, 32, 9000]:
+            do_test(self.threads, n)
+
+    def test_distances_part_pickle(self):
+        import pickle
+        parts = satyr.DistancesPart.create(len(self.threads), 4)
+
+        parts_recycled = []
+        for p in parts:
+            pickled = pickle.dumps(p)
+            p = pickle.loads(pickled)
+            p.compute(self.threads)
+            pickled = pickle.dumps(p)
+            p = pickle.loads(pickled)
+            parts_recycled.append(p)
+
+        dist_from_parts = satyr.Distances.merge_parts(parts_recycled)
+        self.assert_correct_matrix(dist_from_parts, self.threads)
+
+    def test_distances_part_parallel(self):
+        def do_test(threads, nparts):
+            parts = satyr.DistancesPart.create(len(threads), nparts)
+
+            def compute_part(part, queue):
+                # avoids hangup if something goes wrong, probably not necessary
+                try:
+                    part.compute(threads)
+                    queue.put(part)
+                except:
+                    queue.put(None)
+
+            result_queue = Queue()
+            processes = []
+            for p in parts:
+                processes.append(Process(target=compute_part, args=(p, result_queue)))
+                processes[-1].start()
+
+            parts = []
+            results_remaining = len(processes)
+            while results_remaining:
+                parts.append(result_queue.get())
+                results_remaining -= 1
+
+            for pr in processes:
+                pr.join()
 
             dist_from_parts = satyr.Distances.merge_parts(parts)
             self.assert_correct_matrix(dist_from_parts, threads)

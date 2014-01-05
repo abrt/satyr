@@ -79,6 +79,7 @@ void sr_py_distances_part_free(PyObject *object);
 PyObject *sr_py_distances_part_str(PyObject *self);
 
 /* methods */
+PyObject *sr_py_distances_part_reduce(PyObject *self, PyObject *args);
 PyObject *sr_py_distances_part_create(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject *sr_py_distances_part_compute(PyObject *self, PyObject *args);
 
