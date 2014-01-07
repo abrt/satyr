@@ -107,6 +107,11 @@ make check
 %endif
 
 %changelog
+* Tue Jan 07 2014 Martin Milata <mmilata@redhat.com> 0.13-1
+- New upstream version
+  - Kerneloops parser support for ppc64 and s390
+  - Kerneloops hashing
+
 * Tue Dec 10 2013 Martin Milata <mmilata@redhat.com> 0.12-1
 - New upstream version
   - JVM frames normalization
