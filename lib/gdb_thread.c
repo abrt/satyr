@@ -325,6 +325,7 @@ sr_gdb_thread_parse(const char **input,
         if (0 == spaces)
         {
             location->message = "Space expected after the \"Thread\" keyword.";
+            sr_gdb_thread_free(imthread);
             return NULL;
         }
 
