@@ -17,6 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+#include "config.h"
+
 #include "core/fingerprint.h"
 #include "core/stacktrace.h"
 #include "core/frame.h"
@@ -32,6 +34,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <search.h>
+
+#if HAVE_LIBOPCODES
 
 static void
 fingerprint_add_bool(struct sr_strbuf *buffer,
@@ -551,6 +555,27 @@ sr_core_fingerprint_generate_for_binary(struct sr_core_thread *thread,
     sr_elf_eh_frame_free(eh_frame);
     return true;
 }
+
+#else // HAVE_LIBOPCODES
+
+bool
+sr_core_fingerprint_generate(struct sr_core_stacktrace *stacktrace,
+                             char **error_message)
+{
+    *error_message = sr_strdup("satyr compiled without libopcodes");
+    return false;
+}
+
+bool
+sr_core_fingerprint_generate_for_binary(struct sr_core_thread *thread,
+                                        const char *binary_path,
+                                        char **error_message)
+{
+    *error_message = sr_strdup("satyr compiled without libopcodes");
+    return false;
+}
+
+#endif // HAVE_LIBOPCODES
 
 static void
 hash_frame (struct sr_core_frame *frame)
