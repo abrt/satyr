@@ -29,59 +29,108 @@
 #include <stdio.h>
 #include <string.h>
 
-static struct sr_core_thread *
-unwind_thread(Dwfl *dwfl, Dwfl_Frame_State *state, char **error_msg)
+struct frame_callback_arg
 {
-    struct sr_core_frame *head = NULL, *tail = NULL;
-    pid_t tid = 0;
+    struct sr_core_thread *thread;
+    char *error_msg;
+};
 
-    if (state)
+struct thread_callback_arg
+{
+    struct sr_core_stacktrace *stacktrace;
+    char *error_msg;
+};
+
+static int CB_STOP_UNWIND = DWARF_CB_ABORT+1;
+
+static int
+frame_callback(Dwfl_Frame *frame, void *data)
+{
+    struct frame_callback_arg *frame_arg = data;
+    char **error_msg = &frame_arg->error_msg;
+
+    Dwarf_Addr pc;
+    bool minus_one;
+    if (!dwfl_frame_pc(frame, &pc, &minus_one))
     {
-        tid = dwfl_frame_tid_get(state);
+        set_error_dwfl("dwfl_frame_pc");
+        return DWARF_CB_ABORT;
     }
 
-    while (state)
+    Dwfl *dwfl = dwfl_thread_dwfl(dwfl_frame_thread(frame));
+    struct sr_core_frame *result = resolve_frame(dwfl, pc, minus_one);
+
+    /* Do not unwind below __libc_start_main. */
+    if (0 == sr_strcmp0(result->function_name, "__libc_start_main"))
     {
-        Dwarf_Addr pc;
-        bool minus_one;
-        if (!dwfl_frame_state_pc(state, &pc, &minus_one))
-        {
-            warn("Failed to obtain PC: %s", dwfl_errmsg(-1));
-            break;
-        }
-
-        struct sr_core_frame *frame = resolve_frame(dwfl, pc, minus_one);
-        list_append(head, tail, frame);
-
-        /* Do not unwind below __libc_start_main. */
-        if (0 == sr_strcmp0(frame->function_name, "__libc_start_main"))
-            break;
-
-        if (!dwfl_frame_unwind(&state))
-        {
-            warn("Cannot unwind frame: %s", dwfl_errmsg(-1));
-            break;
-        }
+        sr_core_frame_free(result);
+        return CB_STOP_UNWIND;
     }
 
-    if (!error_msg && !head)
+    frame_arg->thread->frames =
+        sr_core_frame_append(frame_arg->thread->frames, result);
+
+    return DWARF_CB_OK;
+}
+
+static int
+unwind_thread(Dwfl_Thread *thread, void *data)
+{
+    struct thread_callback_arg *thread_arg = data;
+    char **error_msg = &thread_arg->error_msg;
+
+    struct sr_core_thread *result = sr_core_thread_new();
+    if (!result)
     {
-        set_error("No frames found for thread id %d", (int)tid);
+        set_error("Failed to initialize stacktrace memory");
+        return DWARF_CB_ABORT;
+    }
+    result->id = (int64_t)dwfl_thread_tid(thread);
+
+    struct frame_callback_arg frame_arg =
+    {
+        .thread = result,
+        .error_msg = NULL
+    };
+
+    int ret = dwfl_thread_getframes(thread, frame_callback, &frame_arg);
+    if (ret == -1)
+    {
+        warn("dwfl_thread_getframes failed for thread id %d: %s",
+             (int)result->id, dwfl_errmsg(-1));
+    }
+    else if (ret == DWARF_CB_ABORT)
+    {
+        *error_msg = frame_arg.error_msg;
+        goto abort;
+    }
+    else if (ret != 0 && ret != CB_STOP_UNWIND)
+    {
+        *error_msg = sr_strdup("Unknown error in dwfl_thread_getframes");
+        goto abort;
     }
 
-    struct sr_core_thread *thread = sr_core_thread_new();
-    thread->id = (int64_t)tid;
-    thread->frames = head;
-    return thread;
+    if (!error_msg && !frame_arg.thread->frames)
+    {
+        set_error("No frames found for thread id %d", (int)result->id);
+        goto abort;
+    }
+
+    thread_arg->stacktrace->threads =
+        sr_core_thread_append(thread_arg->stacktrace->threads, result);
+    return DWARF_CB_OK;
+
+abort:
+    sr_core_thread_free(result);
+    return DWARF_CB_ABORT;
 }
 
 struct sr_core_stacktrace *
 sr_parse_coredump(const char *core_file,
-                   const char *exe_file,
-                   char **error_msg)
+                  const char *exe_file,
+                  char **error_msg)
 {
     struct sr_core_stacktrace *stacktrace = NULL;
-    short signal = 0;
 
     /* Initialize error_msg to 'no error'. */
     if (error_msg)
@@ -91,11 +140,9 @@ sr_parse_coredump(const char *core_file,
     if (*error_msg)
         return NULL;
 
-    Dwfl_Frame_State *state = dwfl_frame_state_core(ch->dwfl, core_file);
-    if (!state)
+    if (dwfl_core_file_attach(ch->dwfl, ch->eh) < 0)
     {
-        set_error("Failed to initialize frame state from core '%s'",
-                   core_file);
+        set_error_dwfl("dwfl_core_file_attach");
         goto fail_destroy_handle;
     }
 
@@ -105,20 +152,30 @@ sr_parse_coredump(const char *core_file,
         set_error("Failed to initialize stacktrace memory");
         goto fail_destroy_handle;
     }
-    struct sr_core_thread *threads_tail = NULL;
 
-    do
+    struct thread_callback_arg thread_arg =
     {
-        struct sr_core_thread *t = unwind_thread(ch->dwfl, state, error_msg);
-        if (*error_msg)
-        {
-            goto fail_destroy_trace;
-        }
-        list_append(stacktrace->threads, threads_tail, t);
-        state = dwfl_frame_thread_next(state);
-    } while (state);
+        .stacktrace = stacktrace,
+        .error_msg = NULL
+    };
 
-    signal = get_signal_number(ch->eh, core_file);
+    int ret = dwfl_getthreads(ch->dwfl, unwind_thread, &thread_arg);
+    if (ret != 0)
+    {
+        if (ret == -1)
+            set_error_dwfl("dwfl_getthreads");
+        else if (ret == DWARF_CB_ABORT)
+            *error_msg = thread_arg.error_msg;
+        else
+            *error_msg = sr_strdup("Unknown error in dwfl_getthreads");
+
+        goto fail_destroy_trace;
+    }
+
+    stacktrace->executable = sr_strdup(exe_file);
+    stacktrace->signal = get_signal_number(ch->eh, core_file);
+    /* FIXME: is this the best we can do? */
+    stacktrace->crash_thread = stacktrace->threads;
 
 fail_destroy_trace:
     if (*error_msg)
@@ -128,11 +185,6 @@ fail_destroy_trace:
     }
 fail_destroy_handle:
     core_handle_free(ch);
-
-    stacktrace->executable = sr_strdup(exe_file);
-    stacktrace->signal = signal;
-    /* FIXME: is this the best we can do? */
-    stacktrace->crash_thread = stacktrace->threads;
     return stacktrace;
 }
 
