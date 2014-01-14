@@ -87,11 +87,13 @@ create_core_stacktrace(const char *directory, const char *gdb_output,
     if (!core_stacktrace)
         return false;
 
+#if 0
     sr_core_fingerprint_generate(core_stacktrace,
                                  error_message);
 
     if (hash_fingerprints)
         sr_core_fingerprint_hash(core_stacktrace);
+#endif
 
     char *json = sr_core_stacktrace_to_json(core_stacktrace);
 
