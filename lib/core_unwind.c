@@ -227,9 +227,10 @@ open_coredump(const char *elf_file, const char *exe_file, char **error_msg)
     }
     ch->segments = head;
 
-    if (!*error_msg && !head)
+    if (!head)
     {
-        set_error("No segments found in coredump '%s'", elf_file);
+        if (error_msg && !*error_msg)
+            set_error("No segments found in coredump '%s'", elf_file);
         goto fail_dwfl;
     }
 

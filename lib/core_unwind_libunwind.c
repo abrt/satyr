@@ -99,7 +99,7 @@ unwind_thread(struct UCD_info *ui,
         }
     }
 
-    if (!error_msg && !trace)
+    if (error_msg && !*error_msg && !trace)
     {
         set_error("No frames found for thread %d", thread_no);
     }
