@@ -137,20 +137,20 @@ sr_parse_coredump(const char *core_file,
         *error_msg = NULL;
 
     struct core_handle *ch = open_coredump(core_file, exe_file, error_msg);
-    if (*error_msg)
-        return NULL;
+    if (!ch)
+        goto fail;
 
     if (dwfl_core_file_attach(ch->dwfl, ch->eh) < 0)
     {
         set_error_dwfl("dwfl_core_file_attach");
-        goto fail_destroy_handle;
+        goto fail;
     }
 
     stacktrace = sr_core_stacktrace_new();
     if (!stacktrace)
     {
         set_error("Failed to initialize stacktrace memory");
-        goto fail_destroy_handle;
+        goto fail;
     }
 
     struct thread_callback_arg thread_arg =
@@ -165,11 +165,16 @@ sr_parse_coredump(const char *core_file,
         if (ret == -1)
             set_error_dwfl("dwfl_getthreads");
         else if (ret == DWARF_CB_ABORT)
-            *error_msg = thread_arg.error_msg;
+        {
+            set_error(thread_arg.error_msg);
+            free(thread_arg.error_msg);
+        }
         else
-            *error_msg = sr_strdup("Unknown error in dwfl_getthreads");
+            set_error("Unknown error in dwfl_getthreads");
 
-        goto fail_destroy_trace;
+        sr_core_stacktrace_free(stacktrace);
+        stacktrace = NULL;
+        goto fail;
     }
 
     stacktrace->executable = sr_strdup(exe_file);
@@ -177,13 +182,7 @@ sr_parse_coredump(const char *core_file,
     /* FIXME: is this the best we can do? */
     stacktrace->crash_thread = stacktrace->threads;
 
-fail_destroy_trace:
-    if (*error_msg)
-    {
-        sr_core_stacktrace_free(stacktrace);
-        stacktrace = NULL;
-    }
-fail_destroy_handle:
+fail:
     core_handle_free(ch);
     return stacktrace;
 }
