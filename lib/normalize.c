@@ -164,7 +164,13 @@ is_removable_xorg(const char *function_name,
         call_match(function_name, source_file, "_XReply", "xcb_io.c", NULL) ||
         call_match(function_name, source_file, "_XError", "XlibInt.c", NULL) ||
         call_match(function_name, source_file, "XSync", "Sync.c", NULL) ||
-        call_match(function_name, source_file, "process_responses", "xcb_io.c", NULL);
+        call_match(function_name, source_file, "process_responses", "xcb_io.c", NULL) ||
+        call_match(function_name, source_file, "OsSigHandler", "osinit.c", NULL) ||
+        call_match(function_name, source_file, "FatalError", "log.c", NULL) ||
+        call_match(function_name, source_file, "AbortServer", "log.c", NULL) ||
+        call_match(function_name, source_file, "AbortDDX", "xf86Init.c", NULL) ||
+        call_match(function_name, source_file, "ddxGiveUp", "xf86Init.c", NULL) ||
+        call_match(function_name, source_file, "OsAbort", "utils.c", NULL);
 }
 
 static bool
