@@ -1,4 +1,4 @@
-SUBDIRS = lib python tests include
+SUBDIRS = lib python tests include ruby
 
 # Automatic update of libtool.
 libtool: $(LIBTOOL_DEPS)
