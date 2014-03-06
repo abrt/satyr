@@ -128,6 +128,7 @@ AC_CONFIG_FILES([
 	tests/Makefile
 	include/Makefile
 	tests/atlocal
+        ruby/Makefile
 ])
 
 AC_OUTPUT

@@ -76,6 +76,8 @@ libsatyr_la_SOURCES =
 libsatyr_la_LIBADD = libsatyr_conv.la
 libsatyr_la_LDFLAGS = -version-info 3:0:0 -export-symbols-regex '^sr_'
 
+# NOTE: when updating CURRENT, update it in ruby/lib/satyr.rb as well!
+
 # From http://www.seul.org/docs/autotut/
 # Version consists 3 numbers: CURRENT, REVISION, AGE.
 # CURRENT is the version of the interface the library implements.
