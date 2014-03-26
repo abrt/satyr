@@ -12,7 +12,11 @@ Requires: ruby(release)
 Requires: ruby(rubygems)
 Requires: rubygem(ffi)
 # the bindings are written for particular ABI
+%if %{__isa_bits} == 64
+Requires: libsatyr.so.3()(64bit)
+%else
 Requires: libsatyr.so.3
+%endif
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
