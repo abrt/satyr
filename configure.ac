@@ -116,7 +116,7 @@ AC_CHECK_LIB([unwind-coredump], [main])
 AC_CHECK_LIB([rpm], [main])
 
 # c++ symbol demangling
-AC_CHECK_LIB([stdc++], [__cxa_demangle])
+AC_CHECK_LIB([stdc++], [__cxa_demangle], [], [echo "error: stdc++ library not found"; exit 1])
 
 AC_CONFIG_FILES([
 	satyr.spec
