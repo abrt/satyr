@@ -140,17 +140,23 @@ sr_operating_system_parse_etc_system_release(const char *etc_system_release,
     if (!release)
         return false;
 
-    *name = sr_strndup(etc_system_release, release - etc_system_release);
-
-    if (0 == strlen(*name))
-        return false;
-
-    /* make the name all lower case */
-    char *a = *name;
-    while (*a)
+    /* Normal form of Red Hat Enterprise Linux's name is "rhel" */
+    if (strncasecmp("Red Hat Enterprise Linux", etc_system_release, strlen("Red Hat Enterprise Linux")) == 0)
+        *name = sr_strndup("rhel", strlen("rhel"));
+    else
     {
-        *a = tolower(*a);
-        a++;
+        *name = sr_strndup(etc_system_release, release - etc_system_release);
+
+        if (0 == strlen(*name))
+            return false;
+
+        /* make the name all lower case */
+        char *a = *name;
+        while (*a)
+        {
+            *a = tolower(*a);
+            a++;
+        }
     }
 
     const char *version_begin = release + strlen(" release ");
