@@ -34,7 +34,8 @@ int
 main(void)
 {
     check("Fedora release 16 (Verne)", "fedora", "16");
-    check("Red Hat Enterprise Linux release 6.2", "red hat enterprise linux", "6.2");
+    check("Red Hat Enterprise Linux release 6.2", "rhel", "6.2");
+    check("CentOS release 6.5 (Final) ", "centos", "6.5");
     return 0;
 }
 ]])
