@@ -24,6 +24,8 @@
 #include "operating_system.h"
 #include "core/unwind.h"
 #include "core/stacktrace.h"
+#include "core/thread.h"
+#include "core/frame.h"
 #include "core/fingerprint.h"
 #include "python/stacktrace.h"
 #include "koops/stacktrace.h"
@@ -62,6 +64,26 @@ sr_abrt_print_report_from_dir(const char *directory,
     return true;
 }
 
+static void
+fulfill_missing_values(struct sr_core_stacktrace *core_stacktrace)
+{
+    struct sr_core_thread *thread = core_stacktrace->threads;
+    while (thread)
+    {
+        struct sr_core_frame *frame = thread->frames;
+        while (frame)
+        {
+            if (!frame->file_name && frame->function_name
+                && strcmp("__kernel_vsyscall", frame->function_name) == 0)
+            {
+                frame->file_name = sr_strdup("kernel");
+            }
+            frame = frame->next;
+        }
+        thread = thread->next;
+    }
+}
+
 static bool
 create_core_stacktrace(const char *directory, const char *gdb_output,
                        bool hash_fingerprints, char **error_message)
@@ -86,6 +108,8 @@ create_core_stacktrace(const char *directory, const char *gdb_output,
     free(coredump_filename);
     if (!core_stacktrace)
         return false;
+
+    fulfill_missing_values(core_stacktrace);
 
 #if 0
     sr_core_fingerprint_generate(core_stacktrace,
