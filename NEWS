@@ -1,3 +1,8 @@
+satyr 0.14
+==========
+Ported to current elfutils unwinder API. Disabled frame fingerprinting.
+Rudimentary ruby bindings added. Bugfixes.
+
 satyr 0.13
 ==========
 Kerneloops parser extended to ppc64 and s390 koopses. ABRT-compatible

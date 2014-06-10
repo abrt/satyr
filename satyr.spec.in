@@ -107,6 +107,12 @@ make check
 %endif
 
 %changelog
+* Tue Jun 10 2014 Martin Milata <mmilata@redhat.com> 0.14-1
+- New upstream version
+  - Ported to elfutils-0.158 unwinder API
+  - Frame fingerprinting disabled
+  - Bugfixes
+
 * Tue Jan 07 2014 Martin Milata <mmilata@redhat.com> 0.13-1
 - New upstream version
   - Kerneloops parser support for ppc64 and s390
