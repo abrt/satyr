@@ -166,7 +166,7 @@ sr_parse_coredump(const char *core_file,
             set_error_dwfl("dwfl_getthreads");
         else if (ret == DWARF_CB_ABORT)
         {
-            set_error(thread_arg.error_msg);
+            set_error("%s", thread_arg.error_msg);
             free(thread_arg.error_msg);
         }
         else

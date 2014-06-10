@@ -62,7 +62,7 @@ libsatyr_conv_la_SOURCES = \
 	unstrip.c \
 	utils.c
 
-libsatyr_conv_la_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE -I$(top_srcdir)/include $(GLIB_CFLAGS)
+libsatyr_conv_la_CFLAGS = -Wall -Wformat=2 -std=gnu99 -D_GNU_SOURCE -I$(top_srcdir)/include $(GLIB_CFLAGS)
 libsatyr_conv_la_LDFLAGS = $(GLIB_LIBS)
 
 if HAVE_LIBOPCODES
