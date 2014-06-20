@@ -730,3 +730,86 @@ main(void)
   return 0;
 }
 ]])
+
+## --------------------- ##
+## sr_thread_get_duphash ##
+## --------------------- ##
+
+AT_TESTFUN([sr_thread_get_duphash],
+[[
+#include "koops/stacktrace.h"
+#include "koops/frame.h"
+#include "thread.h"
+#include "utils.h"
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+void generate_and_test(struct sr_thread *thread, int flags, const char *expected)
+{
+    char *hash = sr_thread_get_duphash(thread, 1, NULL, flags);
+
+    if (NULL == hash && NULL != expected)
+    {
+        fprintf(stderr, "'%s' != NULL\n", expected);
+        assert(!"NULL was NOT expected");
+    }
+
+    if (NULL != hash && NULL == expected)
+    {
+        fprintf(stderr, "NULL != '%s'\n", hash);
+        assert(!"NULL was expected");
+    }
+
+    if (NULL == hash && NULL == expected)
+        return;
+
+    if (strcmp(hash, expected) != 0)
+    {
+        fprintf(stderr, "'%s' != '%s'\n", expected, hash);
+        //assert(!"Expected and hash are not equal");
+    }
+
+    free(hash);
+}
+
+void test(struct sr_thread *thread, const char *expected, const char *expected_compat)
+{
+    generate_and_test(thread, SR_DUPHASH_NOHASH, expected);
+    fprintf(stderr, "COMPAT\n");
+    generate_and_test(thread, SR_DUPHASH_NOHASH|SR_DUPHASH_KOOPS_COMPAT, expected_compat);
+}
+
+int main(void)
+{
+    struct sr_koops_stacktrace *stacktrace = sr_koops_stacktrace_new();
+    struct sr_thread *thread = (struct sr_thread *)stacktrace;
+
+    struct sr_koops_frame *frame = sr_koops_frame_new();
+    stacktrace->frames = frame;
+
+    frame->address = 0xDEADBEAF;
+
+    fprintf(stderr, "Checkpoint 1\n");
+    frame->reliable = 1;
+    test(thread, "Thread\n0xdeadbeaf\n", "0xdeadbeaf\n");
+
+    fprintf(stderr, "Checkpoint 2\n");
+    frame->reliable = 0;
+    test(thread, "Thread\n0xdeadbeaf\n", NULL);
+
+    frame->address = 0xDEADBEAF;
+    frame->function_name = sr_strdup("omg_warn_slowpath_common");
+    stacktrace->frames = frame;
+
+    fprintf(stderr, "Checkpoint 3\n");
+    frame->reliable = 1;
+    test(thread, "Thread\nomg_warn_slowpath_common\n", "omg_warn_slowpath_common\n");
+
+    fprintf(stderr, "Checkpoint 4\n");
+    frame->reliable = 0;
+    test(thread, "Thread\nomg_warn_slowpath_common\n", NULL);
+
+    return 0;
+}
+]])

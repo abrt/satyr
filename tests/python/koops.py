@@ -75,6 +75,7 @@ class TestKerneloops(BindingsTestCase):
                          compat_expected_plain)
         self.assertEqual(self.koops.get_duphash(flags=satyr.DUPHASH_KOOPS_COMPAT, frames=6),
                          '5718b3a86c64e7bed5e8ead08ae3084e447ddbee')
+        self.assertRaises(RuntimeError, self.koops.get_duphash, flags=(satyr.DUPHASH_NOHASH|satyr.DUPHASH_KOOPS_COMPAT), frames=-1)
 
     def test_crash_thread(self):
         self.assertTrue(self.koops.crash_thread is self.koops)
