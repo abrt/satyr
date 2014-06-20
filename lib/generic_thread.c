@@ -262,7 +262,12 @@ sr_thread_get_duphash(struct sr_thread *thread, int nframes, char *prefix,
             nframes--;
     }
 
-    if (flags & SR_DUPHASH_NOHASH)
+    if ((flags & SR_DUPHASH_KOOPS_COMPAT) && strbuf->len == 0)
+    {
+        sr_strbuf_free(strbuf);
+        ret = NULL;
+    }
+    else if (flags & SR_DUPHASH_NOHASH)
         ret = sr_strbuf_free_nobuf(strbuf);
     else
     {
