@@ -33,10 +33,23 @@ sr_parse_coredump(const char *coredump_filename,
                   char **error_message);
 
 struct sr_core_stacktrace *
+sr_parse_coredump_maps(const char *coredump_filename,
+                       const char *executable_filename,
+                       const char *maps_filename,
+                       char **error_message);
+
+struct sr_core_stacktrace *
 sr_core_stacktrace_from_gdb(const char *gdb_output,
                             const char *coredump_filename,
                             const char *executable_filename,
                             char **error_message);
+
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_gdb_maps(const char *gdb_output,
+                                 const char *coredump_filename,
+                                 const char *executable_filename,
+                                 const char *maps_filename,
+                                 char **error_message);
 
 #ifdef __cplusplus
 }

@@ -126,9 +126,10 @@ abort:
 }
 
 struct sr_core_stacktrace *
-sr_parse_coredump(const char *core_file,
-                  const char *exe_file,
-                  char **error_msg)
+sr_parse_coredump_maps(const char *core_file,
+                       const char *exe_file,
+                       const char *maps_file,
+                       char **error_msg)
 {
     struct sr_core_stacktrace *stacktrace = NULL;
 
@@ -136,7 +137,7 @@ sr_parse_coredump(const char *core_file,
     if (error_msg)
         *error_msg = NULL;
 
-    struct core_handle *ch = open_coredump(core_file, exe_file, error_msg);
+    struct core_handle *ch = open_coredump(core_file, exe_file, maps_file, error_msg);
     if (!ch)
         goto fail;
 
@@ -185,6 +186,14 @@ sr_parse_coredump(const char *core_file,
 fail:
     core_handle_free(ch);
     return stacktrace;
+}
+
+struct sr_core_stacktrace *
+sr_parse_coredump(const char *core_file,
+                  const char *exe_file,
+                  char **error_msg)
+{
+    return sr_parse_coredump_maps(core_file, exe_file, NULL, error_msg);
 }
 
 #endif /* WITH_LIBDWFL */

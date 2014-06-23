@@ -94,15 +94,17 @@ create_core_stacktrace(const char *directory, const char *gdb_output,
         return NULL;
 
     char *coredump_filename = sr_build_path(directory, "coredump", NULL);
+    char *maps_filename = sr_build_path(directory, "maps", NULL);
 
     struct sr_core_stacktrace *core_stacktrace;
 
     if (gdb_output)
-        core_stacktrace = sr_core_stacktrace_from_gdb(gdb_output,
-                coredump_filename, executable_contents, error_message);
+        core_stacktrace = sr_core_stacktrace_from_gdb_maps(gdb_output,
+                coredump_filename, executable_contents, maps_filename,
+                error_message);
     else
-        core_stacktrace = sr_parse_coredump(coredump_filename,
-                executable_contents, error_message);
+        core_stacktrace = sr_parse_coredump_maps(coredump_filename,
+                executable_contents, maps_filename, error_message);
 
     free(executable_contents);
     free(coredump_filename);
