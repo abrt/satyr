@@ -85,7 +85,7 @@ struct core_handle
 /* Gets dwfl handle and executable map data to be used for unwinding. The
  * executable map is only used by libunwind. */
 struct core_handle *
-open_coredump(const char *elf_file, const char *exe_file, char **error_msg);
+open_coredump(const char *elf_file, const char *exe_file, const char *maps_file, char **error_msg);
 
 void
 core_handle_free(struct core_handle *ch);
