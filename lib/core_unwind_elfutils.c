@@ -188,12 +188,4 @@ fail:
     return stacktrace;
 }
 
-struct sr_core_stacktrace *
-sr_parse_coredump(const char *core_file,
-                  const char *exe_file,
-                  char **error_msg)
-{
-    return sr_parse_coredump_maps(core_file, exe_file, NULL, error_msg);
-}
-
 #endif /* WITH_LIBDWFL */

@@ -44,9 +44,10 @@
 #if !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND
 
 struct sr_core_stacktrace *
-sr_parse_coredump(const char *coredump_filename,
-                  const char *executable_filename,
-                  char **error_message)
+sr_parse_coredump_maps(const char *coredump_filename,
+                       const char *executable_filename,
+                       const char *maps_filename,
+                       char **error_message)
 {
     *error_message = sr_asprintf("satyr is built without unwind support");
     return NULL;
@@ -495,4 +496,12 @@ sr_core_stacktrace_from_gdb(const char *gdb_output, const char *core_file,
                             const char *exe_file, char **error_msg)
 {
     return sr_core_stacktrace_from_gdb_maps(gdb_output, core_file, exe_file, NULL, error_msg);
+}
+
+struct sr_core_stacktrace *
+sr_parse_coredump(const char *core_file,
+                  const char *exe_file,
+                  char **error_msg)
+{
+    return sr_parse_coredump_maps(core_file, exe_file, NULL, error_msg);
 }
