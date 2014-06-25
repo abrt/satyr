@@ -143,6 +143,44 @@ class TestPythonStacktrace(BindingsTestCase):
     def test_hash(self):
         self.assertHashable(self.trace)
 
+    def test_invalid_syntax_current_file(self):
+        trace = load_input_contents('../python_stacktraces/python-04')
+        trace = satyr.PythonStacktrace(trace)
+
+        self.assertEqual(len(trace.frames), 1)
+        self.assertEqual(trace.exception_name, 'SyntaxError')
+
+        f = trace.frames[0]
+        self.assertEqual(f.file_name, '/usr/bin/python3-mako-render')
+        self.assertEqual(f.function_name, "syntax")
+        self.assertEqual(f.file_line, 43)
+        self.assertEqual(f.line_contents, 'print render(data, kw)')
+        self.assertTrue(f.special_function)
+        self.assertFalse(f.special_file)
+
+    def test_invalid_syntax_imported_file(self):
+        trace = load_input_contents('../python_stacktraces/python-05')
+        trace = satyr.PythonStacktrace(trace)
+
+        self.assertEqual(len(trace.frames), 2)
+        self.assertEqual(trace.exception_name, 'SyntaxError')
+
+        f = trace.frames[1]
+        self.assertEqual(f.file_name, '/usr/bin/will_python_raise')
+        self.assertEqual(f.function_name, "module")
+        self.assertEqual(f.file_line, 2)
+        self.assertEqual(f.line_contents, 'import report')
+        self.assertTrue(f.special_function)
+        self.assertFalse(f.special_file)
+
+        f = trace.frames[0]
+        self.assertEqual(f.file_name, '/usr/lib64/python2.7/site-packages/report/__init__.py')
+        self.assertEqual(f.function_name, "syntax")
+        self.assertEqual(f.file_line, 15)
+        self.assertEqual(f.line_contents, 'def foo(:')
+        self.assertTrue(f.special_function)
+        self.assertFalse(f.special_file)
+
 class TestPythonFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.PythonStacktrace(contents).frames[-1]
