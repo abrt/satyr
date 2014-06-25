@@ -260,33 +260,45 @@ sr_python_frame_parse(const char **input,
 
     if (0 == sr_skip_string(&local_input, ", in "))
     {
-        location->message = sr_asprintf("Function name separator not found.");
-        return NULL;
-    }
+        if (local_input[0] != '\n')
+        {
+            location->message = sr_asprintf("Function name separator not found.");
+            return NULL;
+        }
 
-    location->column += strlen(", in ");
-
-    /* Parse function name */
-    if (!sr_parse_char_cspan(&local_input, "\n", &frame->function_name))
-    {
-        sr_python_frame_free(frame);
-        location->message = sr_asprintf("Unable to find the newline character "
-                "identifying the end of function name.");
-
-        return NULL;
-    }
-
-    location->column += strlen(frame->function_name);
-
-    if (strlen(frame->function_name) > 0 &&
-        frame->function_name[0] == '<' &&
-        frame->function_name[strlen(frame->function_name)-1] == '>')
-    {
+        /* The last frame of SyntaxError stack trace does not have
+         * function name on its line. For the sake of simplicity, we will
+         * believe that we are dealing with such a frame now.
+         */
+        frame->function_name = sr_strdup("syntax");
         frame->special_function = true;
-        frame->function_name[strlen(frame->function_name)-1] = '\0';
-        char *inside = sr_strdup(frame->function_name + 1);
-        free(frame->function_name);
-        frame->function_name = inside;
+    }
+    else
+    {
+        location->column += strlen(", in ");
+
+        /* Parse function name */
+        if (!sr_parse_char_cspan(&local_input, "\n", &frame->function_name))
+        {
+            sr_python_frame_free(frame);
+            location->message = sr_asprintf("Unable to find the newline character "
+                    "identifying the end of function name.");
+
+            return NULL;
+        }
+
+        location->column += strlen(frame->function_name);
+
+        if (strlen(frame->function_name) > 0 &&
+            frame->function_name[0] == '<' &&
+            frame->function_name[strlen(frame->function_name)-1] == '>')
+        {
+            frame->special_function = true;
+            frame->function_name[strlen(frame->function_name)-1] = '\0';
+            char *inside = sr_strdup(frame->function_name + 1);
+            free(frame->function_name);
+            frame->function_name = inside;
+        }
     }
 
     sr_skip_char(&local_input, '\n');

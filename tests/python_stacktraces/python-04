@@ -1,0 +1,6 @@
+invalid syntax (python3-mako-render, line 43)
+
+  File "/usr/bin/python3-mako-render", line 43
+    print render(data, kw)
+               ^
+SyntaxError: invalid syntax

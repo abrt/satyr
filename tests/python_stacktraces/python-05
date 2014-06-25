@@ -1,0 +1,16 @@
+will_python_raise:2:<module>:  File "/usr/lib64/python2.7/site-packages/report/__init__.py", line 15
+
+Traceback (most recent call last):
+  File "/usr/bin/will_python_raise", line 2, in <module>
+    import report
+  File "/usr/lib64/python2.7/site-packages/report/__init__.py", line 15
+    def foo(:
+            ^
+SyntaxError: invalid syntax
+
+Local variables in innermost frame:
+__builtins__: <module '__builtin__' (built-in)>
+__name__: '__main__'
+__file__: '/usr/bin/will_python_raise'
+__doc__: None
+__package__: None
