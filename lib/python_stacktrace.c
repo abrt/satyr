@@ -29,6 +29,7 @@
 #include "generic_thread.h"
 #include "internal_utils.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
 
@@ -137,13 +138,48 @@ sr_python_stacktrace_parse(const char **input,
 
     if (!local_input)
     {
-        location->message = "Traceback header not found.";
-        return NULL;
-    }
+        /* SyntaxError stack trace of an exception thrown in the executed file
+         * conforms to the following template:
+         * invalid syntax ($file, line $number)
+         *
+         *    File "$file", line $number
+         *       $code
+         *         ^
+         * SyntaxError: invalid syntax
+         *
+         * for exceptions thrown from imported files, the stack trace has the
+         * regular form, except the last frame has no function name and is
+         * followed by the pointer line (^).
+         */
+        HEADER = "invalid syntax (",
+        local_input = sr_strstr_location(*input,
+                                     HEADER,
+                                     &location->line,
+                                     &location->column);
 
-    local_input += strlen(HEADER);
-    location->line += 2;
-    location->column = 0;
+        if (!local_input)
+        {
+            location->message = "Traceback header not found.";
+            return NULL;
+        }
+
+        local_input = sr_strstr_location(local_input,
+                           "  File \"",
+                           &location->line,
+                           &location->column);
+
+        if (!local_input)
+        {
+            location->message = "Frame with invalid line not found.";
+            return NULL;
+        }
+    }
+    else
+    {
+        local_input += strlen(HEADER);
+        location->line += 2;
+        location->column = 0;
+    }
 
     struct sr_python_stacktrace *stacktrace = sr_python_stacktrace_new();
 
@@ -171,6 +207,27 @@ sr_python_stacktrace_parse(const char **input,
         location->message = frame_location.message;
         sr_python_stacktrace_free(stacktrace);
         return NULL;
+    }
+
+    bool invalid_syntax_pointer = true;
+    const char *tmp_input = local_input;
+    while (*tmp_input != '\n' && *tmp_input != '\0')
+    {
+        if (*tmp_input != ' ' && *tmp_input != '^')
+        {
+            invalid_syntax_pointer = false;
+            break;
+        }
+        ++tmp_input;
+    }
+
+    if (invalid_syntax_pointer)
+    {
+        /* Skip line "   ^" pointing to the invalid code */
+        sr_skip_char_cspan(&local_input, "\n");
+        ++local_input;
+        ++location->line;
+        location->column = 1;
     }
 
     /* Parse exception name. */
