@@ -559,12 +559,13 @@ sr_gdb_frame_parse_function_name(const char **input,
     /* First character:
        '~' for destructor
        '*' for ????
+       '.' on ppc64
        '_a-zA-Z' for mangled/nonmangled function name
        '(' to start "(anonymous namespace)::" or something
      */
     char first;
     char *namechunk;
-    if (sr_parse_char_limited(&local_input, "~*_" SR_alpha, &first))
+    if (sr_parse_char_limited(&local_input, "~*._" SR_alnum, &first))
     {
         /* If it's a start of 'o'perator, put the 'o' back! */
         if (first == 'o')
