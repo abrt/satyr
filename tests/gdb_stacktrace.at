@@ -247,3 +247,38 @@ main(void)
   return 0;
 }
 ]])
+
+## ----------------------------- ##
+## sr_gdb_stacktrace_parse_ppc64 ##
+## ----------------------------- ##
+AT_TESTFUN([sr_gdb_stacktrace_parse_ppc64],
+[[
+#include "gdb/stacktrace.h"
+#include "gdb/thread.h"
+#include "gdb/frame.h"
+#include "location.h"
+#include "utils.h"
+#include <assert.h>
+#include <stdio.h>
+
+int
+main(void)
+{
+  /* Check that satyr is able to parse backtrace with missing Thread header */
+  struct sr_location location;
+  sr_location_init(&location);
+  char *error_message;
+  char *full_input = sr_file_to_string("../../gdb_stacktraces/rhbz-1119072", &error_message);
+  assert(full_input);
+  char *input = full_input;
+  struct sr_gdb_stacktrace *stacktrace = sr_gdb_stacktrace_parse(&input, &location);
+  assert(stacktrace);
+  assert(5 == sr_gdb_stacktrace_get_thread_count(stacktrace));
+  struct sr_gdb_thread *thread = stacktrace->threads;
+  assert(7 == sr_thread_frame_count(thread));
+  struct sr_gdb_frame *frame = thread->frames;
+  assert(0 == strcmp(frame->function_name, ".pthread_cond_timedwait"));
+  sr_gdb_stacktrace_free(stacktrace);
+  return 0;
+}
+]])
