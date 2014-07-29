@@ -43,6 +43,7 @@ sr_operating_system_init(struct sr_operating_system *operating_system)
     operating_system->version = NULL;
     operating_system->architecture = NULL;
     operating_system->cpe = NULL;
+    operating_system->desktop = NULL;
     operating_system->uptime = 0;
 }
 
@@ -92,6 +93,13 @@ sr_operating_system_to_json(struct sr_operating_system *operating_system)
         sr_strbuf_append_str(strbuf, "\n");
     }
 
+    if (operating_system->desktop)
+    {
+        sr_strbuf_append_str(strbuf, ",   \"desktop\": ");
+        sr_json_append_escaped(strbuf, operating_system->desktop);
+        sr_strbuf_append_str(strbuf, "\n");
+    }
+
     if (operating_system->uptime > 0)
     {
         sr_strbuf_append_strf(strbuf,
@@ -121,6 +129,9 @@ sr_operating_system_from_json(struct sr_json_value *root, char **error_message)
         JSON_READ_STRING(root, "version", &result->version) &&
         JSON_READ_STRING(root, "architecture", &result->architecture) &&
         JSON_READ_UINT64(root, "uptime", &result->uptime);
+
+    /* desktop is optional - failure is not fatal */
+    JSON_READ_STRING(root, "desktop", &result->desktop);
 
     if (!success)
     {
