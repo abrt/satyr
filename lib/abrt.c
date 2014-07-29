@@ -317,6 +317,33 @@ sr_abrt_rpm_packages_from_dir(const char *directory,
     return packages;
 }
 
+static char *
+desktop_from_dir(const char *directory,
+                    char **error_message)
+{
+    char *environ_contents = file_contents(directory, "environ", error_message);
+    if (!environ_contents)
+        return NULL;
+
+    char *desktop = strstr(environ_contents, "DESKTOP_SESSION=");
+    if (!desktop)
+        return NULL;
+
+    /* avoid prefixes - DESKTOP_SESSION= must either be
+       the very first variable or preceeded by a newline */
+    if (desktop != environ_contents && *(desktop - 1) != '\n')
+        return NULL;
+
+    desktop += strlen("DESKTOP_SESSION=");
+    char *newline = strchrnul(desktop, '\n');
+    *newline = '\0';
+
+    char *result = sr_strdup(desktop);
+    free(environ_contents);
+
+    return result;
+}
+
 struct sr_operating_system *
 sr_abrt_operating_system_from_dir(const char *directory,
                                   char **error_message)
@@ -358,6 +385,9 @@ sr_abrt_operating_system_from_dir(const char *directory,
         sr_operating_system_free(os);
         return NULL;
     }
+
+    /* optional - failure is not fatal */
+    os->desktop = desktop_from_dir(directory, error_message);
 
     return os;
 }
