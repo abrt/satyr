@@ -107,7 +107,7 @@ find_elf_core (Dwfl_Module *mod, void **userdata, const char *modname,
     {
         int fd = open(executable_file, O_RDONLY);
         if (fd < 0)
-            return -1;
+            goto fail;
 
         *file_name = realpath(executable_file, NULL);
         *elfp = elf_begin(fd, ELF_C_READ, NULL);
@@ -115,7 +115,7 @@ find_elf_core (Dwfl_Module *mod, void **userdata, const char *modname,
         {
             warn("Unable to open executable '%s': %s", executable_file,
                  elf_errmsg(-1));
-            return -1;
+            goto fail;
         }
 
         ret = fd;
@@ -126,6 +126,10 @@ find_elf_core (Dwfl_Module *mod, void **userdata, const char *modname,
                                      file_name, elfp);
     }
 
+    if (*file_name == NULL)
+        *file_name = strdup(modname);
+
+fail:
     return ret;
 }
 
