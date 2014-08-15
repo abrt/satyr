@@ -110,7 +110,7 @@ find_elf_core (Dwfl_Module *mod, void **userdata, const char *modname,
             return -1;
 
         *file_name = realpath(executable_file, NULL);
-        *elfp = elf_begin(fd, ELF_C_READ, NULL);
+        *elfp = elf_begin(fd, ELF_C_READ_MMAP, NULL);
         if (*elfp == NULL)
         {
             warn("Unable to open executable '%s': %s", executable_file,
