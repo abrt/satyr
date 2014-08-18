@@ -57,3 +57,84 @@ int main(void)
   return 0;
 }
 ]])
+
+## ------------------ ##
+## sr_report_add_auth ##
+## ------------------ ##
+
+AT_TESTFUN([sr_report_add_auth],
+[[
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "report.h"
+
+void check_struct(struct sr_report *report, const char **expected)
+{
+    const char **exp_iter = expected;
+    struct sr_report_custom_entry *cust_iter = report->auth_entries;
+
+    while(cust_iter && *exp_iter)
+    {
+        fprintf(stdout, "Expected('%s':'%s') vs. Current('%s':'%s')\n",
+            exp_iter[0], exp_iter[1], cust_iter->key, cust_iter->value);
+
+        assert(strcmp(cust_iter->key, exp_iter[0]) == 0 &&
+               strcmp(cust_iter->value, exp_iter[1]) == 0);
+
+        cust_iter = cust_iter->next;
+        exp_iter += 2;
+    }
+
+    assert(cust_iter == NULL);
+    assert(*exp_iter == NULL);
+}
+
+void check_json(const char *json, const char **expected)
+{
+    const char **exp_iter = expected;
+    while (*exp_iter)
+    {
+        char *entry = NULL;
+        asprintf(&entry, "\"%s\": \"%s\"", exp_iter[0], exp_iter[1]);
+
+        fprintf(stdout, "Checking: '%s'\n", entry);
+
+        if (strstr(json, entry) == NULL)
+        {
+            fprintf(stderr, "JSON:\n%s\n", json);
+            abort();
+        }
+
+        exp_iter += 2;
+    }
+}
+
+
+int main(void)
+{
+  struct sr_report *report = sr_report_new();
+
+  sr_report_add_auth(report, "foo", "blah");
+  sr_report_add_auth(report, "abrt", "awesome");
+  sr_report_add_auth(report, "satyr", "wonderful");
+
+  const char *expected[] = { "satyr", "wonderful", "abrt", "awesome", "foo", "blah", NULL };
+
+  check_struct(report, expected);
+
+  sr_report_to_json(report);
+
+  char *json = sr_report_to_json(report);
+
+  check_json(json, expected);
+
+  char *error = NULL;
+  struct sr_report *copy = sr_report_from_json_text(json, &error);
+
+  check_struct(copy, expected);
+
+  return 0;
+}
+]])
