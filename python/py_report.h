@@ -65,6 +65,8 @@ PyObject *sr_py_report_str(PyObject *self);
 PyObject *sr_py_report_get_version(PyObject *self, void *data);
 PyObject *sr_py_report_get_type(PyObject *self, void *data);
 int sr_py_report_set_type(PyObject *self, PyObject *rhs, void *data);
+PyObject *sr_py_report_get_auth(PyObject *self, void *data);
+int sr_py_report_set_auth(PyObject *self, PyObject *rhs, void *data);
 
 /**
  * Methods.
