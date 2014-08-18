@@ -42,6 +42,8 @@
 #define to_json_doc "Usage: report.to_json()\n\n" \
                     "Returns: string - the report serialized as JSON"
 
+#define auth_doc "Dictinary of key/value pairs used for authentication"
+
 /* See python/py_common.h and python/py_gdb_frame.c for generic getters/setters documentation. */
 #define GSOFF_PY_STRUCT sr_py_report
 #define GSOFF_PY_MEMBER report
@@ -64,6 +66,7 @@ report_getset[] =
     SR_ATTRIBUTE_STRING(component_name,   "Name of the software component this report pertains to (string)"       ),
     { (char*)"report_version", sr_py_report_get_version, sr_py_setter_readonly, (char*)"Version of the report (int)", NULL },
     { (char*)"report_type", sr_py_report_get_type, sr_py_report_set_type, (char*)"Report type (string)", NULL },
+    { (char*)"auth",        sr_py_report_get_auth, sr_py_report_set_auth, (char*)auth_doc, NULL               },
     { NULL },
 };
 
@@ -491,4 +494,31 @@ sr_py_report_to_json(PyObject *self, PyObject *args)
     PyObject *result = PyString_FromString(json);
     free(json);
     return result;
+}
+
+PyObject *
+sr_py_report_get_auth(PyObject *self, void *data)
+{
+    struct sr_report *report = ((struct sr_py_report *)self)->report;
+    struct sr_report_custom_entry *ae = report->auth_entries;
+
+    PyObject *auth = PyDict_New();
+    for (ae = report->auth_entries; ae; ae = ae->next)
+    {
+        PyObject *val = PyString_FromString(ae->value);
+        if (!val)
+            return NULL;
+
+        if (PyDict_SetItemString(auth, ae->key, val) == -1)
+            return NULL;
+    }
+
+    return auth;
+}
+
+int
+sr_py_report_set_auth(PyObject *self, PyObject *rhs, void *data)
+{
+    PyErr_SetString(PyExc_NotImplementedError, "Setting auth data is not implemented.");
+    return -1;
 }

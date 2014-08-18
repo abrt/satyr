@@ -91,6 +91,12 @@ class TestReport(BindingsTestCase):
     def test_hash(self):
         self.assertHashable(self.report)
 
+    def test_auth(self):
+        self.assertFalse(self.report.auth)
+        self.assertRaises(NotImplementedError, self.report.__setattr__, 'auth', {'hostname': 'darkstar'})
+
+        report_with_auth = satyr.Report(load_input_contents('../json_files/ureport-1-auth'))
+        self.assertEqual(report_with_auth.auth, {'hostname': 'localhost', 'machine_id': '0000'})
 
 if __name__ == '__main__':
     unittest.main()
