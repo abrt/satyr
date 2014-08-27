@@ -44,10 +44,9 @@
 #if !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND
 
 struct sr_core_stacktrace *
-sr_parse_coredump_maps(const char *coredump_filename,
-                       const char *executable_filename,
-                       const char *maps_filename,
-                       char **error_message)
+sr_parse_coredump(const char *coredump_filename,
+                  const char *executable_filename,
+                  char **error_message)
 {
     *error_message = sr_asprintf("satyr is built without unwind support");
     return NULL;
@@ -168,7 +167,7 @@ touch_module(Dwfl_Module *mod, void **userdata, const char *name,
 }
 
 struct core_handle *
-open_coredump(const char *elf_file, const char *exe_file, const char *maps_file, char **error_msg)
+open_coredump(const char *elf_file, const char *exe_file, char **error_msg)
 {
     struct core_handle *ch = sr_mallocz(sizeof(*ch));
     struct exe_mapping_data *head = NULL, **tail = &head;
@@ -203,65 +202,20 @@ open_coredump(const char *elf_file, const char *exe_file, const char *maps_file,
         goto fail_elf;
     }
 
-    if (maps_file)
-    {
-        executable_file = NULL;
-        ch->cb.find_elf = dwfl_linux_proc_find_elf;
-    }
-    else
-    {
-        executable_file = exe_file;
-        ch->cb.find_elf = find_elf_core;
-    }
-
+    executable_file = exe_file;
+    ch->cb.find_elf = find_elf_core;
     ch->cb.find_debuginfo = find_debuginfo_none;
     ch->cb.section_address = dwfl_offline_section_address;
     ch->dwfl = dwfl_begin(&ch->cb);
 
-    /* Report the addresses at which the shared libraries are loaded to
-     * elfutils. See libdwfl/libdwfl.h in the elfutils source for documentation
-     * of the functions used.
-     */
-    if (maps_file)
-    {
-        /* The /proc/PID/maps file was provided - get the library information
-         * from there. */
-        FILE *maps = fopen(maps_file, "r");
-        if (!maps)
-        {
-            set_error("Unable to open '%s': %s", maps_file, strerror(errno));
-            goto fail_dwfl;
-        }
-
-        int ret = dwfl_linux_proc_maps_report(ch->dwfl, maps);
-        fclose(maps);
-
-        if (ret < 0)
-        {
-            set_error_dwfl("dwfl_linux_proc_maps_report");
-            goto fail_dwfl;
-        }
-        else if (ret > 0)
-        {
-            set_error("Failed to parse maps file: %s", strerror(ret));
-            goto fail_dwfl;
-        }
-    }
-    else
-    {
-        /* Elfutils can extract the shared library information from the memory
-         * of the dynamic linker. Because it was writable part of the proces
-         * image, it might be damaged.
-         */
 #if _ELFUTILS_PREREQ(0, 158)
-        if (dwfl_core_file_report(ch->dwfl, ch->eh, exe_file) == -1)
+    if (dwfl_core_file_report(ch->dwfl, ch->eh, exe_file) == -1)
 #else
-        if (dwfl_core_file_report(ch->dwfl, ch->eh) == -1)
+    if (dwfl_core_file_report(ch->dwfl, ch->eh) == -1)
 #endif
-        {
-            set_error_dwfl("dwfl_core_file_report");
-            goto fail_dwfl;
-        }
+    {
+        set_error_dwfl("dwfl_core_file_report");
+        goto fail_dwfl;
     }
 
     if (dwfl_report_end(ch->dwfl, NULL, NULL) != 0)
@@ -428,15 +382,14 @@ get_signal_number(Elf *e, const char *elf_file)
 }
 
 struct sr_core_stacktrace *
-sr_core_stacktrace_from_gdb_maps(const char *gdb_output, const char *core_file,
-                                 const char *exe_file, const char *maps_file,
-                                 char **error_msg)
+sr_core_stacktrace_from_gdb(const char *gdb_output, const char *core_file,
+                            const char *exe_file, char **error_msg)
 {
     /* Initialize error_msg to 'no error'. */
     if (error_msg)
         *error_msg = NULL;
 
-    struct core_handle *ch = open_coredump(core_file, exe_file, maps_file, error_msg);
+    struct core_handle *ch = open_coredump(core_file, exe_file, error_msg);
     if (*error_msg)
         return NULL;
 
@@ -489,19 +442,4 @@ sr_core_stacktrace_from_gdb_maps(const char *gdb_output, const char *core_file,
     core_handle_free(ch);
     sr_gdb_stacktrace_free(gdb_stacktrace);
     return core_stacktrace;
-}
-
-struct sr_core_stacktrace *
-sr_core_stacktrace_from_gdb(const char *gdb_output, const char *core_file,
-                            const char *exe_file, char **error_msg)
-{
-    return sr_core_stacktrace_from_gdb_maps(gdb_output, core_file, exe_file, NULL, error_msg);
-}
-
-struct sr_core_stacktrace *
-sr_parse_coredump(const char *core_file,
-                  const char *exe_file,
-                  char **error_msg)
-{
-    return sr_parse_coredump_maps(core_file, exe_file, NULL, error_msg);
 }

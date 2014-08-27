@@ -127,10 +127,9 @@ get_signal_number_libunwind(struct UCD_info *ui)
 }
 
 struct sr_core_stacktrace *
-sr_parse_coredump_maps(const char *core_file,
-                       const char *exe_file,
-                       const char *maps_file,
-                       char **error_msg)
+sr_parse_coredump(const char *core_file,
+                   const char *exe_file,
+                   char **error_msg)
 {
     struct sr_core_stacktrace *stacktrace = NULL;
 
@@ -138,7 +137,7 @@ sr_parse_coredump_maps(const char *core_file,
     if (error_msg)
         *error_msg = NULL;
 
-    struct core_handle *ch = open_coredump(core_file, exe_file, maps_file, error_msg);
+    struct core_handle *ch = open_coredump(core_file, exe_file, error_msg);
     if (*error_msg)
         return NULL;
 
