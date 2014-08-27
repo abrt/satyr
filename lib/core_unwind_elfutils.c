@@ -29,10 +29,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#define FRAME_LIMIT 1024
+
 struct frame_callback_arg
 {
     struct sr_core_thread *thread;
     char *error_msg;
+    unsigned nframes;
 };
 
 struct thread_callback_arg
@@ -41,7 +44,7 @@ struct thread_callback_arg
     char *error_msg;
 };
 
-static int CB_STOP_UNWIND = DWARF_CB_ABORT+1;
+static const int CB_STOP_UNWIND = DWARF_CB_ABORT+1;
 
 static int
 frame_callback(Dwfl_Frame *frame, void *data)
@@ -70,6 +73,13 @@ frame_callback(Dwfl_Frame *frame, void *data)
     frame_arg->thread->frames =
         sr_core_frame_append(frame_arg->thread->frames, result);
 
+    /* Avoid huge stacktraces from programs stuck in infinite recursion. */
+    frame_arg->nframes++;
+    if (frame_arg->nframes >= FRAME_LIMIT)
+    {
+        return CB_STOP_UNWIND;
+    }
+
     return DWARF_CB_OK;
 }
 
@@ -90,7 +100,8 @@ unwind_thread(Dwfl_Thread *thread, void *data)
     struct frame_callback_arg frame_arg =
     {
         .thread = result,
-        .error_msg = NULL
+        .error_msg = NULL,
+        .nframes = 0
     };
 
     int ret = dwfl_thread_getframes(thread, frame_callback, &frame_arg);
