@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define FRAME_LIMIT 1024
+#define FRAME_LIMIT 256
 
 struct frame_callback_arg
 {
