@@ -29,18 +29,18 @@
 #include <stdio.h>
 #include <string.h>
 
-#define FRAME_LIMIT 1024
+#define FRAME_LIMIT 256
 
 struct frame_callback_arg
 {
-    struct sr_core_thread *thread;
+    struct sr_core_frame **frames_tail;
     char *error_msg;
     unsigned nframes;
 };
 
 struct thread_callback_arg
 {
-    struct sr_core_stacktrace *stacktrace;
+    struct sr_core_thread **threads_tail;
     char *error_msg;
 };
 
@@ -70,15 +70,9 @@ frame_callback(Dwfl_Frame *frame, void *data)
         return CB_STOP_UNWIND;
     }
 
-    frame_arg->thread->frames =
-        sr_core_frame_append(frame_arg->thread->frames, result);
-
-    /* Avoid huge stacktraces from programs stuck in infinite recursion. */
+    *frame_arg->frames_tail = result;
+    frame_arg->frames_tail = &result->next;
     frame_arg->nframes++;
-    if (frame_arg->nframes >= FRAME_LIMIT)
-    {
-        return CB_STOP_UNWIND;
-    }
 
     return DWARF_CB_OK;
 }
@@ -99,7 +93,7 @@ unwind_thread(Dwfl_Thread *thread, void *data)
 
     struct frame_callback_arg frame_arg =
     {
-        .thread = result,
+        .frames_tail = &(result->frames),
         .error_msg = NULL,
         .nframes = 0
     };
@@ -121,14 +115,24 @@ unwind_thread(Dwfl_Thread *thread, void *data)
         goto abort;
     }
 
-    if (!error_msg && !frame_arg.thread->frames)
+    if (!error_msg && !result->frames)
     {
         set_error("No frames found for thread id %d", (int)result->id);
         goto abort;
     }
 
-    thread_arg->stacktrace->threads =
-        sr_core_thread_append(thread_arg->stacktrace->threads, result);
+    /* Truncate the stacktrace to FRAME_LIMIT least recent frames. */
+    while (result->frames && frame_arg.nframes > FRAME_LIMIT)
+    {
+        struct sr_core_frame *old_frame = result->frames;
+        result->frames = old_frame->next;
+        sr_core_frame_free(old_frame);
+        frame_arg.nframes--;
+    }
+
+    *thread_arg->threads_tail = result;
+    thread_arg->threads_tail = &result->next;
+
     return DWARF_CB_OK;
 
 abort:
@@ -166,7 +170,7 @@ sr_parse_coredump(const char *core_file,
 
     struct thread_callback_arg thread_arg =
     {
-        .stacktrace = stacktrace,
+        .threads_tail = &(stacktrace->threads),
         .error_msg = NULL
     };
 
