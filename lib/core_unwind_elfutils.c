@@ -72,13 +72,7 @@ frame_callback(Dwfl_Frame *frame, void *data)
 
     *frame_arg->frames_tail = result;
     frame_arg->frames_tail = &result->next;
-
-    /* Avoid huge stacktraces from programs stuck in infinite recursion. */
     frame_arg->nframes++;
-    if (frame_arg->nframes >= FRAME_LIMIT)
-    {
-        return CB_STOP_UNWIND;
-    }
 
     return DWARF_CB_OK;
 }
@@ -125,6 +119,15 @@ unwind_thread(Dwfl_Thread *thread, void *data)
     {
         set_error("No frames found for thread id %d", (int)result->id);
         goto abort;
+    }
+
+    /* Truncate the stacktrace to FRAME_LIMIT least recent frames. */
+    while (result->frames && frame_arg.nframes > FRAME_LIMIT)
+    {
+        struct sr_core_frame *old_frame = result->frames;
+        result->frames = old_frame->next;
+        sr_core_frame_free(old_frame);
+        frame_arg.nframes--;
     }
 
     *thread_arg->threads_tail = result;
