@@ -61,7 +61,8 @@ GSOFF_END
 static PyGetSetDef
 frame_getset[] =
 {
-    SR_ATTRIBUTE_STRING(name,         "Fully qualified domain name (string)"                                  ),
+    SR_ATTRIBUTE_STRING_R("function_name", name, "Fully qualified method/exception name (string)"             ),
+    SR_ATTRIBUTE_STRING(name,         "Fully qualified method/exception name (string)"                        ),
     SR_ATTRIBUTE_STRING(file_name,    "File name (string)"                                                    ),
     SR_ATTRIBUTE_UINT32(file_line,    "File line (positive integer)"                                          ),
     SR_ATTRIBUTE_STRING(class_path,   "Class path (string)"                                                   ),

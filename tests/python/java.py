@@ -218,6 +218,9 @@ class TestJavaFrame(BindingsTestCase):
     def test_hash(self):
         self.assertHashable(self.frame)
 
+    def test_sanity(self):
+        self.assertEqual(self.frame.name, self.frame.function_name)
+
 
 if __name__ == '__main__':
     unittest.main()
