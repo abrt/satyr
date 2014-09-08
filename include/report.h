@@ -31,6 +31,13 @@ extern "C" {
 struct sr_json_value;
 struct sr_stacktrace;
 
+struct sr_report_custom_entry
+{
+    char *key;
+    char *value;
+    struct sr_report_custom_entry *next;
+};
+
 struct sr_report
 {
     uint32_t report_version;
@@ -49,6 +56,8 @@ struct sr_report
     struct sr_rpm_package *rpm_packages;
 
     struct sr_stacktrace *stacktrace;
+
+    struct sr_report_custom_entry *custom_entries;
 };
 
 struct sr_report *
@@ -59,6 +68,14 @@ sr_report_init(struct sr_report *report);
 
 void
 sr_report_free(struct sr_report *report);
+
+
+/* @brief Adds a new entry to 'custom' data
+ *
+ * The implementation is LIFO. The resulting list is in reversed.
+ */
+void
+sr_report_add_custom(struct sr_report *report, const char *key, const char *value);
 
 char *
 sr_report_to_json(struct sr_report *report);

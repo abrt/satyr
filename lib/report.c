@@ -66,6 +66,7 @@ sr_report_init(struct sr_report *report)
     report->component_name = NULL;
     report->rpm_packages = NULL;
     report->stacktrace = NULL;
+    report->custom_entries = NULL;
 }
 
 void
@@ -75,7 +76,34 @@ sr_report_free(struct sr_report *report)
     sr_operating_system_free(report->operating_system);
     sr_rpm_package_free(report->rpm_packages, true);
     sr_stacktrace_free(report->stacktrace);
+
+    struct sr_report_custom_entry *iter = report->custom_entries;
+    while (iter)
+    {
+        struct sr_report_custom_entry *tmp = iter->next;
+
+        free(iter->value);
+        free(iter->key);
+        free(iter);
+
+        iter = tmp;
+    }
+
     free(report);
+}
+
+void
+sr_report_add_custom(struct sr_report *report, const char *key, const char *value)
+{
+    struct sr_report_custom_entry *new_entry = sr_malloc(sizeof(*new_entry));
+    new_entry->key = sr_strdup(key);
+    new_entry->value = sr_strdup(value);
+
+    /* prepend the new value
+     * it is much faster and easier
+     * we can do it because we do not to preserve the order(?) */
+    new_entry->next = report->custom_entries;
+    report->custom_entries = new_entry;
 }
 
 /* The object has to be non-empty, i.e. contain at least one key-value pair. */
@@ -221,6 +249,30 @@ sr_report_to_json(struct sr_report *report)
         free(rpms_str_indented);
     }
 
+    /* Custom entries.
+     *    custom : {   "foo": "blah"
+     *             ,   "one": "two"
+     *             }
+     */
+    struct sr_report_custom_entry *iter = report->custom_entries;
+    if (iter)
+    {
+        sr_strbuf_append_strf(strbuf,
+                              ",   \"custom\": {   \"%s\": \"%s\"\n",
+                              iter->key, iter->value);
+
+        /* the first entry is prefix with '{', see lines above */
+        iter = iter->next;
+        while (iter)
+        {
+            sr_strbuf_append_strf(strbuf,
+                                  "               ,   \"%s\": \"%s\"\n",
+                                  iter->key, iter->value);
+            iter = iter->next;
+        }
+        sr_strbuf_append_str(strbuf, "               }");
+    }
+
     sr_strbuf_append_str(strbuf, "}");
     return sr_strbuf_free_nobuf(strbuf);
 }
@@ -334,6 +386,32 @@ sr_report_from_json(struct sr_json_value *root, char **error_message)
             break;
         }
 
+    }
+
+    /* Custom entries. */
+    struct sr_json_value *extra = json_element(root, "custom");
+    if (extra)
+    {
+        if (!JSON_CHECK_TYPE(extra, SR_JSON_OBJECT, "custom"))
+            goto fail;
+
+        const unsigned children = json_object_children_count(extra);
+
+        /* from the last children down to the first for easier testing :)
+         * keep it as it is as long as sr_report_add_custom() does LIFO */
+        for (unsigned i = 1; i <= children; ++i)
+        {
+            const char *child_name = NULL;
+            struct sr_json_value *child_object = json_object_get_child(extra,
+                                                                       children - i,
+                                                                       &child_name);
+
+            if (!JSON_CHECK_TYPE(child_object, SR_JSON_STRING, child_name))
+                continue;
+
+            const char *child_value = json_string_get_value(child_object);
+            sr_report_add_custom(report, child_name, child_value);
+        }
     }
 
     return report;

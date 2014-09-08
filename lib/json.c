@@ -787,6 +787,32 @@ json_element(struct sr_json_value *object, const char *key_name)
     return NULL;
 }
 
+unsigned
+json_object_children_count(struct sr_json_value *object)
+{
+    assert(object->type == SR_JSON_OBJECT);
+
+    return object->u.object.length;
+}
+
+struct sr_json_value *
+json_object_get_child(struct sr_json_value *object, unsigned child_no, const char **child_name)
+{
+    assert(object->type == SR_JSON_OBJECT);
+    assert(child_no < object->u.object.length);
+
+    *child_name = object->u.object.values[child_no].name;
+    return object->u.object.values[child_no].value;
+}
+
+const char *
+json_string_get_value(struct sr_json_value *object)
+{
+    assert(object->type == SR_JSON_STRING);
+
+    return object->u.string.ptr;
+}
+
 #define DEFINE_JSON_READ(name, c_type, json_type, json_member, conversion)                       \
     bool                                                                                         \
     name(struct sr_json_value *object, const char *key_name, c_type *dest, char **error_message) \
