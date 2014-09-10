@@ -130,4 +130,16 @@ json_read_bool(struct sr_json_value *object, const char *key_name, bool *dest,
         abort();                                                                      \
     }
 
+/* returns the number of object's children */
+unsigned
+json_object_children_count(struct sr_json_value *object);
+
+/* returns the child_noth child and passes its name in child_name arg */
+struct sr_json_value *
+json_object_get_child(struct sr_json_value *object, unsigned child_no, const char **child_name);
+
+/* returns string's value */
+const char *
+json_string_get_value(struct sr_json_value *object);
+
 #endif

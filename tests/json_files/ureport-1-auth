@@ -1,0 +1,112 @@
+{
+  "ureport_version": 2,
+
+  "reason": "Program /usr/bin/sleep was terminated by signal 11",
+
+  "os": {
+    "name": "fedora",
+    "version": "18",
+    "architecture": "x86_64"
+  },
+
+  "problem": {
+    "type": "core",
+
+    "executable": "/usr/bin/sleep",
+
+    "signal": 11,
+
+    "component": "coreutils",
+
+    "user": {
+      "local": true,
+      "root": false
+    },
+
+    "stacktrace": [
+      {
+        "crash_thread": true,
+
+        "frames": [
+          {
+            "build_id": "5f6632d75fd027f5b7b410787f3f06c6bf73eee6",
+            "build_id_offset": 767024,
+            "file_name": "/lib64/libc.so.6",
+            "address": 251315074096,
+            "fingerprint": "6c1eb9626919a2a5f6a4fc4c2edc9b21b33b7354",
+            "function_name": "__nanosleep"
+          },
+          {
+            "build_id": "cd379d3bb5d07c96d491712e41c34bcd06b2ce32",
+            "build_id_offset": 16567,
+            "file_name": "/usr/bin/sleep",
+            "address": 4210871,
+            "fingerprint": "d24433b82a2c751fc580f47154823e0bed641a54",
+            "function_name": "close_stdout"
+          },
+          {
+            "build_id": "cd379d3bb5d07c96d491712e41c34bcd06b2ce32",
+            "build_id_offset": 16202,
+            "file_name": "/usr/bin/sleep",
+            "address": 4210506,
+            "fingerprint": "562719fb960d1c4dbf30c04b3cff37c82acc3d2d",
+            "function_name": "close_stdout"
+          },
+          {
+            "build_id": "cd379d3bb5d07c96d491712e41c34bcd06b2ce32",
+            "build_id_offset": 6404,
+            "fingerprint": "2e8fb95adafe21d035b9bcb9993810fecf4be657",
+            "file_name": "/usr/bin/sleep",
+            "address": 4200708
+          },
+          {
+            "build_id": "5f6632d75fd027f5b7b410787f3f06c6bf73eee6",
+            "build_id_offset": 137733,
+            "file_name": "/lib64/libc.so.6",
+            "address": 251314444805,
+            "fingerprint": "075acda5d3230e115cf7c88597eaba416bdaa6bb",
+            "function_name": "__libc_start_main"
+          }
+        ]
+      }
+    ]
+  },
+
+  "packages": [
+    {
+      "name": "coreutils",
+      "epoch": 0,
+      "version": "8.17",
+      "architecture": "x86_64",
+      "package_role": "affected",
+      "release": "8.fc18",
+      "install_time": 1371464601
+    },
+    {
+      "name": "glibc",
+      "epoch": 0,
+      "version": "2.16",
+      "architecture": "x86_64",
+      "release": "31.fc18",
+      "install_time": 1371464176
+    },
+    {
+      "name": "glibc-common",
+      "epoch": 0,
+      "version": "2.16",
+      "architecture": "x86_64",
+      "release": "31.fc18",
+      "install_time": 1371464184
+    }
+  ],
+
+  "reporter": {
+    "version": "0.3",
+    "name": "satyr"
+  },
+
+  "auth": {
+    "hostname": "localhost",
+    "machine_id": "0000"
+  }
+}
