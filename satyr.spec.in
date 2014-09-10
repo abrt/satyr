@@ -18,7 +18,7 @@
 %endif
 
 Name: satyr
-Version: @PACKAGE_VERSION@
+Version: @@SATYR_VERSION@@
 Release: 1%{?dist}
 Summary: Tools to create anonymous, machine-friendly problem reports
 Group: System Environment/Libraries
