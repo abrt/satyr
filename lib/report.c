@@ -267,14 +267,14 @@ sr_report_to_json(struct sr_report *report)
         iter = iter->next;
         while (iter)
         {
-            sr_strbuf_append_strf(strbuf, "             ,   ");
+            sr_strbuf_append_strf(strbuf, "            ,   ");
             sr_json_append_escaped(strbuf, iter->key);
             sr_strbuf_append_str(strbuf, ": ");
             sr_json_append_escaped(strbuf, iter->value);
             sr_strbuf_append_str(strbuf, "\n");
             iter = iter->next;
         }
-        sr_strbuf_append_str(strbuf, "             }");
+        sr_strbuf_append_str(strbuf, "            } ");
     }
 
     sr_strbuf_append_str(strbuf, "}");
