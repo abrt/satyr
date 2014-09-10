@@ -1,4 +1,4 @@
-AC_INIT([satyr], [0.14], [crash-catcher@fedorahosted.org])
+AC_INIT([satyr], m4_esyscmd([cat ./satyr-version]), [crash-catcher@fedorahosted.org])
 AC_CANONICAL_TARGET
 AC_CONFIG_HEADERS([lib/config.h])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
@@ -119,7 +119,6 @@ AC_CHECK_LIB([rpm], [main])
 AC_CHECK_LIB([stdc++], [__cxa_demangle], [], [echo "error: stdc++ library not found"; exit 1])
 
 AC_CONFIG_FILES([
-	satyr.spec
 	satyr.pc
 	Makefile
 	lib/Makefile

@@ -39,6 +39,9 @@ case "$1" in
             exit 0
         ;;
     *)
+            echo "Running gen-version"
+            ./gen-version
+
             echo "Running autoreconf"
             autoreconf --install --force
         ;;

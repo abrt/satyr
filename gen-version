@@ -1,0 +1,23 @@
+#!/bin/bash
+
+DEF_VER=0.14
+LF='
+'
+
+if test -d .git -o -f .git &&
+    VN=$(git describe --tags --match "[0-9]*" --abbrev=4 HEAD 2>/dev/null) &&
+    case "$VN" in
+	*$LF*) (exit 1) ;;
+	[0-9]*)
+	    git update-index -q --refresh
+	    test -z "$(git diff-index --name-only HEAD --)" || VN="$VN-dirty"
+    esac
+then
+    VN=$(echo "$VN" | sed -e 's/-/./g');
+else
+    VN="$DEF_VER"
+fi
+
+sed -e "s/@@SATYR_VERSION@@/$VN/g" < satyr.spec.in > satyr.spec
+
+echo -n $VN > satyr-version
