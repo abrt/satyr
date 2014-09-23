@@ -558,10 +558,7 @@ sr_gdb_stacktrace_to_short_text(struct sr_gdb_stacktrace *stacktrace,
     crash_thread = sr_gdb_stacktrace_find_crash_thread(stacktrace);
 
     if (!crash_thread)
-    {
-        sr_gdb_stacktrace_free(stacktrace);
         return NULL;
-    }
 
     struct sr_gdb_thread *optimized_thread
         = sr_gdb_thread_get_optimized(crash_thread, stacktrace->libs,
