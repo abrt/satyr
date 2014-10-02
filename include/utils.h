@@ -378,6 +378,9 @@ sr_skip_whitespace(const char *s);
 char *
 sr_skip_non_whitespace(const char *s);
 
+bool
+sr_skip_to_next_line_location(const char **s, int *line, int *column);
+
 /**
  * Emit a string of hex representation of bytes.
  */

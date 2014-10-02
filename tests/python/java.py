@@ -152,6 +152,18 @@ class TestJavaStacktrace(BindingsTestCase):
     def test_hash(self):
         self.assertHashable(self.trace)
 
+    def test_suppressed(self):
+        contents = load_input_contents('../java_stacktraces/java-04')
+        trace = satyr.JavaStacktrace(contents)
+
+        names = 4*['java.lang.RuntimeException', 'WontCatchSuppressedException.die', 'WontCatchSuppressedException.die']
+        names[-1] = 'WontCatchSuppressedException.main'
+        msgs = 4*['yes', None, None]
+
+        for frame, name, msg in zip(trace.threads[0].frames, names, msgs):
+            self.assertEqual(frame.name, name)
+            self.assertEqual(frame.message, msg)
+
 class TestJavaThread(BindingsTestCase):
     def setUp(self):
         self.thread = satyr.JavaStacktrace(contents).threads[0]
