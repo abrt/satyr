@@ -28,6 +28,7 @@
 #include "stacktrace.h"
 #include "internal_utils.h"
 #include <string.h>
+#include <ctype.h>
 #include <inttypes.h>
 
 #define SR_JF_MARK_NATIVE_METHOD "Native Method"
@@ -337,6 +338,10 @@ sr_java_frame_parse_exception(const char **input,
         if (strncmp("... ", cursor, strlen("... ")) == 0)
             goto current_exception_done;
 
+        /* Suppressed exceptions follow after the end of current exception */
+        if (strncmp("Suppressed: ", cursor, strlen("Suppressed: ")) == 0)
+            goto current_exception_done;
+
         /* The top most exception does not have '...' at its end */
         if (strncmp("Caused by: ", cursor, strlen("Caused by: ")) == 0)
             goto parse_inner_exception;
@@ -363,18 +368,23 @@ sr_java_frame_parse_exception(const char **input,
     goto exception_parsing_successful;
 
 current_exception_done:
-    sr_location_add(location, 0, sr_skip_char_cspan(&cursor, "\n"));
-
-    if (*cursor == '\n')
-    {
-        ++cursor;
-        /* this adds one line */
-        sr_location_add(location, 2, 0);
-    }
+    sr_skip_to_next_line_location(&cursor, &location->line, &location->column);
 
     mark = cursor;
     cursor = sr_skip_whitespace(mark);
     sr_location_add(location, 0, cursor - mark);
+
+    if (strncmp("Suppressed: ", cursor, strlen("Suppressed: ")) == 0)
+    {
+        /* Skip all lines related to the suppressed exception. We can do
+         * this by skipping all lines that begin with a whitespace - the
+         * main exception chain always begins without preceding whitespace.
+         */
+        sr_skip_to_next_line_location(&cursor, &location->line, &location->column);
+
+        while (cursor && isspace(*cursor))
+            sr_skip_to_next_line_location(&cursor, &location->line, &location->column);
+    }
 
     if (strncmp("Caused by: ", cursor, strlen("Caused by: ")) == 0)
     {

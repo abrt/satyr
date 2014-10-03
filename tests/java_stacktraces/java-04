@@ -1,0 +1,185 @@
+Exception in thread "main" java.lang.RuntimeException: yes
+	at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+	at WontCatchSuppressedException.main(WontCatchSuppressedException.java:35)
+Caused by: java.lang.RuntimeException: yes
+	at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+	at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+	... 1 more
+	Suppressed: java.lang.RuntimeException: no
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+		at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+		... 1 more
+	Caused by: java.lang.RuntimeException: no
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+		... 3 more
+		Suppressed: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+			at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+			... 3 more
+		Caused by: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+			... 5 more
+			Suppressed: java.lang.RuntimeException: no
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+				at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+				... 5 more
+			Suppressed: java.lang.RuntimeException: no
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+				at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+				... 5 more
+		Suppressed: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+			at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+			... 3 more
+		Caused by: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+			... 5 more
+			Suppressed: java.lang.RuntimeException: no
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+				at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+				... 5 more
+			Suppressed: java.lang.RuntimeException: no
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+				at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+				... 5 more
+	Caused by: java.lang.RuntimeException: no
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+		... 4 more
+		Suppressed: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+			at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+			... 4 more
+		Suppressed: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+			at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+			... 4 more
+	Suppressed: java.lang.RuntimeException: no
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+		at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+		... 1 more
+	Caused by: java.lang.RuntimeException: no
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+		... 3 more
+		Suppressed: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+			at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+			... 3 more
+		Caused by: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+			... 5 more
+			Suppressed: java.lang.RuntimeException: no
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+				at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+				... 5 more
+			Suppressed: java.lang.RuntimeException: no
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+				at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+				... 5 more
+		Suppressed: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+			at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+			... 3 more
+		Caused by: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+			... 5 more
+			Suppressed: java.lang.RuntimeException: no
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+				at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+				... 5 more
+			Suppressed: java.lang.RuntimeException: no
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+				at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+				at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+				... 5 more
+	Caused by: java.lang.RuntimeException: no
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+		... 4 more
+		Suppressed: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+			at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+			... 4 more
+		Suppressed: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+			at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+			... 4 more
+Caused by: java.lang.RuntimeException: yes
+	at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+	at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+	... 2 more
+	Suppressed: java.lang.RuntimeException: no
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+		at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+		... 2 more
+	Caused by: java.lang.RuntimeException: no
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+		... 4 more
+		Suppressed: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+			at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+			... 4 more
+		Suppressed: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+			at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+			... 4 more
+	Suppressed: java.lang.RuntimeException: no
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:29)
+		at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+		... 2 more
+	Caused by: java.lang.RuntimeException: no
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+		... 4 more
+		Suppressed: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+			at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+			... 4 more
+		Suppressed: java.lang.RuntimeException: no
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+			at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+			at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+			... 4 more
+Caused by: java.lang.RuntimeException: yes
+	at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+	at WontCatchSuppressedException.die(WontCatchSuppressedException.java:27)
+	... 3 more
+	Suppressed: java.lang.RuntimeException: no
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+		at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+		... 3 more
+	Suppressed: java.lang.RuntimeException: no
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:23)
+		at WontCatchSuppressedException.close(WontCatchSuppressedException.java:16)
+		at WontCatchSuppressedException.die(WontCatchSuppressedException.java:28)
+		... 3 more

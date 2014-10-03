@@ -656,6 +656,22 @@ sr_skip_non_whitespace(const char *s)
     return (char *) s;
 }
 
+bool
+sr_skip_to_next_line_location(const char **s, int *line, int *column)
+{
+    *column += sr_skip_char_cspan(s, "\n");
+
+    if (*s && **s == '\n')
+    {
+        *column = 0;
+        (*line)++;
+        (*s)++;
+        return true;
+    }
+
+    return false;
+}
+
 char *
 sr_bin2hex(char *dst, const char *str, int count)
 {
