@@ -170,10 +170,11 @@ sr_gdb_thread_quality_counts(struct sr_gdb_thread *thread,
     while (frame)
     {
         *all_count += 1;
+        bool has_name = (frame->function_name
+            && 0 != strcmp(frame->function_name, "??"));
+        bool has_source = (frame->source_file && *frame->source_file);
 
-        if (frame->signal_handler_called ||
-            (frame->function_name
-             && 0 != strcmp(frame->function_name, "??")))
+        if (frame->signal_handler_called || (has_name && has_source))
         {
             *ok_count += 1;
         }
