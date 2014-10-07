@@ -107,6 +107,15 @@ make check
 %endif
 
 %changelog
+* Tue Oct 07 2014 Jakub Filak <jfilak@redhat.com> 0.15-1
+- New upstream version
+  - uReport enhancements (DESKTOP_SESSION, auth_data, missing values)
+  - Enhance the backtrace quality algorithm to tackle MiniDebuginfo
+  - Support unusual Python and Java exceptions
+  - Deal with infinite recursion in backtraces
+  - Fix unwinding of VDSO frames on i386
+  - Bugfixes
+
 * Tue Jun 10 2014 Martin Milata <mmilata@redhat.com> 0.14-1
 - New upstream version
   - Ported to elfutils-0.158 unwinder API

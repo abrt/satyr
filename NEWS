@@ -1,3 +1,16 @@
+satyr 0.15
+==========
+Fixed issues found in a security audit. Fixed the compat version of duphash
+generation which were not refusing to produce duphash for completely unreliable
+oopses. Fixed parsing of invalid syntax Python exceptions which were not
+recognized and caused satyr to refuse such a Python exception. Fixed unwinding
+of VDSO frames on i386. Limit the number of frames unwound to deal with
+infinite recursion.  Support authentication data, use dummy values for some
+missing members and include DESKTOP_SESSION in uReport. Ignore suppressed Java
+exceptions causing satyr to fail to parse such an Java exceptions. Quality
+frame has to have file name because almost all frames has function name because
+of MiniDebuginfo.
+
 satyr 0.14
 ==========
 Ported to current elfutils unwinder API. Disabled frame fingerprinting.
