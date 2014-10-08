@@ -72,5 +72,8 @@ testrb -Ilib test
 %doc %{gem_docdir}
 
 %changelog
+* Wed Oct 08 2014 Martin Milata <mmilata@redhat.com> - 0.2-1
+- Ruby 1.8 compatibility fix
+
 * Tue Mar 04 2014 Martin Milata <mmilata@redhat.com> - 0.1-1
 - Initial package

@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'satyr'
-  s.version = '0.1'
+  s.version = '0.2'
   s.summary = 'Parse uReport bug report format'
   s.description = 'Ruby bindings for satyr, library for working with the uReport problem report format.'
   s.authors = ['Martin Milata']
