@@ -3,6 +3,11 @@ require 'ffi'
 # Ruby bindings for libsatyr
 module Satyr
 
+  def self.set_encoding str
+    str.force_encoding('UTF-8') if str.respond_to? :force_encoding
+    str
+  end
+
   # FFI wrappers for C functions. <em>Do not use this module directly</em>
   module FFI
     extend ::FFI::Library
@@ -86,7 +91,8 @@ module Satyr
       pointer = Satyr::FFI.sr_report_from_json_text json.to_s, error_msg
       error_msg = error_msg.read_pointer
       unless error_msg.null?
-        message = error_msg.read_string.force_encoding('UTF-8')
+        message = error_msg.read_string
+        Satyr::set_encoding message
         Satyr::FFI.free error_msg
         raise SatyrError, "Failed to parse JSON: #{message}"
       end
@@ -168,7 +174,8 @@ module Satyr
       opts = {:frames => 0, :flags => :normal, :prefix => ""}.merge(opts)
       str_pointer = Satyr::FFI.sr_thread_get_duphash @struct.to_ptr, opts[:frames], opts[:prefix], opts[:flags]
       raise SatyrError, "Failed to compute duphash" if str_pointer.null?
-      hash = str_pointer.read_string.force_encoding('UTF-8')
+      hash = str_pointer.read_string
+      Satyr::set_encoding hash
       Satyr::FFI.free str_pointer
       hash
     end
