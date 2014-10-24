@@ -14,6 +14,12 @@ expected_short_text = '''Thread no. 1 (5 frames)
  #4 _gtk_marshal_BOOLEAN__BOXED at gtkmarshalers.c:84
 '''
 
+expected_short_text_955617 = '''Thread no. 1 (3 frames)
+ #10 xf86CursorSetCursor at xf86Cursor.c:333
+ #11 xf86CursorEnableDisableFBAccess at xf86Cursor.c:233
+ #12 ?? at /usr/lib/xorg/modules/drivers/nvidia_drv.so
+'''
+
 class TestGdbStacktrace(BindingsTestCase):
     def setUp(self):
         self.trace = satyr.GdbStacktrace(contents)
@@ -60,6 +66,11 @@ class TestGdbStacktrace(BindingsTestCase):
 
     def test_hash(self):
         self.assertHashable(self.trace)
+
+    def test_short_text_normalization(self):
+        contents = load_input_contents('../gdb_stacktraces/rhbz-955617')
+        trace = satyr.GdbStacktrace(contents)
+        self.assertEqual(trace.to_short_text(5), expected_short_text_955617)
 
 class TestGdbThread(BindingsTestCase):
     def setUp(self):
