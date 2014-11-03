@@ -1,0 +1,43 @@
+general protection fault: 0000 [#1] SMP
+Modules linked in: ccm rfcomm ip6t_rpfilter ip6t_REJECT xt_conntrack ebtable_nat ebtable_broute bridge stp llc ebtable_filter ebtables ip6table_nat nf_conntrack_ipv6 nf_defrag_ipv6 nf_nat_ipv6 ip6table_mangle ip6table_security ip6table_raw ip6table_filter ip6_tables iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack iptable_mangle iptable_security bnep iptable_raw iTCO_wdt iTCO_vendor_support x86_pkg_temp_thermal coretemp kvm_intel kvm snd_hda_codec_hdmi crct10dif_pclmul snd_hda_codec_conexant snd_hda_codec_generic crc32_pclmul crc32c_intel arc4 iwldvm ghash_clmulni_intel mac80211 joydev microcode snd_hda_intel uvcvideo snd_hda_controller serio_raw videobuf2_vmalloc i2c_i801 snd_hda_codec videobuf2_memops iwlwifi videobuf2_core btusb videodev snd_hwdep lpc_ich bluetooth media mfd_core cfg80211 snd_seq snd_seq_device snd_pcm sdhci_pci sdhci mmc_core mei_me shpchp mei snd_timer wmi tpm_tis tpm thinkpad_acpi snd soundcore rfkill nfsd auth_rpcgss nfs_acl lockd sunrpc i915 i2c_algo_bit drm_kms_helper e1000e drm ptp i2c_core pps_core video
+CPU: 1 PID: 946 Comm: X Not tainted 3.15.10-201.fc20.x86_64 #1
+Hardware name: LENOVO 4173W15/4173W15, BIOS 8CET58WW (1.38 ) 07/18/2013
+task: ffff8800d523cf00 ti: ffff88020211c000 task.ti: ffff88020211c000
+RIP: 0010:[<ffffffff81171b02>]  [<ffffffff81171b02>] find_get_entry+0x42/0xc0
+RSP: 0000:ffff88020211fa28  EFLAGS: 00013246
+RAX: 0000000080000000 RBX: ffff880037e6e670 RCX: 00000000fffffffa
+RDX: 1000000000000000 RSI: ffff88013c46dad0 RDI: 0000000000000036
+RBP: ffff88020211fa38 R08: 0000000000000000 R09: ffff88013c46d918
+R10: ffff88020211fa08 R11: ffff880000000418 R12: 0000000000000072
+R13: ffff880037e6e668 R14: ffff880037e6e518 R15: ffffea0006fd9480
+FS:  00007fc8b072a9c0(0000) GS:ffff88021e240000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fc8ac283000 CR3: 000000020fd19000 CR4: 00000000000407e0
+Stack:
+ 0000000000000072 0000000000000072 ffff88020211fa60 ffffffff81171d6f
+ 0000000000000072 0000000000000000 0000000000000001 ffff88020211fb18
+ ffffffff8118b98d 0000000000000000 ffff8800d523cf00 ffff88020211fb28
+Call Trace:
+ [<ffffffff81171d6f>] find_lock_entry+0x1f/0x80
+ [<ffffffff8118b98d>] shmem_getpage_gfp+0xcd/0x7c0
+ [<ffffffff8118c1d0>] shmem_read_mapping_page_gfp+0x40/0x80
+ [<ffffffffa00ff6aa>] i915_gem_object_get_pages_gtt+0x14a/0x3b0 [i915]
+ [<ffffffffa00fb9bc>] i915_gem_object_get_pages+0x6c/0xc0 [i915]
+ [<ffffffffa00ffd5d>] i915_gem_object_pin+0x34d/0x6f0 [i915]
+ [<ffffffff811c915f>] ? kfree+0xff/0x140
+ [<ffffffffa0102169>] i915_gem_fault+0x139/0x2a0 [i915]
+ [<ffffffff8119adb8>] __do_fault+0x48/0xc0
+ [<ffffffffa00341b1>] ? drm_vm_open_locked+0x31/0x90 [drm]
+ [<ffffffff8119e5f0>] do_shared_fault.isra.58+0x40/0x1e0
+ [<ffffffff8119f865>] handle_mm_fault+0x495/0x10e0
+ [<ffffffffa002da3c>] ? drm_ioctl+0x1ec/0x660 [drm]
+ [<ffffffff811a6d0d>] ? mmap_region+0x19d/0x5d0
+ [<ffffffff816fa3ec>] __do_page_fault+0x18c/0x530
+ [<ffffffff811a7435>] ? do_mmap_pgoff+0x2f5/0x3c0
+ [<ffffffff812e9ec3>] ? file_map_prot_check+0x63/0xd0
+ [<ffffffff811f9a20>] ? do_vfs_ioctl+0x2e0/0x4a0
+ [<ffffffff816fa7b2>] do_page_fault+0x22/0x30
+ [<ffffffff816f6e88>] page_fault+0x28/0x30
+Code: 89 df e8 62 13 1e 00 48 85 c0 48 89 c6 74 52 48 8b 10 48 85 d2 74 3d f6 c2 03 75 6e 65 8b 04 25 a0 c7 00 00 a9 00 ff 1f 00 75 5d <8b> 4a 1c 85 c9 74 ca 8d 79 01 4c 8d 4a 1c 89 c8 f0 0f b1 7a 1c 
+RIP  [<ffffffff81171b02>] find_get_entry+0x42/0xc0
+ RSP <ffff88020211fa28>

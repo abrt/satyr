@@ -84,6 +84,11 @@ struct sr_koops_stacktrace
      * @brief Call trace.  It might be NULL as it is not mandatory.
      */
     struct sr_koops_frame *frames;
+
+    /**
+     * @brief Reason message extracted by ABRT.
+     */
+    char *reason;
 };
 
 /**

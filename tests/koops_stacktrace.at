@@ -813,3 +813,46 @@ int main(void)
     return 0;
 }
 ]])
+
+## ------------------------------ ##
+## sr_koops_stacktrace_get_reason ##
+## ------------------------------ ##
+
+AT_TESTFUN([sr_koops_stacktrace_get_reason],
+[[
+#include "koops/stacktrace.h"
+#include "koops/frame.h"
+#include "thread.h"
+#include "location.h"
+#include "utils.h"
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+
+int main(void)
+{
+    char *error_message;
+    char *full_input = sr_file_to_string("../../kerneloopses/rhbz-1140681", &error_message);
+    assert(full_input);
+    char *input = full_input;
+
+    struct sr_location location;
+    sr_location_init(&location);
+    struct sr_koops_stacktrace *stacktrace =
+        sr_koops_stacktrace_parse(&input, &location);
+
+    assert(stacktrace);
+    assert(*input == '\0');
+    free(full_input);
+
+    char *expected_reason = "general protection fault in find_get_entry";
+    char *actual_reason = sr_koops_stacktrace_get_reason(stacktrace);
+    printf("%s\n%s\n", expected_reason, actual_reason);
+    assert(0 == strcmp(expected_reason, actual_reason));
+
+    sr_koops_stacktrace_free(stacktrace);
+
+    return 0;
+}
+]])
