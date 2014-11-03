@@ -661,7 +661,7 @@ sr_skip_to_next_line_location(const char **s, int *line, int *column)
 {
     *column += sr_skip_char_cspan(s, "\n");
 
-    if (*s && **s == '\n')
+    if (**s == '\n')
     {
         *column = 0;
         (*line)++;

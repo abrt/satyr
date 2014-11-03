@@ -500,7 +500,7 @@ PyObject *
 sr_py_report_get_auth(PyObject *self, void *data)
 {
     struct sr_report *report = ((struct sr_py_report *)self)->report;
-    struct sr_report_custom_entry *ae = report->auth_entries;
+    struct sr_report_custom_entry *ae;
 
     PyObject *auth = PyDict_New();
     for (ae = report->auth_entries; ae; ae = ae->next)
