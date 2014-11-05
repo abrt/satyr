@@ -131,6 +131,7 @@ sr_koops_stacktrace_free(struct sr_koops_stacktrace *stacktrace)
 
     free(stacktrace->version);
     free(stacktrace->raw_oops);
+    free(stacktrace->reason);
     free(stacktrace);
 }
 
@@ -148,6 +149,9 @@ sr_koops_stacktrace_dup(struct sr_koops_stacktrace *stacktrace)
 
     if (result->raw_oops)
         result->raw_oops = sr_strdup(result->raw_oops);
+
+    if (result->reason)
+        result->reason = sr_strdup(result->reason);
 
     return result;
 }
@@ -334,6 +338,9 @@ sr_koops_stacktrace_parse(const char **input,
 
     /* Looks for the "Tainted: " line in the whole input */
     parse_taint_flags(local_input, stacktrace);
+
+    /* The "reason" is expected to be the first line of the input */
+    stacktrace->reason = sr_strndup(*input, strcspn(*input, "\n"));
 
     while (*local_input)
     {
@@ -700,7 +707,7 @@ char *
 sr_koops_stacktrace_get_reason(struct sr_koops_stacktrace *stacktrace)
 {
     char *func = "<unknown>";
-    char *result;
+    struct sr_strbuf *result = sr_strbuf_new();
 
     struct sr_koops_stacktrace *copy = sr_koops_stacktrace_dup(stacktrace);
     sr_normalize_koops_stacktrace(copy);
@@ -708,17 +715,26 @@ sr_koops_stacktrace_get_reason(struct sr_koops_stacktrace *stacktrace)
     if (copy->frames && copy->frames->function_name)
         func = copy->frames->function_name;
 
-    if (copy->frames && copy->frames->module_name)
+    if (stacktrace->reason)
     {
-        result = sr_asprintf("Kernel oops in %s [%s]", func,
-                copy->frames->module_name);
+        if (strstr(stacktrace->reason, "general protection fault: "))
+            result = sr_strbuf_append_strf(result, "general protection fault in %s", func);
+        else if (strstr(stacktrace->reason, "kernel paging request at"))
+            result = sr_strbuf_append_strf(result, "kernel paging request at %s", func);
+        else
+            result = sr_strbuf_append_str(result, stacktrace->reason);
     }
     else
-        result = sr_asprintf("Kernel oops in %s", func);
+    {
+        result = sr_strbuf_append_strf(result, "Kernel oops in %s", func);
+    }
+
+    if (copy->frames && copy->frames->module_name)
+        result = sr_strbuf_append_strf(result, " [%s]", copy->frames->module_name);
 
     sr_koops_stacktrace_free(copy);
 
-    return result;
+    return sr_strbuf_free_nobuf(result);
 }
 
 static void
