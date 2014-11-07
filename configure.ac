@@ -104,13 +104,19 @@ AC_CHECK_LIB([elf], [main])
 AC_CHECK_LIB([dw], [main])
 AC_CHECK_LIB([dwfl], [main])
 AC_CHECK_LIB([dl], [main])
-AC_CHECK_FUNC(dwfl_getthreads, AC_DEFINE(HAVE_DWFL_NEXT_THREAD, [], [Have function dwfl_getthreads for coredump unwinding]))
+elfutils_unwinder=0
+AC_CHECK_FUNC(dwfl_getthreads,
+  AC_DEFINE(HAVE_DWFL_NEXT_THREAD, [], [Have function dwfl_getthreads for coredump unwinding])
+  elfutils_unwinder=1
+)
 
 # libunwind
-AC_CHECK_HEADERS([libunwind-coredump.h])
-AC_CHECK_LIB([unwind], [main])
-AC_CHECK_LIB([unwind-generic], [main])
-AC_CHECK_LIB([unwind-coredump], [main])
+if test "$elfutils_unwinder" != "1"; then
+  AC_CHECK_HEADERS([libunwind-coredump.h])
+  AC_CHECK_LIB([unwind], [main])
+  AC_CHECK_LIB([unwind-generic], [main])
+  AC_CHECK_LIB([unwind-coredump], [main])
+fi
 
 # rpm
 AC_CHECK_LIB([rpm], [main])
