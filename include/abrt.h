@@ -26,6 +26,7 @@ extern "C" {
 
 #include "report_type.h"
 #include <stdbool.h>
+#include <sys/types.h>
 
 bool
 sr_abrt_print_report_from_dir(const char *directory,
@@ -42,6 +43,13 @@ sr_abrt_create_core_stacktrace_from_gdb(const char *directory,
                                         const char *gdb_output,
                                         bool hash_fingerprints,
                                         char **error_message);
+
+bool
+sr_abrt_create_core_stacktrace_from_core_hook(const char *directory,
+                                              pid_t thread_id,
+                                              const char *executable,
+                                              int signum,
+                                              char **error_message);
 
 struct sr_rpm_package *
 sr_abrt_parse_dso_list(const char *text);

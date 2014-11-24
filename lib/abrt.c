@@ -162,6 +162,41 @@ sr_abrt_create_core_stacktrace(const char *directory,
                                   error_message);
 }
 
+bool
+sr_abrt_create_core_stacktrace_from_core_hook(const char *directory,
+                                              pid_t thread_id,
+                                              const char *executable,
+                                              int signum,
+                                              char **error_message)
+{
+
+    struct sr_core_stacktrace *core_stacktrace;
+    core_stacktrace = sr_core_stacktrace_from_core_hook(thread_id, executable,
+                                                        signum, error_message);
+
+    if (!core_stacktrace)
+        return false;
+
+    fulfill_missing_values(core_stacktrace);
+
+    char *json = sr_core_stacktrace_to_json(core_stacktrace);
+
+    // Add newline to the end of core stacktrace file to make text
+    // editors happy.
+    json = sr_realloc(json, strlen(json) + 2);
+    strcat(json, "\n");
+
+    char *core_backtrace_filename = sr_build_path(directory, "core_backtrace", NULL);
+    bool success = sr_string_to_file(core_backtrace_filename,
+                                    json,
+                                    error_message);
+
+    free(core_backtrace_filename);
+    free(json);
+    sr_core_stacktrace_free(core_stacktrace);
+    return success;
+}
+
 struct sr_rpm_package *
 sr_abrt_parse_dso_list(const char *text)
 {
