@@ -52,6 +52,20 @@ sr_parse_coredump(const char *coredump_filename,
 
 #endif /* !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND */
 
+#if !defined WITH_LIBDWFL
+
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_core_hook(pid_t thread_id,
+                                  const char *executable_filename,
+                                  int signum,
+                                  char **error_message);
+{
+    *error_message = sr_asprintf("satyr is built without live process unwind support");
+    return NULL;
+}
+
+#endif /* !defined WITH_LIBDWFL */
+
 /* FIXME: is there another way to pass the executable name to the find_elf
  * callback? */
 const char *executable_file = NULL;
