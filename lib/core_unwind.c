@@ -129,7 +129,7 @@ find_elf_core (Dwfl_Module *mod, void **userdata, const char *modname,
 }
 
 /* Do not use debuginfo files at all. */
-static int
+int
 find_debuginfo_none (Dwfl_Module *mod, void **userdata, const char *modname,
                      GElf_Addr base, const char *file_name,
                      const char *debuglink_file, GElf_Word debuglink_crc,

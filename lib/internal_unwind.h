@@ -96,4 +96,10 @@ resolve_frame(Dwfl *dwfl, Dwarf_Addr ip, bool minus_one);
 short
 get_signal_number(Elf *e, const char *elf_file);
 
+int
+find_debuginfo_none (Dwfl_Module *mod, void **userdata, const char *modname,
+                     GElf_Addr base, const char *file_name,
+                     const char *debuglink_file, GElf_Word debuglink_crc,
+                     char **debuginfo_file_name);
+
 #endif /* SATYR_INTERNAL_UNWIND_H */

@@ -77,6 +77,19 @@ frame_callback(Dwfl_Frame *frame, void *data)
     return DWARF_CB_OK;
 }
 
+static void
+truncate_long_thread(struct sr_core_thread *thread, struct frame_callback_arg *frame_arg)
+{
+    /* Truncate the stacktrace to FRAME_LIMIT least recent frames. */
+    while (thread->frames && frame_arg->nframes > FRAME_LIMIT)
+    {
+        struct sr_core_frame *old_frame = thread->frames;
+        thread->frames = old_frame->next;
+        sr_core_frame_free(old_frame);
+        frame_arg->nframes--;
+    }
+}
+
 static int
 unwind_thread(Dwfl_Thread *thread, void *data)
 {
@@ -86,7 +99,7 @@ unwind_thread(Dwfl_Thread *thread, void *data)
     struct sr_core_thread *result = sr_core_thread_new();
     if (!result)
     {
-        set_error("Failed to initialize stacktrace memory");
+        set_error("Failed to initialize thread memory");
         return DWARF_CB_ABORT;
     }
     result->id = (int64_t)dwfl_thread_tid(thread);
@@ -121,14 +134,7 @@ unwind_thread(Dwfl_Thread *thread, void *data)
         goto abort;
     }
 
-    /* Truncate the stacktrace to FRAME_LIMIT least recent frames. */
-    while (result->frames && frame_arg.nframes > FRAME_LIMIT)
-    {
-        struct sr_core_frame *old_frame = result->frames;
-        result->frames = old_frame->next;
-        sr_core_frame_free(old_frame);
-        frame_arg.nframes--;
-    }
+    truncate_long_thread(result, &frame_arg);
 
     *thread_arg->threads_tail = result;
     thread_arg->threads_tail = &result->next;
