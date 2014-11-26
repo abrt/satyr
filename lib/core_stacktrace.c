@@ -85,6 +85,7 @@ sr_core_stacktrace_init(struct sr_core_stacktrace *stacktrace)
     stacktrace->crash_thread = NULL;
     stacktrace->threads = NULL;
     stacktrace->type = SR_REPORT_CORE;
+    stacktrace->only_crash_thread = false;
 }
 
 void
@@ -167,7 +168,8 @@ sr_core_stacktrace_from_json(struct sr_json_value *root,
 
     bool success =
         JSON_READ_UINT16(root, "signal", &result->signal) &&
-        JSON_READ_STRING(root, "executable", &result->executable);
+        JSON_READ_STRING(root, "executable", &result->executable) &&
+        JSON_READ_BOOL(root, "only_crash_thread", &result->only_crash_thread);
 
     if (!success)
         goto fail;
@@ -238,6 +240,9 @@ sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
         sr_json_append_escaped(strbuf, stacktrace->executable);
         sr_strbuf_append_str(strbuf, "\n");
     }
+
+    if (stacktrace->only_crash_thread)
+        sr_strbuf_append_str(strbuf, ",   \"only_crash_thread\": true\n");
 
     sr_strbuf_append_str(strbuf, ",   \"stacktrace\":\n");
 

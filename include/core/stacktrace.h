@@ -31,6 +31,7 @@ extern "C" {
 
 #include "../report_type.h"
 #include <inttypes.h>
+#include <stdbool.h>
 
 struct sr_core_thread;
 struct sr_location;
@@ -56,6 +57,9 @@ struct sr_core_stacktrace
     struct sr_core_thread *crash_thread;
 
     struct sr_core_thread *threads;
+
+    /** Does the trace contain only crash thread, or all threads? */
+    bool only_crash_thread;
 };
 
 /**

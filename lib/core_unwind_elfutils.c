@@ -338,6 +338,7 @@ sr_core_stacktrace_from_core_hook(pid_t tid,
     if (signum > 0)
         stacktrace->signal = (uint16_t)signum;
     stacktrace->crash_thread = stacktrace->threads;
+    stacktrace->only_crash_thread = true;
 
 fail:
     dwfl_end(dwfl);
