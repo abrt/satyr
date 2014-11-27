@@ -51,14 +51,16 @@ core_stacktrace_methods[] =
 #define GSOFF_C_STRUCT sr_core_stacktrace
 GSOFF_START
 GSOFF_MEMBER(signal),
-GSOFF_MEMBER(executable)
+GSOFF_MEMBER(executable),
+GSOFF_MEMBER(only_crash_thread)
 GSOFF_END
 
 static PyGetSetDef
 stacktrace_getset[] =
 {
-    SR_ATTRIBUTE_UINT16(signal,     "Signal number (int)"             ),
-    SR_ATTRIBUTE_STRING(executable, "Name of the executable (string)" ),
+    SR_ATTRIBUTE_UINT16(signal,          "Signal number (int)"                     ),
+    SR_ATTRIBUTE_STRING(executable,      "Name of the executable (string)"         ),
+    SR_ATTRIBUTE_BOOL(only_crash_thread, "Do we only have the crash thread? (bool)"),
     { NULL }
 };
 

@@ -51,6 +51,7 @@ class TestCoreStacktrace(BindingsTestCase):
     def test_getset(self):
         self.assertGetSetCorrect(self.trace, 'signal', 6, 42)
         self.assertGetSetCorrect(self.trace, 'executable', '/usr/bin/will_abort', '/bin/true')
+        self.assertGetSetCorrect(self.trace, 'only_crash_thread', False, True)
 
     def test_crash_thread(self):
         self.assertTrue(self.trace.crash_thread is self.trace.threads[1])
@@ -71,6 +72,7 @@ class TestCoreStacktrace(BindingsTestCase):
         {
             "signal": 9,
             "executable": "C:\\\\porn.bat",
+            "only_crash_thread": true,
             "stacktrace": [
                 {
                     "frames": [
@@ -108,6 +110,7 @@ class TestCoreStacktrace(BindingsTestCase):
         trace = satyr.CoreStacktrace.from_json(json_text)
         self.assertEqual(trace.signal, 9)
         self.assertEqual(trace.executable, 'C:\\porn.bat')
+        self.assertEqual(trace.only_crash_thread, True)
 
         self.assertEqual(len(trace.threads), 2)
         self.assertEqual(len(trace.threads[0].frames), 3)
