@@ -100,7 +100,8 @@ is_removable_gdk(const char *function_name,
         call_match(function_name, source_file, "gdk_x_error", "gdkmain-x11.c", NULL) ||
         call_match(function_name, source_file, "gdk_threads_dispatch", "gdk.c", NULL) ||
         call_match(function_name, source_file, "gdk_event_dispatch", "gdkevents-x11.c", "gdkevents.c", NULL) ||
-        call_match(function_name, source_file, "gdk_event_source_dispatch", "gdkeventsource.c", NULL);
+        call_match(function_name, source_file, "gdk_event_source_dispatch", "gdkeventsource.c", NULL) ||
+        call_match(function_name, source_file, "_gdk_x11_display_error_event", "gdkdisplay-x11.c", "libgdk", NULL);
 }
 
 static bool
@@ -170,7 +171,9 @@ is_removable_xorg(const char *function_name,
         call_match(function_name, source_file, "AbortServer", "log.c", NULL) ||
         call_match(function_name, source_file, "AbortDDX", "xf86Init.c", NULL) ||
         call_match(function_name, source_file, "ddxGiveUp", "xf86Init.c", NULL) ||
-        call_match(function_name, source_file, "OsAbort", "utils.c", NULL);
+        call_match(function_name, source_file, "OsAbort", "utils.c", NULL) ||
+        call_match(function_name, source_file, "handle_error", "xcb_io.c", "libX11", NULL) ||
+        call_match(function_name, source_file, "handle_response", "xcb_io.c", "libX11", NULL);
 }
 
 static bool
