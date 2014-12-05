@@ -28,6 +28,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/ptrace.h>
+#include <sys/wait.h>
 
 #define FRAME_LIMIT 256
 
@@ -77,6 +81,19 @@ frame_callback(Dwfl_Frame *frame, void *data)
     return DWARF_CB_OK;
 }
 
+static void
+truncate_long_thread(struct sr_core_thread *thread, struct frame_callback_arg *frame_arg)
+{
+    /* Truncate the stacktrace to FRAME_LIMIT least recent frames. */
+    while (thread->frames && frame_arg->nframes > FRAME_LIMIT)
+    {
+        struct sr_core_frame *old_frame = thread->frames;
+        thread->frames = old_frame->next;
+        sr_core_frame_free(old_frame);
+        frame_arg->nframes--;
+    }
+}
+
 static int
 unwind_thread(Dwfl_Thread *thread, void *data)
 {
@@ -86,7 +103,7 @@ unwind_thread(Dwfl_Thread *thread, void *data)
     struct sr_core_thread *result = sr_core_thread_new();
     if (!result)
     {
-        set_error("Failed to initialize stacktrace memory");
+        set_error("Failed to initialize thread memory");
         return DWARF_CB_ABORT;
     }
     result->id = (int64_t)dwfl_thread_tid(thread);
@@ -121,14 +138,7 @@ unwind_thread(Dwfl_Thread *thread, void *data)
         goto abort;
     }
 
-    /* Truncate the stacktrace to FRAME_LIMIT least recent frames. */
-    while (result->frames && frame_arg.nframes > FRAME_LIMIT)
-    {
-        struct sr_core_frame *old_frame = result->frames;
-        result->frames = old_frame->next;
-        sr_core_frame_free(old_frame);
-        frame_arg.nframes--;
-    }
+    truncate_long_thread(result, &frame_arg);
 
     *thread_arg->threads_tail = result;
     thread_arg->threads_tail = &result->next;
@@ -199,6 +209,139 @@ sr_parse_coredump(const char *core_file,
 
 fail:
     core_handle_free(ch);
+    return stacktrace;
+}
+
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_core_hook(pid_t tid,
+                                  const char *executable,
+                                  int signum,
+                                  char **error_msg)
+{
+    struct sr_core_stacktrace *stacktrace = NULL;
+
+    /* Initialize error_msg to 'no error'. */
+    if (error_msg)
+        *error_msg = NULL;
+
+    const Dwfl_Callbacks proc_cb =
+    {
+        .find_elf = dwfl_linux_proc_find_elf,
+        .find_debuginfo = find_debuginfo_none,
+    };
+
+    Dwfl *dwfl = dwfl_begin(&proc_cb);
+
+    if (dwfl_linux_proc_report(dwfl, tid) != 0)
+    {
+        set_error_dwfl("dwfl_linux_proc_report");
+        goto fail;
+    }
+
+    if (dwfl_report_end(dwfl, NULL, NULL) != 0)
+    {
+        set_error_dwfl("dwfl_report_end");
+        goto fail;
+    }
+
+    if (ptrace(PTRACE_SEIZE, tid, NULL, (void *)(uintptr_t)PTRACE_O_TRACEEXIT) != 0)
+    {
+        set_error("PTRACE_SEIZE (tid %u) failed: %s", (unsigned)tid, strerror(errno));
+        goto fail;
+    }
+
+    if (close(STDIN_FILENO) != 0)
+    {
+        set_error("Failed to close stdin: %s", strerror(errno));
+        goto fail;
+    }
+
+    int status;
+    pid_t got = waitpid(tid, &status, 0);
+    if (got == -1)
+    {
+        set_error("waitpid failed: %s", strerror(errno));
+        goto fail;
+    }
+
+    if (got != tid)
+    {
+        set_error("waitpid returned %u but %u was expected", (unsigned)got, (unsigned)tid);
+        goto fail;
+    }
+
+    if (!WIFSTOPPED(status))
+    {
+        set_error("waitpid returned 0x%x but WIFSTOPPED was expected", status);
+        goto fail;
+    }
+
+    if ((status >> 8) != (SIGTRAP | (PTRACE_EVENT_EXIT << 8)))
+    {
+        set_error("waitpid returned 0x%x but (status >> 8) == "
+                  "(SIGTRAP | (PTRACE_EVENT_EXIT << 8)) was expected", status);
+        goto fail;
+    }
+
+    if (dwfl_linux_proc_attach(dwfl, tid, true) != 0)
+    {
+        set_error_dwfl("dwfl_linux_proc_attach");
+        goto fail;
+    }
+
+    stacktrace = sr_core_stacktrace_new();
+    if (!stacktrace)
+    {
+        set_error("Failed to initialize stacktrace memory");
+        goto fail;
+    }
+
+    stacktrace->threads = sr_core_thread_new();
+    if (!stacktrace->threads)
+    {
+        set_error("Failed to initialize thread memory");
+        sr_core_stacktrace_free(stacktrace);
+        stacktrace = 0;
+        goto fail;
+    }
+    stacktrace->threads->id = tid;
+
+    struct frame_callback_arg frame_arg =
+    {
+        .frames_tail = &(stacktrace->threads->frames),
+        .error_msg = NULL,
+        .nframes = 0
+    };
+
+    int ret = dwfl_getthread_frames(dwfl, tid, frame_callback, &frame_arg);
+    if (ret != 0 && ret != CB_STOP_UNWIND)
+    {
+        if (ret == -1)
+            set_error_dwfl("dwfl_getthread_frames");
+        else if (ret == DWARF_CB_ABORT)
+        {
+            set_error("%s", frame_arg.error_msg);
+            free(frame_arg.error_msg);
+        }
+        else
+            set_error("Unknown error in dwfl_getthreads");
+
+        sr_core_stacktrace_free(stacktrace);
+        stacktrace = NULL;
+        goto fail;
+    }
+
+    truncate_long_thread(stacktrace->threads, &frame_arg);
+
+    if (executable)
+        stacktrace->executable = sr_strdup(executable);
+    if (signum > 0)
+        stacktrace->signal = (uint16_t)signum;
+    stacktrace->crash_thread = stacktrace->threads;
+    stacktrace->only_crash_thread = true;
+
+fail:
+    dwfl_end(dwfl);
     return stacktrace;
 }
 

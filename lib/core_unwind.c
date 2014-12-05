@@ -54,6 +54,20 @@ sr_parse_coredump(const char *coredump_filename,
 
 #endif /* !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND */
 
+#if !defined WITH_LIBDWFL
+
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_core_hook(pid_t thread_id,
+                                  const char *executable_filename,
+                                  int signum,
+                                  char **error_message);
+{
+    *error_message = sr_asprintf("satyr is built without live process unwind support");
+    return NULL;
+}
+
+#endif /* !defined WITH_LIBDWFL */
+
 /* FIXME: is there another way to pass the executable name to the find_elf
  * callback? */
 const char *executable_file = NULL;
@@ -129,7 +143,7 @@ find_elf_core (Dwfl_Module *mod, void **userdata, const char *modname,
 }
 
 /* Do not use debuginfo files at all. */
-static int
+int
 find_debuginfo_none (Dwfl_Module *mod, void **userdata, const char *modname,
                      GElf_Addr base, const char *file_name,
                      const char *debuglink_file, GElf_Word debuglink_crc,

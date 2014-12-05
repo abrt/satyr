@@ -20,6 +20,8 @@
 #include "gdb/stacktrace.h"
 #include "gdb/thread.h"
 #include "gdb/frame.h"
+#include "core/unwind.h"
+#include "core/stacktrace.h"
 #include "utils.h"
 #include "location.h"
 #include "strbuf.h"
@@ -37,6 +39,7 @@
 #include <sysexits.h>
 #include <assert.h>
 #include <libgen.h>
+#include <time.h>
 
 static char *g_program_name;
 
@@ -275,6 +278,82 @@ debug_duphash(int argc, char **argv)
 }
 
 static void
+debug_unwind_from_hook(int argc, char **argv)
+{
+    if (argc != 3)
+    {
+        fprintf(stderr, "Wrong number of arguments.\n");
+        fprintf(stderr, "Usage: satyr debug unwind-from-hook "
+                        "<executable> <tid> <signal>\n");
+        exit(1);
+    }
+
+    char *executable = argv[0];
+    char *end;
+    unsigned long tid = strtoul(argv[1], &end, 10);
+    if (*end != '\0')
+    {
+        fprintf(stderr, "Wrong tid\n");
+        exit(1);
+    }
+
+    unsigned long signum = strtoul(argv[2], &end, 10);
+    if (*end != '\0')
+    {
+        fprintf(stderr, "Wrong signal number\n");
+        exit(1);
+    }
+
+    char *error_message = NULL;
+    struct sr_core_stacktrace *core_stacktrace;
+
+    core_stacktrace = sr_core_stacktrace_from_core_hook(tid, executable, signum,
+                                                        &error_message);
+    if (!core_stacktrace)
+    {
+        fprintf(stderr, "Unwind failed: %s\n", error_message);
+        exit(1);
+    }
+
+    char *json = sr_core_stacktrace_to_json(core_stacktrace);
+    // Add newline to the end of core stacktrace file to make text
+    // editors happy.
+    json = sr_realloc(json, strlen(json) + 2);
+    strcat(json, "\n");
+
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+    char core_backtrace_filename[256];
+
+    if (tm == NULL)
+    {
+        perror("localtime");
+        exit(1);
+    }
+
+    if (strftime(core_backtrace_filename, sizeof(core_backtrace_filename),
+                 "/tmp/satyr-core-stacktrace-%F-%T.json", tm) == 0)
+    {
+        fprintf(stderr, "stftime failed\n");
+        exit(1);
+    }
+
+
+    bool success = sr_string_to_file(core_backtrace_filename,
+                                    json,
+                                    &error_message);
+
+    if (!success)
+    {
+        fprintf(stderr, "Failed to write stacktrace: %s\n", error_message);
+        exit(1);
+    }
+
+    free(json);
+    sr_core_stacktrace_free(core_stacktrace);
+}
+
+static void
 debug(int argc, char **argv)
 {
     /* Debug command requires a subcommand. */
@@ -288,6 +367,8 @@ debug(int argc, char **argv)
         debug_normalize(argc - 1, argv + 1);
     else if (0 == strcmp(argv[0], "duphash"))
         debug_duphash(argc - 1, argv + 1);
+    else if (0 == strcmp(argv[0], "unwind-from-hook"))
+        debug_unwind_from_hook(argc - 1, argv + 1);
     else
     {
         fprintf(stderr, "Unknown debug subcommand.\n");

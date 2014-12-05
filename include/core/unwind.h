@@ -24,6 +24,8 @@
 extern "C" {
 #endif
 
+#include <sys/types.h>
+
 struct sr_core_stacktrace;
 struct sr_gdb_stacktrace;
 
@@ -37,6 +39,22 @@ sr_core_stacktrace_from_gdb(const char *gdb_output,
                             const char *coredump_filename,
                             const char *executable_filename,
                             char **error_message);
+
+/* This function can be used to unwind stack of live ("dying") process, invoked
+ * from the core dump hook (/proc/sys/kernel/core_pattern).
+ *
+ * Beware:
+ *
+ * - It can only unwind one thread of the process, the thread that caused the
+ *   terminating signal to be sent. You must supply that thread's tid.
+ * - The function calls close() on stdin, meaning that in the core handler you
+ *   cannot access the core image after calling this function.
+ */
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_core_hook(pid_t thread_id,
+                                  const char *executable_filename,
+                                  int signum,
+                                  char **error_message);
 
 #ifdef __cplusplus
 }
