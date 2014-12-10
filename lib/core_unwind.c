@@ -25,6 +25,7 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/procfs.h> /* struct elf_prstatus */
+#include <sys/ptrace.h> /* PTRACE_SEIZE */
 
 #include <elfutils/version.h>
 
@@ -54,19 +55,19 @@ sr_parse_coredump(const char *coredump_filename,
 
 #endif /* !defined WITH_LIBDWFL && !defined WITH_LIBUNWIND */
 
-#if !defined WITH_LIBDWFL
+#if (!defined WITH_LIBDWFL || !defined PTRACE_SEIZE)
 
 struct sr_core_stacktrace *
 sr_core_stacktrace_from_core_hook(pid_t thread_id,
                                   const char *executable_filename,
                                   int signum,
-                                  char **error_message);
+                                  char **error_message)
 {
     *error_message = sr_asprintf("satyr is built without live process unwind support");
     return NULL;
 }
 
-#endif /* !defined WITH_LIBDWFL */
+#endif /* !defined WITH_LIBDWFL || !defined PTRACE_SEIZE */
 
 /* FIXME: is there another way to pass the executable name to the find_elf
  * callback? */

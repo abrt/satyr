@@ -212,6 +212,10 @@ fail:
     return stacktrace;
 }
 
+/* If PTRACE_SEIZE is not defined (kernel < 3.4), stub function from
+ * core_unwind.c is used. */
+#ifdef PTRACE_SEIZE
+
 struct sr_core_stacktrace *
 sr_core_stacktrace_from_core_hook(pid_t tid,
                                   const char *executable,
@@ -344,5 +348,7 @@ fail:
     dwfl_end(dwfl);
     return stacktrace;
 }
+
+#endif /* PTRACE_SEIZE */
 
 #endif /* WITH_LIBDWFL */
