@@ -432,15 +432,15 @@ sr_abrt_report_from_dir(const char *directory,
     struct sr_report *report = sr_report_new();
 
     /* Report type. */
-    char *analyzer_contents = file_contents(directory, "analyzer", error_message);
-    if (!analyzer_contents)
+    char *type_contents = file_contents(directory, "type", error_message);
+    if (!type_contents)
     {
         sr_report_free(report);
         return NULL;
     }
 
-    report->report_type = sr_abrt_type_from_analyzer(analyzer_contents);
-    free(analyzer_contents);
+    report->report_type = sr_abrt_type_from_type(type_contents);
+    free(type_contents);
 
     /* Operating system. */
     report->operating_system = sr_abrt_operating_system_from_dir(
@@ -586,16 +586,23 @@ sr_abrt_report_from_dir(const char *directory,
 }
 
 enum sr_report_type
-sr_abrt_type_from_analyzer(const char *analyzer)
+sr_abrt_type_from_type(const char *type)
 {
-    if (0 == strncmp(analyzer, "CCpp", 4))
+    if (0 == strncmp(type, "CCpp", 4))
         return SR_REPORT_CORE;
-    else if (0 == strncmp(analyzer, "Python", 6))
+    else if (0 == strncmp(type, "Python", 6))
         return SR_REPORT_PYTHON;
-    else if (0 == strncmp(analyzer, "Kerneloops", 10))
+    else if (0 == strncmp(type, "Kerneloops", 10))
         return SR_REPORT_KERNELOOPS;
-    else if (0 == strncmp(analyzer, "Java", 4))
+    else if (0 == strncmp(type, "Java", 4))
         return SR_REPORT_JAVA;
 
     return SR_REPORT_INVALID;
+}
+
+enum sr_report_type
+sr_abrt_type_from_analyzer(const char *analyzer)
+{
+    warn("sr_abrt_type_from_analyzer() is deprecated, using sr_abrt_type_from_type() instead");
+    return sr_abrt_type_from_type(analyzer);
 }

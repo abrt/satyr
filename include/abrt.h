@@ -66,8 +66,12 @@ struct sr_report *
 sr_abrt_report_from_dir(const char *directory,
                         char **error_message);
 
+/* Deprecated: use sr_report_type_from_type() instead */
 enum sr_report_type
 sr_abrt_type_from_analyzer(const char *analyzer);
+
+enum sr_report_type
+sr_abrt_type_from_type(const char *type);
 
 #ifdef __cplusplus
 }
