@@ -44,5 +44,8 @@ case "$1" in
 
             echo "Running autoreconf"
             autoreconf --install --force
+
+            echo "Running configure"
+            ./configure "$@"
         ;;
 esac
