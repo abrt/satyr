@@ -32,6 +32,7 @@
 #include "java/stacktrace.h"
 #include "json.h"
 #include "location.h"
+#include "internal_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
