@@ -102,6 +102,14 @@ sr_python_stacktrace_free(struct sr_python_stacktrace *stacktrace)
     if (!stacktrace)
         return;
 
+    while (stacktrace->frames)
+    {
+        struct sr_python_frame *frame = stacktrace->frames;
+        stacktrace->frames = frame->next;
+        sr_python_frame_free(frame);
+    }
+
+    free(stacktrace->exception_name);
     free(stacktrace);
 }
 
