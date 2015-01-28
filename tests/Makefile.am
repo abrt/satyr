@@ -4,7 +4,16 @@ EXTRA_DIST = gdb_stacktraces \
              json_files \
              kerneloopses \
              programs \
-             python \
+             python/core.py \
+             python/gdb.py \
+             python/java.py \
+             python/koops.py \
+             python/metrics.py \
+             python/misc.py \
+             python/python.py \
+             python/report.py \
+             python/ruby.py \
+             python/test_helpers.py \
              python_stacktraces
 
 ## ------------ ##
