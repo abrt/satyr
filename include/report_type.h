@@ -32,6 +32,7 @@ enum sr_report_type
     SR_REPORT_KERNELOOPS,
     SR_REPORT_JAVA,
     SR_REPORT_GDB,
+    SR_REPORT_RUBY,
 
     /* Keep this the last entry. */
     SR_REPORT_NUM

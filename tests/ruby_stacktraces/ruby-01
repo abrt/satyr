@@ -1,0 +1,23 @@
+/usr/share/ruby/vendor_ruby/will_crash.rb:13:in `rescue in block (2 levels) in func': Exception
+successfully
+raised. (Wrap::MyException)
+	from /usr/share/ruby/vendor_ruby/will_crash.rb:10:in `block (2 levels) in func'
+	from /usr/share/ruby/vendor_ruby/will_crash.rb:9:in `times'
+	from /usr/share/ruby/vendor_ruby/will_crash.rb:9:in `block in func'
+	from /usr/share/ruby/vendor_ruby/will_crash.rb:8:in `times'
+	from /usr/share/ruby/vendor_ruby/will_crash.rb:8:in `func'
+	from /usr/share/ruby/vendor_ruby/will_crash.rb:30:in `block in <class:WillClass>'
+	from /usr/share/ruby/vendor_ruby/will_crash.rb:28:in `times'
+	from /usr/share/ruby/vendor_ruby/will_crash.rb:28:in `rescue in rescue in rescue in <class:WillClass>'
+	from /usr/share/ruby/vendor_ruby/will_crash.rb:25:in `rescue in rescue in <class:WillClass>'
+	from /usr/share/ruby/vendor_ruby/will_crash.rb:22:in `rescue in <class:WillClass>'
+	from /usr/share/ruby/vendor_ruby/will_crash.rb:19:in `<class:WillClass>'
+	from /usr/share/ruby/vendor_ruby/will_crash.rb:6:in `<top (required)>'
+	from /usr/share/rubygems/rubygems/core_ext/kernel_require.rb:55:in `require'
+	from /usr/share/rubygems/rubygems/core_ext/kernel_require.rb:55:in `require'
+	from /usr/bin/will_ruby_raise:11:in `block (2 levels) in <module:WillModule>'
+	from /usr/bin/will_ruby_raise:10:in `times'
+	from /usr/bin/will_ruby_raise:10:in `block in <module:WillModule>'
+	from /usr/bin/will_ruby_raise:9:in `times'
+	from /usr/bin/will_ruby_raise:9:in `<module:WillModule>'
+	from /usr/bin/will_ruby_raise:8:in `<main>'

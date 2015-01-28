@@ -1,5 +1,6 @@
 EXTRA_DIST = gdb_stacktraces \
              java_stacktraces \
+             ruby_stacktraces \
              json_files \
              kerneloopses \
              programs \
@@ -58,6 +59,8 @@ TESTSUITE_AT =		\
   core_frame.at         \
   core_thread.at        \
   core_stacktrace.at    \
+  ruby_frame.at		\
+  ruby_stacktrace.at	\
   normalize.at  	\
   metrics.at 		\
   cluster.at  		\

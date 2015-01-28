@@ -1,0 +1,166 @@
+{   "exception_name": "SignalException"
+,   "stacktrace":
+      [ {   "file_name": "/usr/share/rubygems/rubygems/basic_specification.rb"
+        ,   "file_line": 50
+        ,   "function_name": "contains_requirable_file?"
+        ,   "block_level": 3
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/basic_specification.rb"
+        ,   "file_line": 50
+        ,   "function_name": "each"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/basic_specification.rb"
+        ,   "file_line": 50
+        ,   "function_name": "any?"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/basic_specification.rb"
+        ,   "file_line": 50
+        ,   "function_name": "contains_requirable_file?"
+        ,   "block_level": 2
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/basic_specification.rb"
+        ,   "file_line": 49
+        ,   "function_name": "each"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/basic_specification.rb"
+        ,   "file_line": 49
+        ,   "function_name": "any?"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/basic_specification.rb"
+        ,   "file_line": 49
+        ,   "function_name": "contains_requirable_file?"
+        ,   "block_level": 1
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/basic_specification.rb"
+        ,   "file_line": 45
+        ,   "function_name": "each"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/basic_specification.rb"
+        ,   "file_line": 45
+        ,   "function_name": "any?"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/basic_specification.rb"
+        ,   "file_line": 45
+        ,   "function_name": "contains_requirable_file?"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/specification.rb"
+        ,   "file_line": 898
+        ,   "function_name": "find_inactive_by_path"
+        ,   "block_level": 1
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/specification.rb"
+        ,   "file_line": 897
+        ,   "function_name": "each"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/specification.rb"
+        ,   "file_line": 897
+        ,   "function_name": "find"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/specification.rb"
+        ,   "file_line": 897
+        ,   "function_name": "find_inactive_by_path"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems.rb"
+        ,   "file_line": 183
+        ,   "function_name": "try_activate"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/core_ext/kernel_require.rb"
+        ,   "file_line": 132
+        ,   "function_name": "require"
+        ,   "rescue_level": 1
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/core_ext/kernel_require.rb"
+        ,   "file_line": 144
+        ,   "function_name": "require"
+        }
+      , {   "file_name": "/usr/share/gems/gems/compass-0.12.2/lib/compass/sass_extensions/sprites/engines/chunky_png_engine.rb"
+        ,   "file_line": 2
+        ,   "special_function": "top (required)"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/core_ext/kernel_require.rb"
+        ,   "file_line": 55
+        ,   "function_name": "require"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/core_ext/kernel_require.rb"
+        ,   "file_line": 55
+        ,   "function_name": "require"
+        }
+      , {   "file_name": "/usr/share/gems/gems/compass-0.12.2/lib/compass/sass_extensions/sprites/engines.rb"
+        ,   "file_line": 25
+        ,   "special_function": "top (required)"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/core_ext/kernel_require.rb"
+        ,   "file_line": 55
+        ,   "function_name": "require"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/core_ext/kernel_require.rb"
+        ,   "file_line": 55
+        ,   "function_name": "require"
+        }
+      , {   "file_name": "/usr/share/gems/gems/compass-0.12.2/lib/compass/sass_extensions/sprites.rb"
+        ,   "file_line": 18
+        ,   "special_function": "top (required)"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/core_ext/kernel_require.rb"
+        ,   "file_line": 55
+        ,   "function_name": "require"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/core_ext/kernel_require.rb"
+        ,   "file_line": 55
+        ,   "function_name": "require"
+        }
+      , {   "file_name": "/usr/share/gems/gems/compass-0.12.2/lib/compass/sass_extensions.rb"
+        ,   "file_line": 10
+        ,   "special_function": "top (required)"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/core_ext/kernel_require.rb"
+        ,   "file_line": 55
+        ,   "function_name": "require"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/core_ext/kernel_require.rb"
+        ,   "file_line": 55
+        ,   "function_name": "require"
+        }
+      , {   "file_name": "/usr/share/gems/gems/compass-0.12.2/lib/compass.rb"
+        ,   "file_line": 5
+        ,   "special_function": "top (required)"
+        ,   "block_level": 1
+        }
+      , {   "file_name": "/usr/share/gems/gems/compass-0.12.2/lib/compass.rb"
+        ,   "file_line": 4
+        ,   "function_name": "each"
+        }
+      , {   "file_name": "/usr/share/gems/gems/compass-0.12.2/lib/compass.rb"
+        ,   "file_line": 4
+        ,   "special_function": "top (required)"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/core_ext/kernel_require.rb"
+        ,   "file_line": 55
+        ,   "function_name": "require"
+        }
+      , {   "file_name": "/usr/share/rubygems/rubygems/core_ext/kernel_require.rb"
+        ,   "file_line": 55
+        ,   "function_name": "require"
+        }
+      , {   "file_name": "/usr/share/gems/gems/compass-0.12.2/bin/compass"
+        ,   "file_line": 20
+        ,   "special_function": "top (required)"
+        ,   "block_level": 1
+        }
+      , {   "file_name": "/usr/share/gems/gems/compass-0.12.2/bin/compass"
+        ,   "file_line": 8
+        ,   "function_name": "fallback_load_path"
+        }
+      , {   "file_name": "/usr/share/gems/gems/compass-0.12.2/bin/compass"
+        ,   "file_line": 19
+        ,   "special_function": "top (required)"
+        }
+      , {   "file_name": "/usr/bin/compass"
+        ,   "file_line": 23
+        ,   "function_name": "load"
+        }
+      , {   "file_name": "/usr/bin/compass"
+        ,   "file_line": 23
+        ,   "special_function": "main"
+        } ]
+}

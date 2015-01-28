@@ -1,0 +1,158 @@
+{   "exception_name": "NotImplementedError"
+,   "stacktrace":
+      [ {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/class_module.rb"
+        ,   "file_line": 173
+        ,   "function_name": "aref_prefix"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/class_module.rb"
+        ,   "file_line": 181
+        ,   "function_name": "aref"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/generator/template/darkfish/class.rhtml"
+        ,   "file_line": 47
+        ,   "function_name": "generate_class"
+        ,   "block_level": 1
+        }
+      , {   "file_name": "/usr/share/ruby/erb.rb"
+        ,   "file_line": 850
+        ,   "function_name": "eval"
+        }
+      , {   "file_name": "/usr/share/ruby/erb.rb"
+        ,   "file_line": 850
+        ,   "function_name": "result"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/generator/darkfish.rb"
+        ,   "file_line": 724
+        ,   "function_name": "template_result"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/generator/darkfish.rb"
+        ,   "file_line": 703
+        ,   "function_name": "render_template"
+        ,   "block_level": 1
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/generator/darkfish.rb"
+        ,   "file_line": 698
+        ,   "function_name": "open"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/generator/darkfish.rb"
+        ,   "file_line": 698
+        ,   "function_name": "open"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/generator/darkfish.rb"
+        ,   "file_line": 698
+        ,   "function_name": "render_template"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/generator/darkfish.rb"
+        ,   "file_line": 351
+        ,   "function_name": "generate_class"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/generator/darkfish.rb"
+        ,   "file_line": 371
+        ,   "function_name": "generate_class_files"
+        ,   "block_level": 1
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/generator/darkfish.rb"
+        ,   "file_line": 368
+        ,   "function_name": "each"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/generator/darkfish.rb"
+        ,   "file_line": 368
+        ,   "function_name": "generate_class_files"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/generator/darkfish.rb"
+        ,   "file_line": 245
+        ,   "function_name": "generate"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/rubygems_hook.rb"
+        ,   "file_line": 137
+        ,   "function_name": "document"
+        ,   "block_level": 1
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/rubygems_hook.rb"
+        ,   "file_line": 134
+        ,   "function_name": "chdir"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/rubygems_hook.rb"
+        ,   "file_line": 134
+        ,   "function_name": "document"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/rubygems_hook.rb"
+        ,   "file_line": 202
+        ,   "function_name": "generate"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/rubygems_hook.rb"
+        ,   "file_line": 56
+        ,   "function_name": "generation_hook"
+        ,   "block_level": 1
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/rubygems_hook.rb"
+        ,   "file_line": 55
+        ,   "function_name": "each"
+        }
+      , {   "file_name": "/usr/share/gems/gems/rdoc-4.1.1/lib/rdoc/rubygems_hook.rb"
+        ,   "file_line": 55
+        ,   "function_name": "generation_hook"
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/request_set.rb"
+        ,   "file_line": 188
+        ,   "function_name": "call"
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/request_set.rb"
+        ,   "file_line": 188
+        ,   "function_name": "install"
+        ,   "block_level": 1
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/request_set.rb"
+        ,   "file_line": 187
+        ,   "function_name": "each"
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/request_set.rb"
+        ,   "file_line": 187
+        ,   "function_name": "install"
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/dependency_installer.rb"
+        ,   "file_line": 394
+        ,   "function_name": "install"
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/commands/update_command.rb"
+        ,   "file_line": 211
+        ,   "function_name": "update_gem"
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/commands/update_command.rb"
+        ,   "file_line": 223
+        ,   "function_name": "update_gems"
+        ,   "block_level": 1
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/commands/update_command.rb"
+        ,   "file_line": 222
+        ,   "function_name": "each"
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/commands/update_command.rb"
+        ,   "file_line": 222
+        ,   "function_name": "update_gems"
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/commands/update_command.rb"
+        ,   "file_line": 98
+        ,   "function_name": "execute"
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/command.rb"
+        ,   "file_line": 307
+        ,   "function_name": "invoke_with_build_args"
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/command_manager.rb"
+        ,   "file_line": 168
+        ,   "function_name": "process_args"
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/command_manager.rb"
+        ,   "file_line": 138
+        ,   "function_name": "run"
+        }
+      , {   "file_name": "/usr/local/share/ruby/site_ruby/rubygems/gem_runner.rb"
+        ,   "file_line": 54
+        ,   "function_name": "run"
+        }
+      , {   "file_name": "/bin/gem"
+        ,   "file_line": 21
+        ,   "special_function": "main"
+        } ]
+}

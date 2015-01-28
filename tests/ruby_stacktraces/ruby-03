@@ -1,0 +1,4 @@
+/usr/share/gems/gems/openshift-origin-node-1.18.0.1/lib/openshift-origin-node/utils/tc.rb:103:in `get_interface_mtu': Unable to determine external network interface IP address. (RuntimeError)
+	from /usr/share/gems/gems/openshift-origin-node-1.18.0.1/lib/openshift-origin-node/utils/tc.rb:77:in `initialize'
+	from /sbin/oo-admin-ctl-tc:24:in `new'
+	from /sbin/oo-admin-ctl-tc:24:in `<main>'
