@@ -12,6 +12,7 @@ EXTRA_DIST = gdb_stacktraces \
              python/misc.py \
              python/python.py \
              python/report.py \
+             python/ruby.py \
              python/test_helpers.py \
              python_stacktraces
 
