@@ -1,0 +1,19 @@
+{   "exception_name": "RuntimeError"
+,   "stacktrace":
+      [ {   "file_name": "/usr/share/gems/gems/openshift-origin-node-1.18.0.1/lib/openshift-origin-node/utils/tc.rb"
+        ,   "file_line": 103
+        ,   "function_name": "get_interface_mtu"
+        }
+      , {   "file_name": "/usr/share/gems/gems/openshift-origin-node-1.18.0.1/lib/openshift-origin-node/utils/tc.rb"
+        ,   "file_line": 77
+        ,   "function_name": "initialize"
+        }
+      , {   "file_name": "/sbin/oo-admin-ctl-tc"
+        ,   "file_line": 24
+        ,   "function_name": "new"
+        }
+      , {   "file_name": "/sbin/oo-admin-ctl-tc"
+        ,   "file_line": 24
+        ,   "special_function": "main"
+        } ]
+}

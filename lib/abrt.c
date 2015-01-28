@@ -30,6 +30,7 @@
 #include "python/stacktrace.h"
 #include "koops/stacktrace.h"
 #include "java/stacktrace.h"
+#include "ruby/stacktrace.h"
 #include "json.h"
 #include "location.h"
 #include <stdio.h>
@@ -567,6 +568,34 @@ sr_abrt_report_from_dir(const char *directory,
         }
     }
 
+    /* Ruby stacktrace. */
+    if (report->report_type == SR_REPORT_RUBY)
+    {
+        char *backtrace_contents = file_contents(directory, "backtrace",
+                                                 error_message);
+        if (!backtrace_contents)
+        {
+            sr_report_free(report);
+            return NULL;
+        }
+
+        /* Parse the Ruby stacktrace. */
+        struct sr_location location;
+        sr_location_init(&location);
+        const char *contents_pointer = backtrace_contents;
+        report->stacktrace = (struct sr_stacktrace *)sr_ruby_stacktrace_parse(
+            &contents_pointer,
+            &location);
+
+        free(backtrace_contents);
+        if (!report->stacktrace)
+        {
+            *error_message = sr_location_to_string(&location);
+            sr_report_free(report);
+            return NULL;
+        }
+    }
+
     return report;
 }
 
@@ -581,6 +610,8 @@ sr_abrt_type_from_analyzer(const char *analyzer)
         return SR_REPORT_KERNELOOPS;
     else if (0 == strncmp(analyzer, "Java", 4))
         return SR_REPORT_JAVA;
+    else if (0 == strncmp(analyzer, "Ruby", 4))
+        return SR_REPORT_RUBY;
 
     return SR_REPORT_INVALID;
 }

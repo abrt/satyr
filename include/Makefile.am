@@ -49,3 +49,8 @@ pythonheadersdir = $(includedir)/satyr/python
 pythonheaders_HEADERS = \
 	python/frame.h \
 	python/stacktrace.h
+
+rubyheadersdir = $(includedir)/satyr/ruby
+rubyheaders_HEADERS = \
+	ruby/frame.h \
+	ruby/stacktrace.h

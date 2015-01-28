@@ -42,6 +42,7 @@ static char *report_types[] =
     [SR_REPORT_KERNELOOPS] = "kerneloops",
     [SR_REPORT_JAVA] = "java",
     [SR_REPORT_GDB] = "gdb",
+    [SR_REPORT_RUBY] = "ruby",
     NULL
 };
 
@@ -189,6 +190,7 @@ sr_report_to_json(struct sr_report *report)
     case SR_REPORT_PYTHON:
     case SR_REPORT_KERNELOOPS:
     case SR_REPORT_JAVA:
+    case SR_REPORT_RUBY:
         report_type = sr_report_type_to_string(report->report_type);
         reason = sr_stacktrace_get_reason(report->stacktrace);
         break;
@@ -383,6 +385,7 @@ sr_report_from_json(struct sr_json_value *root, char **error_message)
         case SR_REPORT_PYTHON:
         case SR_REPORT_KERNELOOPS:
         case SR_REPORT_JAVA:
+        case SR_REPORT_RUBY:
             report->stacktrace = sr_stacktrace_from_json(report->report_type, problem, error_message);
             break;
         default:

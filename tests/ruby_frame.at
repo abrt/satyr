@@ -1,0 +1,285 @@
+# Checking the satyr. -*- Autotest -*-
+
+AT_BANNER([Ruby frames])
+
+AT_TESTFUN([sr_ruby_frame_parse],
+[[
+#include "ruby/frame.h"
+#include "utils.h"
+#include "location.h"
+#include <assert.h>
+
+void
+check(char *input, char *file, unsigned line,
+      char *function, bool special, unsigned block_level, unsigned rescue_level)
+{
+  struct sr_location location;
+  sr_location_init(&location);
+
+  struct sr_ruby_frame *frame;
+  frame = sr_ruby_frame_parse(&input, &location);
+
+  assert(frame);
+  assert(frame->file_name && 0 == strcmp(frame->file_name, file));
+  assert(frame->file_line == line);
+  assert(frame->function_name && 0 == strcmp(frame->function_name, function));
+  assert(!!frame->special_function == !!special);
+  assert(frame->block_level == block_level);
+  assert(frame->rescue_level == rescue_level);
+  assert(*input == '\0');
+
+  sr_ruby_frame_free(frame);
+}
+
+int
+main(void)
+{
+  check("/usr/share/ruby/vendor_ruby/will_crash.rb:13:in `rescue in block (2 levels) in func'",
+        "/usr/share/ruby/vendor_ruby/will_crash.rb", 13, "func", false, 2, 1);
+
+  check("/home/u/work/will:crash/will_crash.rb:30:in `block in <class:WillClass>'",
+        "/home/u/work/will:crash/will_crash.rb", 30, "class:WillClass", true, 1, 0);
+
+  check("./will_ruby_raise:8:in `<main>'",
+        "./will_ruby_raise", 8, "main", true, 0, 0);
+
+  /* try failing */
+  struct sr_location location;
+  sr_location_init(&location);
+  char *input = "i;dikasdfxc";
+
+  struct sr_ruby_frame *frame  = sr_ruby_frame_parse(&input, &location);
+  assert(!frame);
+  assert(location.message);
+
+  return 0;
+}
+]])
+
+AT_TESTFUN([sr_ruby_frame_cmp],
+[[
+#include "ruby/frame.h"
+#include "utils.h"
+#include "location.h"
+#include <assert.h>
+
+int
+main(void)
+{
+  struct sr_location location;
+  char *line = "/usr/share/ruby/vendor_ruby/will_crash.rb:13:in `rescue in block (2 levels) in func'";
+  char *input;
+
+  sr_location_init(&location);
+  input = line;
+  struct sr_ruby_frame *frame1 = sr_ruby_frame_parse(&input, &location);
+  assert(frame1);
+
+  sr_location_init(&location);
+  input = line;
+  struct sr_ruby_frame *frame2 = sr_ruby_frame_parse(&input, &location);
+  assert(frame1);
+
+  assert(0 == sr_ruby_frame_cmp(frame1, frame2));
+  assert(frame1 != frame2);
+
+  frame2->file_line = 9000;
+  assert(0 != sr_ruby_frame_cmp(frame1, frame2));
+
+  sr_ruby_frame_free(frame1);
+  sr_ruby_frame_free(frame2);
+
+  return 0;
+}
+]])
+
+AT_TESTFUN([sr_ruby_frame_dup],
+[[
+#include "ruby/frame.h"
+#include "utils.h"
+#include "location.h"
+#include <assert.h>
+
+int
+main(void)
+{
+  struct sr_location location;
+  char *line = "/usr/share/ruby/vendor_ruby/will_crash.rb:13:in `rescue in block (2 levels) in func'";
+  char *input;
+
+  sr_location_init(&location);
+  input = line;
+  struct sr_ruby_frame *frame1 = sr_ruby_frame_parse(&input, &location);
+  assert(frame1);
+
+  struct sr_ruby_frame *frame2 = sr_ruby_frame_dup(frame1, false);
+
+  assert(0 == sr_ruby_frame_cmp(frame1, frame2));
+  assert(frame1 != frame2);
+  assert(frame1->function_name != frame2->function_name);
+
+  return 0;
+}
+]])
+
+AT_TESTFUN([sr_ruby_frame_append],
+[[
+#include "ruby/frame.h"
+#include "utils.h"
+#include "location.h"
+#include <assert.h>
+
+int
+main(void)
+{
+  struct sr_ruby_frame *frame1 = sr_ruby_frame_new();
+  struct sr_ruby_frame *frame2 = sr_ruby_frame_new();
+
+  assert(frame1->next == frame2->next);
+  assert(frame1->next == NULL);
+
+  sr_ruby_frame_append(frame1, frame2);
+  assert(frame1->next == frame2);
+
+  sr_ruby_frame_free(frame1);
+  sr_ruby_frame_free(frame2);
+
+  return 0;
+}
+]])
+
+AT_TESTFUN([sr_ruby_frame_to_json],
+[[
+#include "ruby/frame.h"
+#include "utils.h"
+#include "location.h"
+#include <assert.h>
+
+int
+main(void)
+{
+  struct sr_location location;
+  char *line = "/usr/share/ruby/vendor_ruby/will_crash.rb:13:in `rescue in block (2 levels) in func'";
+  char *input;
+
+  sr_location_init(&location);
+  input = line;
+  struct sr_ruby_frame *frame1 = sr_ruby_frame_parse(&input, &location);
+  assert(frame1);
+
+  char *expected = "{   \"file_name\": \"/usr/share/ruby/vendor_ruby/will_crash.rb\"\n"
+                   ",   \"file_line\": 13\n"
+                   ",   \"function_name\": \"func\"\n"
+                   ",   \"block_level\": 2\n"
+                   ",   \"rescue_level\": 1\n"
+                   "}";
+
+  char *json = sr_ruby_frame_to_json(frame1);
+  assert(0 == strcmp(json, expected));
+
+  return 0;
+}
+]])
+
+AT_TESTFUN([sr_ruby_frame_from_json],
+[[
+#include "ruby/frame.h"
+#include "utils.h"
+#include "json.h"
+#include "location.h"
+#include <assert.h>
+
+void
+check(char *input)
+{
+  struct sr_location location;
+  sr_location_init(&location);
+
+  struct sr_ruby_frame *frame1 = sr_ruby_frame_parse(&input, &location);
+  assert(frame1);
+
+  char *json = sr_ruby_frame_to_json(frame1);
+  char *error = NULL;
+
+  struct sr_json_value *root = sr_json_parse(json, &error);
+  assert(root);
+  struct sr_ruby_frame *frame2 = sr_ruby_frame_from_json(root, &error);
+  assert(frame2);
+  assert(0 == sr_ruby_frame_cmp(frame1, frame2));
+
+  return 0;
+}
+
+int
+main(void)
+{
+  check("/usr/share/ruby/vendor_ruby/will_crash.rb:13:in `rescue in block (2 levels) in func'");
+  check("/usr/share/ruby/vendor:ruby/will_crash.rb:13:in `block (22 levels) in <func>'");
+
+  return 0;
+}
+]])
+
+AT_TESTFUN([sr_ruby_frame_append_to_str],
+[[
+#include "ruby/frame.h"
+#include "utils.h"
+#include "location.h"
+#include "strbuf.h"
+#include <assert.h>
+
+int
+main(void)
+{
+  struct sr_location location;
+  char *line = "/usr/share/ruby/vendor_ruby/will_crash.rb:13:in `rescue in block (2 levels) in func'";
+  char *input;
+
+  sr_location_init(&location);
+  input = line;
+  struct sr_ruby_frame *frame1 = sr_ruby_frame_parse(&input, &location);
+  assert(frame1);
+
+  struct sr_strbuf *strbuf = sr_strbuf_new();
+  sr_ruby_frame_append_to_str(frame1, strbuf);
+  char *result = sr_strbuf_free_nobuf(strbuf);
+
+  assert(0 == strcmp(result, "rescue in block (2 levels) in func in /usr/share/ruby/vendor_ruby/will_crash.rb:13"));
+
+  return 0;
+}
+]])
+
+AT_TESTFUN([sr_ruby_frame_generic_functions],
+[[
+#include "ruby/frame.h"
+#include "frame.h"
+#include "utils.h"
+#include "location.h"
+#include "strbuf.h"
+#include <assert.h>
+
+int
+main(void)
+{
+  struct sr_location location;
+  char *line = "/usr/share/ruby/vendor_ruby/will_crash.rb:13:in `rescue in block (2 levels) in func'";
+  char *input;
+
+  sr_location_init(&location);
+  input = line;
+  struct sr_ruby_frame *frame1 = sr_ruby_frame_parse(&input, &location);
+  assert(frame1);
+
+  assert(sr_frame_next(frame1) == NULL);
+
+  struct sr_strbuf *strbuf = sr_strbuf_new();
+  sr_frame_append_to_str((struct sr_frame*)frame1, strbuf);
+  char *result = sr_strbuf_free_nobuf(strbuf);
+
+  assert(0 == strcmp(result, "rescue in block (2 levels) in func in /usr/share/ruby/vendor_ruby/will_crash.rb:13"));
+
+  sr_frame_free((struct sr_frame*)frame1);
+  return 0;
+}
+]])

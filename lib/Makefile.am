@@ -57,6 +57,8 @@ libsatyr_conv_la_SOURCES = \
 	python_stacktrace.c \
 	report.c \
 	rpm.c \
+	ruby_frame.c \
+	ruby_stacktrace.c \
 	sha1.c \
 	strbuf.c \
 	unstrip.c \
