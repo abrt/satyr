@@ -131,6 +131,7 @@ static struct thread_methods* dtable[SR_REPORT_NUM] =
     [SR_REPORT_KERNELOOPS] = &koops_thread_methods,
     [SR_REPORT_JAVA] = &java_thread_methods,
     [SR_REPORT_GDB] = &gdb_thread_methods,
+    [SR_REPORT_RUBY] = &ruby_thread_methods,
 };
 
 struct sr_frame *

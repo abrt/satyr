@@ -1,0 +1,387 @@
+/*
+    ruby_stacktrace.c
+
+    Copyright (C) 2015  Red Hat, Inc.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+#include "ruby/stacktrace.h"
+#include "ruby/frame.h"
+#include "location.h"
+#include "utils.h"
+#include "json.h"
+#include "sha1.h"
+#include "report_type.h"
+#include "strbuf.h"
+#include "generic_stacktrace.h"
+#include "generic_thread.h"
+#include "internal_utils.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <inttypes.h>
+
+/* Method tables */
+
+static void
+ruby_append_bthash_text(struct sr_ruby_stacktrace *stacktrace, enum sr_bthash_flags flags,
+                          struct sr_strbuf *strbuf);
+
+DEFINE_FRAMES_FUNC(ruby_frames, struct sr_ruby_stacktrace)
+DEFINE_SET_FRAMES_FUNC(ruby_set_frames, struct sr_ruby_stacktrace)
+DEFINE_PARSE_WRAPPER_FUNC(ruby_parse, SR_REPORT_RUBY)
+
+struct thread_methods ruby_thread_methods =
+{
+    .frames = (frames_fn_t) ruby_frames,
+    .set_frames = (set_frames_fn_t) ruby_set_frames,
+    .cmp = (thread_cmp_fn_t) NULL,
+    .frame_count = (frame_count_fn_t) thread_frame_count,
+    .next = (next_thread_fn_t) thread_no_next_thread,
+    .set_next = (set_next_thread_fn_t) NULL,
+    .thread_append_bthash_text =
+        (thread_append_bthash_text_fn_t) thread_no_bthash_text,
+    .thread_free = (thread_free_fn_t) sr_ruby_stacktrace_free,
+    .remove_frame = (remove_frame_fn_t) thread_remove_frame,
+    .remove_frames_above =
+        (remove_frames_above_fn_t) thread_remove_frames_above,
+    .thread_dup = (thread_dup_fn_t) sr_ruby_stacktrace_dup,
+    .normalize = (normalize_fn_t) thread_no_normalization,
+};
+
+struct stacktrace_methods ruby_stacktrace_methods =
+{
+    .parse = (parse_fn_t) ruby_parse,
+    .parse_location = (parse_location_fn_t) sr_ruby_stacktrace_parse,
+    .to_short_text = (to_short_text_fn_t) stacktrace_to_short_text,
+    .to_json = (to_json_fn_t) sr_ruby_stacktrace_to_json,
+    .from_json = (from_json_fn_t) sr_ruby_stacktrace_from_json,
+    .get_reason = (get_reason_fn_t) sr_ruby_stacktrace_get_reason,
+    .find_crash_thread = (find_crash_thread_fn_t) stacktrace_one_thread_only,
+    .threads = (threads_fn_t) stacktrace_one_thread_only,
+    .set_threads = (set_threads_fn_t) NULL,
+    .stacktrace_free = (stacktrace_free_fn_t) sr_ruby_stacktrace_free,
+    .stacktrace_append_bthash_text =
+        (stacktrace_append_bthash_text_fn_t) ruby_append_bthash_text,
+};
+
+/* Public functions */
+
+struct sr_ruby_stacktrace *
+sr_ruby_stacktrace_new()
+{
+    struct sr_ruby_stacktrace *stacktrace =
+        sr_malloc(sizeof(struct sr_ruby_stacktrace));
+
+    sr_ruby_stacktrace_init(stacktrace);
+    return stacktrace;
+}
+
+void
+sr_ruby_stacktrace_init(struct sr_ruby_stacktrace *stacktrace)
+{
+    memset(stacktrace, 0, sizeof(struct sr_ruby_stacktrace));
+    stacktrace->type = SR_REPORT_RUBY;
+}
+
+void
+sr_ruby_stacktrace_free(struct sr_ruby_stacktrace *stacktrace)
+{
+    if (!stacktrace)
+        return;
+
+    while (stacktrace->frames)
+    {
+        struct sr_ruby_frame *frame = stacktrace->frames;
+        stacktrace->frames = frame->next;
+        sr_ruby_frame_free(frame);
+    }
+
+    free(stacktrace->exception_name);
+    free(stacktrace);
+}
+
+struct sr_ruby_stacktrace *
+sr_ruby_stacktrace_dup(struct sr_ruby_stacktrace *stacktrace)
+{
+    struct sr_ruby_stacktrace *result = sr_ruby_stacktrace_new();
+    memcpy(result, stacktrace, sizeof(struct sr_ruby_stacktrace));
+
+    if (result->exception_name)
+        result->exception_name = sr_strdup(result->exception_name);
+
+    if (result->frames)
+        result->frames = sr_ruby_frame_dup(result->frames, true);
+
+    return result;
+}
+
+struct sr_ruby_stacktrace *
+sr_ruby_stacktrace_parse(const char **input,
+                         struct sr_location *location)
+{
+    const char *local_input = *input;
+    struct sr_ruby_stacktrace *stacktrace = sr_ruby_stacktrace_new();
+    char *message_and_class = NULL;
+
+    /* /some/thing.rb:13:in `method': exception message (Exception::Class)\n\tfrom ...
+     * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     */
+    stacktrace->frames = sr_ruby_frame_parse(&local_input, location);
+    if (!stacktrace->frames)
+    {
+        location->message = sr_asprintf("Topmost stacktrace frame not found: %s",
+                            location->message ? location->message : "(unknown reason)");
+        goto fail;
+    }
+
+    /* /some/thing.rb:13:in `method': exception message (Exception::Class)\n\tfrom ...
+     *                              ^^
+     */
+    if (!sr_skip_string(&local_input, ": "))
+    {
+        location->message = sr_strdup("Unable to find the colon after first function name.");
+        goto fail;
+    }
+    location->column += strlen(": ");
+
+    /* /some/thing.rb:13:in `method': exception message (Exception::Class)\n\tfrom ...
+     *                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     */
+    if (!sr_parse_char_cspan(&local_input, "\t", &message_and_class))
+    {
+        location->message = sr_strdup("Unable to find the exception type and message.");
+        goto fail;
+    }
+
+    /* /some/thing.rb:13:in `method': exception message (Exception::Class)\n\tfrom ...
+     *                                                                    ^^
+     */
+    size_t l = strlen(message_and_class);
+    location->column += l;
+
+    char *p = message_and_class + l - 1;
+    if (p < message_and_class || *p != '\n')
+    {
+        location->column--;
+        location->message = sr_strdup("Unable to find the new line character after "
+                                      "the end of exception class");
+        goto fail;
+    }
+
+    /* /some/thing.rb:13:in `method': exception message (Exception::Class)\n\tfrom ...
+     *                                                                   ^
+     */
+    p--;
+    if (p < message_and_class || *p != ')')
+    {
+        location->column -= 2;
+        location->message = sr_strdup("Unable to find the ')' character identifying "
+                                      "the end of exception class");
+        goto fail;
+    }
+
+    /* /some/thing.rb:13:in `method': exception message (Exception::Class)\n\tfrom ...
+     *                                                   ^^^^^^^^^^^^^^^^
+     */
+    *p = '\0';
+    do {
+        p--;
+    } while (p >= message_and_class && *p != '(');
+    p++;
+
+    if (strlen(p) <= 0)
+    {
+        location->message = sr_strdup("Unable to find the '(' character identifying "
+                                      "the beginning of the exception class");
+        goto fail;
+    }
+    stacktrace->exception_name = sr_strdup(p);
+
+    /* /some/thing.rb:13:in `method': exception message (Exception::Class)\n\tfrom ...
+     *                                                  ^
+     */
+    p--;
+    if (p < message_and_class || *p != '(')
+    {
+        location->message = sr_strdup("Unable to find the '(' character identifying "
+                                      "the beginning of the exception class");
+        goto fail;
+    }
+
+    /* Throw away the message, it may contain sensitive data. */
+    free(message_and_class);
+    message_and_class = p = NULL;
+
+    /* /some/thing.rb:13:in `method': exception message (Exception::Class)\n\tfrom ...
+     *                                   we're here now, increment the line ^^
+     */
+    location->column = 0;
+    location->line++;
+
+    struct sr_ruby_frame *last_frame = stacktrace->frames;
+    while (*local_input)
+    {
+        /* The exception message can continue on the lines after the topmost frame
+         * - skip those.
+         */
+        int skipped = sr_skip_string(&local_input, "\tfrom ");
+        if (!skipped)
+        {
+            location->message = sr_strdup("Frame header not found.");
+            goto fail;
+        }
+        location->column += skipped;
+
+        last_frame->next = sr_ruby_frame_parse(&local_input, location);
+        if (!last_frame->next)
+        {
+            /* location->message is already set */
+            goto fail;
+        }
+
+        /* Eat newline (except at the end of file). */
+        if (!sr_skip_char(&local_input, '\n') && *local_input != '\0')
+        {
+            location->message = sr_strdup("Expected newline after stacktrace frame.");
+            goto fail;
+        }
+        location->column = 0;
+        location->line++;
+        last_frame = last_frame->next;
+    }
+
+    *input = local_input;
+    return stacktrace;
+
+fail:
+    sr_ruby_stacktrace_free(stacktrace);
+    free(message_and_class);
+    return NULL;
+}
+
+char *
+sr_ruby_stacktrace_to_json(struct sr_ruby_stacktrace *stacktrace)
+{
+    struct sr_strbuf *strbuf = sr_strbuf_new();
+
+    /* Exception class name. */
+    if (stacktrace->exception_name)
+    {
+        sr_strbuf_append_str(strbuf, ",   \"exception_name\": ");
+        sr_json_append_escaped(strbuf, stacktrace->exception_name);
+        sr_strbuf_append_str(strbuf, "\n");
+    }
+
+    /* Frames. */
+    if (stacktrace->frames)
+    {
+        struct sr_ruby_frame *frame = stacktrace->frames;
+        sr_strbuf_append_str(strbuf, ",   \"stacktrace\":\n");
+        while (frame)
+        {
+            if (frame == stacktrace->frames)
+                sr_strbuf_append_str(strbuf, "      [ ");
+            else
+                sr_strbuf_append_str(strbuf, "      , ");
+
+            char *frame_json = sr_ruby_frame_to_json(frame);
+            char *indented_frame_json = sr_indent_except_first_line(frame_json, 8);
+            sr_strbuf_append_str(strbuf, indented_frame_json);
+            free(indented_frame_json);
+            free(frame_json);
+            frame = frame->next;
+            if (frame)
+                sr_strbuf_append_str(strbuf, "\n");
+        }
+
+        sr_strbuf_append_str(strbuf, " ]\n");
+    }
+
+    if (strbuf->len > 0)
+        strbuf->buf[0] = '{';
+    else
+        sr_strbuf_append_char(strbuf, '{');
+
+    sr_strbuf_append_char(strbuf, '}');
+    return sr_strbuf_free_nobuf(strbuf);
+}
+
+struct sr_ruby_stacktrace *
+sr_ruby_stacktrace_from_json(struct sr_json_value *root, char **error_message)
+{
+    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "stacktrace"))
+        return NULL;
+
+    struct sr_ruby_stacktrace *result = sr_ruby_stacktrace_new();
+
+    /* Exception name. */
+    if (!JSON_READ_STRING(root, "exception_name", &result->exception_name))
+        goto fail;
+
+    /* Frames. */
+    struct sr_json_value *stacktrace = json_element(root, "stacktrace");
+    if (stacktrace)
+    {
+        if (!JSON_CHECK_TYPE(stacktrace, SR_JSON_ARRAY, "stacktrace"))
+            goto fail;
+
+        struct sr_json_value *frame_json;
+        FOR_JSON_ARRAY(stacktrace, frame_json)
+        {
+            struct sr_ruby_frame *frame = sr_ruby_frame_from_json(frame_json,
+                error_message);
+
+            if (!frame)
+                goto fail;
+
+            result->frames = sr_ruby_frame_append(result->frames, frame);
+        }
+    }
+
+    return result;
+
+fail:
+    sr_ruby_stacktrace_free(result);
+    return NULL;
+}
+
+char *
+sr_ruby_stacktrace_get_reason(struct sr_ruby_stacktrace *stacktrace)
+{
+    char *exc = "Unknown error";
+    char *file = "<unknown>";
+    uint32_t line = 0;
+
+    struct sr_ruby_frame *frame = stacktrace->frames;
+    if (frame)
+    {
+        file = frame->file_name;
+        line = frame->file_line;
+    }
+
+    if (stacktrace->exception_name)
+        exc = stacktrace->exception_name;
+
+    return sr_asprintf("%s in %s:%"PRIu32, exc, file, line);
+}
+
+static void
+ruby_append_bthash_text(struct sr_ruby_stacktrace *stacktrace, enum sr_bthash_flags flags,
+                        struct sr_strbuf *strbuf)
+{
+    sr_strbuf_append_strf(strbuf, "Exception: %s\n", OR_UNKNOWN(stacktrace->exception_name));
+    sr_strbuf_append_char(strbuf, '\n');
+}

@@ -55,7 +55,8 @@ struct stacktrace_methods
 };
 
 extern struct stacktrace_methods core_stacktrace_methods, python_stacktrace_methods,
-       koops_stacktrace_methods, gdb_stacktrace_methods, java_stacktrace_methods;
+       koops_stacktrace_methods, gdb_stacktrace_methods, java_stacktrace_methods,
+       ruby_stacktrace_methods;
 
 /* Macros to generate accessors for the "threads" member. */
 #define DEFINE_THREADS_FUNC(name, concrete_t) \

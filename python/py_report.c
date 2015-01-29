@@ -28,6 +28,7 @@
 #include "py_python_stacktrace.h"
 #include "py_koops_stacktrace.h"
 #include "py_java_stacktrace.h"
+#include "py_ruby_stacktrace.h"
 
 #include "report.h"
 #include "operating_system.h"
@@ -284,6 +285,10 @@ report_prepare_subobjects(struct sr_py_report *report)
             if (stacktrace_prepare(report, &sr_py_koops_stacktrace_type, false) < 0)
                 return -1;
             break;
+        case SR_REPORT_RUBY:
+            if (stacktrace_prepare(report, &sr_py_ruby_stacktrace_type, false) < 0)
+                return -1;
+            break;
         default:
             report->report->stacktrace = NULL;
             break;
@@ -346,6 +351,10 @@ report_to_python_obj(struct sr_report *report)
         case SR_REPORT_KERNELOOPS:
             ro->stacktrace = koops_stacktrace_to_python_obj(
                     (struct sr_koops_stacktrace *)report->stacktrace);
+            break;
+        case SR_REPORT_RUBY:
+            ro->stacktrace = ruby_stacktrace_to_python_obj(
+                    (struct sr_ruby_stacktrace *)report->stacktrace);
             break;
         default:
             Py_INCREF(Py_None);
