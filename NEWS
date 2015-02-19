@@ -1,3 +1,8 @@
+satyr 0.16
+==========
+Added support for unwinding stack of dying process from core dump hook. Added
+support for Ruby uReports. Various bugfixes.
+
 satyr 0.15
 ==========
 Fixed issues found in a security audit. Fixed the compat version of duphash

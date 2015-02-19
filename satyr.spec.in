@@ -107,6 +107,12 @@ make check
 %endif
 
 %changelog
+* Thu Feb 19 2015 Martin Milata <mmilata@redhat.com> 0.16-1
+- New upstream version
+  - Add support for unwinding from core dump hook
+  - Add support for Ruby uReports
+  - Bugfixes
+
 * Tue Oct 07 2014 Jakub Filak <jfilak@redhat.com> 0.15-1
 - New upstream version
   - uReport enhancements (DESKTOP_SESSION, auth_data, missing values)
