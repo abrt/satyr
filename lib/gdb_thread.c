@@ -290,7 +290,7 @@ sr_gdb_thread_append_to_str(struct sr_gdb_thread *thread,
             (struct sr_thread*) thread);
     if (verbose)
     {
-        sr_strbuf_append_strf(dest, "Thread no. %d (%d frames)\n",
+        sr_strbuf_append_strf(dest, "Thread no. %u (%d frames)\n",
                               thread->number,
                               frame_count);
     }
