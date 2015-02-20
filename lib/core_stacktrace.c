@@ -231,8 +231,8 @@ sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
 {
     struct sr_strbuf *strbuf = sr_strbuf_new();
     sr_strbuf_append_strf(strbuf,
-                          "{   \"signal\": %"PRIu8"\n",
-                          stacktrace->signal);
+                          "{   \"signal\": %"PRIu16"\n",
+                          (unsigned)stacktrace->signal);
 
     if (stacktrace->executable)
     {
@@ -354,7 +354,7 @@ sr_core_stacktrace_get_reason(struct sr_core_stacktrace *stacktrace)
 {
     char *prog = stacktrace->executable ? stacktrace->executable : "<unknown>";
 
-    return sr_asprintf("Program %s was terminated by signal %"PRIu16, prog, stacktrace->signal);
+    return sr_asprintf("Program %s was terminated by signal %"PRIu16, prog, (unsigned)stacktrace->signal);
 }
 
 static void
@@ -362,6 +362,6 @@ core_append_bthash_text(struct sr_core_stacktrace *stacktrace, enum sr_bthash_fl
                         struct sr_strbuf *strbuf)
 {
     sr_strbuf_append_strf(strbuf, "Executable: %s\n", OR_UNKNOWN(stacktrace->executable));
-    sr_strbuf_append_strf(strbuf, "Signal: %"PRIu16"\n", stacktrace->signal);
+    sr_strbuf_append_strf(strbuf, "Signal: %"PRIu16"\n", (unsigned)stacktrace->signal);
     sr_strbuf_append_char(strbuf, '\n');
 }

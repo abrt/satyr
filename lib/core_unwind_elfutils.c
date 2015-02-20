@@ -276,14 +276,14 @@ sr_core_stacktrace_from_core_hook(pid_t tid,
 
     if (!WIFSTOPPED(status))
     {
-        set_error("waitpid returned 0x%x but WIFSTOPPED was expected", status);
+        set_error("waitpid returned 0x%x but WIFSTOPPED was expected", (unsigned)status);
         goto fail;
     }
 
     if ((status >> 8) != (SIGTRAP | (PTRACE_EVENT_EXIT << 8)))
     {
         set_error("waitpid returned 0x%x but (status >> 8) == "
-                  "(SIGTRAP | (PTRACE_EVENT_EXIT << 8)) was expected", status);
+                  "(SIGTRAP | (PTRACE_EVENT_EXIT << 8)) was expected", (unsigned)status);
         goto fail;
     }
 

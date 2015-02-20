@@ -269,7 +269,7 @@ sr_gdb_frame_append_to_str(struct sr_gdb_frame *frame,
                             bool verbose)
 {
     if (verbose)
-        sr_strbuf_append_strf(str, " #%d", frame->number);
+        sr_strbuf_append_strf(str, " #%u", frame->number);
     else
         sr_strbuf_append_str(str, " ");
 
@@ -283,7 +283,7 @@ sr_gdb_frame_append_to_str(struct sr_gdb_frame *frame,
             sr_strbuf_append_str(str, " at");
         sr_strbuf_append_strf(str, " %s", frame->source_file);
         if (frame->source_line != -1)
-            sr_strbuf_append_strf(str, ":%d", frame->source_line);
+            sr_strbuf_append_strf(str, ":%u", frame->source_line);
     }
 
     if (frame->signal_handler_called)

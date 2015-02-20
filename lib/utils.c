@@ -302,7 +302,7 @@ sr_file_to_string(const char *filename,
     static const size_t FILE_SIZE_LIMIT = 20000000; /* ~ 20 MB */
     if (size > FILE_SIZE_LIMIT)
     {
-        *error_message = sr_asprintf("Input file too big (%lld). Maximum size is %zd.",
+        *error_message = sr_asprintf("Input file too big (%lld). Maximum size is %zu.",
                                      (long long)size,
                                      FILE_SIZE_LIMIT);
 

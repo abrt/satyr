@@ -474,7 +474,7 @@ sr_ruby_frame_append_to_str(struct sr_ruby_frame *frame,
 
         if (frame->file_line)
         {
-            sr_strbuf_append_strf(dest, ":%d", frame->file_line);
+            sr_strbuf_append_strf(dest, ":%u", frame->file_line);
         }
     }
 }
