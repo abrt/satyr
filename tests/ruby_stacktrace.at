@@ -261,6 +261,7 @@ main(void)
 
 AT_TESTFUN([sr_ruby_stacktrace_from_json],
 [[
+#include "stacktrace.h"
 #include "ruby/stacktrace.h"
 #include "ruby/frame.h"
 #include "utils.h"
@@ -268,13 +269,14 @@ AT_TESTFUN([sr_ruby_stacktrace_from_json],
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 void
 check(char *filename)
 {
   char *error_message = NULL;
-  const char *file_contents = sr_file_to_string(filename, &error_message);
-  const char *input = file_contents;
+  char *file_contents = sr_file_to_string(filename, &error_message);
+  char *input = file_contents;
   struct sr_location location;
   sr_location_init(&location);
 
