@@ -226,7 +226,7 @@ find_crash_thread_from_crash_frame(struct sr_gdb_stacktrace *stacktrace,
             sr_glibc_thread_find_exit_frame(thread);
         if (sr_debug_parser)
         {
-            printf(" - thread #%d: same_name %s, abort_satisfied %s\n",
+            printf(" - thread #%"PRIu32": same_name %s, abort_satisfied %s\n",
                    thread->number,
                    same_name ? "true" : "false",
                    abort_requirement_satisfied ? "true" : "false");

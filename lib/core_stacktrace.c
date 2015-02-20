@@ -231,7 +231,7 @@ sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
 {
     struct sr_strbuf *strbuf = sr_strbuf_new();
     sr_strbuf_append_strf(strbuf,
-                          "{   \"signal\": %"PRIu8"\n",
+                          "{   \"signal\": %"PRIu16"\n",
                           stacktrace->signal);
 
     if (stacktrace->executable)

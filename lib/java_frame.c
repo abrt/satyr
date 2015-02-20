@@ -238,7 +238,7 @@ sr_java_frame_append_to_str(struct sr_java_frame *frame,
         /* WHY? Because it was parsed in this form */
         /* Ooops! Maybe the source file was empty string. Don't care! */
         if (frame->file_line)
-            sr_strbuf_append_strf(dest, ":%d", frame->file_line);
+            sr_strbuf_append_strf(dest, ":%"PRIu32, frame->file_line);
 
         sr_strbuf_append_str(dest, ")");
 

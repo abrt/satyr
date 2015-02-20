@@ -392,7 +392,7 @@ sr_disasm_binary_to_text(struct sr_disasm_state *state,
     struct sr_strbuf *strbuf = sr_strbuf_new();
     for (int i = 0; i < size; ++i)
     {
-        sr_strbuf_append_strf(strbuf, "0x%02x ", (unsigned char)code[i]);
+        sr_strbuf_append_strf(strbuf, "0x%02x ", (unsigned)code[i]);
         if ((i + 1) % 12 == 0)
             sr_strbuf_append_char(strbuf, '\n');
     }
