@@ -202,7 +202,7 @@ open_coredump(const char *elf_file, const char *exe_file, char **error_msg)
         goto fail_free;
     }
 
-    ch->eh = elf_begin(ch->fd, ELF_C_READ, NULL);
+    ch->eh = elf_begin(ch->fd, ELF_C_READ_MMAP, NULL);
     if (ch->eh == NULL)
     {
         set_error_elf("elf_begin");
