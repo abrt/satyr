@@ -294,12 +294,12 @@ resolve_frame(Dwfl *dwfl, Dwarf_Addr ip, bool minus_one)
             sr_bin2hex(frame->build_id, (const char *)build_id_bits, ret);
         }
 
-        if (dwfl_module_info(mod, NULL, &start, NULL, NULL, NULL,
-                             &filename, NULL) != NULL)
+        char *modname = dwfl_module_info(mod, NULL, &start, NULL, NULL, NULL,
+                                         &filename, NULL);
+        if (modname)
         {
             frame->build_id_offset = ip - start;
-            if (filename)
-                frame->file_name = sr_strdup(filename);
+            frame->file_name = filename ? sr_strdup(filename) : sr_strdup(modname);
         }
 
         funcname = dwfl_module_addrname(mod, (GElf_Addr)ip_adjusted);
