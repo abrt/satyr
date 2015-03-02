@@ -93,8 +93,7 @@ report_methods[] =
 PyTypeObject
 sr_py_report_type =
 {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "satyr.Report",             /* tp_name */
     sizeof(struct sr_py_report), /* tp_basicsize */
     0,                          /* tp_itemsize */

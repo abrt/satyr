@@ -1,3 +1,4 @@
+#include "py_common.h"
 #include "py_gdb_stacktrace.h"
 #include "py_gdb_thread.h"
 #include "py_gdb_frame.h"
@@ -89,8 +90,7 @@ gdb_stacktrace_members[] =
 };
 
 PyTypeObject sr_py_gdb_stacktrace_type = {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "satyr.GdbStacktrace",           /* tp_name */
     sizeof(struct sr_py_gdb_stacktrace),        /* tp_basicsize */
     0,                              /* tp_itemsize */

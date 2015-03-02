@@ -44,8 +44,7 @@ frame_methods[] =
 PyTypeObject
 sr_py_base_frame_type =
 {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "satyr.BaseFrame",          /* tp_name */
     sizeof(struct sr_py_base_frame),        /* tp_basicsize */
     0,                          /* tp_itemsize */
@@ -110,10 +109,10 @@ sr_py_base_frame_short_string(PyObject *self, PyObject *args)
 static int
 sr_py_base_frame_cmp(struct sr_py_base_frame *self, struct sr_py_base_frame *other)
 {
-    if (self->ob_type != other->ob_type)
+    if (Py_TYPE(self) != Py_TYPE(other))
     {
         /* distinct types must be unequal */
-        return normalize_cmp(self->ob_type - other->ob_type);
+        return normalize_cmp(Py_TYPE(self) - Py_TYPE(other));
     }
 
     return normalize_cmp(sr_frame_cmp(self->frame, other->frame));

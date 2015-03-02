@@ -65,8 +65,7 @@ stacktrace_getset[] =
 };
 
 PyTypeObject sr_py_core_stacktrace_type = {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "satyr.CoreStacktrace",         /* tp_name */
     sizeof(struct sr_py_core_stacktrace), /* tp_basicsize */
     0,                              /* tp_itemsize */

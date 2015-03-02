@@ -40,8 +40,7 @@ distances_methods[] =
 PyTypeObject
 sr_py_distances_type =
 {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "satyr.Distances",       /* tp_name */
     sizeof(struct sr_py_distances),    /* tp_basicsize */
     0,                          /* tp_itemsize */

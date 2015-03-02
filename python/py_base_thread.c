@@ -64,8 +64,7 @@ thread_members[] =
 PyTypeObject
 sr_py_base_thread_type =
 {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "satyr.BaseThread",         /* tp_name */
     sizeof(struct sr_py_base_thread), /* tp_basicsize */
     0,                          /* tp_itemsize */
@@ -190,10 +189,10 @@ frames_to_python_list(struct sr_thread *thread, PyTypeObject *frame_type)
 static int
 sr_py_base_thread_cmp(struct sr_py_base_thread *self, struct sr_py_base_thread *other)
 {
-    if (self->ob_type != other->ob_type)
+    if (Py_TYPE(self) != Py_TYPE(other))
     {
         /* distinct types must be unequal */
-        return normalize_cmp(self->ob_type - other->ob_type);
+        return normalize_cmp(Py_TYPE(self) - Py_TYPE(other));
     }
 
     if (frames_prepare_linked_list(self) < 0
@@ -242,7 +241,7 @@ sr_py_base_thread_distance(PyObject *self, PyObject *args, PyObject *kwds)
     if (frames_prepare_linked_list(t2) < 0)
         return NULL;
 
-    if (self->ob_type != other->ob_type)
+    if (Py_TYPE(self) != Py_TYPE(other))
     {
         PyErr_SetString(PyExc_TypeError, "Both threads must have the same type");
         return NULL;

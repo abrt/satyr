@@ -138,6 +138,15 @@ sr_py_setter_readonly(PyObject *self, PyObject *rhs, void *data);
  */
 int normalize_cmp(int n);
 
+/* Python3 compatibility */
+#if PY_MAJOR_VERSION >= 3
+#define PyString_FromString PyUnicode_FromString
+#define PyString_AsString PyUnicode_AsUTF8
+#define PyInt_FromLong PyLong_FromLong
+#define PyInt_AsLong PyLong_AsLong
+#define PyInt_AsUnsignedLongLongMask PyLong_AsUnsignedLongLongMask
+#endif
+
 #ifdef __cplusplus
 }
 #endif

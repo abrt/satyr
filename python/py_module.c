@@ -1,4 +1,5 @@
 #include <Python.h>
+#include "py_common.h"
 #include "py_cluster.h"
 #include "py_base_frame.h"
 #include "py_base_thread.h"
@@ -31,6 +32,22 @@
 #include "rpm.h"
 #include "utils.h"
 
+#if PY_MAJOR_VERSION >= 3
+  #define MOD_ERROR_VAL NULL
+  #define MOD_SUCCESS_VAL(val) val
+  #define MOD_INIT PyMODINIT_FUNC PyInit__satyr3(void)
+  #define MOD_DEF(ob, name, doc, methods) \
+            static struct PyModuleDef moduledef = { \
+              PyModuleDef_HEAD_INIT, name, doc, -1, methods, }; \
+            ob = PyModule_Create(&moduledef);
+#else
+  #define MOD_ERROR_VAL
+  #define MOD_SUCCESS_VAL(val)
+  #define MOD_INIT void init_satyr(void)
+  #define MOD_DEF(ob, name, doc, methods) \
+            ob = Py_InitModule3(name, methods, doc);
+#endif
+
 /* XXX: if we export more standalone functions, move them to a separate file */
 static PyObject *
 sr_py_demangle_symbol(PyObject *self, PyObject *args)
@@ -62,169 +79,167 @@ module_methods[]=
     { NULL },
 };
 
-#ifndef PyMODINIT_FUNC
-#define PyMODINIT_FUNC void
-#endif
+static char module_doc[] = "Anonymous, machine-friendly problem reports library";
 
-PyMODINIT_FUNC
-init_satyr()
+MOD_INIT
 {
     if (PyType_Ready(&sr_py_base_frame_type) < 0)
     {
         puts("PyType_Ready(&sr_py_base_frame_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_base_thread_type) < 0)
     {
         puts("PyType_Ready(&sr_py_base_thread_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_single_stacktrace_type) < 0)
     {
         puts("PyType_Ready(&sr_py_single_stacktrace_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_multi_stacktrace_type) < 0)
     {
         puts("PyType_Ready(&sr_py_multi_stacktrace_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_gdb_frame_type) < 0)
     {
         puts("PyType_Ready(&sr_py_gdb_frame_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_gdb_thread_type) < 0)
     {
         puts("PyType_Ready(&sr_py_gdb_thread_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_gdb_stacktrace_type) < 0)
     {
         puts("PyType_Ready(&sr_py_gdb_stacktrace_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_distances_type) < 0)
     {
         puts("PyType_Ready(&sr_py_distances_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_dendrogram_type) < 0)
     {
         puts("PyType_Ready(&sr_py_dendrogram_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_gdb_sharedlib_type) < 0)
     {
         puts("PyType_Ready(&sr_py_gdb_sharedlib_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_koops_frame_type) < 0)
     {
         puts("PyType_Ready(&sr_py_koops_frame_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_koops_stacktrace_type) < 0)
     {
         puts("PyType_Ready(&sr_py_koops_stacktrace_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_python_frame_type) < 0)
     {
         puts("PyType_Ready(&sr_py_python_frame_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_python_stacktrace_type) < 0)
     {
         puts("PyType_Ready(&sr_py_python_stacktrace_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_java_frame_type) < 0)
     {
         puts("PyType_Ready(&sr_py_java_frame_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_java_thread_type) < 0)
     {
         puts("PyType_Ready(&sr_py_java_thread_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_java_stacktrace_type) < 0)
     {
         puts("PyType_Ready(&sr_py_java_stacktrace_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_core_frame_type) < 0)
     {
         puts("PyType_Ready(&sr_py_core_frame_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_core_thread_type) < 0)
     {
         puts("PyType_Ready(&sr_py_core_thread_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_core_stacktrace_type) < 0)
     {
         puts("PyType_Ready(&sr_py_core_stacktrace_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_ruby_frame_type) < 0)
     {
         puts("PyType_Ready(&sr_py_ruby_frame_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_ruby_stacktrace_type) < 0)
     {
         puts("PyType_Ready(&sr_py_ruby_stacktrace_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_operating_system_type) < 0)
     {
         puts("PyType_Ready(&sr_py_operating_system_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_report_type) < 0)
     {
         puts("PyType_Ready(&sr_py_report_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     if (PyType_Ready(&sr_py_rpm_package_type) < 0)
     {
         puts("PyType_Ready(&sr_py_rpm_package_type) < 0");
-        return;
+        return MOD_ERROR_VAL;
     }
 
 
-    PyObject *module = Py_InitModule("_satyr", module_methods);
+    PyObject *module;
+    MOD_DEF(module, "_satyr", module_doc, module_methods);
     if (!module)
     {
         puts("module == NULL");
-        return;
+        return MOD_ERROR_VAL;
     }
 
     Py_INCREF(&sr_py_base_frame_type);
@@ -348,4 +363,6 @@ init_satyr()
 
     PyModule_AddIntConstant(module, "ROLE_UNKNOWN", SR_ROLE_UNKNOWN);
     PyModule_AddIntConstant(module, "ROLE_AFFECTED", SR_ROLE_AFFECTED);
+
+    return MOD_SUCCESS_VAL(module);
 }
