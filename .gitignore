@@ -14,6 +14,7 @@ build/*
 /satyr
 /satyr.pc
 /satyr.spec
+/satyr-version
 /aclocal.m4
 /config.log
 /config.status
@@ -45,6 +46,11 @@ build/*
 /lib/config.h.in
 
 /python/*.l[ao]
+/python/doc/conf.py
+/python/doc/_build
+
+/ruby/rubygem-satyr.spec
+/ruby/satyr-*.gem
 
 /tests/Makefile
 /tests/atconfig
@@ -54,3 +60,4 @@ build/*
 /tests/testsuite.log
 /tests/testsuite.dir
 /tests/python/test_helpers.pyc
+/tests/python/__pycache__
