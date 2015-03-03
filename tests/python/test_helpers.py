@@ -1,10 +1,8 @@
 import os
 import unittest
 
-try:
-    import _satyr as satyr
-except ImportError:
-    import satyr
+# should import satyr.py which imports ../../python/.libs/_satyr.so
+import satyr
 
 class BindingsTestCase(unittest.TestCase):
     def assertGetSetCorrect(self, obj, attr, orig_val, new_val):

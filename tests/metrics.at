@@ -43,6 +43,21 @@ is_dist_equal(float x, float y)
   float epsilon = 1e-6;
   return x - epsilon <= y && x + epsilon >= y;
 }
+
+struct sr_gdb_thread *threads[[8]];
+static void
+prepare_threads()
+{
+  threads[[0]] = create_thread(4, "asd", "agd", "das", "??");
+  threads[[1]] = create_thread(3, "asd", "agd", "??");
+  threads[[2]] = create_thread(3, "asd", "agd", "??");
+  threads[[3]] = create_thread(3, "dg", "??", "??");
+
+  threads[[4]] = create_thread(2, "foo", "??");
+  threads[[5]] = create_thread(5, "bbb", "??", "foo", "bar", "baz");
+  threads[[6]] = create_thread(1, "dg");
+  threads[[7]] = create_thread(3, "bar", "das", "baz");
+}
 ])
 
 AT_TESTFUN([metrics_all_one_thread_empty],
@@ -357,11 +372,7 @@ UTILS
 int
 main()
 {
-  struct sr_gdb_thread *threads[[4]];
-  threads[[0]] = create_thread(4, "asd", "agd", "das", "??");
-  threads[[1]] = create_thread(3, "asd", "agd", "??");
-  threads[[2]] = create_thread(3, "asd", "agd", "??");
-  threads[[3]] = create_thread(3, "dg", "??", "??");
+  prepare_threads();
 
   struct sr_distances *distances = sr_threads_compare(threads, 3, 4, SR_DISTANCE_JACCARD);
   assert(is_dist_equal(0.6, sr_distances_get_distance(distances, 0, 1)));
@@ -370,6 +381,123 @@ main()
   assert(is_dist_equal(0.0, sr_distances_get_distance(distances, 1, 2)));
   assert(is_dist_equal(1.0, sr_distances_get_distance(distances, 1, 3)));
   assert(is_dist_equal(1.0, sr_distances_get_distance(distances, 2, 3)));
+
+  return 0;
+}
+])
+
+AT_TESTFUN([distances_part_divide],
+[
+#include <assert.h>
+#include "distance.h"
+#include "utils.h"
+
+void
+test_nparts(int m, int n, int nparts)
+{
+  struct sr_distances_part *parts =
+    sr_distances_part_create(m, n, SR_DISTANCE_LEVENSHTEIN, nparts);
+  struct sr_distances_part *cur;
+  size_t nelems = (m * (m-1))/2 + m*(n-m);
+  size_t expected_parts = (nelems >= nparts ? nparts : nelems);
+  size_t i;
+
+  for (i = 0, cur = parts;
+       i < expected_parts;
+       i++, cur = cur->next)
+  {
+    assert(cur);
+  }
+  assert(cur == NULL);
+}
+
+int
+main()
+{
+  test_nparts(3, 8, 1);
+  test_nparts(3, 8, 2);
+  test_nparts(3, 8, 3);
+  test_nparts(3, 8, 4);
+  test_nparts(3, 8, 5);
+  test_nparts(3, 8, 6);
+  test_nparts(3, 8, 7);
+  test_nparts(3, 8, 8);
+  test_nparts(3, 8, 9);
+  test_nparts(3, 8, 10);
+  test_nparts(3, 8, 11);
+  test_nparts(3, 8, 12);
+  test_nparts(3, 8, 13);
+  test_nparts(3, 8, 18);
+  test_nparts(3, 8, 19);
+  test_nparts(3, 8, 5000);
+  test_nparts(50, 50, 5);
+  test_nparts(50, 50, 10);
+  test_nparts(50, 50, 20);
+  test_nparts(50, 50, 50);
+  test_nparts(1, 50, 50);
+  test_nparts(1, 50, 3000);
+
+  return 0;
+}
+])
+
+AT_TESTFUN([distances_part_conquer],
+[
+#include <assert.h>
+#include "distance.h"
+#include "utils.h"
+
+UTILS
+
+void
+test_and_compare(int m, int n, int nparts)
+{
+  prepare_threads();
+  printf("m = %d, n = %d, nparts = %d\n", m, n, nparts);
+
+  struct sr_distances *reference = sr_threads_compare(threads, m, n, SR_DISTANCE_JACCARD);
+
+  struct sr_distances_part *parts = sr_distances_part_create(m, n, SR_DISTANCE_JACCARD, nparts);
+  struct sr_distances_part *it;
+  for (it = parts; it != NULL; it = it->next)
+  {
+    sr_distances_part_compute(it, threads);
+  }
+  struct sr_distances *distances = sr_distances_part_merge(parts);
+  sr_distances_part_free(parts, true);
+  assert(distances);
+
+  int i,j;
+  for (i = 0; i < m; i++)
+  {
+    for (j = i+1; j < n; j++)
+    {
+      assert(is_dist_equal(sr_distances_get_distance(distances, i, j),
+                           sr_distances_get_distance(reference, i, j)));
+      printf("\t%f", sr_distances_get_distance(distances, i, j));
+    }
+    printf("\n");
+  }
+}
+
+int
+main()
+{
+  test_and_compare(3, 4, 1);
+  test_and_compare(3, 4, 2);
+  test_and_compare(3, 4, 3);
+  test_and_compare(3, 4, 4);
+
+  test_and_compare(2, 5, 1);
+  test_and_compare(2, 5, 2);
+  test_and_compare(2, 5, 3);
+  test_and_compare(2, 5, 4);
+
+  test_and_compare(7, 8, 1);
+  test_and_compare(7, 8, 2);
+  test_and_compare(7, 8, 4);
+  test_and_compare(7, 8, 8);
+  test_and_compare(7, 8, 16);
 
   return 0;
 }

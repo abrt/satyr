@@ -30,6 +30,8 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 struct sr_thread;
 
@@ -174,15 +176,99 @@ sr_distances_set_distance(struct sr_distances *distances,
  * Compare first m threads from the array with other threads.
  * @param n
  * Number of threads in the passed array.
- * @param dist_func
- * Distance function which will be used to compare the threads. It's assumed to
- * be symmetric and return zero distance for equal threads.
+ * @param dist_type
+ * Type of distance to compute.
  * @returns
  * This function never returns NULL.
  */
 struct sr_distances *
 sr_threads_compare(struct sr_thread **threads, int m, int n,
                    enum sr_distance_type dist_type);
+
+/**
+ * @brief A part of a distance matrix to be computed (possibly in different
+ * threads/processes and even different machines provided they have the same
+ * architecture and saytr version) and then merged with other parts into a full
+ * matrix.
+ */
+struct sr_distances_part
+{
+    /* Same as for struct sr_distances. */
+    int m;
+    int n;
+    /* First coordinates of this part. */
+    int m_begin;
+    int n_begin;
+    /* Length of the part. */
+    size_t len;
+    /* Distance type. */
+    enum sr_distance_type dist_type;
+    /* Checksum of the threads used to compute this part to catch situations
+     * when sr_distances_part_compute is called with wrong array of threads. */
+    uint32_t checksum;
+    /* The actual result. */
+    float *distances;
+    /* Make it possible to create lists of sr_distances_part. */
+    struct sr_distances_part *next;
+};
+
+/**
+ * Creates new distance matrix part. You probably don't want to use this
+ * function directly, use sr_distances_part_create instead.
+ */
+struct sr_distances_part *
+sr_distances_part_new(int m, int n, enum sr_distance_type dist_type,
+                      int m_begin, int n_begin, size_t len);
+
+/**
+ * Creates linked list of distance matrix parts suitable for parallel
+ * computation.
+ * @param m
+ * Same as for sr_threads_compare
+ * @param n
+ * Same as for sr_threads_compare
+ * @param dist_type
+ * Same as for sr_threads_compare
+ * @param nparts
+ * Divide the computation into nparts parts. Use something like number of your
+ * CPU cores here.
+ */
+struct sr_distances_part *
+sr_distances_part_create(int m, int n, enum sr_distance_type dist_type,
+                         unsigned nparts);
+
+/**
+ * Perform the distance computation on the matrix part.
+ * @param part
+ * Part of the matrix previously returned by sr_distances_part_create.
+ * @param threads
+ * Array of threads. They are not modified by calling this function.
+ */
+void
+sr_distances_part_compute(struct sr_distances_part *part,
+                          struct sr_thread **threads);
+
+/**
+ * Merge the matrix part into full distance matrix.
+ * @param part
+ * Linked list of matrix part that have been computed using
+ * sr_distances_part_compute.
+ * @returns
+ * The resulting distance matrix, or NULL on failure.
+ */
+struct sr_distances *
+sr_distances_part_merge(struct sr_distances_part *parts);
+
+/**
+ * Free the distance matrix part.
+ * @param part
+ * Will be freed.
+ * @param follow_links
+ * If true, part is treated as a linked list and all the elements are freed.
+ */
+void
+sr_distances_part_free(struct sr_distances_part *part, bool follow_links);
+
 #ifdef __cplusplus
 }
 #endif

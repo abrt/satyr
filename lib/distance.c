@@ -22,6 +22,7 @@
 #include "frame.h"
 #include "normalize.h"
 #include "utils.h"
+#include "sha1.h"
 #include "gdb/thread.h"
 #include "internal_utils.h"
 #include <stdlib.h>
@@ -294,15 +295,21 @@ sr_distance(enum sr_distance_type distance_type,
 }
 
 static int
-get_distance_position(const struct sr_distances *distances, int i, int j)
+get_distance_position_mn(int m, int n, int i, int j)
 {
     /* The array holds only matrix entries (i, j) where i < j,
      * locate the position in the array. */
-    assert(i < j && i >= 0 && i < distances->m && j < distances->n);
+    assert(i < j && i >= 0 && i < m && j < n);
 
-    int h = distances->n, l = distances->n - i;
+    int h = n, l = n - i;
 
     return ((h * h - h) - (l * l - l)) / 2 + j - 1;
+}
+
+static int
+get_distance_position(const struct sr_distances *distances, int i, int j)
+{
+    return get_distance_position_mn(distances->m, distances->n, i, j);
 }
 
 struct sr_distances *
@@ -382,6 +389,49 @@ sr_distances_set_distance(struct sr_distances *distances,
     distances->distances[get_distance_position(distances, i, j)] = d;
 }
 
+static float
+normalize_and_compare(struct sr_thread *t1, struct sr_thread *t2,
+                      enum sr_distance_type dist_type)
+{
+    float dist;
+
+    /* XXX: GDB crashes have a special normalization step for
+     * clustering. If there's something similar for other types, we can
+     * generalize it -- meanwhile there's a separate case for GDB here
+     */
+    if (t1->type == SR_REPORT_GDB)
+    {
+        struct sr_gdb_thread *copy1 = (struct sr_gdb_thread*)t1,
+                             *copy2 = (struct sr_gdb_thread*)t2;
+        int ok = 0, all = 0;
+
+        sr_gdb_thread_quality_counts(copy1, &ok, &all);
+        sr_gdb_thread_quality_counts(copy2, &ok, &all);
+
+        if (ok != all)
+        {
+            /* There are some unknown function names, try to pair them, but
+             * the threads need to be copied first. */
+            copy1 = sr_gdb_thread_dup(copy1, false);
+            copy2 = sr_gdb_thread_dup(copy2, false);
+            sr_normalize_gdb_paired_unknown_function_names(copy1, copy2);
+        }
+
+        dist = sr_distance(dist_type, (struct sr_thread*)copy1,
+                           (struct sr_thread*)copy2);
+
+        if (ok != all)
+        {
+            sr_gdb_thread_free(copy1);
+            sr_gdb_thread_free(copy2);
+        }
+    }
+    else
+        dist = sr_distance(dist_type, t1, t2);
+
+    return dist;
+}
+
 struct sr_distances *
 sr_threads_compare(struct sr_thread **threads,
                    int m,
@@ -390,7 +440,6 @@ sr_threads_compare(struct sr_thread **threads,
 {
     struct sr_distances *distances;
     int i, j;
-    float dist;
 
     distances = sr_distances_new(m, n);
 
@@ -410,43 +459,239 @@ sr_threads_compare(struct sr_thread **threads,
     {
         for (j = i + 1; j < n; j++)
         {
-            /* XXX: GDB crashes have a special normalization step for
-             * clustering. If there's something similar for other types, we can
-             * generalize it -- meanwhile there's a separate case for GDB here
-             */
-            if (type == SR_REPORT_GDB)
-            {
-                struct sr_gdb_thread *thread1 = (struct sr_gdb_thread*)threads[i],
-                                     *thread2 = (struct sr_gdb_thread*)threads[j];
-                int ok = 0, all = 0;
 
-                sr_gdb_thread_quality_counts(thread1, &ok, &all);
-                sr_gdb_thread_quality_counts(thread2, &ok, &all);
-
-                if (ok != all)
-                {
-                    /* There are some unknown function names, try to pair them, but
-                     * the threads need to be copied first. */
-                    thread1 = sr_gdb_thread_dup(thread1, false);
-                    thread2 = sr_gdb_thread_dup(thread2, false);
-                    sr_normalize_gdb_paired_unknown_function_names(thread1, thread2);
-                }
-
-                dist = sr_distance(dist_type, (struct sr_thread*)thread1,
-                                   (struct sr_thread*)thread2);
-
-                if (ok != all)
-                {
-                    sr_gdb_thread_free(thread1);
-                    sr_gdb_thread_free(thread2);
-                }
-            }
-            else
-                dist = sr_distance(dist_type, threads[i], threads[j]);
-
-            distances->distances[get_distance_position(distances, i, j)] = dist;
+            distances->distances[get_distance_position(distances, i, j)]
+                = normalize_and_compare(threads[i], threads[j], dist_type);
         }
     }
 
     return distances;
+}
+
+struct sr_distances_part *
+sr_distances_part_new(int m, int n, enum sr_distance_type dist_type,
+                      int m_begin, int n_begin, size_t len)
+{
+    struct sr_distances_part *part = sr_mallocz(sizeof(*part));
+
+    part->m = m;
+    part->n = n;
+    part->m_begin = m_begin;
+    part->n_begin = n_begin;
+    part->len = len;
+    part->dist_type = dist_type;
+
+    return part;
+}
+
+/*
+ * int main(int argc, char *argv[])
+ * {
+ *     int m = atoi(argv[1]), n = atoi(argv[2]);
+ * 
+ *     printf("j\\i ");
+ *     for (int i = 0; i < m; i++) printf("%3d", i);
+ *     printf("\n");
+ * 
+ *     for (int j = 0; j < n; j++) {
+ *         printf("%2d: ", j);
+ *         for (int i = 0; i < m; i++) {
+ *             if (i < j) printf("%3d", get_distance_position_mn(m, n, i, j));
+ *             else printf("  .");
+ *         }
+ *         printf("\n");
+ *     }
+ * }
+ *
+ * $ ./a.out 3 8
+ * m = 3, n = 8
+ * j\i   0  1  2
+ *  0:   .  .  .
+ *  1:   0  .  .
+ *  2:   1  8  .
+ *  3:   2  9 15
+ *  4:   3 10 16
+ *  5:   4 11 17
+ *  6:   5 12 18
+ *  7:   6 13 19
+ */
+struct sr_distances_part *
+sr_distances_part_create(int m, int n, enum sr_distance_type dist_type,
+                         unsigned nparts)
+{
+    struct sr_distances_part *res = NULL;
+    struct sr_distances_part **tail = &res;
+
+    if (m >= n)
+        m = n - 1;
+
+    assert(m > 0 && n > 1 && m < n);
+
+    int triangle_twice = m * (m-1);
+    assert(triangle_twice % 2 == 0);
+
+    int nelems = triangle_twice / 2 + (m*(n-m));
+
+    int nelems_per_part = nelems / nparts;
+    /* First $leftover parts will be (nelems_per_part+1) long */
+    int leftover = nelems % nparts;
+    if (leftover)
+        nelems_per_part++;
+
+    /* There probably is a formula for this. This code just walks every element
+     * of the matrix instead ... */
+    int m_begin = 0;
+    int n_begin = 1;
+    /* How many items we've enountered that will go into the next part. */
+    int counter = 0;
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = i+1; j < n; j++)
+        {
+            counter++;
+            if (counter > nelems_per_part)
+            {
+                *tail = sr_distances_part_new(m, n, dist_type, m_begin,
+                                              n_begin, nelems_per_part);
+                tail = &((*tail)->next);
+
+                m_begin = i;
+                n_begin = j;
+                counter = 1;
+                if (leftover)
+                {
+                    leftover--;
+                    if (leftover == 0)
+                        nelems_per_part--;
+                }
+            }
+        }
+    }
+
+    assert(counter == nelems_per_part);
+    *tail = sr_distances_part_new(m, n, dist_type, m_begin, n_begin, counter);
+    tail = &((*tail)->next);
+
+    return res;
+}
+
+/* Take the lengths of all threads, compute SHA1 from them, take first four
+ * bytes. */
+static uint32_t
+thread_list_checksum(struct sr_thread **threads, size_t n)
+{
+    struct sr_sha1_state sha1;
+    int frame_count;
+    union
+    {
+        unsigned char hashbuf[SR_SHA1_RESULT_BIN_LEN];
+        uint32_t truncated;
+    } u;
+
+    sr_sha1_begin(&sha1);
+
+    for (size_t i = 0; i < n; i++)
+    {
+        frame_count = sr_thread_frame_count(threads[i]);
+        sr_sha1_hash(&sha1, &frame_count, sizeof(frame_count));
+    }
+
+    sr_sha1_end(&sha1, u.hashbuf);
+    return u.truncated;
+}
+
+void
+sr_distances_part_compute(struct sr_distances_part *part,
+                          struct sr_thread **threads)
+{
+    assert(part);
+
+    int i,j;
+    size_t dist_idx;
+    part->distances = sr_malloc_array(sizeof(float), part->len);
+
+    for (dist_idx = 0, i = part->m_begin, j = part->n_begin;
+         dist_idx < part->len;
+         dist_idx++)
+    {
+        assert(j > i);
+        assert(i < part->m && j < part->n);
+
+        part->distances[dist_idx]
+            = normalize_and_compare(threads[i], threads[j], part->dist_type);
+
+        j++;
+        if (j >= part->n)
+        {
+            i++;
+            j = i+1;
+        }
+    }
+
+    part->checksum = thread_list_checksum(threads, part->n);
+}
+
+struct sr_distances *
+sr_distances_part_merge(struct sr_distances_part *parts)
+{
+    if (!parts)
+        return NULL;
+
+    struct sr_distances *distances = sr_distances_new(parts->m, parts->n);
+
+    for (struct sr_distances_part *it = parts;
+         it != NULL;
+         it = it->next)
+    {
+        if (it->m != parts->m || it->n != parts->n
+            || it->distances == NULL
+            || it->checksum != parts->checksum)
+        {
+            goto error;
+        }
+
+        size_t dist_idx;
+        int i, j;
+
+        for (dist_idx = 0, i = it->m_begin, j = it->n_begin;
+             dist_idx < it->len;
+             dist_idx++)
+        {
+            if (j <= i || i >= it->m || j >= it->n)
+                goto error;
+
+            distances->distances[get_distance_position(distances, i, j)]
+                = it->distances[dist_idx];
+
+            j++;
+            if (j >= it->n)
+            {
+                i++;
+                j = i+1;
+            }
+        }
+
+    }
+
+    return distances;
+error:
+    sr_distances_free(distances);
+    return NULL;
+}
+
+void
+sr_distances_part_free(struct sr_distances_part *part, bool follow_links)
+{
+    if (!part)
+        return;
+
+    struct sr_distances_part *next = part->next;
+
+    if (part->distances)
+        free(part->distances);
+
+    free(part);
+
+    if (follow_links)
+        sr_distances_part_free(next, true);
 }
