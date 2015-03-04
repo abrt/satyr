@@ -294,8 +294,8 @@ resolve_frame(Dwfl *dwfl, Dwarf_Addr ip, bool minus_one)
             sr_bin2hex(frame->build_id, (const char *)build_id_bits, ret);
         }
 
-        char *modname = dwfl_module_info(mod, NULL, &start, NULL, NULL, NULL,
-                                         &filename, NULL);
+        const char *modname = dwfl_module_info(mod, NULL, &start, NULL, NULL, NULL,
+                                               &filename, NULL);
         if (modname)
         {
             frame->build_id_offset = ip - start;
