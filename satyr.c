@@ -210,6 +210,9 @@ debug_normalize(int argc, char **argv)
     struct sr_strbuf *strbuf = sr_strbuf_new();
     sr_gdb_thread_append_to_str(thread, strbuf, false);
     puts(strbuf->buf);
+
+    free(text);
+    sr_strbuf_free(strbuf);
 }
 
 static void

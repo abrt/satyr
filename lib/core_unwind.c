@@ -127,6 +127,7 @@ find_elf_core (Dwfl_Module *mod, void **userdata, const char *modname,
         {
             warn("Unable to open executable '%s': %s", executable_file,
                  elf_errmsg(-1));
+            close(fd);
             return -1;
         }
 
@@ -399,9 +400,10 @@ struct sr_core_stacktrace *
 sr_core_stacktrace_from_gdb(const char *gdb_output, const char *core_file,
                             const char *exe_file, char **error_msg)
 {
+    /* I'm not going to rewrite it now since the function is not being used. */
+    assert(error_msg);
     /* Initialize error_msg to 'no error'. */
-    if (error_msg)
-        *error_msg = NULL;
+    *error_msg = NULL;
 
     struct core_handle *ch = open_coredump(core_file, exe_file, error_msg);
     if (*error_msg)

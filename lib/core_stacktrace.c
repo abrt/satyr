@@ -192,7 +192,10 @@ sr_core_stacktrace_from_json(struct sr_json_value *root,
             if (crash_thread)
             {
                 if (!JSON_CHECK_TYPE(crash_thread, SR_JSON_BOOLEAN, "crash_thread"))
+                {
+                    sr_core_thread_free(thread);
                     goto fail;
+                }
 
                 if (crash_thread->u.boolean)
                     result->crash_thread = thread;
@@ -296,6 +299,7 @@ sr_core_stacktrace_create(const char *gdb_stacktrace_text,
     {
         warn("Unable to parse unstrip output.");
 
+        sr_gdb_stacktrace_free(gdb_stacktrace);
         return NULL;
     }
 
@@ -332,6 +336,8 @@ sr_core_stacktrace_create(const char *gdb_stacktrace_text,
                 core_frame->function_name =
                     sr_strdup(gdb_frame->function_name);
             }
+
+            core_thread->frames = sr_core_frame_append(core_thread->frames, core_frame);
         }
 
         core_stacktrace->threads =
@@ -341,6 +347,8 @@ sr_core_stacktrace_create(const char *gdb_stacktrace_text,
         gdb_thread = gdb_thread->next;
     }
 
+    sr_unstrip_free(unstrip);
+    sr_gdb_stacktrace_free(gdb_stacktrace);
     return core_stacktrace;
 }
 

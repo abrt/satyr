@@ -199,7 +199,9 @@ sr_rpm_package_sort(struct sr_rpm_package *packages)
             array[loop]->next = NULL;
     }
 
-    return array[0];
+    struct sr_rpm_package *result = array[0];
+    free(array);
+    return result;
 }
 
 static struct sr_rpm_package *

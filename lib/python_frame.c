@@ -220,11 +220,10 @@ sr_python_frame_parse(const char **input,
     /* Parse file name */
     if (!sr_parse_char_cspan(&local_input, "\"", &frame->file_name))
     {
-        sr_python_frame_free(frame);
         location->message = sr_asprintf("Unable to find the '\"' character "
                 "identifying the beginning of file name.");
 
-        return NULL;
+        goto fail;
     }
 
     if (strlen(frame->file_name) > 0 &&
@@ -243,7 +242,7 @@ sr_python_frame_parse(const char **input,
     if (0 == sr_skip_string(&local_input, "\", line "))
     {
         location->message = sr_asprintf("Line separator not found.");
-        return NULL;
+        goto fail;
     }
 
     location->column += strlen("\", line ");
@@ -253,7 +252,7 @@ sr_python_frame_parse(const char **input,
     if (0 == length)
     {
         location->message = sr_asprintf("Line number not found.");
-        return NULL;
+        goto fail;
     }
 
     location->column += length;
@@ -263,7 +262,7 @@ sr_python_frame_parse(const char **input,
         if (local_input[0] != '\n')
         {
             location->message = sr_asprintf("Function name separator not found.");
-            return NULL;
+            goto fail;
         }
 
         /* The last frame of SyntaxError stack trace does not have
@@ -280,11 +279,10 @@ sr_python_frame_parse(const char **input,
         /* Parse function name */
         if (!sr_parse_char_cspan(&local_input, "\n", &frame->function_name))
         {
-            sr_python_frame_free(frame);
             location->message = sr_asprintf("Unable to find the newline character "
                     "identifying the end of function name.");
 
-            return NULL;
+            goto fail;
         }
 
         location->column += strlen(frame->function_name);
@@ -301,19 +299,23 @@ sr_python_frame_parse(const char **input,
         }
     }
 
-    sr_skip_char(&local_input, '\n');
-    sr_location_add(location, 1, 0);
+    if (sr_skip_char(&local_input, '\n'))
+        sr_location_add(location, 1, 0);
 
     /* Parse source code line (optional). */
     if (4 == sr_skip_string(&local_input, "    "))
     {
-        sr_parse_char_cspan(&local_input, "\n", &frame->line_contents);
-        sr_skip_char(&local_input, '\n');
-        sr_location_add(location, 1, 0);
+        if (sr_parse_char_cspan(&local_input, "\n", &frame->line_contents)
+                && sr_skip_char(&local_input, '\n'))
+            sr_location_add(location, 1, 0);
     }
 
     *input = local_input;
     return frame;
+
+fail:
+    sr_python_frame_free(frame);
+    return NULL;
 }
 
 char *

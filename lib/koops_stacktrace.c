@@ -506,7 +506,10 @@ taint_flags_to_json(struct sr_koops_stacktrace *stacktrace)
     }
 
     if (strbuf->len == 0)
+    {
+        sr_strbuf_free(strbuf);
         return sr_strdup("[]");
+    }
 
     sr_strbuf_append_char(strbuf, ']');
     char *result = sr_strbuf_free_nobuf(strbuf);
