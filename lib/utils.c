@@ -354,6 +354,7 @@ sr_string_to_file(const char *filename,
                                      filename,
                                      error);
 
+        close(fd);
         return false;
     }
 

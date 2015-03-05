@@ -359,7 +359,10 @@ sr_java_frame_parse_exception(const char **input,
         if (exception->next == NULL)
             exception->next = parsed;
         else
+        {
+            assert(frame);
             frame->next = parsed;
+        }
 
         frame = parsed;
     }

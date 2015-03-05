@@ -362,12 +362,18 @@ desktop_from_dir(const char *directory,
 
     char *desktop = strstr(environ_contents, "DESKTOP_SESSION=");
     if (!desktop)
+    {
+        free(environ_contents);
         return NULL;
+    }
 
     /* avoid prefixes - DESKTOP_SESSION= must either be
        the very first variable or preceeded by a newline */
     if (desktop != environ_contents && *(desktop - 1) != '\n')
+    {
+        free(environ_contents);
         return NULL;
+    }
 
     desktop += strlen("DESKTOP_SESSION=");
     char *newline = strchrnul(desktop, '\n');
