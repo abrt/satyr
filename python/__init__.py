@@ -1,2 +1,8 @@
 """satyr - python bindings for satyr library"""
-from _satyr import *
+
+import sys
+
+if sys.version_info[0] == 2:
+    from ._satyr import *
+else:
+    from ._satyr3 import *

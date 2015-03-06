@@ -18,6 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "py_common.h"
 #include "py_base_thread.h"
 #include "py_base_stacktrace.h"
 
@@ -60,8 +61,7 @@ single_getset[] =
 };
 
 PyTypeObject sr_py_single_stacktrace_type = {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "satyr.SingleThreadStacktrace", /* tp_name */
     sizeof(struct sr_py_base_thread), /* tp_basicsize */
     0,                              /* tp_itemsize */
@@ -132,8 +132,7 @@ multi_getset[] =
 };
 
 PyTypeObject sr_py_multi_stacktrace_type = {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "satyr.MultiThreadStacktrace",  /* tp_name */
     sizeof(struct sr_py_multi_stacktrace), /* tp_basicsize */
     0,                              /* tp_itemsize */

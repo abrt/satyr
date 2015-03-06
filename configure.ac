@@ -54,6 +54,51 @@ AC_ARG_ENABLE([static-python-module],
               [enable_static_python_module=no])
 AM_CONDITIONAL(ENABLE_STATIC_PYTHON_MODULE, [test $enable_static_python_module = yes])
 
+AC_ARG_WITH([python3],
+            [AS_HELP_STRING([--without-python3],
+                            [Build without python3 support.])],
+            [with_python3=$withval],
+            [with_python3=yes])
+AM_CONDITIONAL(WITH_PYTHON3, [test $with_python3 = yes])
+[if test "$with_python3" = "yes"]
+[then]
+    AC_PATH_PROG([PYTHON3], [python3], [no])
+    [if test "$PYTHON3" == "no"]
+    [then]
+        [echo "The python3 program was not found in the search path. Please ensure"]
+        [echo "that it is installed and its directory is included in the search path or"]
+        [echo "pass --without-python3 to ./configure."]
+        [echo "Then run configure again before attempting to build satyr."]
+        [exit 1]
+    [fi]
+
+    AC_PATH_PROG([PYTHON3_CONFIG], [python3-config], [no])
+    [if test "$PYTHON3_CONFIG" = "no"]
+    [then]
+        [echo "The python3-config program was not found in the search path. Please ensure"]
+        [echo "that it is installed and its directory is included in the search path or"]
+        [echo "pass --without-python3 to ./configure."]
+        [echo "Then run configure again before attempting to build satyr."]
+        [exit 1]
+    [fi]
+
+    PYTHON3_CFLAGS=`python3-config --cflags 2> /dev/null`
+    PYTHON3_LIBS=`python3-config --libs 2> /dev/null`
+
+    AC_SUBST([PYTHON3_PREFIX], ['${prefix}'])
+    AC_SUBST([PYTHON3_EXEC_PREFIX], ['${exec_prefix}'])
+
+    PYTHON3_DIR=`$PYTHON3 -c "import distutils.sysconfig; \
+        print(distutils.sysconfig.get_python_lib(0,0,prefix='$PYTHON3_PREFIX'))"`
+    PYTHON3_EXECDIR=`$PYTHON3 -c "import distutils.sysconfig; \
+        print(distutils.sysconfig.get_python_lib(1,0,prefix='$PYTHON3_EXEC_PREFIX'))"`
+
+    AC_SUBST(PYTHON3_CFLAGS)
+    AC_SUBST(PYTHON3_LIBS)
+    AC_SUBST(python3dir, $PYTHON3_DIR)
+    AC_SUBST(py3execdir, $PYTHON3_EXECDIR)
+[fi]
+
 AC_CHECK_LIB([opcodes], [main], [have_libopcodes=yes], [have_libopcodes=no])
 [if test "$have_libopcodes" = "no" -a "$target_cpu" = "x86_64"; then]
     [echo "The libopcodes library was not found in the search path. The core stacktrace support "]

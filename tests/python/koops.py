@@ -212,7 +212,7 @@ class TestKoopsFrame(BindingsTestCase):
 
     def test_getset(self):
         self.assertGetSetCorrect(self.frame, 'reliable', True, False)
-        self.assertGetSetCorrect(self.frame, 'address', 0xffffffff81057adfL, 60200)
+        self.assertGetSetCorrect(self.frame, 'address', 0xffffffff81057adf, 60200)
         self.assertGetSetCorrect(self.frame, 'function_name', 'warn_slowpath_common', 'fun_ction')
         self.assertGetSetCorrect(self.frame, 'function_offset', 0x7f, 890)
         self.assertGetSetCorrect(self.frame, 'function_length', 0xc0, 234)

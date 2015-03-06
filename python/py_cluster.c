@@ -1,3 +1,4 @@
+#include "py_common.h"
 #include "py_cluster.h"
 #include "py_metrics.h"
 #include "strbuf.h"
@@ -34,8 +35,7 @@ dendrogram_methods[] =
 PyTypeObject
 sr_py_dendrogram_type =
 {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "satyr.Dendrogram",      /* tp_name */
     sizeof(struct sr_py_dendrogram),   /* tp_basicsize */
     0,                          /* tp_itemsize */

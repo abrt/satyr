@@ -141,9 +141,9 @@ class TestGdbFrame(BindingsTestCase):
         self.assertGetSetCorrect(self.frame, 'source_line', 82, 1337)
         self.assertGetSetCorrect(self.frame, 'signal_handler_called', False, True)
         self.assertGetSetCorrect(self.frame, 'address', 0x3ec220e48d, 0x666)
-        self.assertGetSetCorrect(self.frame, 'address', 0x666, 4398046511104L)
+        self.assertGetSetCorrect(self.frame, 'address', 0x666, 4398046511104)
         ## 2^66, this is expected to fail
-        #self.assertGetSetCorrect(self.frame, 'address', 4398046511104L, 73786976294838206464L)
+        #self.assertGetSetCorrect(self.frame, 'address', 4398046511104, 73786976294838206464L)
         self.assertGetSetCorrect(self.frame, 'library_name', None, 'sowhat.so')
 
     def test_hash(self):

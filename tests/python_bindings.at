@@ -1,7 +1,11 @@
 m4_define([AT_TEST_PYTHON],
-[AT_SETUP([python_bindings_for_$1])
-AT_CHECK([PYTHONPATH=../../../python/.libs/ ../../python/$1.py -v], 0, [ignore], [ignore])
-AT_CLEANUP])
+[AT_SETUP([python2_bindings_for_$1])
+AT_CHECK([PYTHONPATH=../../../python/.libs/ python2 ../../python/$1.py -v], 0, [ignore], [ignore])
+AT_CLEANUP
+AT_SETUP([python3_bindings_for_$1])
+AT_CHECK([PYTHONPATH=../../../python/.libs/ python3 ../../python/$1.py -v], 0, [ignore], [ignore])
+AT_CLEANUP
+])
 
 
 AT_BANNER([BINDINGS])

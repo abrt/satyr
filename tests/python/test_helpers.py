@@ -1,8 +1,12 @@
 import os
+import sys
 import unittest
 
 try:
-    import _satyr as satyr
+    if sys.version_info[0] == 2:
+        import _satyr as satyr
+    else:
+        import _satyr3 as satyr
 except ImportError:
     import satyr
 
@@ -26,7 +30,7 @@ def load_input_contents(path):
     if not os.path.isfile(path):
         path = '../' + path
 
-    with file(path) as f:
+    with open(path, 'r') as f:
         return f.read()
 
 def frame_count(trace):

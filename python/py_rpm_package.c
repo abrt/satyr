@@ -62,8 +62,7 @@ rpm_package_getset[] =
 PyTypeObject
 sr_py_rpm_package_type =
 {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "satyr.RpmPackage",         /* tp_name */
     sizeof(struct sr_py_rpm_package), /* tp_basicsize */
     0,                          /* tp_itemsize */

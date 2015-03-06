@@ -1,13 +1,13 @@
 SUBDIRS = . doc
 
-clientexecdir = $(pyexecdir)/satyr
+py2satyrdir = $(pyexecdir)/satyr
 
-clientexec_PYTHON = \
+py2satyr_PYTHON = \
     __init__.py
 
-clientexec_LTLIBRARIES = _satyr.la
+py2satyr_LTLIBRARIES = _satyr.la
 
-_satyr_la_SOURCES = \
+PYEXTFILES = \
     py_cluster.h \
     py_cluster.c \
     py_base_frame.h \
@@ -60,25 +60,56 @@ _satyr_la_SOURCES = \
     py_common.c \
     py_module.c
 
-_satyr_la_CPPFLAGS = \
-    -DLOCALSTATEDIR='"$(localstatedir)"' \
+PYEXTCPPFLAGS = \
     -I../include \
     -I../lib \
-    $(PYTHON_CFLAGS) \
     -D_GNU_SOURCE \
     -Wall -Wwrite-strings \
     -fno-strict-aliasing
 
-_satyr_la_LDFLAGS = \
+PYEXTLDFLAGS = \
     -module \
-    -avoid-version \
+    -avoid-version
+
+_satyr_la_SOURCES = $(PYEXTFILES)
+_satyr_la_CPPFLAGS = \
+    $(PYEXTCPPFLAGS) \
+    $(PYTHON_CFLAGS)
+_satyr_la_LDFLAGS = \
+    $(PYEXTLDFLAGS) \
     -export-symbols-regex init_satyr
 
 # Depending on the configure option, we either link libsatyr.so dynamically (as
-# is usual), or directly include the its object files (by including the
+# is usual), or directly include its object files (by including the
 # convenience library).
 if ENABLE_STATIC_PYTHON_MODULE
 _satyr_la_LIBADD = ../lib/libsatyr_conv.la
 else
 _satyr_la_LIBADD = ../lib/libsatyr.la
+endif
+
+if WITH_PYTHON3
+py3satyrdir = $(py3execdir)/satyr
+
+# XXX: Using _PYTHON instead of _DATA runs py-compile that produces python2
+# .pyc and .pyo files, which we obviously don't want. Treat it as data for now,
+# RPM macros will produce the bytecode anyway.
+py3satyr_DATA = \
+    __init__.py
+
+py3satyr_LTLIBRARIES = _satyr3.la
+
+_satyr3_la_SOURCES = $(PYEXTFILES)
+_satyr3_la_CPPFLAGS = \
+    $(PYEXTCPPFLAGS) \
+    $(PYTHON3_CFLAGS)
+_satyr3_la_LDFLAGS = \
+    $(PYEXTLDFLAGS) \
+    -export-symbols-regex PyInit__satyr3
+
+if ENABLE_STATIC_PYTHON_MODULE
+_satyr3_la_LIBADD = ../lib/libsatyr_conv.la
+else
+_satyr3_la_LIBADD = ../lib/libsatyr.la
+endif
 endif

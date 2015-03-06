@@ -44,8 +44,7 @@ core_thread_methods[] =
 
 PyTypeObject sr_py_core_thread_type =
 {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "satyr.CoreThread",      /* tp_name */
     sizeof(struct sr_py_core_thread), /* tp_basicsize */
     0,                          /* tp_itemsize */

@@ -44,8 +44,7 @@ ruby_stacktrace_getset[] =
 };
 
 PyTypeObject sr_py_ruby_stacktrace_type = {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "satyr.RubyStacktrace",         /* tp_name */
     sizeof(struct sr_py_ruby_stacktrace), /* tp_basicsize */
     0,                              /* tp_itemsize */
