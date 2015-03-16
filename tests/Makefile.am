@@ -4,6 +4,7 @@ EXTRA_DIST = gdb_stacktraces \
              json_files \
              kerneloopses \
              programs \
+             python/satyr.py \
              python/core.py \
              python/gdb.py \
              python/java.py \
