@@ -102,7 +102,9 @@ py3satyr_LTLIBRARIES = _satyr3.la
 _satyr3_la_SOURCES = $(PYEXTFILES)
 _satyr3_la_CPPFLAGS = \
     $(PYEXTCPPFLAGS) \
-    $(PYTHON3_CFLAGS)
+    $(PYTHON3_CFLAGS) \
+    # openSUSE PYTHON3 flags contains -Werror=declaration-after-statement
+    -Wno-error=declaration-after-statement
 _satyr3_la_LDFLAGS = \
     $(PYEXTLDFLAGS) \
     -export-symbols-regex PyInit__satyr3
