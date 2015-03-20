@@ -121,6 +121,12 @@ make check
 %{python3_sitearch}/%{name}/*
 
 %changelog
+* Fri Mar 20 2015 Martin Milata <mmilata@redhat.com> 0.17-1
+- New upstream version
+  - Add python3 bindings
+  - Add paralellizable distance matrix computation
+  - Bugfixes
+
 * Thu Feb 19 2015 Martin Milata <mmilata@redhat.com> 0.16-1
 - New upstream version
   - Add support for unwinding from core dump hook
