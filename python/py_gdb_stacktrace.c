@@ -8,6 +8,7 @@
 #include "strbuf.h"
 #include "gdb/stacktrace.h"
 #include "gdb/thread.h"
+#include "gdb/frame.h"
 #include "gdb/sharedlib.h"
 #include "location.h"
 #include "normalize.h"
@@ -408,13 +409,20 @@ sr_py_gdb_stacktrace_find_crash_frame(PyObject *self, PyObject *args)
         PyObject_New(struct sr_py_gdb_frame, &sr_py_gdb_frame_type);
 
     if (!result)
+    {
+        sr_gdb_frame_free(frame);
         return PyErr_NoMemory();
+    }
 
     result->frame = frame;
     this->crashframe = result;
 
     if (stacktrace_rebuild_thread_python_list(this) < 0)
+    {
+        sr_gdb_frame_free(frame);
+        Py_DECREF(result);
         return NULL;
+    }
 
     return (PyObject *)result;
 }
