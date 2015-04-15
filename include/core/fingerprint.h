@@ -22,7 +22,7 @@
 
 /**
  * @file
- * @brief Fingerprint algorithm for core stack traces.
+ * @brief Fingerprint algorithm for core stack traces. (DEPRECATED)
  */
 
 #ifdef __cplusplus

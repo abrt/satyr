@@ -99,46 +99,6 @@ AM_CONDITIONAL(WITH_PYTHON3, [test $with_python3 = yes])
     AC_SUBST(py3execdir, $PYTHON3_EXECDIR)
 [fi]
 
-AC_CHECK_LIB([opcodes], [main], [have_libopcodes=yes], [have_libopcodes=no])
-[if test "$have_libopcodes" = "no" -a "$target_cpu" = "x86_64"; then]
-    [echo "The libopcodes library was not found in the search path. The core stacktrace support "]
-    [echo "will not be built.  If you want to build core fingerprinting support, please ensure"]
-    [echo "that libopcodes is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Satyr."]
-[fi]
-
-# Check libopcodes
-AC_MSG_CHECKING([whether libopcodes is position independent])
-opcodes_pic="not found"
-# ugly, but still better than whitelisting known-working systems
-for DIR in /lib /usr/lib /lib64 /usr/lib64; do
-  OPCODES="$DIR/libopcodes.a"
-  if ! test -r $OPCODES; then
-      continue
-  fi
-
-  if readelf -r $OPCODES | grep R_X86_64_32 >/dev/null; then
-      opcodes_pic=no
-      break
-  else
-      opcodes_pic=yes
-      break
-  fi
-done
-AC_MSG_RESULT([$opcodes_pic])
-
-[if test "$opcodes_pic" = "no" -a "$target_cpu" = "x86_64"; then]
-    [echo "The libopcodes library on your system was not compiled with PIC. The core backtrace fingerprinting support "]
-    [echo "will not be built.  If you want to build core backtrace support, please ensure"]
-    [echo "that the provided libopcodes is build with -fPIC."]
-    [echo "Then run configure again before attempting to build Satyr."]
-[fi]
-
-test ! \( "$opcodes_pic" = "yes" -a "$have_libopcodes" = "yes" -a "$target_cpu" = "x86_64" \)
-have_good_libopcodes=$?
-AM_CONDITIONAL(HAVE_LIBOPCODES, test $have_good_libopcodes -eq 1)
-AC_DEFINE_UNQUOTED(HAVE_LIBOPCODES, $have_good_libopcodes, [Have libopcodes compiled with -fPIC])
-
 # Check BFD
 AC_CHECK_LIB([bfd], [main])
 
