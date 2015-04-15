@@ -67,12 +67,6 @@ libsatyr_conv_la_SOURCES = \
 libsatyr_conv_la_CFLAGS = -Wall -Wformat=2 -std=gnu99 -D_GNU_SOURCE -I$(top_srcdir)/include $(GLIB_CFLAGS)
 libsatyr_conv_la_LDFLAGS = $(GLIB_LIBS)
 
-if HAVE_LIBOPCODES
-# Conditional link is required to avoid linking to a library without
-# -fPIC.
-libsatyr_conv_la_LIBADD = -lopcodes
-endif
-
 lib_LTLIBRARIES = libsatyr.la
 libsatyr_la_SOURCES = 
 libsatyr_la_LIBADD = libsatyr_conv.la
