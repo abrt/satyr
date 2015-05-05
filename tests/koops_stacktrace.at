@@ -161,7 +161,11 @@ check(const char *path,
     stacktrace->taint_acpi_overridden +
     stacktrace->taint_warning +
     stacktrace->taint_staging_driver +
-    stacktrace->taint_firmware_workaround;
+    stacktrace->taint_firmware_workaround +
+    stacktrace->taint_unsigned_module +
+    stacktrace->taint_soft_lockup +
+    stacktrace->taint_live_patched
+    ;
 
   assert(actual_taint_count == taint_count);
 

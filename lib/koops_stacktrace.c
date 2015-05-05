@@ -48,6 +48,9 @@ struct sr_taint_flag sr_flags[] = {
     FLAG('C', staging_driver),
     FLAG('I', firmware_workaround),
     FLAG('O', module_out_of_tree),
+    FLAG('E', unsigned_module),
+    FLAG('L', soft_lockup),
+    FLAG('K', live_patched),
     { '\0', 0, NULL} /* sentinel */
 };
 

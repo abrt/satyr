@@ -66,6 +66,9 @@ struct sr_koops_stacktrace
     bool taint_warning;
     bool taint_staging_driver;
     bool taint_firmware_workaround;
+    bool taint_unsigned_module;
+    bool taint_soft_lockup;
+    bool taint_live_patched;
 
     /**
      * @brief List of loaded modules.
