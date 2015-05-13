@@ -44,6 +44,12 @@ sr_abrt_create_core_stacktrace_from_gdb(const char *directory,
                                         bool hash_fingerprints,
                                         char **error_message);
 
+char *
+sr_abrt_get_core_stacktrace_from_core_hook(pid_t thread_id,
+                                           const char *executable,
+                                           int signum,
+                                           char **error_message);
+
 bool
 sr_abrt_create_core_stacktrace_from_core_hook(const char *directory,
                                               pid_t thread_id,
