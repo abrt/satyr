@@ -193,6 +193,7 @@ is_removable_glibc_with_above(const char *function_name,
 {
     return
         call_match(function_name, source_file, "__assert_fail", "", NULL) ||
+        call_match(function_name, source_file, "__assert_fail_base", "", NULL) ||
         call_match(function_name, source_file, "__chk_fail", "", NULL) ||
         call_match(function_name, source_file, "__longjmp_chk", "", NULL) ||
         call_match(function_name, source_file, "__malloc_assert", "", NULL) ||
