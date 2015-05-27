@@ -123,6 +123,9 @@ struct sr_core_thread *
 sr_core_thread_append(struct sr_core_thread *dest,
                       struct sr_core_thread *item);
 
+bool
+sr_core_thread_is_exit_frame(struct sr_core_frame *frame);
+
 struct sr_core_frame *
 sr_core_thread_find_exit_frame(struct sr_core_thread *thread);
 

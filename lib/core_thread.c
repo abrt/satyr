@@ -149,6 +149,22 @@ sr_core_thread_append(struct sr_core_thread *dest,
     return dest;
 }
 
+bool
+sr_core_thread_is_exit_frame(struct sr_core_frame *frame)
+{
+    return
+        sr_core_frame_calls_func(frame, "__run_exit_handlers", NULL) ||
+        sr_core_frame_calls_func(frame, "raise", "libc.so", "libc-", "libpthread.so", NULL) ||
+        sr_core_frame_calls_func(frame, "__GI_raise", NULL) ||
+        sr_core_frame_calls_func(frame, "exit", NULL) ||
+        sr_core_frame_calls_func(frame, "abort", "libc.so", "libc-", NULL) ||
+        sr_core_frame_calls_func(frame, "__GI_abort", NULL) ||
+        /* Terminates a function in case of buffer overflow. */
+        sr_core_frame_calls_func(frame, "__chk_fail", "libc.so", NULL) ||
+        sr_core_frame_calls_func(frame, "__stack_chk_fail", "libc.so", NULL) ||
+        sr_core_frame_calls_func(frame, "kill", NULL);
+}
+
 struct sr_core_frame *
 sr_core_thread_find_exit_frame(struct sr_core_thread *thread)
 {
@@ -156,19 +172,7 @@ sr_core_thread_find_exit_frame(struct sr_core_thread *thread)
     struct sr_core_frame *result = NULL;
     while (frame)
     {
-        bool is_exit_frame =
-            sr_core_frame_calls_func(frame, "__run_exit_handlers", NULL) ||
-            sr_core_frame_calls_func(frame, "raise", "libc.so", "libc-", "libpthread.so", NULL) ||
-            sr_core_frame_calls_func(frame, "__GI_raise", NULL) ||
-            sr_core_frame_calls_func(frame, "exit", NULL) ||
-            sr_core_frame_calls_func(frame, "abort", "libc.so", "libc-", NULL) ||
-            sr_core_frame_calls_func(frame, "__GI_abort", NULL) ||
-            /* Terminates a function in case of buffer overflow. */
-            sr_core_frame_calls_func(frame, "__chk_fail", "libc.so", NULL) ||
-            sr_core_frame_calls_func(frame, "__stack_chk_fail", "libc.so", NULL) ||
-            sr_core_frame_calls_func(frame, "kill", NULL);
-
-        if (is_exit_frame)
+        if (sr_core_thread_is_exit_frame(frame))
             result = frame;
 
         frame = frame->next;
