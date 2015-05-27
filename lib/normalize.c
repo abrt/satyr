@@ -216,7 +216,8 @@ is_removable_glibc_with_above(const char *function_name,
         call_match(function_name, source_file, "__libc_memalign", "malloc.c", NULL) ||
         call_match(function_name, source_file, "__libc_realloc", "malloc.c", NULL) ||
         call_match(function_name, source_file, "__posix_memalign", "malloc.c", NULL) ||
-        call_match(function_name, source_file, "__libc_calloc", "malloc.c", NULL);
+        call_match(function_name, source_file, "__libc_calloc", "malloc.c", NULL) ||
+        call_match(function_name, source_file, "__libc_fatal", "libc", NULL);
 }
 
 static char *
