@@ -282,6 +282,22 @@ remove_func_prefix(char *function_name, const char *prefix, int num)
     memmove(function_name, function_name + num, func_len - num + 1);
 }
 
+static bool
+sr_gdb_is_exit_frame(struct sr_gdb_frame *frame)
+{
+    return
+        sr_gdb_frame_calls_func(frame, "__run_exit_handlers", "exit.c", NULL) ||
+        sr_gdb_frame_calls_func(frame, "raise", "pt-raise.c", "libc.so", "libc-", "libpthread.so", NULL) ||
+        sr_gdb_frame_calls_func(frame, "__GI_raise", "raise.c", NULL) ||
+        sr_gdb_frame_calls_func(frame, "exit", "exit.c", NULL) ||
+        sr_gdb_frame_calls_func(frame, "abort", "abort.c", "libc.so", "libc-", NULL) ||
+        sr_gdb_frame_calls_func(frame, "__GI_abort", "abort.c", NULL) ||
+        /* Terminates a function in case of buffer overflow. */
+        sr_gdb_frame_calls_func(frame, "__chk_fail", "chk_fail.c", "libc.so", NULL) ||
+        sr_gdb_frame_calls_func(frame, "__stack_chk_fail", "stack_chk_fail.c", "libc.so", NULL) ||
+        sr_gdb_frame_calls_func(frame, "kill", "syscall-template.S", NULL);
+}
+
 void
 sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
 {
@@ -352,7 +368,8 @@ sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
             is_removable_vim(frame->function_name, frame->source_file);
 
         bool removable_with_above =
-            is_removable_glibc_with_above(frame->function_name, frame->source_file);
+            is_removable_glibc_with_above(frame->function_name, frame->source_file) ||
+            sr_gdb_is_exit_frame(frame);
 
         if (removable_with_above)
         {
@@ -496,7 +513,8 @@ sr_normalize_core_thread(struct sr_core_thread *thread)
             is_removable_vim(frame->function_name, frame->file_name);
 
         bool removable_with_above =
-            is_removable_glibc_with_above(frame->function_name, frame->file_name);
+            is_removable_glibc_with_above(frame->function_name, frame->file_name)  ||
+            sr_core_thread_is_exit_frame(frame);
 
         if (removable_with_above)
         {
@@ -689,19 +707,7 @@ sr_glibc_thread_find_exit_frame(struct sr_gdb_thread *thread)
     struct sr_gdb_frame *result = NULL;
     while (frame)
     {
-        bool is_exit_frame =
-            sr_gdb_frame_calls_func(frame, "__run_exit_handlers", "exit.c", NULL) ||
-            sr_gdb_frame_calls_func(frame, "raise", "pt-raise.c", "libc.so", "libc-", "libpthread.so", NULL) ||
-            sr_gdb_frame_calls_func(frame, "__GI_raise", "raise.c", NULL) ||
-            sr_gdb_frame_calls_func(frame, "exit", "exit.c", NULL) ||
-            sr_gdb_frame_calls_func(frame, "abort", "abort.c", "libc.so", "libc-", NULL) ||
-            sr_gdb_frame_calls_func(frame, "__GI_abort", "abort.c", NULL) ||
-            /* Terminates a function in case of buffer overflow. */
-            sr_gdb_frame_calls_func(frame, "__chk_fail", "chk_fail.c", "libc.so", NULL) ||
-            sr_gdb_frame_calls_func(frame, "__stack_chk_fail", "stack_chk_fail.c", "libc.so", NULL) ||
-            sr_gdb_frame_calls_func(frame, "kill", "syscall-template.S", NULL);
-
-        if (is_exit_frame)
+        if (sr_gdb_is_exit_frame(frame))
             result = frame;
 
         frame = frame->next;
