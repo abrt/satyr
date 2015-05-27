@@ -27,6 +27,7 @@ create_thread(int count, ...)
     const char *fname = va_arg(argp, const char*);
     struct sr_gdb_frame *frame = sr_gdb_frame_new();
     frame->function_name = sr_strdup(fname);
+    frame->source_file = sr_strdup("");
 
     if (!thread->frames)
       thread->frames = frame;
@@ -88,6 +89,38 @@ main(void)
   return 0;
 }
 ]])
+
+AT_TESTFUN([sr_normalize_gdb_thread],
+[
+UTILS
+
+int
+main()
+{
+  struct sr_gdb_thread *threads[[3]];
+  struct sr_gdb_frame *frame;
+  threads[[0]] = create_thread(5, "aa", "abort", "raise", "__assert_fail_base", "ee");
+  
+  threads[[1]] = create_thread(5, "aa", "abort", "bb", "cc", "dd");
+  threads[[1]]->frames->next->source_file = sr_strdup("abort.c");
+  
+  threads[[2]] = create_thread(5, "aa", "abort", "raise", "dd", "ee");
+  threads[[2]]->frames->next->source_file = sr_strdup("abort.c");
+  threads[[2]]->frames->next->next->source_file = sr_strdup("libc.so");
+
+  sr_normalize_gdb_thread(threads[[0]]);
+  assert(0 == strcmp(threads[[0]]->frames->function_name, "ee"));
+
+  sr_normalize_gdb_thread(threads[[1]]);
+  assert(0 == strcmp(threads[[1]]->frames->function_name, "bb"));
+
+  sr_normalize_gdb_thread(threads[[2]]);
+  assert(0 == strcmp(threads[[2]]->frames->function_name, "dd"));
+  
+  return 0;
+}
+])
+
 
 AT_TESTFUN([sr_normalize_gdb_paired_unknown_function_names],
 [
