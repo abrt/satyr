@@ -1,3 +1,9 @@
+satyr 0.18
+==========
+Removed function fingerprinting code. New taint flags added. Normalization
+tweaks. Added function to create core stacktraces from core hook in more secure
+manner.
+
 satyr 0.17
 ==========
 Added python3 bindings. Added paralellizable distance matrix computation.

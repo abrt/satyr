@@ -121,6 +121,13 @@ make check
 %{python3_sitearch}/%{name}/*
 
 %changelog
+* Tue Jun 02 2015 Martin Milata <mmilata@redhat.com> 0.18-1
+- New upstream version
+  - Removed function fingerprinting
+  - More secure unwinding from core hook
+  - New taint flags
+  - Normalization tweaks
+
 * Fri Mar 20 2015 Martin Milata <mmilata@redhat.com> 0.17-1
 - New upstream version
   - Add python3 bindings
