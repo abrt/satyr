@@ -80,6 +80,12 @@ DISTCLEANFILES = atconfig
 EXTRA_DIST += atlocal.in
 EXTRA_DIST += java_testcases.c
 
+if WITH_PYTHON3
+TESTSUITEFLAGS =
+else
+TESTSUITEFLAGS = SKIP_PYTHON3=yes
+endif
+
 atconfig: $(top_builddir)/config.status
 	(cd ${top_builddir} && ./config.status ${subdir}/atconfig)
 
