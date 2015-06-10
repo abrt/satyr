@@ -4,7 +4,7 @@ AT_CHECK([python2 ../../python/$1.py -v], 0, [ignore], [ignore])
 AT_CLEANUP
 
 AT_SETUP([python3_bindings_for_$1])
-AT_SKIP_IF([test -n "$SKIP_PYTHON3"])
+AT_CHECK([if test -n "$SKIP_PYTHON3"; then exit 77; fi])
 AT_CHECK([python3 ../../python/$1.py -v], 0, [ignore], [ignore])
 AT_CLEANUP
 ])
