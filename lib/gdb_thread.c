@@ -75,6 +75,7 @@ void
 sr_gdb_thread_init(struct sr_gdb_thread *thread)
 {
     thread->number = -1;
+    thread->tid = -1;
     thread->frames = NULL;
     thread->next = NULL;
     thread->type = SR_REPORT_GDB;
@@ -124,7 +125,6 @@ sr_gdb_thread_cmp(struct sr_gdb_thread *thread1,
     int number = thread1->number - thread2->number;
     if (number != 0)
         return number;
-
 
     struct sr_gdb_frame *frame1 = thread1->frames,
         *frame2 = thread2->frames;
@@ -351,7 +351,7 @@ sr_gdb_thread_parse(const char **input,
         }
 
         /* Read the LWP section in parentheses, optional. */
-        location->column += sr_gdb_thread_skip_lwp(&local_input);
+        location->column += sr_gdb_thread_parse_lwp(&local_input, &imthread->tid);
 
         /* Read the Thread keyword in parentheses, optional. */
         chars = sr_skip_string(&local_input, "(Thread ");
@@ -377,7 +377,7 @@ sr_gdb_thread_parse(const char **input,
 
             /* Handle the optional " (LWP [0-9]+)" section. */
             location->column += sr_skip_char_sequence(&local_input, ' ');
-            location->column += sr_gdb_thread_skip_lwp(&local_input);
+            location->column += sr_gdb_thread_parse_lwp(&local_input, &imthread->tid);
 
             /* Read the end of the parenthesis. */
             if (!sr_skip_char(&local_input, ')'))
@@ -436,20 +436,30 @@ sr_gdb_thread_parse(const char **input,
 }
 
 int
-sr_gdb_thread_skip_lwp(const char **input)
+sr_gdb_thread_parse_lwp(const char **input, uint32_t *tid)
 {
     const char *local_input = *input;
     int count = sr_skip_string(&local_input, "(LWP ");
     if (0 == count)
         return 0;
-    int digits = sr_skip_uint(&local_input);
+
+    uint32_t value;
+    int digits = sr_parse_uint32(&local_input, &value);
     if (0 == digits)
         return 0;
     count += digits;
     if (!sr_skip_char(&local_input, ')'))
         return 0;
     *input = local_input;
+    if (tid != NULL)
+        *tid = value;
     return count + 1;
+}
+
+int
+sr_gdb_thread_skip_lwp(const char **input)
+{
+    return sr_gdb_thread_parse_lwp(input, /*Ignore value*/NULL);
 }
 
 struct sr_gdb_thread *

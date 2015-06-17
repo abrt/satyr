@@ -279,6 +279,8 @@ main(void)
         "            tv_sec = 1273231242, tv_nsec = 190522021}, __unused = {0, 0, 0}}\n",
         &thread);
 
+  thread.tid = 6357;
+
   /* Check that it also handles more exotic header. */
   check("Thread 3 (Thread 0xdd119170 (LWP 6357)):\n"
         "#0  0x000000322160e7fd in fsync () at ../sysdeps/unix/syscall-template.S:82\n"
@@ -286,6 +288,8 @@ main(void)
         "#1  0x000000322222987a in write_to_temp_file () at gfileutils.c:980\n"
         "No locals.\n",
         &thread);
+
+  thread.tid = 635;
 
   /* Another format of the header. */
   check("Thread 3 (LWP 635):\n"
@@ -370,9 +374,9 @@ main(void)
 ]])
 
 ## ---------------------- ##
-## sr_gdb_thread_skip_lwp ##
+## sr_gdb_thread_parse_lwp ##
 ## ---------------------- ##
-AT_TESTFUN([sr_gdb_thread_skip_lwp],
+AT_TESTFUN([sr_gdb_thread_parse_lwp],
 [[
 #include "gdb/thread.h"
 #include <assert.h>
@@ -380,30 +384,33 @@ AT_TESTFUN([sr_gdb_thread_skip_lwp],
 
 static void
 check(char *input,
-      int expected_count)
+      int expected_count,
+      uint32_t expected_tid)
 {
   char *old_input = input;
-  assert(expected_count == sr_gdb_thread_skip_lwp(&input));
+  uint32_t tid = -1;
+  assert(expected_count == sr_gdb_thread_parse_lwp(&input, &tid));
   assert(input - old_input == expected_count);
+  assert(tid == expected_tid);
 }
 
 int
 main(void)
 {
-  check("(LWP 20)", 8);
-  check("(LWP 20)10", 8);
-  check("(LWP 245443452355454343450)", 27);
-  check("(LWP 245443452355454343450)  ", 27);
+  check("(LWP 20)", 8, 20);
+  check("(LWP 20)10", 8, 20);
+  check("(LWP 3454343450)", 16, 3454343450);
+  check("(LWP 2454434523)  ", 16, 2454434523);
 
-  check("", 0);
-  check(" ", 0);
-  check(" (LWP 20)", 0);
-  check("(LWP", 0);
-  check("(LWP 20", 0);
-  check("(LWP )", 0);
-  check("(LWP 20()", 0);
-  check("(LWP 0x0)", 0);
-  check("(LWP 20(", 0);
+  check("", 0, -1);
+  check(" ", 0, -1);
+  check(" (LWP 20)", 0, -1);
+  check("(LWP", 0, -1);
+  check("(LWP 20", 0, -1);
+  check("(LWP )", 0, -1);
+  check("(LWP 20()", 0, -1);
+  check("(LWP 0x0)", 0, -1);
+  check("(LWP 20(", 0, -1);
 
   return 0;
 }

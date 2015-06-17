@@ -59,6 +59,12 @@ struct sr_gdb_thread
      * stacktrace.
      */
     struct sr_gdb_thread *next;
+
+    /**
+     * TID of thread that triggered core dump, as seen in the PID namespace in
+     * which the thread resides.
+     */
+    uint32_t tid;
 };
 
 /**
@@ -212,9 +218,17 @@ sr_gdb_thread_parse(const char **input,
  * If the input contains a LWP section in form of "(LWP [0-9]+), move
  * the input pointer after this section. Otherwise do not modify
  * input.
+ * @param tid
+ * Can be NULL. If not NULL, the parsed [0-9]+ value is stored there.
  * @returns
  * The number of characters parsed from input. 0 if the input does not
  * contain a LWP section.
+ */
+int
+sr_gdb_thread_parse_lwp(const char **input, uint32_t *tid);
+
+/**
+ * This functions is an alias to sr_gdb_thread_parse_lwp(input, NULL);
  */
 int
 sr_gdb_thread_skip_lwp(const char **input);
