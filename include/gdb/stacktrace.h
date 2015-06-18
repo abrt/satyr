@@ -32,6 +32,7 @@ extern "C" {
 
 #include "../report_type.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 struct sr_gdb_thread;
 struct sr_gdb_frame;
@@ -64,6 +65,18 @@ struct sr_gdb_stacktrace
      * Shared libraries loaded at the moment of crash.
      */
     struct sr_gdb_sharedlib *libs;
+
+    /**
+     * TID of thread passed by Kernel to the core pattern helper as the TID
+     * of thread which triggered core dump.
+     *
+     * This value may not be set at all and is not included in GDB-produced
+     * backtrace, so it must be assigned by our callers.
+     *
+     * Its only purpose is to make the searching for the crashed thread as
+     * accurate as possible.
+     */
+    uint32_t crash_tid;
 };
 
 /**
@@ -202,6 +215,17 @@ sr_gdb_stacktrace_to_text(struct sr_gdb_stacktrace *stacktrace,
  */
 struct sr_gdb_frame *
 sr_gdb_stacktrace_get_crash_frame(struct sr_gdb_stacktrace *stacktrace);
+
+/**
+ * Sets the crash TID, which is used to search for the crash thread, to the
+ * given value.
+ * @param tid
+ * Value of the '%i' parameter passed on command line by Kernel when piping
+ * a core dump file to a program.
+ */
+void
+sr_gdb_stacktrace_set_crash_tid(struct sr_gdb_stacktrace *stacktrace,
+                                uint32_t tid);
 
 /**
  * Parses a textual stack trace and puts it into a structure.  If

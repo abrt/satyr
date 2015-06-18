@@ -89,6 +89,7 @@ sr_gdb_stacktrace_init(struct sr_gdb_stacktrace *stacktrace)
 {
     stacktrace->threads = NULL;
     stacktrace->crash = NULL;
+    stacktrace->crash_tid = -1;
     stacktrace->libs = NULL;
     stacktrace->type = SR_REPORT_GDB;
 }
@@ -267,10 +268,25 @@ sr_gdb_stacktrace_find_crash_thread(struct sr_gdb_stacktrace *stacktrace)
     if (!stacktrace->threads->next)
         return stacktrace->threads;
 
+    /* If we know TID of the crashed thread, we can try to find the crash
+     * thread by that value.
+     */
+    struct sr_gdb_thread *thread;
+    if (stacktrace->crash_tid != -1)
+    {
+        thread = stacktrace->threads;
+        while (thread)
+        {
+            if (thread->tid == stacktrace->crash_tid)
+                return thread;
+
+            thread = thread->next;
+        }
+    }
+
     /* If we have a crash frame *and* there is just one thread which has
      * this frame on the top, it is also simple.
      */
-    struct sr_gdb_thread *thread;
     thread = find_crash_thread_from_crash_frame(stacktrace, ONE_MATCHING);
     if (thread)
         return thread;
@@ -414,6 +430,13 @@ sr_gdb_stacktrace_get_crash_frame(struct sr_gdb_stacktrace *stacktrace)
     crash_frame = sr_gdb_frame_dup(crash_frame, false);
     sr_gdb_stacktrace_free(stacktrace);
     return crash_frame;
+}
+
+void
+sr_gdb_stacktrace_set_crash_tid(struct sr_gdb_stacktrace *stacktrace,
+                                uint32_t tid)
+{
+    stacktrace->crash_tid = tid;
 }
 
 struct sr_gdb_stacktrace *
