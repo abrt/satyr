@@ -107,6 +107,8 @@ main(void)
   check("../../gdb_stacktraces/rhbz-621492", "raise", -1);
   /* Test the stacktrace from Red Hat Bugzilla bug #803600. */
   check("../../gdb_stacktraces/rhbz-803600", "validate_row", -1);
+  /* Test the stacktrace from Red Hat Bugzilla bug #1032472. */
+  check("../../gdb_stacktraces/rhbz-1032472", "g_str_hash", -1);
   /* A casual gnome-shell stack trace that has the crash frame header but does
    * not have a thread with that frame. The stacktrace has been sent by
    * a proactive user to ABRT developers

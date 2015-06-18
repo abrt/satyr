@@ -465,6 +465,55 @@ sr_gdb_frame_parse_function_name_chunk(const char **input,
     return total_char_count;
 }
 
+/* Parses output of 'c_type_print_template_args()' at gdb/c_typeprint.c
+ *
+ * There are no rules for the format of "[with ...]" and the gdb unit-test
+ * "cp-support.exp" simply uses "\[with .*\]" regular expression to validate
+ * the format of this section.
+ *
+ * The function checks if the current input starts with " [with " and if so, it
+ * reads all characters until it finds the closing ] or the end of the input.
+ * The latter case leads to an error.
+ *
+ * The [] must be balanced; otherwise the function reads the entire input (and
+ * reports an error) or does not read all template arguments (should cause an
+ * error in the other parsing functions).
+ */
+int sr_gdb_frame_parse_function_name_template_args(const char **input,
+                                                   char **target)
+{
+    const char *local_input = *input;
+    if (0 == sr_skip_string(&local_input, " [with "))
+        return 0;
+
+    struct sr_strbuf *buf = sr_strbuf_new();
+    sr_strbuf_append_str(buf, " [with ");
+    int depth = 1;
+    while (*local_input)
+    {
+        if ('[' == *local_input)
+            ++depth;
+        else if (']' == *local_input && --depth == 0)
+            break;
+
+        sr_strbuf_append_char(buf, *local_input);
+        ++local_input;
+    }
+
+    if (!sr_skip_char(&local_input, ']'))
+    {
+        sr_strbuf_free(buf);
+        return 0;
+    }
+
+    sr_strbuf_append_char(buf, ']');
+
+    *target = sr_strbuf_free_nobuf(buf);
+    int total_char_count = local_input - *input;
+    *input = local_input;
+    return total_char_count;
+}
+
 int
 sr_gdb_frame_parse_function_name_braces(const char **input, char **target)
 {
@@ -513,7 +562,17 @@ sr_gdb_frame_parse_function_name_template(const char **input, char **target)
     while (true)
     {
         char *namechunk = NULL;
-        if (0 < sr_gdb_frame_parse_function_name_chunk(&local_input, true, &namechunk) ||
+        /* The template args usually follows a symbol name (potentially with
+         * braces). However we try to parse the template args first as
+         * "sr_gdb_frame_parse_function_name_chunk()" accepts almost the same
+         * format, but the difference is that the template args must have
+         * prefix ' [with ', so the parse template args function can return
+         * faster if the local_input does not meet the requirements (the name
+         * chunk parse function parses entire input until it finds an abandoned
+         * character).
+         */
+        if (0 < sr_gdb_frame_parse_function_name_template_args(&local_input, &namechunk) ||
+            0 < sr_gdb_frame_parse_function_name_chunk(&local_input, true, &namechunk) ||
             0 < sr_gdb_frame_parse_function_name_braces(&local_input, &namechunk) ||
             0 < sr_gdb_frame_parse_function_name_template(&local_input, &namechunk))
         {

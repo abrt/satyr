@@ -210,7 +210,112 @@ main(void)
   check(true, "CairoOutputDev::tilingPatternFill");
   check(true, "sdr::(anonymous namespace)::ViewContact::~ViewContact");
   check(true, "operator==<nsIAtom, nsICSSPseudoClass>");
+  check(true, "wait_until<std::unique_lock<bmalloc::Mutex>, std::chrono::_V2::system_clock, std::chrono::duration<long int, std::ratio<1l, 1000000000l> >, bmalloc::AsyncTask<Object, Function>::entryPoint() [with Object = bmalloc::Heap; Function = void (bmalloc::Heap::*)()]::<lambda()> >");
   return 0;
+}
+]])
+
+## ---------------------------------------------- ##
+## sr_gdb_frame_parse_function_name_template_args ##
+## ---------------------------------------------- ##
+AT_TESTFUN([sr_gdb_frame_parse_function_name_template_args],
+[[
+#include "gdb/frame.h"
+#include "utils.h"
+#include "location.h"
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+static int
+check(const char *input, size_t len)
+{
+    if (len == -1)
+        len = strlen(input);
+
+    char *local_input = sr_strdup(input);
+    char *old_input = local_input;
+
+    char *namechunk = (char *)0xDEADBEEF;
+    size_t chars = sr_gdb_frame_parse_function_name_template_args(&local_input, &namechunk);
+
+    if (len == 0 && chars != 0)
+    {
+        fprintf(stderr, "NOT Failed to parse: '%s'\n", input);
+        return 1;
+    }
+
+    if (len != 0  && chars == 0)
+    {
+        fprintf(stderr, "Failed to parse    : '%s'\n", input);
+        return 1;
+    }
+
+    if (len != 0 && chars != len)
+    {
+        fprintf(stderr, "Reported invalid number of read characters > expected"
+                        ": %d ; got : %d ; input : '%s'\n", chars, len, input);
+        return 1;
+    }
+
+    if (chars != 0 && namechunk == (char *)0xDEADBEEF)
+    {
+        fprintf(stderr, "Did not return parsed data : '%s'\n", input);
+        return 1;
+    }
+
+    if (chars == 0 && namechunk != (char *)0xDEADBEEF)
+    {
+        fprintf(stderr, "Touched the output variable when failed : '%s'\n", input);
+        return 1;
+    }
+
+    if (chars != 0 && strncmp(namechunk, input, len) != 0)
+    {
+        fprintf(stderr, "Invalid output > expected : '%*s', got : '%s'\n", len, namechunk);
+        return 1;
+    }
+
+    if (namechunk != (char *)0xDEADBEEF)
+    {
+        free(namechunk);
+    }
+
+    free(old_input);
+    return 0;
+}
+
+/* m4 does not allow unbalanced square brackets, so we have to use "Quadrigaph"
+ * @<:@ and @:>@.
+ */
+
+int
+main(int argc, char *argv[])
+{
+    int res = 0;
+
+    res += check(" []", 0);
+    res += check(" @<:@with ", 0);
+    res += check(" @<:@with @<:@", 0);
+    res += check(" [within ]", 0);
+
+    res += check(" [with [@<:@[]]]", 0);
+    res += check(" @<:@with [[[]]]", 0);
+    res += check(" @<:@with [a][b][c][d][e]", 0);
+
+    /* -1 == succeeds and read full input */
+    res += check(" [with ]", -1);
+    res += check(" [with ]@:>@", strlen(" [with ]"));
+
+    res += check(" [with [a][b][c][d]]", -1);
+    res += check(" [with [f = [ d([g[e]])]]]", -1);
+    res += check(" [with j() = [h<[i]>]; k = [l, m, n~[o]]]", -1);
+
+    res += check(" [with Func = boost:graphs::bfs<tr1::distance([blah])>()]", -1);
+    res += check(" [with Object = std::map<std::string, std::string>; Func = boost:graphs::bfs<tr1::distance([blah])>(); Param = int]", -1);
+
+    return res;
 }
 ]])
 

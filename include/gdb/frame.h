@@ -316,6 +316,20 @@ sr_gdb_frame_parse_function_name_template(const char **input,
                                           char **target);
 
 /**
+ * If the input buffer contains part of function name containing template args,
+ * for example
+ * " [with Object = bmalloc::Heap; Function = void (bmalloc::Heap::*)()]", parse
+ * it, append the contents to the target and move the input after the trailing
+ * square brace. Otherwise do not modify the input and the target.
+ * @returns
+ * The number of characters parsed from input. 0 if the input does not
+ * contain a template args part of function name.
+ */
+int
+sr_gdb_frame_parse_function_name_template_args(const char **input,
+                                               char **target);
+
+/**
  * Parses the function name, which is a part of the frame header, from
  * the input. If the frame header contains also the function type,
  * it's also parsed.
