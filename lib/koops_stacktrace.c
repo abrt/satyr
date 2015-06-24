@@ -428,6 +428,12 @@ module_list_continues(const char *input)
         sr_skip_char_span(&input, "0123456789"))
         return false;
 
+    /* See tests/kerneloopses/rhbz-1235021 */
+    if (sr_skip_string(&input, "irq event stamp") &&
+        sr_skip_char_span(&input, " :") &&
+        sr_skip_char_span(&input, "0123456789"))
+        return false;
+
     /* Other conditions may need to be added */
 
     return true;
