@@ -1,0 +1,55 @@
+NMI watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [pulseaudio:1580]
+Modules linked in: xt_CHECKSUM ipt_MASQUERADE nf_nat_masquerade_ipv4 tun nf_conntrack_netbios_ns nf_conntrack_broadcast ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 xt_conntrack ebtable_nat ebtable_broute bridge ebtable_filter ebtables ip6table_nat nf_conntrack_ipv6 nf_defrag_ipv6 nf_nat_ipv6 ip6table_mangle ip6table_security ip6table_raw ip6table_filter ip6_tables iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack iptable_mangle iptable_security iptable_raw bnep option usb_wwan hid_logitech_hidpp btusb bluetooth hid_logitech_dj rfkill huawei_cdc_ncm cdc_wdm cdc_ncm usbnet intel_rapl iosf_mbi iTCO_wdt iTCO_vendor_support x86_pkg_temp_thermal ppdev coretemp btrfs kvm_intel kvm xor crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel vfat fat raid6_pq snd_hda_codec_hdmi
+ snd_hda_codec_realtek snd_hda_codec_ca0132 snd_hda_codec_generic snd_hda_intel snd_hda_controller snd_hda_codec snd_hwdep snd_seq serio_raw snd_seq_device snd_pcm snd_timer mei_me snd lpc_ich mei i2c_i801 mfd_core shpchp soundcore parport_pc parport tpm_infineon tpm_tis tpm nfsd binfmt_misc auth_rpcgss nfs_acl lockd grace sunrpc uas usb_storage i915 i2c_algo_bit drm_kms_helper 8021q garp stp llc drm mrp r8169 mii video
+irq event stamp: 416210
+hardirqs last  enabled at (416209): [<ffffffff8188cdac>] restore_args+0x0/0x30
+hardirqs last disabled at (416210): [<ffffffff8188d11d>] apic_timer_interrupt+0x6d/0x80
+softirqs last  enabled at (416208): [<ffffffff810b2d03>] __do_softirq+0x3b3/0x670
+softirqs last disabled at (416203): [<ffffffff810b3245>] irq_exit+0x145/0x150
+CPU: 0 PID: 1580 Comm: pulseaudio Not tainted 4.0.5-300.fc22.x86_64+debug #1
+Hardware name: Gigabyte Technology Co., Ltd. Z87M-D3H/Z87M-D3H, BIOS F11 08/12/2014
+task: ffff88003eea8000 ti: ffff88003ee70000 task.ti: ffff88003ee70000
+RIP: 0010:[<ffffffff81153416>]  [<ffffffff81153416>] smp_call_function_many+0x216/0x280
+RSP: 0018:ffff88003ee739f8  EFLAGS: 00000202
+RAX: ffff8807fe9d9ff0 RBX: ffffffff8188cdac RCX: 0000000000000002
+RDX: ffff8807fe9d9ff0 RSI: 0000000000000008 RDI: 0000000000000000
+RBP: ffff88003ee73a38 R08: ffff8807fe09c480 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff88003ee73968
+R13: ffff88003eea8000 R14: ffff88003ee70000 R15: ffff88003eea8000
+FS:  00007fedda516880(0000) GS:ffff8807fe400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f430b649630 CR3: 000000003edc2000 CR4: 00000000001407f0
+Stack:
+ 0000000000000000 000000018110843f ffff88003eea8000 ffff8807d792a000
+ ffffffff810778b0 0000000000000000 ffff8807d792a000 8000000000000163
+ ffff88003ee73a68 ffffffff811534ff ffff8807d792a000 ffff8807d792a000
+Call Trace:
+ [<ffffffff810778b0>] ? leave_mm+0x180/0x180
+ [<ffffffff811534ff>] on_each_cpu+0x3f/0xb0
+ [<ffffffff8107838c>] flush_tlb_all+0x1c/0x20
+ [<ffffffff8107279f>] __change_page_attr_set_clr+0x1df/0xd20
+ [<ffffffff8122f800>] ? __purge_vmap_area_lazy+0x200/0x6b0
+ [<ffffffff8122f68e>] ? __purge_vmap_area_lazy+0x8e/0x6b0
+ [<ffffffff81027b8d>] ? native_sched_clock+0x2d/0xa0
+ [<ffffffff812309cb>] ? vm_unmap_aliases+0x8b/0x2e0
+ [<ffffffff81073444>] change_page_attr_set_clr+0x164/0x530
+ [<ffffffff818881e4>] ? mutex_lock_nested+0x2b4/0x460
+ [<ffffffff81073d37>] _set_pages_array+0xf7/0x150
+ [<ffffffff8110bf3d>] ? trace_hardirqs_on+0xd/0x10
+ [<ffffffffa044cc2b>] ? azx_pcm_hw_params+0x3b/0xa0 [snd_hda_controller]
+ [<ffffffff81073dc3>] set_pages_array_wc+0x13/0x20
+ [<ffffffffa033cd9a>] __mark_pages_wc+0x7a/0x90 [snd_hda_intel]
+ [<ffffffffa033cf4f>] substream_alloc_pages+0x8f/0xc0 [snd_hda_intel]
+ [<ffffffffa044cc54>] azx_pcm_hw_params+0x64/0xa0 [snd_hda_controller]
+ [<ffffffffa03faba3>] snd_pcm_hw_params+0xb3/0x3b0 [snd_pcm]
+ [<ffffffff8120b1cb>] ? memdup_user+0x4b/0x90
+ [<ffffffffa03fcccf>] snd_pcm_common_ioctl1+0x32f/0xc30 [snd_pcm]
+ [<ffffffff813a6c49>] ? avc_has_perm+0x159/0x2f0
+ [<ffffffff813a6b1d>] ? avc_has_perm+0x2d/0x2f0
+ [<ffffffff8121cbcf>] ? might_fault+0x5f/0xb0
+ [<ffffffffa03fd793>] snd_pcm_playback_ioctl1+0x1c3/0x2f0 [snd_pcm]
+ [<ffffffffa03fd8e8>] snd_pcm_playback_ioctl+0x28/0x40 [snd_pcm]
+ [<ffffffff8128eda8>] do_vfs_ioctl+0x2e8/0x530
+ [<ffffffff8128f071>] SyS_ioctl+0x81/0xa0
+ [<ffffffff8188c109>] system_call_fastpath+0x12/0x17
+Code: 32 df 00 89 c1 39 f0 0f 8d 7c fe ff ff 48 98 49 8b 17 48 03 14 c5 80 1f f4 81 f6 42 18 01 48 89 d0 74 ca 66 90 f3 90 f6 40 18 01 <75> f8 48 63 35 75 32 df 00 eb b7 0f b6 4d cc 4c 89 ea 4c 89 e6 
