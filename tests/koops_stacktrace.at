@@ -136,7 +136,7 @@ check(const char *path,
   else
       assert(!first_function_name && !last_function_name && 0 == frame_count);
 
-  printf("expected: %d, got: %d\n", frame_count,
+  printf("Frames expected: %d, got: %d\n", frame_count,
          sr_thread_frame_count((struct sr_thread*) stacktrace));
   assert(frame_count == sr_thread_frame_count((struct sr_thread*) stacktrace));
 
@@ -176,6 +176,7 @@ check(const char *path,
     mod++;
     actual_module_count++;
   }
+  printf("Modules expected: %d, got: %d\n", module_count, actual_module_count);
   assert(actual_module_count == module_count);
 
   /* test parsing via sr_stacktrace_parse */
