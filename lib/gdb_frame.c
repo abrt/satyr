@@ -1052,6 +1052,17 @@ sr_gdb_frame_parse_file_location(const char **input,
         location->message = "Expected a file name.";
         return false;
     }
+    
+    /* If the parsed file_name contains "/lib" and then ".so." or ends with ".so",
+     * it is most certainly a shared object, not a source file, so disregard it.
+     * See RHBZ#1239318 */
+    char *tmp = NULL;
+    if((tmp = strstr(file_name, "/lib")) != NULL
+       && (strstr(tmp, ".so.") != NULL
+           || strcmp(tmp + strlen(tmp) - 3, ".so") == 0)) {
+        free(file_name);
+        file_name = NULL;
+    }
 
     if (sr_skip_char(&local_input, ':'))
     {
