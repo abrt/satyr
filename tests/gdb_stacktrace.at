@@ -168,21 +168,38 @@ AT_TESTFUN([sr_gdb_stacktrace_quality_complex],
 #include "location.h"
 #include "utils.h"
 #include <assert.h>
+#include <stdio.h>
 
-int
-main(void)
-{
-  /* Load the stacktrace from Red Hat Bugzilla bug #621492. */
+void check(const char *path, const float expected_quality) {
   struct sr_location location;
   sr_location_init(&location);
   char *error_message;
-  char *full_input = sr_file_to_string("../../gdb_stacktraces/rhbz-621492", &error_message);
+  char *full_input = sr_file_to_string(path, &error_message);
   assert(full_input);
   char *input = full_input;
   struct sr_gdb_stacktrace *stacktrace = sr_gdb_stacktrace_parse(&input, &location);
   assert(stacktrace);
-  assert(1.0f == sr_gdb_stacktrace_quality_complex(stacktrace));
+  float quality = sr_gdb_stacktrace_quality_complex(stacktrace);
+  printf("Expected quality: %f got: %f\n", expected_quality, quality);
+  /* Be a little tolerant */
+  assert(expected_quality > quality - 0.00001f && expected_quality < quality + 0.00001f);
   sr_gdb_stacktrace_free(stacktrace);
+}
+
+int
+main(void)
+{
+  /* Test the stacktrace from Red Hat Bugzilla bug #621492. */
+  check("../../gdb_stacktraces/rhbz-621492", 0.994703f);
+  /* 100% pure BIO quality backtrace */
+  check("../../gdb_stacktraces/quality_100", 1.0f);
+  /* 89% genetically modified quality backtrace */
+  check("../../gdb_stacktraces/quality_89", 0.89f);
+  /* Rotten RHBZ#1239318 backtrace */
+  check("../../gdb_stacktraces/rhbz-1239318", 0.0f);
+  /* RHBZ#1239318 backtrace modified to have more SO files end in ".so" */
+  check("../../gdb_stacktraces/rhbz-1239318_modified", 0.0f);
+
   return 0;
 }
 ]])
