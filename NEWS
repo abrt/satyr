@@ -1,3 +1,8 @@
+satyr 0.19
+==========
+Enhancements to GDB parser: Thread ID, C++ template arguments. Tests and
+bugfixes.
+
 satyr 0.18
 ==========
 Removed function fingerprinting code. New taint flags added. Normalization

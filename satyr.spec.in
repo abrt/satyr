@@ -121,6 +121,11 @@ make check
 %{python3_sitearch}/%{name}/*
 
 %changelog
+* Tue Jul 07 2015 Martin Milata <mmilata@redhat.com> 0.19-1
+- New upstream version
+  - Enhancements to GDB parser: Thread ID, C++ template arguments
+  - Tests and bugfixes
+
 * Tue Jun 02 2015 Martin Milata <mmilata@redhat.com> 0.18-1
 - New upstream version
   - Removed function fingerprinting
