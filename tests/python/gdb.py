@@ -17,7 +17,7 @@ expected_short_text = '''Thread no. 1 (5 frames)
 expected_short_text_955617 = '''Thread no. 1 (3 frames)
  #10 xf86CursorSetCursor at xf86Cursor.c:333
  #11 xf86CursorEnableDisableFBAccess at xf86Cursor.c:233
- #12 ?? at /usr/lib/xorg/modules/drivers/nvidia_drv.so
+ #12 ??
 '''
 
 class TestGdbStacktrace(BindingsTestCase):
