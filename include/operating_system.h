@@ -38,6 +38,7 @@ struct sr_operating_system
     /* Uptime in seconds. */
     uint64_t uptime;
     char *desktop;
+    char *variant;
 };
 
 struct sr_operating_system *

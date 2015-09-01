@@ -44,6 +44,7 @@ sr_operating_system_init(struct sr_operating_system *operating_system)
     operating_system->architecture = NULL;
     operating_system->cpe = NULL;
     operating_system->desktop = NULL;
+    operating_system->variant = NULL;
     operating_system->uptime = 0;
 }
 
@@ -58,6 +59,7 @@ sr_operating_system_free(struct sr_operating_system *operating_system)
     free(operating_system->architecture);
     free(operating_system->cpe);
     free(operating_system->desktop);
+    free(operating_system->variant);
     free(operating_system);
 }
 
@@ -101,6 +103,13 @@ sr_operating_system_to_json(struct sr_operating_system *operating_system)
         sr_strbuf_append_str(strbuf, "\n");
     }
 
+    if (operating_system->variant)
+    {
+        sr_strbuf_append_str(strbuf, ",   \"variant\": ");
+        sr_json_append_escaped(strbuf, operating_system->variant);
+        sr_strbuf_append_str(strbuf, "\n");
+    }
+
     if (operating_system->uptime > 0)
     {
         sr_strbuf_append_strf(strbuf,
@@ -133,6 +142,8 @@ sr_operating_system_from_json(struct sr_json_value *root, char **error_message)
 
     /* desktop is optional - failure is not fatal */
     JSON_READ_STRING(root, "desktop", &result->desktop);
+    /* variant is optional - failure is not fatal */
+    JSON_READ_STRING(root, "variant", &result->variant);
 
     if (!success)
     {
@@ -211,6 +222,10 @@ os_release_callback(char *key, char *value, void *data)
     else if (0 == strcmp(key, "CPE_NAME"))
     {
         operating_system->cpe = value;
+    }
+    else if (0 == strcmp(key, "VARIANT_ID"))
+    {
+        operating_system->variant = value;
     }
     else
     {
