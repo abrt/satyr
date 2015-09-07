@@ -7,6 +7,13 @@
   %define enable_python_manpage 1
 %endif
 
+%if 0%{?fedora}
+  %define with_python3 1
+%else
+  # EL doesn't have Python 3
+  %define with_python3 0
+%endif
+
 %if 0%{?suse_version}
   %define python2_sitearch %{python_sitearch}
   %define python2_devel python-devel
@@ -27,7 +34,9 @@ License: GPLv2+
 URL: https://github.com/abrt/satyr
 Source0: https://fedorahosted.org/released/abrt/satyr-%{version}.tar.xz
 BuildRequires: %{python2_devel}
+%if 0%{?with_python3}
 BuildRequires: python3-devel
+%endif # if with_python3
 BuildRequires: %{libdw_devel}
 BuildRequires: %{libelf_devel}
 BuildRequires: binutils-devel
@@ -65,6 +74,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %description python
 Python bindings for %{name}.
 
+%if 0%{?with_python3}
 %package python3
 Summary: Python 3 bindings for %{name}
 Group: Development/Libraries
@@ -72,6 +82,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description python3
 Python 3 bindings for %{name}.
+%endif # if with_python3
 
 %prep
 %setup -q
@@ -80,6 +91,9 @@ Python 3 bindings for %{name}.
 %configure \
 %if ! %{?enable_python_manpage}
         --disable-python-manpage \
+%endif
+%if ! %{?with_python3}
+        --without-python3 \
 %endif
         --disable-static
 
@@ -116,9 +130,11 @@ make check
 %{_mandir}/man3/satyr-python.3*
 %endif
 
+%if 0%{?with_python3}
 %files python3
 %dir %{python3_sitearch}/%{name}
 %{python3_sitearch}/%{name}/*
+%endif
 
 %changelog
 * Tue Jul 07 2015 Martin Milata <mmilata@redhat.com> 0.19-1
