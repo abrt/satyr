@@ -285,8 +285,13 @@ resolve_frame(Dwfl *dwfl, Dwarf_Addr ip, bool minus_one)
         int ret;
         const unsigned char *build_id_bits;
         const char *filename, *funcname;
-        GElf_Addr bid_addr;
+        GElf_Addr bias, bid_addr;
         Dwarf_Addr start;
+
+        /* Initialize the module's main Elf for dwfl_module_build_id and dwfl_module_info */
+        /* No need to deallocate the variable 'bias' and the return value.*/
+        if (NULL == dwfl_module_getelf(mod, &bias))
+            warn("The module's main Elf was not found");
 
         ret = dwfl_module_build_id(mod, &build_id_bits, &bid_addr);
         if (ret > 0)
@@ -297,6 +302,7 @@ resolve_frame(Dwfl *dwfl, Dwarf_Addr ip, bool minus_one)
 
         const char *modname = dwfl_module_info(mod, NULL, &start, NULL, NULL, NULL,
                                                &filename, NULL);
+
         if (modname)
         {
             frame->build_id_offset = ip - start;
