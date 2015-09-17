@@ -137,6 +137,13 @@ make check
 %endif
 
 %changelog
+* Thu Sep 17 2015 Matej Habrnal <mhabrnal@redhat.com> 0.20-1
+- New upstream version
+  - Don't parse SO files as source_files
+  - Add support for OS Variant
+  - Fix the missing frame build_id and file_name
+  - Bugfixes
+
 * Tue Jul 07 2015 Martin Milata <mmilata@redhat.com> 0.19-1
 - New upstream version
   - Enhancements to GDB parser: Thread ID, C++ template arguments

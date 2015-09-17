@@ -1,3 +1,8 @@
+satyr 0.20
+==========
+Don't parse SO files as source_files. Added support for OS Variant. Fixed the
+missing frame build_id and file_name. Tests and bugfixes.
+
 satyr 0.19
 ==========
 Enhancements to GDB parser: Thread ID, C++ template arguments. Tests and
