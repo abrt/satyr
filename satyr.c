@@ -40,6 +40,10 @@
 #include <assert.h>
 #include <libgen.h>
 #include <time.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 static char *g_program_name;
 
@@ -281,8 +285,40 @@ debug_duphash(int argc, char **argv)
 }
 
 static void
+forward_output_streams_to_tmp_files(void)
+{
+    const char *names[] = {NULL, "STDOUT", "STDERR"};
+    FILE *streams[] = {NULL, stdout, stderr};
+    char stream_file_name[sizeof("/tmp/satyr..STDOUT") + 3 * sizeof(pid_t) + 1];
+
+    int fd;
+    for (fd = 1; fd <= 2; ++fd)
+    {
+        int r = snprintf(stream_file_name, sizeof(stream_file_name),
+                         "/tmp/satyr.%d.%s", getpid(), names[fd]);
+
+        if (r >= sizeof(stream_file_name))
+        {
+            fprintf(stderr, "Bug in file formatting code");
+            abort();
+        }
+
+        fprintf(streams[fd], "Forwarding %s to %s\n", names[fd], stream_file_name);
+        fflush(streams[fd]);
+
+        unlink(stream_file_name);
+        close(fd);
+        int str = open(stream_file_name, O_CREAT | O_WRONLY | O_EXCL, 0400);
+        if (str != fd)
+            exit(100 + fd);
+    }
+}
+
+static void
 debug_unwind_from_hook(int argc, char **argv)
 {
+    forward_output_streams_to_tmp_files();
+
     if (argc != 3)
     {
         fprintf(stderr, "Wrong number of arguments.\n");
