@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <errno.h>
 
 static char*
 file_contents(const char *directory, const char *file, char **error_message)
@@ -400,6 +401,53 @@ desktop_from_dir(const char *directory,
     return result;
 }
 
+static bool
+occurrences_from_dir(const char *directory,
+                     uint32_t *retval,
+                     char **error_message)
+{
+    char *count_contents = file_contents(directory, "count", error_message);
+    if (!count_contents)
+        return NULL;
+
+    char *endptr = NULL;
+    bool result = false;
+    const long count = strtol(count_contents, &endptr , 10);
+
+    /* Check for various possible errors */
+    if ((errno == ERANGE && (count == LONG_MAX || count == LONG_MIN))
+            || (errno != 0 && count == 0))
+    {
+        *error_message = sr_asprintf("'count' file does not contain number: %s", strerror(errno));
+        goto finito;
+    }
+
+    if (endptr == count_contents)
+    {
+        *error_message = sr_asprintf("'count' file contains no digits: '%s'", count_contents);
+        goto finito;
+    }
+
+    if (*endptr != '\0')
+    {
+        *error_message = sr_asprintf("'count' file has non-digit suffix: '%s'", endptr);
+        goto finito;
+    }
+
+    if (count < 0 || count > UINT32_MAX)
+    {
+        *error_message = sr_asprintf("'count' file is out of range: '%s'", count_contents);
+        goto finito;
+    }
+
+    *retval = (uint32_t)count;
+    result = true;
+
+finito:
+    free(count_contents);
+    return result;
+}
+
 struct sr_operating_system *
 sr_abrt_operating_system_from_dir(const char *directory,
                                   char **error_message)
@@ -483,6 +531,13 @@ sr_abrt_report_from_dir(const char *directory,
         directory, error_message);
 
     if (!report->rpm_packages)
+    {
+        sr_report_free(report);
+        return NULL;
+    }
+
+    /* Serial. */
+    if (!occurrences_from_dir(directory, &report->serial, error_message))
     {
         sr_report_free(report);
         return NULL;

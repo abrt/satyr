@@ -23,6 +23,8 @@
       "root": false
     },
 
+    "serial": 1,
+
     "stacktrace": [
       {
         "crash_thread": true,

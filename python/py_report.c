@@ -54,7 +54,8 @@ GSOFF_MEMBER(reporter_name),
 GSOFF_MEMBER(reporter_version),
 GSOFF_MEMBER(user_root),
 GSOFF_MEMBER(user_local),
-GSOFF_MEMBER(component_name)
+GSOFF_MEMBER(component_name),
+GSOFF_MEMBER(serial)
 GSOFF_END
 
 static PyGetSetDef
@@ -65,6 +66,7 @@ report_getset[] =
     SR_ATTRIBUTE_BOOL(user_root,          "Did the problem originate in a program running as root? (bool)"        ),
     SR_ATTRIBUTE_BOOL(user_local,         "Did the problem originate in a program executed by local user? (bool)" ),
     SR_ATTRIBUTE_STRING(component_name,   "Name of the software component this report pertains to (string)"       ),
+    SR_ATTRIBUTE_UINT32(serial,           "Serial number of the report (int)"                                     ),
     { (char*)"report_version", sr_py_report_get_version, sr_py_setter_readonly, (char*)"Version of the report (int)", NULL },
     { (char*)"report_type", sr_py_report_get_type, sr_py_report_set_type, (char*)"Report type (string)", NULL },
     { (char*)"auth",        sr_py_report_get_auth, sr_py_report_set_auth, (char*)auth_doc, NULL               },
