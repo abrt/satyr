@@ -15,7 +15,8 @@ EXTRA_DIST = gdb_stacktraces \
              python/report.py \
              python/ruby.py \
              python/test_helpers.py \
-             python_stacktraces
+             python_stacktraces \
+             problem_dir
 
 ## ------------ ##
 ## package.m4.  ##

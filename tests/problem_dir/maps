@@ -1,0 +1,20 @@
+556ad31d7000-556ad31de000 r-xp 00000000 fd:00 395889                     /usr/bin/sleep
+556ad33dd000-556ad33de000 r--p 00006000 fd:00 395889                     /usr/bin/sleep
+556ad33de000-556ad33df000 rw-p 00007000 fd:00 395889                     /usr/bin/sleep
+556ad4b37000-556ad4b58000 rw-p 00000000 00:00 0                          [heap]
+7fdfa4d72000-7fdfab6e5000 r--p 00000000 fd:00 395600                     /usr/lib/locale/locale-archive
+7fdfab6e5000-7fdfab8a9000 r-xp 00000000 fd:00 393881                     /usr/lib64/libc-2.23.so
+7fdfab8a9000-7fdfabaa9000 ---p 001c4000 fd:00 393881                     /usr/lib64/libc-2.23.so
+7fdfabaa9000-7fdfabaad000 r--p 001c4000 fd:00 393881                     /usr/lib64/libc-2.23.so
+7fdfabaad000-7fdfabaaf000 rw-p 001c8000 fd:00 393881                     /usr/lib64/libc-2.23.so
+7fdfabaaf000-7fdfabab3000 rw-p 00000000 00:00 0 
+7fdfabab3000-7fdfabad7000 r-xp 00000000 fd:00 393874                     /usr/lib64/ld-2.23.so
+7fdfabcb9000-7fdfabcbc000 rw-p 00000000 00:00 0 
+7fdfabcd5000-7fdfabcd6000 rw-p 00000000 00:00 0 
+7fdfabcd6000-7fdfabcd7000 r--p 00023000 fd:00 393874                     /usr/lib64/ld-2.23.so
+7fdfabcd7000-7fdfabcd8000 rw-p 00024000 fd:00 393874                     /usr/lib64/ld-2.23.so
+7fdfabcd8000-7fdfabcd9000 rw-p 00000000 00:00 0 
+7ffe68e26000-7ffe68e47000 rw-p 00000000 00:00 0                          [stack]
+7ffe68fa2000-7ffe68fa5000 r--p 00000000 00:00 0                          [vvar]
+7ffe68fa5000-7ffe68fa7000 r-xp 00000000 00:00 0                          [vdso]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]

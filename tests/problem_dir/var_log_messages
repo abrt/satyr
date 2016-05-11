@@ -1,0 +1,3 @@
+User Logs:
+-- Logs begin at Thu 2016-04-07 11:54:33 CEST, end at Wed 2016-05-11 14:43:31 CEST. --
+May 11 14:43:31 dhcp-24-126.brq.redhat.com audit[19861]: ANOM_ABEND auid=1000 uid=0 gid=0 ses=4 subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 pid=19861 comm="sleep" exe="/usr/bin/sleep" sig=11
