@@ -61,6 +61,7 @@ class TestReport(BindingsTestCase):
         self.assertGetSetCorrect(self.report, 'user_root', False, True)
         self.assertGetSetCorrect(self.report, 'user_local', True, False)
         self.assertGetSetCorrect(self.report, 'component_name', 'coreutils', 'zsh')
+        self.assertGetSetCorrect(self.report, 'serial', 1, 44)
 
         self.assertGetSetCorrect(self.report, 'report_type', 'core', 'python')
         self.assertRaises(ValueError, self.report.__setattr__, 'report_type', 'C#')

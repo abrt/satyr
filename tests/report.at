@@ -138,3 +138,103 @@ int main(void)
   return 0;
 }
 ]])
+
+## ----------------------- ##
+## sr_abrt_report_from_dir ##
+## ----------------------- ##
+
+AT_TESTFUN([sr_abrt_report_from_dir],
+[[
+
+#include <assert.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include "abrt.h"
+#include "report.h"
+#include "report_type.h"
+#include "operating_system.h"
+#include "rpm.h"
+#include "utils.h"
+
+int main(void)
+{
+    char *error_message = NULL;
+
+    sr_abrt_print_report_from_dir("../../problem_dir", &error_message);
+    struct sr_report *r = sr_abrt_report_from_dir("../../problem_dir", &error_message);
+
+    if (error_message != NULL)
+        fprintf(stderr, "%s\n", error_message);
+
+    assert(r);
+
+    /* set reporter_version because the value depends on build */
+    r->reporter_version = "0.20.dirty";
+
+    assert(r->report_version == 2);
+    assert(strcmp(r->reporter_name, "satyr") == 0);
+    assert(r->report_type == SR_REPORT_CORE);
+    assert(r->user_root == false);
+    assert(r->user_local == true);
+    assert(strcmp(r->component_name, "coreutils") == 0);
+    assert(r->serial == 55);
+
+    struct sr_operating_system *os = r->operating_system;
+
+    assert(strcmp(os->name, "fedora") == 0);
+    assert(strcmp(os->version, "24") == 0);
+    assert(strcmp(os->architecture, "x86_64") == 0);
+    assert(strcmp(os->cpe, "cpe:/o:fedoraproject:fedora:24") == 0);
+    assert(strcmp(os->variant, "workstation") == 0);
+
+    /* packages */
+    struct sr_rpm_package *pkg = r->rpm_packages;
+
+    assert(strcmp(pkg->name, "coreutils") == 0);
+    assert(pkg->epoch == 0);
+    assert(strcmp(pkg->version, "8.25") == 0);
+    assert(strcmp(pkg->release, "5.fc24") == 0);
+    assert(strcmp(pkg->architecture, "x86_64") == 0);
+    assert(pkg->install_time == 1460022612);
+    assert(pkg->role == SR_ROLE_AFFECTED);
+
+    struct sr_rpm_package *pkg2 = pkg->next;
+
+    assert(strcmp(pkg2->name, "glibc") == 0);
+    assert(pkg2->epoch == 0);
+    assert(strcmp(pkg2->version, "2.23.1") == 0);
+    assert(strcmp(pkg2->release, "5.fc24") == 0);
+    assert(strcmp(pkg2->architecture, "x86_64") == 0);
+    assert(pkg2->install_time == 1460022605);
+
+    struct sr_rpm_package *pkg3 = pkg2->next;
+
+    assert(strcmp(pkg3->name, "glibc-all-langpacks") == 0);
+    assert(pkg3->epoch == 0);
+    assert(strcmp(pkg3->version, "2.23.1") == 0);
+    assert(strcmp(pkg3->release, "5.fc24") == 0);
+    assert(strcmp(pkg3->architecture, "x86_64") == 0);
+    assert(pkg3->install_time == 1460024921);
+
+    /* to json */
+    char *report_json = sr_report_to_json(r);
+    error_message = NULL;
+    char *report_json_from_file = sr_file_to_string("../../json_files/ureport-from-problem-dir", &error_message);
+
+    if (error_message != NULL)
+        fprintf(stderr, "%s\n", error_message);
+
+    assert(report_json_from_file);
+
+    /* compare created json string with reference uReport */
+    assert(strcmp(report_json, report_json_from_file) == 0);
+
+    free(report_json);
+    free(report_json_from_file);
+
+    sr_report_free(r);
+
+    return 0;
+}
+]])

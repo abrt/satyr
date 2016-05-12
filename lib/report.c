@@ -68,6 +68,7 @@ sr_report_init(struct sr_report *report)
     report->rpm_packages = NULL;
     report->stacktrace = NULL;
     report->auth_entries = NULL;
+    report->serial = 0;
 }
 
 void
@@ -150,6 +151,8 @@ problem_object_string(struct sr_report *report, const char *report_type)
                               report->user_root ? "true" : "false",
                               report->user_local ? "true" : "false");
     }
+
+    sr_strbuf_append_strf(strbuf, ",   \"serial\": %"PRIu32"\n", report->serial);
 
     /* Stacktrace. */
     if (report->stacktrace)
@@ -377,6 +380,10 @@ sr_report_from_json(struct sr_json_value *root, char **error_message)
             if (!success)
                 goto fail;
         }
+
+        /* Serial. */
+        if (!JSON_READ_UINT32(problem, "serial", &report->serial))
+            goto fail;
 
         /* Stacktrace. */
         switch (report->report_type)

@@ -1,0 +1,6 @@
+ipc : default
+mnt : default
+net : default
+pid : default
+uts : default
+user : default

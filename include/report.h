@@ -58,6 +58,8 @@ struct sr_report
     struct sr_stacktrace *stacktrace;
 
     struct sr_report_custom_entry *auth_entries;
+
+    uint32_t serial;
 };
 
 struct sr_report *
