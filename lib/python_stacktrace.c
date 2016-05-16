@@ -231,9 +231,15 @@ sr_python_stacktrace_parse(const char **input,
     }
 
     /* Parse exception name. */
-    sr_parse_char_cspan(&local_input,
-                        ":\n",
-                        &stacktrace->exception_name);
+    if (!sr_parse_char_cspan(&local_input, ":\n", &stacktrace->exception_name))
+    {
+
+        location->message = "Unable to find the ':\\n' characters "
+                            "identifying the end of exception name.";
+        sr_python_stacktrace_free(stacktrace);
+        return NULL;
+
+    }
 
     *input = local_input;
     return stacktrace;
