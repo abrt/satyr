@@ -1,3 +1,7 @@
+satyr 0.21
+==========
+Introduce 'serial' field in uReport and actualize list of normalized functions.
+
 satyr 0.20
 ==========
 Don't parse SO files as source_files. Added support for OS Variant. Fixed the
