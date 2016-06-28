@@ -503,7 +503,7 @@ sr_py_distances_part_reduce(PyObject *self, PyObject *args)
         if (!dist_list)
             return NULL;
 
-        int i;
+        unsigned int i;
         for (i = 0; i < part->len; i++)
         {
             PyObject *f = PyFloat_FromDouble((double)part->distances[i]);

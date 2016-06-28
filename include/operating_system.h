@@ -42,7 +42,7 @@ struct sr_operating_system
 };
 
 struct sr_operating_system *
-sr_operating_system_new();
+sr_operating_system_new(void);
 
 void
 sr_operating_system_init(struct sr_operating_system *operating_system);

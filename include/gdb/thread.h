@@ -74,7 +74,7 @@ struct sr_gdb_thread
  * calling the function sr_gdb_thread_free().
  */
 struct sr_gdb_thread *
-sr_gdb_thread_new();
+sr_gdb_thread_new(void);
 
 /**
  * Initializes all members of the thread to default values.

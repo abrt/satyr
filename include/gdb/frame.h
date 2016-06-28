@@ -36,6 +36,8 @@ extern "C" {
 struct sr_strbuf;
 struct sr_location;
 
+typedef uint64_t sr_gdb_frame_address_t;
+
 /**
  * @brief A function call of a GDB-produced stack trace.
  *
@@ -87,7 +89,7 @@ struct sr_gdb_frame
      * address is unknown. Address is unknown when the frame
      * represents inlined function.
      */
-    uint64_t address;
+    sr_gdb_frame_address_t address;
 
     /**
      * A library name or NULL.
@@ -108,7 +110,7 @@ struct sr_gdb_frame
  * calling the function sr_gdb_frame_free().
  */
 struct sr_gdb_frame *
-sr_gdb_frame_new();
+sr_gdb_frame_new(void);
 
 /**
  * Initializes all members of the frame structure to their default

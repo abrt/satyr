@@ -182,7 +182,7 @@ sr_py_ruby_frame_str(PyObject *self)
     {
         sr_strbuf_append_str(buf, ":in `");
 
-        int i;
+        unsigned int i;
         for (i = 0; i < this->frame->rescue_level; i++)
         {
             sr_strbuf_append_str(buf, "rescue in ");

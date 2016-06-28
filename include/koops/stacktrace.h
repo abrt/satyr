@@ -101,7 +101,7 @@ struct sr_koops_stacktrace
  * calling the function sr_koops_stacktrace_free().
  */
 struct sr_koops_stacktrace *
-sr_koops_stacktrace_new();
+sr_koops_stacktrace_new(void);
 
 /**
  * Initializes all members of the stacktrace structure to their default

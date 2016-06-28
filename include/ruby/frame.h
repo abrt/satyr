@@ -58,7 +58,7 @@ struct sr_ruby_frame
 };
 
 struct sr_ruby_frame *
-sr_ruby_frame_new();
+sr_ruby_frame_new(void);
 
 void
 sr_ruby_frame_init(struct sr_ruby_frame *frame);

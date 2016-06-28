@@ -54,7 +54,7 @@ struct sr_java_stacktrace
  * calling the function sr_java_stacktrace_free().
  */
 struct sr_java_stacktrace *
-sr_java_stacktrace_new();
+sr_java_stacktrace_new(void);
 
 /**
  * Initializes all members of the stacktrace structure to their default

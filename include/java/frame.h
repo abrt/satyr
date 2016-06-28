@@ -98,7 +98,7 @@ struct sr_java_frame
  * calling the function sr_java_frame_free().
  */
 struct sr_java_frame *
-sr_java_frame_new();
+sr_java_frame_new(void);
 
 /**
  * Creates and initializes a new exception in frame structure.
@@ -107,7 +107,7 @@ sr_java_frame_new();
  * calling the function sr_java_frame_free().
  */
 struct sr_java_frame *
-sr_java_frame_new_exception();
+sr_java_frame_new_exception(void);
 
 /**
  * Initializes all members of the frame structure to their default
