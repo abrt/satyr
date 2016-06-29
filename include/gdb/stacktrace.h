@@ -86,7 +86,7 @@ struct sr_gdb_stacktrace
  * calling the function sr_gdb_stacktrace_free().
  */
 struct sr_gdb_stacktrace *
-sr_gdb_stacktrace_new();
+sr_gdb_stacktrace_new(void);
 
 /**
  * Initializes all members of the stacktrace structure to their default

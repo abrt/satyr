@@ -67,7 +67,7 @@ struct sr_core_thread
  * calling the function sr_core_thread_free().
  */
 struct sr_core_thread *
-sr_core_thread_new();
+sr_core_thread_new(void);
 
 /**
  * Initializes all members of the thread to default values.

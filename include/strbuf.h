@@ -55,7 +55,7 @@ struct sr_strbuf
  * calling the function sr_strbuf_free().
  */
 struct sr_strbuf *
-sr_strbuf_new();
+sr_strbuf_new(void);
 
 /**
  * Initializes all members of the strbuf structure to their default

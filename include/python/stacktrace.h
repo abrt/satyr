@@ -54,7 +54,7 @@ struct sr_python_stacktrace
  * calling the function sr_python_stacktrace_free().
  */
 struct sr_python_stacktrace *
-sr_python_stacktrace_new();
+sr_python_stacktrace_new(void);
 
 /**
  * Initializes all members of the stacktrace structure to their default

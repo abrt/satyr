@@ -481,7 +481,7 @@ sr_py_gdb_stacktrace_find_address(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &address))
         return NULL;
 
-    if (address == -1)
+    if (address == (unsigned long long) -1)
         Py_RETURN_NONE;
 
     int i;

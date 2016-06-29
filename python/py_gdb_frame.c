@@ -227,7 +227,7 @@ sr_py_gdb_frame_str(PyObject *self)
         sr_strbuf_append_str(buf, "unknown function");
     else
         sr_strbuf_append_strf(buf, "function %s", this->frame->function_name);
-    if (this->frame->address != -1)
+    if (this->frame->address != (sr_py_gdb_frame_address_t) -1)
         sr_strbuf_append_strf(buf, " @ 0x%016"PRIx64, this->frame->address);
     if (this->frame->library_name)
         sr_strbuf_append_strf(buf, " (%s)", this->frame->library_name);

@@ -31,8 +31,11 @@ extern "C" {
 
 #include <Python.h>
 #include <structmember.h>
+#include "gdb/frame.h"
 
 PyTypeObject sr_py_gdb_frame_type;
+
+typedef sr_gdb_frame_address_t sr_py_gdb_frame_address_t;
 
 /* The beginning of this structure has to have the same layout as
  * sr_py_base_frame.

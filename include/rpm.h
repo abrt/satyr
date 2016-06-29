@@ -78,7 +78,7 @@ struct sr_rpm_package
 };
 
 struct sr_rpm_package *
-sr_rpm_package_new();
+sr_rpm_package_new(void);
 
 void
 sr_rpm_package_init(struct sr_rpm_package *package);
@@ -192,7 +192,7 @@ sr_rpm_package_parse_nevra(const char *text,
                            char **architecture);
 
 struct sr_rpm_consistency *
-sr_rpm_consistency_new();
+sr_rpm_consistency_new(void);
 
 void
 sr_rpm_consistency_init(struct sr_rpm_consistency *consistency);

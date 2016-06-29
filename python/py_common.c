@@ -164,7 +164,7 @@ sr_py_getter_uint64(PyObject *self, void *data)
         = MEMB_T(uint64_t, MEMB(self, gsoff->c_struct_offset), gsoff->member_offset);
 
     /* If the attribute is UINT64_MAX, return None. */
-    if (num == -1)
+    if (num == (uint64_t) -1)
         Py_RETURN_NONE;
 
     return PyLong_FromUnsignedLongLong(num);

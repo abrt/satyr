@@ -85,7 +85,7 @@ struct sr_core_frame
  * calling the function sr_core_frame_free().
  */
 struct sr_core_frame *
-sr_core_frame_new();
+sr_core_frame_new(void);
 
 /**
  * Initializes all members of the frame structure to their default

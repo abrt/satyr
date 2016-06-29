@@ -63,7 +63,7 @@ struct sr_report
 };
 
 struct sr_report *
-sr_report_new();
+sr_report_new(void);
 
 void
 sr_report_init(struct sr_report *report);

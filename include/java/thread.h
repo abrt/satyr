@@ -72,7 +72,7 @@ struct sr_java_thread
  * calling the function sr_java_thread_free().
  */
 struct sr_java_thread *
-sr_java_thread_new();
+sr_java_thread_new(void);
 
 /**
  * Initializes all members of the thread to default values.

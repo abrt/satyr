@@ -58,7 +58,7 @@ struct sr_gdb_sharedlib
  * calling the function sr_gdb_sharedlib_free().
  */
 struct sr_gdb_sharedlib *
-sr_gdb_sharedlib_new();
+sr_gdb_sharedlib_new(void);
 
 /**
  * Initializes all members of the sharedlib to default values.  No

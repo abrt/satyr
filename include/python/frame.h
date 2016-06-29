@@ -64,7 +64,7 @@ struct sr_python_frame
  * calling the function sr_python_frame_free().
  */
 struct sr_python_frame *
-sr_python_frame_new();
+sr_python_frame_new(void);
 
 /**
  * Initializes all members of the frame structure to their default

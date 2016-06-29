@@ -69,7 +69,7 @@ struct sr_core_stacktrace
  * calling the function sr_core_stacktrace_free().
  */
 struct sr_core_stacktrace *
-sr_core_stacktrace_new();
+sr_core_stacktrace_new(void);
 
 /**
  * Initializes all members of the stacktrace structure to their default

@@ -42,7 +42,7 @@ struct sr_ruby_stacktrace
 };
 
 struct sr_ruby_stacktrace *
-sr_ruby_stacktrace_new();
+sr_ruby_stacktrace_new(void);
 
 void
 sr_ruby_stacktrace_init(struct sr_ruby_stacktrace *stacktrace);
