@@ -28,6 +28,9 @@ extern "C" {
 #include <stdbool.h>
 #include <sys/types.h>
 
+/* Forward declaration to avoid the need to include core/unwind.h */
+struct sr_core_stracetrace_unwind_state;
+
 bool
 sr_abrt_print_report_from_dir(const char *directory,
                               char **error_message);
@@ -43,6 +46,18 @@ sr_abrt_create_core_stacktrace_from_gdb(const char *directory,
                                         const char *gdb_output,
                                         bool hash_fingerprints,
                                         char **error_message);
+
+
+struct sr_core_stracetrace_unwind_state *
+sr_abrt_get_core_stacktrace_from_core_hook_prepare(pid_t thread_id,
+                                                   char **error_message);
+
+char *
+sr_abrt_get_core_stacktrace_from_core_hook_generate(pid_t thread_id,
+                                                    const char *executable,
+                                                    int signum,
+                                                    struct sr_core_stracetrace_unwind_state *state,
+                                                    char **error_message);
 
 char *
 sr_abrt_get_core_stacktrace_from_core_hook(pid_t thread_id,
