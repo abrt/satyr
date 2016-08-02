@@ -33,8 +33,6 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 
-#define FRAME_LIMIT 256
-
 struct frame_callback_arg
 {
     struct sr_core_frame **frames_tail;
@@ -84,8 +82,8 @@ frame_callback(Dwfl_Frame *frame, void *data)
 static void
 truncate_long_thread(struct sr_core_thread *thread, struct frame_callback_arg *frame_arg)
 {
-    /* Truncate the stacktrace to FRAME_LIMIT least recent frames. */
-    while (thread->frames && frame_arg->nframes > FRAME_LIMIT)
+    /* Truncate the stacktrace to CORE_STACKTRACE_FRAME_LIMIT least recent frames. */
+    while (thread->frames && frame_arg->nframes > CORE_STACKTRACE_FRAME_LIMIT)
     {
         struct sr_core_frame *old_frame = thread->frames;
         thread->frames = old_frame->next;
