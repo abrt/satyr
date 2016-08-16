@@ -71,6 +71,9 @@ main(void)
     check(true, "Modules linked in: vfat fat\n usb_storage [last unloaded: scsi_wait_scan]\n",
           modules);
 
+    check(true, "Modules linked in: vfat fat\n usb_storage\nirq event stamp: 754336\n",
+          modules);
+
     check(true,
           "Modules linked in: vfat fat usb_storage\n"
           "Pid: 31337, comm: ksoftirqd/2\n",
