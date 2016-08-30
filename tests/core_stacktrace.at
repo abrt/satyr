@@ -197,3 +197,161 @@ main(void)
   return 0;
 }
 ]])
+
+## --------------------------------- ##
+## sr_core_stacktrace_from_gdb_limit ##
+## --------------------------------- ##
+
+AT_TESTFUN([sr_core_stacktrace_from_gdb_limit],
+[[
+#define _GNU_SOURCE
+#include "stacktrace.h"
+#include "core/stacktrace.h"
+#include "core/thread.h"
+#include "core/frame.h"
+#include "core/unwind.h"
+#include "strbuf.h"
+#include "utils.h"
+#include "report_type.h"
+#include <assert.h>
+#include <stdio.h>
+#include "internal_unwind.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <errno.h>
+#include <err.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+char *generate_coredump(int start)
+{
+
+  if (start)
+  {
+      return generate_coredump(--start);
+  }
+
+  const char* coredump_pattern = "/tmp/satyr.core";
+
+  char *mypid = NULL;
+  asprintf(&mypid, "%d", getpid());
+  if (mypid == NULL)
+      err(1, "asprintf");
+
+  pid_t pid = fork();
+  if (pid < 0)
+      err(1, "fork");
+  if (pid == 0)
+  {
+      char *args[] = { "gcore", "-o", (char *)coredump_pattern, mypid, NULL };
+      execv("/usr/bin/gcore", args);
+  }
+
+  int status;
+  int r;
+  while ((r = waitpid(pid, &status, 0)) < 0)
+  {
+      if (errno != EAGAIN)
+          err(1, "waitpid");
+  }
+
+  if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+      errx(1, "gcore failed");
+
+  return sr_asprintf("%s.%s", coredump_pattern, mypid);
+}
+struct sr_strbuf *
+get_backtrace(const char *core_file, const char *executable)
+{
+  unsigned i = 0;
+  char *args[25];
+  args[i++] = (char*)"/usr/bin/gdb";
+  args[i++] = (char*)"-batch";
+  args[i++] = (char*)"-iex";
+  args[i++] = (char*)"set debug-file-directory /";
+  args[i++] = (char*)"-ex";
+  args[i++] = sr_asprintf("file %s", executable);
+  args[i++] = (char*)"-ex";
+  args[i++] = sr_asprintf("core-file %s", core_file);
+  args[i++] = (char*)"-ex";
+  args[i++] = (char*)"thread apply all -ascending backtrace 1024 full";
+  args[i++] = (char*)"-ex";
+  args[i++] = (char*)"info sharedlib";
+  args[i++] = (char*)"-ex";
+  args[i++] = (char*)"print (char*)__abort_msg";
+  args[i++] = (char*)"-ex";
+  args[i++] = (char*)"print (char*)__glib_assert_msg";
+  args[i++] = (char*)"-ex";
+  args[i++] = (char*)"info all-registers";
+  args[i++] = (char*)"-ex";
+  args[i++] = (char*)"disassemble";
+  args[i++] = NULL;
+
+  int p[2];
+  int pipe_return = pipe(p);
+  if (pipe_return != 0)
+      err(1, "pipe");
+
+  pid_t pid = fork();
+  if (pid < 0)
+      err(1, "fork");
+  if (pid == 0) /* child */
+  {
+    close(p[0]);
+    dup2(p[1], 1);  // send stdout to the pipe
+    dup2(p[1], 2);  // send stderr to the pipe
+
+    execv(args[0], args);
+  }
+  close(p[1]);
+
+  struct sr_strbuf *gdb_buf = sr_strbuf_new();
+  sr_strbuf_init(gdb_buf);
+  char buf[256];
+  ssize_t size;
+  while((size = read(p[0], buf, sizeof(buf)-1)) > 0 && errno != EINTR)
+  {
+    buf[size] = '\0';
+    sr_strbuf_append_str(gdb_buf, (const char*) buf);
+  }
+
+  int status, r;
+  while ((r = waitpid(pid, &status, 0)) < 0)
+  {
+      if (errno != EAGAIN)
+          err(1, "waitpid");
+  }
+
+  return gdb_buf;
+}
+
+int
+main(int argc, char* argv[])
+{
+  char *coredump_path = generate_coredump(257);
+
+  struct sr_strbuf *gdb_output = get_backtrace(coredump_path, argv[0]);
+  assert(gdb_output);
+  assert(gdb_output->buf);
+
+  char *error_msg = NULL;
+  struct sr_core_stacktrace *core_stacktrace = sr_core_stacktrace_from_gdb(gdb_output->buf, coredump_path, argv[0], &error_msg);
+  assert(!error_msg);
+
+  struct sr_core_thread *threads = core_stacktrace->threads;
+  struct sr_core_frame *frames = threads->frames;
+  unsigned nframes = 0;
+  for(; frames; ++nframes, frames = frames->next)
+    ;
+
+  /* max num of frames is CORE_STACKTRACE_FRAME_LIMIT */
+  assert(nframes == CORE_STACKTRACE_FRAME_LIMIT);
+
+  free(coredump_path);
+  sr_strbuf_free(gdb_output);
+
+  return 0;
+}
+]])
