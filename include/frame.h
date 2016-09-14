@@ -27,6 +27,7 @@
  * * sr_koops_frame
  * * sr_java_frame
  * * sr_gdb_frame
+ * * sr_ruby_frame
  * You may need to explicitly cast the pointer to struct sr_frame in order to
  * avoid compiler warning.
  */

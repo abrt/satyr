@@ -22,6 +22,7 @@ int main(void)
   check(SR_REPORT_CORE, "core");
   check(SR_REPORT_KERNELOOPS, "kerneloops");
   check(SR_REPORT_GDB, "gdb");
+  check(SR_REPORT_RUBY, "ruby");
   check(SR_REPORT_NUM, "invalid");
   check(5000, "invalid");
   check(-42, "invalid");
@@ -51,6 +52,7 @@ int main(void)
   check(SR_REPORT_CORE, "core");
   check(SR_REPORT_PYTHON, "python");
   check(SR_REPORT_GDB, "gdb");
+  check(SR_REPORT_RUBY, "ruby");
   check(SR_REPORT_INVALID, NULL);
   check(SR_REPORT_INVALID, "visual basic");
 

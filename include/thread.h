@@ -29,6 +29,7 @@
  * * sr_koops_stacktrace
  * * sr_java_thread
  * * sr_gdb_thread
+ * * sr_ruby_stacktrace
  * You may need to explicitly cast the pointer to struct sr_thread in order to
  * avoid compiler warning.
  */
