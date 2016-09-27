@@ -49,7 +49,7 @@ struct frame_methods
 
 extern struct frame_methods core_frame_methods, python_frame_methods,
        koops_frame_methods, gdb_frame_methods, java_frame_methods,
-       ruby_frame_methods;
+       ruby_frame_methods, js_frame_methods;
 
 void
 frame_append_bthash_text(struct sr_frame *frame, enum sr_bthash_flags flags,

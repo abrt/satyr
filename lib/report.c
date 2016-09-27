@@ -43,6 +43,7 @@ static char *report_types[] =
     [SR_REPORT_JAVA] = "java",
     [SR_REPORT_GDB] = "gdb",
     [SR_REPORT_RUBY] = "ruby",
+    [SR_REPORT_JAVASCRIPT] = "javascript",
     NULL
 };
 
@@ -194,6 +195,7 @@ sr_report_to_json(struct sr_report *report)
     case SR_REPORT_KERNELOOPS:
     case SR_REPORT_JAVA:
     case SR_REPORT_RUBY:
+    case SR_REPORT_JAVASCRIPT:
         report_type = sr_report_type_to_string(report->report_type);
         reason = sr_stacktrace_get_reason(report->stacktrace);
         break;

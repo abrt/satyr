@@ -48,6 +48,10 @@ PYEXTFILES = \
     py_ruby_frame.c \
     py_ruby_stacktrace.h \
     py_ruby_stacktrace.c \
+    py_js_frame.h \
+    py_js_frame.c \
+    py_js_stacktrace.h \
+    py_js_stacktrace.c \
     py_rpm_package.h \
     py_rpm_package.c \
     py_metrics.h \

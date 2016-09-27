@@ -1,0 +1,6 @@
+TypeError: Cannot read property 'message' of undefined
+    at Socket.<anonymous> (/tmp/index.js:16:35)
+    at Socket.g (events.js:286:16)
+    at emitNone (events.js:86:13)
+    at Socket.emit (events.js:185:7)
+    at PipeConnectWrap.afterConnect [as oncomplete] (net.js:1068:10)

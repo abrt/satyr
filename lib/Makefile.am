@@ -59,6 +59,9 @@ libsatyr_conv_la_SOURCES = \
 	rpm.c \
 	ruby_frame.c \
 	ruby_stacktrace.c \
+	js_platform.c \
+	js_frame.c \
+	js_stacktrace.c \
 	sha1.c \
 	strbuf.c \
 	unstrip.c \

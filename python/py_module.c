@@ -20,6 +20,8 @@
 #include "py_core_stacktrace.h"
 #include "py_ruby_frame.h"
 #include "py_ruby_stacktrace.h"
+#include "py_js_frame.h"
+#include "py_js_stacktrace.h"
 #include "py_rpm_package.h"
 #include "py_metrics.h"
 #include "py_operating_system.h"
@@ -221,6 +223,18 @@ MOD_INIT
         return MOD_ERROR_VAL;
     }
 
+    if (PyType_Ready(&sr_py_js_frame_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_js_frame_type) < 0");
+        return MOD_ERROR_VAL;
+    }
+
+    if (PyType_Ready(&sr_py_js_stacktrace_type) < 0)
+    {
+        puts("PyType_Ready(&sr_py_js_stacktrace_type) < 0");
+        return MOD_ERROR_VAL;
+    }
+
     if (PyType_Ready(&sr_py_operating_system_type) < 0)
     {
         puts("PyType_Ready(&sr_py_operating_system_type) < 0");
@@ -347,6 +361,14 @@ MOD_INIT
     Py_INCREF(&sr_py_ruby_stacktrace_type);
     PyModule_AddObject(module, "RubyStacktrace",
                        (PyObject *)&sr_py_ruby_stacktrace_type);
+
+    Py_INCREF(&sr_py_js_frame_type);
+    PyModule_AddObject(module, "JavaScriptFrame",
+                       (PyObject *)&sr_py_js_frame_type);
+
+    Py_INCREF(&sr_py_js_stacktrace_type);
+    PyModule_AddObject(module, "JavaScriptStacktrace",
+                       (PyObject *)&sr_py_js_stacktrace_type);
 
     Py_INCREF(&sr_py_core_frame_type);
     PyModule_AddObject(module, "CoreFrame",

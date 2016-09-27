@@ -1,6 +1,7 @@
 EXTRA_DIST = gdb_stacktraces \
              java_stacktraces \
              ruby_stacktraces \
+             js_stacktraces \
              json_files \
              kerneloopses \
              programs \
@@ -14,6 +15,7 @@ EXTRA_DIST = gdb_stacktraces \
              python/python.py \
              python/report.py \
              python/ruby.py \
+             python/javascript.py \
              python/test_helpers.py \
              python_stacktraces \
              problem_dir
@@ -64,6 +66,9 @@ TESTSUITE_AT =		\
   core_stacktrace.at    \
   ruby_frame.at		\
   ruby_stacktrace.at	\
+  js_platform.at \
+  js_frame.at \
+  js_stacktrace.at \
   normalize.at  	\
   metrics.at 		\
   cluster.at  		\

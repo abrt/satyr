@@ -9,10 +9,15 @@ AT_BANNER([Report])
 AT_TESTFUN([sr_report_type_to_string],
 [[
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "report_type.h"
+#include "utils.h"
 
-void check(enum sr_report_type type, char *str)
+void check(enum sr_report_type type, const char *str)
 {
+  const char *ret_str = sr_report_type_to_string(type);
+  printf("sr_report_type_to_string(%d) -> %s == %s)\n", type, ret_str, str);
   assert(0 == sr_strcmp0(sr_report_type_to_string(type), str));
 }
 
@@ -23,6 +28,7 @@ int main(void)
   check(SR_REPORT_KERNELOOPS, "kerneloops");
   check(SR_REPORT_GDB, "gdb");
   check(SR_REPORT_RUBY, "ruby");
+  check(SR_REPORT_JAVASCRIPT, "javascript");
   check(SR_REPORT_NUM, "invalid");
   check(5000, "invalid");
   check(-42, "invalid");
@@ -39,10 +45,13 @@ AT_TESTFUN([sr_report_type_from_string],
 [[
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "report_type.h"
 
 void check(enum sr_report_type type, char *str)
 {
+  const enum sr_report_type ret_type = sr_report_type_from_string(str);
+  printf("sr_report_type_from_string(%s) -> %d == %d)\n", str, ret_type, type);
   assert(sr_report_type_from_string(str) == type);
 }
 
@@ -53,6 +62,7 @@ int main(void)
   check(SR_REPORT_PYTHON, "python");
   check(SR_REPORT_GDB, "gdb");
   check(SR_REPORT_RUBY, "ruby");
+  check(SR_REPORT_JAVASCRIPT, "javascript");
   check(SR_REPORT_INVALID, NULL);
   check(SR_REPORT_INVALID, "visual basic");
 

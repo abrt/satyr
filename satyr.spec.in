@@ -106,7 +106,12 @@ make install DESTDIR=%{buildroot}
 find %{buildroot} -name "*.la" | xargs rm --
 
 %check
-make check
+make check|| {
+    # find and print the logs of failed test
+    # do not cat tests/testsuite.log because it contains a lot of bloat
+    find tests/testsuite.dir -name "testsuite.log" -print -exec cat '{}' \;
+    exit 1
+}
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig

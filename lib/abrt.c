@@ -31,6 +31,7 @@
 #include "koops/stacktrace.h"
 #include "java/stacktrace.h"
 #include "ruby/stacktrace.h"
+#include "js/stacktrace.h"
 #include "json.h"
 #include "location.h"
 #include "internal_utils.h"
@@ -678,6 +679,66 @@ sr_abrt_report_from_dir(const char *directory,
         report->stacktrace = (struct sr_stacktrace *)sr_ruby_stacktrace_parse(
             &contents_pointer,
             &location);
+
+        free(backtrace_contents);
+        if (!report->stacktrace)
+        {
+            *error_message = sr_location_to_string(&location);
+            sr_report_free(report);
+            return NULL;
+        }
+    }
+
+    /* JavaScript stacktrace. */
+    if (report->report_type == SR_REPORT_JAVASCRIPT)
+    {
+        char *backtrace_contents = file_contents(directory, "backtrace",
+                                                     error_message);
+        if (!backtrace_contents)
+        {
+            sr_report_free(report);
+            return NULL;
+        }
+
+        /* Load platform information */
+        char *analyzer_contents = file_contents(directory, "analyzer",
+                                                error_message);
+        if (!analyzer_contents)
+        {
+            sr_report_free(report);
+            return NULL;
+        }
+
+        /* Determine platform */
+        sr_js_platform_t platform = sr_js_platform_from_string(analyzer_contents,
+                                                               NULL,
+                                                               error_message);
+        free(analyzer_contents);
+
+        struct sr_location location;
+        sr_location_init(&location);
+        const char *contents_pointer = backtrace_contents;
+
+        if (platform)
+        {   /* If we know platform, use platform specific parser. */
+            report->stacktrace = (struct sr_stacktrace *)sr_js_platform_parse_stacktrace(
+                platform,
+                &contents_pointer,
+                &location);
+        }
+        else
+        {   /* Otherwise use brute force to guess the platform. */
+
+            /* This message should help maintainers when a new platform
+             * appears. */
+            warn("Have to try to guess JavaScript platform: %s", *error_message);
+            free(*error_message);
+            *error_message = NULL;
+
+            report->stacktrace = (struct sr_stacktrace *)sr_js_stacktrace_parse(
+                &contents_pointer,
+                &location);
+        }
 
         free(backtrace_contents);
         if (!report->stacktrace)

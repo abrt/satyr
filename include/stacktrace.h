@@ -28,6 +28,7 @@
  * * sr_java_stacktrace
  * * sr_gdb_stacktrace
  * * sr_ruby_stacktrace
+ * * sr_js_stacktrace
  * You may need to explicitly cast the pointer to struct sr_stacktrace in order
  * to avoid compiler warning.
  */
