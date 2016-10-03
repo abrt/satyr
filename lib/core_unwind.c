@@ -436,7 +436,22 @@ sr_core_stacktrace_from_gdb(const char *gdb_output, const char *core_file,
     {
         struct sr_core_thread *core_thread = sr_core_thread_new();
 
+        unsigned long nframes = CORE_STACKTRACE_FRAME_LIMIT;
+        struct sr_gdb_frame *top_frame = gdb_thread->frames;
         for (struct sr_gdb_frame *gdb_frame = gdb_thread->frames;
+             gdb_frame;
+             gdb_frame = gdb_frame->next)
+        {
+            if (gdb_frame->signal_handler_called)
+                continue;
+
+            if (nframes)
+                --nframes;
+            else
+                top_frame = top_frame->next;
+        }
+
+        for (struct sr_gdb_frame *gdb_frame = top_frame;
              gdb_frame;
              gdb_frame = gdb_frame->next)
         {
