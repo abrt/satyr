@@ -267,7 +267,12 @@ get_backtrace(const char *core_file, const char *executable)
 {
   unsigned i = 0;
   char *args[25];
-  args[i++] = (char*)"/usr/bin/gdb";
+
+  if (access("/usr/bin/gdb", F_OK) != -1)
+      args[i++] = (char*)"/usr/bin/gdb";
+  else
+      args[i++] = (char*)"/usr/libexec/gdb";
+
   args[i++] = (char*)"-batch";
   args[i++] = (char*)"-iex";
   args[i++] = (char*)"set debug-file-directory /";
