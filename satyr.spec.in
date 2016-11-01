@@ -45,6 +45,7 @@ BuildRequires: libtool
 BuildRequires: pkgconfig
 BuildRequires: automake
 BuildRequires: gcc-c++
+BuildRequires: gdb
 %if %{?enable_python_manpage}
 BuildRequires: python-sphinx
 %endif
