@@ -28,6 +28,7 @@ extern "C" {
 
 struct sr_core_stacktrace;
 struct sr_gdb_stacktrace;
+struct sr_core_stracetrace_unwind_state;
 
 struct sr_core_stacktrace *
 sr_parse_coredump(const char *coredump_filename,
@@ -55,6 +56,19 @@ sr_core_stacktrace_from_core_hook(pid_t thread_id,
                                   const char *executable_filename,
                                   int signum,
                                   char **error_message);
+
+struct sr_core_stracetrace_unwind_state *
+sr_core_stacktrace_from_core_hook_prepare(pid_t tid, char **error_msg);
+
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_core_hook_generate(pid_t tid,
+                                           const char *executable,
+                                           int signum,
+                                           struct sr_core_stracetrace_unwind_state *state,
+                                           char **error_msg);
+
+void
+sr_core_stacktrace_unwind_state_free(struct sr_core_stracetrace_unwind_state *state);
 
 #ifdef __cplusplus
 }

@@ -165,17 +165,23 @@ sr_abrt_create_core_stacktrace(const char *directory,
                                   error_message);
 }
 
-char *
-sr_abrt_get_core_stacktrace_from_core_hook(pid_t thread_id,
-                                           const char *executable,
-                                           int signum,
-                                           char **error_message)
+struct sr_core_stracetrace_unwind_state *
+sr_abrt_get_core_stacktrace_from_core_hook_prepare(pid_t thread_id,
+                                                   char **error_message)
 {
+    return sr_core_stacktrace_from_core_hook_prepare(thread_id, error_message);
+}
 
+char *
+sr_abrt_get_core_stacktrace_from_core_hook_generate(pid_t thread_id,
+                                                    const char *executable,
+                                                    int signum,
+                                                    struct sr_core_stracetrace_unwind_state *state,
+                                                    char **error_message)
+{
     struct sr_core_stacktrace *core_stacktrace;
-    core_stacktrace = sr_core_stacktrace_from_core_hook(thread_id, executable,
-                                                        signum, error_message);
-
+    core_stacktrace = sr_core_stacktrace_from_core_hook_generate(thread_id,
+                                    executable, signum, state, error_message);
     if (!core_stacktrace)
         return false;
 
@@ -190,29 +196,18 @@ sr_abrt_get_core_stacktrace_from_core_hook(pid_t thread_id,
     strcat(json, "\n");
 
     return json;
-;
 }
 
-bool
-sr_abrt_create_core_stacktrace_from_core_hook(const char *directory,
-                                              pid_t thread_id,
-                                              const char *executable,
-                                              int signum,
-                                              char **error_message)
+char *
+sr_abrt_get_core_stacktrace_from_core_hook(pid_t thread_id,
+                                           const char *executable,
+                                           int signum,
+                                           char **error_message)
 {
-    char *json = sr_abrt_get_core_stacktrace_from_core_hook(thread_id,
-                                                            executable,
-                                                            signum,
-                                                            error_message);
-
-    char *core_backtrace_filename = sr_build_path(directory, "core_backtrace", NULL);
-    bool success = sr_string_to_file(core_backtrace_filename,
-                                    json,
-                                    error_message);
-
-    free(core_backtrace_filename);
-    free(json);
-    return success;
+    struct sr_core_stracetrace_unwind_state *state = sr_abrt_get_core_stacktrace_from_core_hook_prepare(thread_id, error_message);
+    if (!state)
+        return NULL;
+    return sr_abrt_get_core_stacktrace_from_core_hook_generate(thread_id, executable, signum, state, error_message);
 }
 
 struct sr_rpm_package *

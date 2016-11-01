@@ -22,6 +22,7 @@
 #include "core/frame.h"
 #include "core/thread.h"
 #include "core/stacktrace.h"
+#include "core/unwind.h"
 #include "internal_unwind.h"
 
 #ifdef WITH_LIBDWFL
@@ -44,6 +45,11 @@ struct thread_callback_arg
 {
     struct sr_core_thread **threads_tail;
     char *error_msg;
+};
+
+struct sr_core_stracetrace_unwind_state {
+    Dwfl *dwfl;
+    Dwfl_Callbacks proc_cb;
 };
 
 static const int CB_STOP_UNWIND = DWARF_CB_ABORT+1;
@@ -214,25 +220,33 @@ fail:
  * core_unwind.c is used. */
 #ifdef PTRACE_SEIZE
 
-struct sr_core_stacktrace *
-sr_core_stacktrace_from_core_hook(pid_t tid,
-                                  const char *executable,
-                                  int signum,
-                                  char **error_msg)
+void
+sr_core_stacktrace_unwind_state_free(struct sr_core_stracetrace_unwind_state *state)
 {
-    struct sr_core_stacktrace *stacktrace = NULL;
+    if (!state)
+        return;
 
+    if (state->dwfl)
+    {
+        dwfl_end(state->dwfl);
+        state->dwfl = NULL;
+    }
+
+    free(state);
+}
+
+struct sr_core_stracetrace_unwind_state *
+sr_core_stacktrace_from_core_hook_prepare(pid_t tid, char **error_msg)
+{
     /* Initialize error_msg to 'no error'. */
     if (error_msg)
         *error_msg = NULL;
 
-    const Dwfl_Callbacks proc_cb =
-    {
-        .find_elf = dwfl_linux_proc_find_elf,
-        .find_debuginfo = find_debuginfo_none,
-    };
+    struct sr_core_stracetrace_unwind_state *state = sr_mallocz(sizeof(*state));
+    state->proc_cb.find_elf = dwfl_linux_proc_find_elf;
+    state->proc_cb.find_debuginfo = find_debuginfo_none;
 
-    Dwfl *dwfl = dwfl_begin(&proc_cb);
+    Dwfl *dwfl = state->dwfl = dwfl_begin(&(state->proc_cb));
 
     if (dwfl_linux_proc_report(dwfl, tid) != 0)
     {
@@ -284,20 +298,26 @@ sr_core_stacktrace_from_core_hook(pid_t tid,
                   "(SIGTRAP | (PTRACE_EVENT_EXIT << 8)) was expected", (unsigned)status);
         goto fail;
     }
+    return state;
 
-    if (dwfl_linux_proc_attach(dwfl, tid, true) != 0)
-    {
-        set_error_dwfl("dwfl_linux_proc_attach");
-        goto fail;
-    }
+fail:
+    sr_core_stacktrace_unwind_state_free(state);
+    return NULL;
+}
 
-    stacktrace = sr_core_stacktrace_new();
+struct sr_core_stacktrace*
+sr_core_stacktrace_from_core_hook_generate(pid_t tid,
+                                           const char *executable,
+                                           int signum,
+                                           struct sr_core_stracetrace_unwind_state* state,
+                                           char **error_msg)
+{
+    struct sr_core_stacktrace *stacktrace = sr_core_stacktrace_new();
     if (!stacktrace)
     {
         set_error("Failed to initialize stacktrace memory");
         goto fail;
     }
-
     stacktrace->threads = sr_core_thread_new();
     if (!stacktrace->threads)
     {
@@ -308,6 +328,12 @@ sr_core_stacktrace_from_core_hook(pid_t tid,
     }
     stacktrace->threads->id = tid;
 
+    if (dwfl_linux_proc_attach(state->dwfl, tid, true) != 0)
+    {
+        set_error_dwfl("dwfl_linux_proc_attach");
+        goto fail;
+    }
+
     struct frame_callback_arg frame_arg =
     {
         .frames_tail = &(stacktrace->threads->frames),
@@ -315,7 +341,7 @@ sr_core_stacktrace_from_core_hook(pid_t tid,
         .nframes = 0
     };
 
-    int ret = dwfl_getthread_frames(dwfl, tid, frame_callback, &frame_arg);
+    int ret = dwfl_getthread_frames(state->dwfl, tid, frame_callback, &frame_arg);
     if (ret != 0 && ret != CB_STOP_UNWIND)
     {
         if (ret == -1)
@@ -343,8 +369,20 @@ sr_core_stacktrace_from_core_hook(pid_t tid,
     stacktrace->only_crash_thread = true;
 
 fail:
-    dwfl_end(dwfl);
+    sr_core_stacktrace_unwind_state_free(state);
     return stacktrace;
+}
+
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_core_hook(pid_t tid,
+                                  const char *executable,
+                                  int signum,
+                                  char **error_msg)
+{
+    struct sr_core_stracetrace_unwind_state* state = sr_core_stacktrace_from_core_hook_prepare(tid, error_msg);
+    if (!state)
+        return NULL;
+    return sr_core_stacktrace_from_core_hook_generate(tid, executable, signum, state, error_msg);
 }
 
 #endif /* PTRACE_SEIZE */
