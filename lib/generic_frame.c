@@ -35,6 +35,7 @@ static struct frame_methods* dtable[SR_REPORT_NUM] =
     [SR_REPORT_JAVA] = &java_frame_methods,
     [SR_REPORT_GDB] = &gdb_frame_methods,
     [SR_REPORT_RUBY] = &ruby_frame_methods,
+    [SR_REPORT_JAVASCRIPT] = &js_frame_methods,
 };
 
 void

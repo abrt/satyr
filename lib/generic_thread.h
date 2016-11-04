@@ -57,7 +57,7 @@ struct thread_methods
 
 extern struct thread_methods core_thread_methods, python_thread_methods,
        koops_thread_methods, gdb_thread_methods, java_thread_methods,
-       ruby_thread_methods;
+       ruby_thread_methods, js_thread_methods;
 
 /* Macros to generate accessors for the "frames" member. */
 #define DEFINE_FRAMES_FUNC(name, concrete_t) \

@@ -1,0 +1,56 @@
+{   "exception_name": "ReferenceError"
+,   "stacktrace":
+      [ {   "file_name": "/tmp/index.js"
+        ,   "file_line": 2
+        ,   "line_column": 1
+        ,   "function_name": "Object.<anonymous>"
+        }
+      , {   "file_name": "module.js"
+        ,   "file_line": 556
+        ,   "line_column": 32
+        ,   "function_name": "Module._compile"
+        }
+      , {   "file_name": "module.js"
+        ,   "file_line": 565
+        ,   "line_column": 10
+        ,   "function_name": "Object.Module._extensions..js"
+        }
+      , {   "file_name": "module.js"
+        ,   "file_line": 473
+        ,   "line_column": 32
+        ,   "function_name": "Module.load"
+        }
+      , {   "file_name": "module.js"
+        ,   "file_line": 432
+        ,   "line_column": 12
+        ,   "function_name": "tryModuleLoad"
+        }
+      , {   "file_name": "module.js"
+        ,   "file_line": 424
+        ,   "line_column": 3
+        ,   "function_name": "Function.Module._load"
+        }
+      , {   "file_name": "module.js"
+        ,   "file_line": 590
+        ,   "line_column": 10
+        ,   "function_name": "Module.runMain"
+        }
+      , {   "file_name": "bootstrap_node.js"
+        ,   "file_line": 394
+        ,   "line_column": 7
+        ,   "function_name": "run"
+        }
+      , {   "file_name": "bootstrap_node.js"
+        ,   "file_line": 149
+        ,   "line_column": 9
+        ,   "function_name": "startup"
+        }
+      , {   "file_name": "bootstrap_node.js"
+        ,   "file_line": 509
+        ,   "line_column": 3
+        } ]
+,   "platform":
+        {    "engine": "V8"
+        ,    "runtime": "<unknown>"
+        }
+}

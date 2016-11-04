@@ -28,6 +28,7 @@
 #include <stdio.h>
 
 struct sr_json_value;
+struct sr_location;
 enum sr_json_type;
 
 void

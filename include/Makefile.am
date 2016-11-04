@@ -54,3 +54,9 @@ rubyheadersdir = $(includedir)/satyr/ruby
 rubyheaders_HEADERS = \
 	ruby/frame.h \
 	ruby/stacktrace.h
+
+jsheadersdir = $(includedir)/satyr/js
+jsheaders_HEADERS = \
+	js/platform.h \
+	js/frame.h \
+	js/stacktrace.h

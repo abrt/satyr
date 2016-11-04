@@ -41,6 +41,7 @@ static struct stacktrace_methods* dtable[SR_REPORT_NUM] =
     [SR_REPORT_JAVA] = &java_stacktrace_methods,
     [SR_REPORT_GDB] = &gdb_stacktrace_methods,
     [SR_REPORT_RUBY] = &ruby_stacktrace_methods,
+    [SR_REPORT_JAVASCRIPT] = &js_stacktrace_methods,
 };
 
 /* In case stacktrace type supports only one thread, return the stacktrace itself. */

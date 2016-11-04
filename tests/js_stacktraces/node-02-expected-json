@@ -1,0 +1,32 @@
+{   "exception_name": "TypeError"
+,   "stacktrace":
+      [ {   "file_name": "/tmp/index.js"
+        ,   "file_line": 16
+        ,   "line_column": 35
+        ,   "function_name": "Socket.<anonymous>"
+        }
+      , {   "file_name": "events.js"
+        ,   "file_line": 286
+        ,   "line_column": 16
+        ,   "function_name": "Socket.g"
+        }
+      , {   "file_name": "events.js"
+        ,   "file_line": 86
+        ,   "line_column": 13
+        ,   "function_name": "emitNone"
+        }
+      , {   "file_name": "events.js"
+        ,   "file_line": 185
+        ,   "line_column": 7
+        ,   "function_name": "Socket.emit"
+        }
+      , {   "file_name": "net.js"
+        ,   "file_line": 1068
+        ,   "line_column": 10
+        ,   "function_name": "PipeConnectWrap.afterConnect"
+        } ]
+,   "platform":
+        {    "engine": "V8"
+        ,    "runtime": "<unknown>"
+        }
+}
