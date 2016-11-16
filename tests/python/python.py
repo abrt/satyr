@@ -6,12 +6,12 @@ from test_helpers import *
 path = '../python_stacktraces/python-01'
 contents = load_input_contents(path)
 frames_expected = 11
-expected_short_text = '''#1 _getPackage in /home/anonymized/PackageKit/helpers/yum/yumBackend.py:2534
-#2 updateProgress in /usr/share/PackageKit/helpers/yum/yumBackend.py:2593
-#3 _do_start in /usr/share/PackageKit/helpers/yum/yumBackend.py:2551
-#4 start in /usr/lib/python2.6/site-packages/urlgrabber/progress.py:129
-#5 downloadPkgs in /usr/lib/yum-plugins/presto.py:419
-#6 predownload_hook in /usr/lib/yum-plugins/presto.py:577
+expected_short_text = '''#1 [/home/anonymized/PackageKit/helpers/yum/yumBackend.py:2534] _getPackage
+#2 [/usr/share/PackageKit/helpers/yum/yumBackend.py:2593] updateProgress
+#3 [/usr/share/PackageKit/helpers/yum/yumBackend.py:2551] _do_start
+#4 [/usr/lib/python2.6/site-packages/urlgrabber/progress.py:129] start
+#5 [/usr/lib/yum-plugins/presto.py:419] downloadPkgs
+#6 [/usr/lib/yum-plugins/presto.py:577] predownload_hook
 '''
 
 class TestPythonStacktrace(BindingsTestCase):
