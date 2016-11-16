@@ -6,10 +6,10 @@ from test_helpers import *
 contents = load_input_contents('../json_files/core-01')
 threads_expected = 2
 frames_expected = 6
-expected_short_text = '''#1 raise in /usr/lib64/libc-2.15.so
-#2 abort in /usr/lib64/libc-2.15.so
-#3 92ebaf825e4f492952c45189cb9ffc6541f8599b+1123 in /usr/bin/will_abort
-#4 __libc_start_main in /usr/lib64/libc-2.15.so
+expected_short_text = '''#1 [libc-2.15.so] raise
+#2 [libc-2.15.so] abort
+#3 [will_abort] 92ebaf825e4f492952c45189cb9ffc6541f8599b+1123
+#4 [libc-2.15.so] __libc_start_main
 '''
 
 class TestCoreStacktrace(BindingsTestCase):

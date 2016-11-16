@@ -328,19 +328,20 @@ void
 sr_core_frame_append_to_str(struct sr_core_frame *frame,
                             struct sr_strbuf *dest)
 {
+    if (frame->file_name)
+    {
+        const char *basename = strrchr(frame->file_name, '/');
+        sr_strbuf_append_strf(dest, "[%s]", basename ? ++basename : frame->file_name);
+    }
+
     if (frame->function_name)
     {
-        sr_strbuf_append_str(dest, frame->function_name);
+        sr_strbuf_append_strf(dest, " %s", frame->function_name);
     }
     else
     {
-        sr_strbuf_append_strf(dest, "%s+%"PRIu64, frame->build_id,
+        sr_strbuf_append_strf(dest, " %s+%"PRIu64, frame->build_id,
                               frame->build_id_offset);
-    }
-
-    if (frame->file_name)
-    {
-        sr_strbuf_append_strf(dest, " in %s", frame->file_name);
     }
 }
 

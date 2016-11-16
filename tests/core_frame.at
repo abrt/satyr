@@ -123,7 +123,7 @@ main(void)
   sr_frame_append_to_str((struct sr_frame*)frame, strbuf);
   char *res = sr_strbuf_free_nobuf(strbuf);
 
-  assert(0 == strcmp(res, "test1 in executable1"));
+  assert(0 == strcmp(res, "[executable1] test1"));
   free(res);
 
   return 0;

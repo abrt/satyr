@@ -433,14 +433,9 @@ void
 sr_python_frame_append_to_str(struct sr_python_frame *frame,
                               struct sr_strbuf *dest)
 {
-    sr_strbuf_append_strf(dest, "%s%s%s",
-                          (frame->special_function ? "<" : ""),
-                          (frame->function_name ? frame->function_name : "??"),
-                          (frame->special_function ? ">" : ""));
-
     if (frame->file_name)
     {
-        sr_strbuf_append_strf(dest, " in %s%s%s",
+        sr_strbuf_append_strf(dest, "[%s%s%s",
                               (frame->special_file ? "<" : ""),
                               frame->file_name,
                               (frame->special_file ? ">" : ""));
@@ -449,7 +444,14 @@ sr_python_frame_append_to_str(struct sr_python_frame *frame,
         {
             sr_strbuf_append_strf(dest, ":%"PRIu32, frame->file_line);
         }
+
+        sr_strbuf_append_str(dest, "]");
     }
+
+    sr_strbuf_append_strf(dest, " %s%s%s",
+                          (frame->special_function ? "<" : ""),
+                          (frame->function_name ? frame->function_name : "??"),
+                          (frame->special_function ? ">" : ""));
 }
 
 static void
