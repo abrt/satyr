@@ -143,6 +143,13 @@ make check|| {
 %endif
 
 %changelog
+* Thu Dec 1 2016 Jakub Filak <jakub@thefilaks.net> 0.22-1
+- New upstream version
+  - Added support fof JavaScript (V8) stack traces
+  - Most parts of the in-hook core unwinder callable under unprivileged user
+  - GDB core unwinder limits number of unwound frames
+  - Fixed a pair of compile warnings - Chris Redmon <credmonster@gmail.com>
+
 * Wed May 18 2016 Matej Habrnal <mhabrnal@redhat.com> 0.21-1
 - New upstream version
   - Introduce 'serial' field in uReport

@@ -1,3 +1,11 @@
+satyr 0.22
+==========
+Added JavaScript stack trace parser and uReport generator (V8 stack trace is
+the only recognized JavaScript stack trace format). Refactored the in-hook
+core backtrace unwinder to avoid the need to run elfutils functions under root
+user. Started limiting the number of unwound frames in GDB core unwinder to
+show only the frames that caused infinite recursion.
+
 satyr 0.21
 ==========
 Introduce 'serial' field in uReport and actualize list of normalized functions.
