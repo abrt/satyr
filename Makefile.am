@@ -22,13 +22,9 @@ EXTRA_DIST += satyr.pc.in
 
 EXTRA_DIST += autogen.sh RELEASE
 
-#UPLOAD_URI = user@fedorahosted.org:satyr
+#UPLOAD_URI = user@fedorahosted.org:abrt
 #.PHONY: upload
 #upload:
-#	make dist-gzip
-#	scp $(distdir).tar.gz $(UPLOAD_URI)
-#	make dist-zip
-#	scp $(distdir).zip $(UPLOAD_URI)
 #	make dist-xz
 #	scp $(distdir).tar.xz $(UPLOAD_URI)
 
