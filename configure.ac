@@ -124,7 +124,16 @@ if test "$elfutils_unwinder" != "1"; then
 fi
 
 # rpm
-AC_CHECK_LIB([rpm], [main])
+AC_ARG_WITH([rpm],
+            [AS_HELP_STRING([--with-rpm],
+                            [Build with rpm support.])],
+            [with_rpm=$withval],
+            [with_rpm=no])
+[if test "$with_rpm" = "yes"]
+[then]
+    PKG_CHECK_MODULES([RPM], [rpm])
+    AC_DEFINE(HAVE_LIBRPM, [], [Have rpm support.])
+[fi]
 
 # c++ symbol demangling
 AC_CHECK_LIB([stdc++], [__cxa_demangle], [], [echo "error: stdc++ library not found"; exit 1])
