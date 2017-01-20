@@ -12,7 +12,7 @@ analysis, and reporting supporting kernel space, user space, Python, and Java
 programs.  Considering failure processing, it allows to parse failure
 description from various sources such as GDB-created stack traces, Python stack
 traces with a description of uncaught exception, and kernel oops message.
-Infromation can also be extracted from the core dumps of unexpectedly
+Information can also be extracted from the core dumps of unexpectedly
 terminated user space processes and from the machine executable code of
 binaries.  Considering failure analysis, the stack traces of failed processes
 can be normalized, trimmed, and compared.  Clusters of similar stack traces can
