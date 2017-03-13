@@ -143,6 +143,11 @@ make check|| {
 %endif
 
 %changelog
+* Mon Mar 13 2017 Matej Habrnal <mhabrnal@redhat.com> 0.23-1
+- New upstream version
+  - Allow rpm to be optional at build time
+  - Do not use deprecated fedorahosted.org
+
 * Thu Dec 1 2016 Jakub Filak <jakub@thefilaks.net> 0.22-1
 - New upstream version
   - Added support fof JavaScript (V8) stack traces
