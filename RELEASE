@@ -1,16 +1,14 @@
 Releasing a new version of satyr
------------------------------------
+--------------------------------
 
-1. Check that all changes from all work computers are commited.  Then
+1. Check that all changes from all work computers are commited. Then
 check, that the local clone of the program is up-to-date:
 $ git status
 $ git pull
 
 
-2. Check that the version number has been increased after the last
-release. If it was not, increase it on the first line of configure.ac,
-and document this change in the ChangeLog:
-* configure.ac: Increase version to 0.8.
+2. Increase a version number in gen-version script (option DEF_VER=x.y).
+(x.y = the new version number)
 
 
 3. Check all the changes in the ChangeLog since the last release, and
@@ -39,23 +37,17 @@ significant new functionality. Document this change in the ChangeLog.
 with the code. Document changes in the ChangeLog.
 
 
-7. Run ./autogen.sh and the ./configure to update all generated files.
-
-
-8. Run `make dist` to create satyr-x.y.tar.gz. Check that its
-contents is ok, and every file is in place.
-
-
-9. Commit all the new changes. Tag the new release using `git tag x.y`
+7. Commit all the new changes. Tag the new release using `git tag x.y`
 (x.y = the new version number). Push the changes to the git server
 using `git push && git push --tags`.
 
 
-10. Run `make upload` to create tar.gz, zip, and tar.xz files, and
-upload them to the FTP server.
+Creating a satyr-x.y.tar.xz
+---------------------------
+1. Set the new version to satyr-version and run autoconf
+(x.y = the new version number):
+`echo -n x.y > satyr-version && autoconf --force`
 
-11. Increase the version in configure.ac, run `./autogen.sh`,
-`./configure`, `make`, and `make check`, document the change in the
-ChangeLog: * configure.ac: Increase version to x.y.
 
-And then commit and push the changes.
+2. Create satyr-x.y.tar.xz
+`make dist-xz`
