@@ -21,6 +21,11 @@
 #define SATYR_FRAME_H
 
 /**
+ * @file
+ * @brief Frame 
+ */
+
+/**
  * Functions declared here work with all frame types, i.e.
  * * sr_core_frame
  * * sr_python_frame

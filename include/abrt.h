@@ -20,6 +20,11 @@
 #ifndef SATYR_ABRT_H
 #define SATYR_ABRT_H
 
+/**
+ * @file
+ * @brief Abrt
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

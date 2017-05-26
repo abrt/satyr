@@ -21,6 +21,11 @@
 #define SATYR_STACKTRACE_H
 
 /**
+ * @file
+ * @brief Stack trace
+ */
+
+/**
  * Functions declared here work with all stacktrace types:
  * * sr_core_stacktrace
  * * sr_python_stacktrace

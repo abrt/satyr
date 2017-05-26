@@ -32,6 +32,11 @@
 #ifndef SATYR_JSON_H
 #define SATYR_JSON_H
 
+/**
+ * @file
+ * @brief Json
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -20,6 +20,11 @@
 #ifndef SATYR_REPORT_TYPE_H
 #define SATYR_REPORT_TYPE_H
 
+/**
+ * @file
+ * @brief Report type
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
