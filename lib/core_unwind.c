@@ -57,6 +57,24 @@ sr_parse_coredump(const char *coredump_filename,
 
 #if (!defined WITH_LIBDWFL || !defined PTRACE_SEIZE)
 
+struct sr_core_stracetrace_unwind_state *
+sr_core_stacktrace_from_core_hook_prepare(pid_t thread_id, char **error_message)
+{
+    *error_message = sr_asprintf("satyr is built without live process unwind support");
+    return NULL;
+}
+
+struct sr_core_stacktrace *
+sr_core_stacktrace_from_core_hook_generate(pid_t thread_id,
+                                           const char *executable_filename,
+                                           int signum,
+                                           struct sr_core_stracetrace_unwind_state *state,
+                                           char **error_message)
+{
+    *error_message = sr_asprintf("satyr is built without live process unwind support");
+    return NULL;
+}
+
 struct sr_core_stacktrace *
 sr_core_stacktrace_from_core_hook(pid_t thread_id,
                                   const char *executable_filename,
