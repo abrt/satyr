@@ -1,12 +1,5 @@
 SUBDIRS = . doc
 
-py2satyrdir = $(pyexecdir)/satyr
-
-py2satyr_PYTHON = \
-    __init__.py
-
-py2satyr_LTLIBRARIES = _satyr.la
-
 PYEXTFILES = \
     py_cluster.h \
     py_cluster.c \
@@ -75,6 +68,14 @@ PYEXTLDFLAGS = \
     -module \
     -avoid-version
 
+if WITH_PYTHON2
+py2satyrdir = $(pyexecdir)/satyr
+
+py2satyr_PYTHON = \
+    __init__.py
+
+py2satyr_LTLIBRARIES = _satyr.la
+
 _satyr_la_SOURCES = $(PYEXTFILES)
 _satyr_la_CPPFLAGS = \
     $(PYEXTCPPFLAGS) \
@@ -90,6 +91,7 @@ if ENABLE_STATIC_PYTHON_MODULE
 _satyr_la_LIBADD = ../lib/libsatyr_conv.la
 else
 _satyr_la_LIBADD = ../lib/libsatyr.la
+endif
 endif
 
 if WITH_PYTHON3

@@ -51,21 +51,38 @@ AM_MISSING_PROG([AUTOM4TE], [autom4te])
 # Needed by tests/atlocal.in.
 AC_SUBST([O0CFLAGS], [`echo $CFLAGS | sed 's/-O[[0-9]] *//'`])
 
-AM_PATH_PYTHON
-AM_CONDITIONAL([HAVE_PYTHON], test -n "$PYTHON")
-[if test -z "$PYTHON"; then]
-    [echo "The python interpreter was not found in the search path. The Python language bindings"]
-    [echo "will not be built.  If you want to build the Python language bindings, please ensure"]
-    [echo "that python is installed and its directory is included in the search path."]
-    [echo "Then run configure again before attempting to build Satyr."]
-[fi]
+AC_ARG_WITH([python2],
+            [AS_HELP_STRING([--without-python2],
+                            [Build without python2 support.])],
+            [with_python2=$withval],
+            [with_python2=yes])
+AM_CONDITIONAL(WITH_PYTHON2, [test $with_python2 = yes])
+[if test "$with_python2" = "yes"]
+[then]
+    AC_PATH_PROG([PYTHON], [python], [no])
+    [if test "$PYTHON" = "no"]
+    [then]
+        [echo "The python program was not found in the search path. Please ensure"]
+        [echo "that it is installed and its directory is included in the search path or"]
+        [echo "pass --without-python2 to ./configure."]
+        [echo "Then run configure again before attempting to build satyr."]
+        [exit 1]
+    [fi]
 
-# Just PKG_CHECK_MODULES([PYTHON], [python]) works only with python2.7+
-# Below, if python is not found, we set up for python2.6 w/o checking:
-PKG_CHECK_MODULES([PYTHON], [python2],,[
-    PYTHON_LIBS='-L/usr/lib64 -lpython2.6'
-    PYTHON_CFLAGS='-I/usr/include/python2.6'
-])
+    # Just PKG_CHECK_MODULES([PYTHON], [python]) works only with python2.7+
+    # Below, if python is not found, we set up for python2.6 w/o checking:
+    PKG_CHECK_MODULES([PYTHON], [python2],,[
+        PYTHON_LIBS='-L/usr/lib64 -lpython2.6'
+        PYTHON_CFLAGS='-I/usr/include/python2.6'
+    ])
+
+    AC_SUBST([PYTHON2_EXEC_PREFIX], ['${exec_prefix}'])
+
+    PYTHON2_EXECDIR=`$PYTHON -c "import distutils.sysconfig; \
+        print(distutils.sysconfig.get_python_lib(1,0,prefix='$PYTHON2_EXEC_PREFIX'))"`
+
+    AC_SUBST(pyexecdir, $PYTHON2_EXECDIR)
+[fi]
 
 AC_ARG_ENABLE([static-python-module],
               [AS_HELP_STRING([--enable-static-python-module],
