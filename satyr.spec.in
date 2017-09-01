@@ -67,21 +67,31 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %description devel
 Development libraries and headers for %{name}.
 
-%package python
+%package -n python2-satyr
+%{?python_provide:%python_provide python2-satyr}
+# Remove before F30
+Provides: %{name}-python = %{version}-%{release}
+Provides: %{name}-python%{?_isa} = %{version}-%{release}
+Obsoletes: %{name}-python < 0.24
 Summary: Python bindings for %{name}
 Group: Development/Libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
 
-%description python
+%description -n python2-satyr
 Python bindings for %{name}.
 
 %if 0%{?with_python3}
-%package python3
+%package -n python3-satyr
+%{?python_provide:%python_provide python3-satyr}
+# Remove before F30
+Provides: %{name}-python3 = %{version}-%{release}
+Provides: %{name}-python3%{?_isa} = %{version}-%{release}
+Obsoletes: %{name}-python3 < 0.24
 Summary: Python 3 bindings for %{name}
 Group: Development/Libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
 
-%description python3
+%description -n python3-satyr
 Python 3 bindings for %{name}.
 %endif # if with_python3
 
@@ -128,7 +138,7 @@ make check|| {
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*
 
-%files python
+%files -n python2-satyr
 %dir %{python2_sitearch}/%{name}
 %{python2_sitearch}/%{name}/*
 
@@ -137,7 +147,7 @@ make check|| {
 %endif
 
 %if 0%{?with_python3}
-%files python3
+%files -n python3-satyr
 %dir %{python3_sitearch}/%{name}
 %{python3_sitearch}/%{name}/*
 %endif
