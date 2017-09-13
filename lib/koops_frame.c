@@ -286,12 +286,70 @@ fail:
     return NULL;
 }
 
+static struct sr_koops_frame *
+koops_frame_parse_arm_reduced(const char **input)
+{
+    const char *local_input = *input;
+    sr_skip_char_span(&local_input, " \t");
+
+    struct sr_koops_frame *frame = sr_koops_frame_new();
+
+    if (!sr_koops_parse_address(&local_input, &frame->address))
+        goto fail;
+
+    sr_skip_char_span(&local_input, " \t");
+
+    /* Question mark means unreliable */
+    frame->reliable = sr_skip_char(&local_input, '?') != true;
+
+    sr_skip_char_span(&local_input, " \t");
+
+    if (!sr_skip_char(&local_input, '('))
+        goto fail;
+
+    if (!sr_parse_char_cspan(&local_input, " \t\n)+<", &frame->function_name))
+        goto fail;
+
+    if (!sr_skip_char(&local_input, ')'))
+        goto fail;
+
+    sr_skip_char_span(&local_input, " \t");
+
+    if (!sr_skip_string(&local_input, "from"))
+        goto fail;
+
+    sr_skip_char_span(&local_input, " \t");
+
+    if (!sr_koops_parse_address(&local_input, &frame->from_address))
+        goto fail;
+
+    sr_skip_char_span(&local_input, " \t");
+
+    if (!sr_koops_parse_function(&local_input,
+                                 &frame->from_function_name,
+                                 &frame->from_function_offset,
+                                 &frame->from_function_length,
+                                 &frame->from_module_name))
+        goto fail;
+
+    *input = local_input;
+    return frame;
+
+fail:
+    sr_koops_frame_free(frame);
+    return NULL;
+}
+
 struct sr_koops_frame *
 sr_koops_frame_parse(const char **input)
 {
     struct sr_koops_frame *ppc_frame = koops_frame_parse_ppc(input);
     if (ppc_frame)
         return ppc_frame;
+
+    struct sr_koops_frame *arm_frame = koops_frame_parse_arm_reduced(input);
+    if (arm_frame)
+        return arm_frame;
 
     const char *local_input = *input;
     sr_skip_char_span(&local_input, " \t");
