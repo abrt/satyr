@@ -256,6 +256,8 @@ main(void)
 
   check("../../kerneloopses/rhbz-1235021", "smp_call_function_many", "system_call_fastpath", 29, 0, 110, NULL, NULL);
 
+  check("../../kerneloopses/arm-hung-task-oops", "dump_backtrace_log_lvl", "kthread", 6, 2, 0, NULL, NULL);
+
   return 0;
 }
 ]])

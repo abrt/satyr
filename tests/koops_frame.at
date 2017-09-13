@@ -239,6 +239,17 @@ main(void)
   frame.function_length = 0x280;
 
   check(true, "sys_delete_module+0x11f/0x280", &frame);
+
+  sr_koops_frame_init(&frame);
+  frame.address = 0xc0014318;
+  frame.reliable = true;
+  frame.function_name = "dump_backtrace_log_lvl";
+  frame.from_address = 0xc001457c;
+  frame.from_function_name = "show_stack";
+  frame.from_function_offset = 0x24;
+  frame.from_function_length = 0x2c;
+
+  check(true, "[<c0014318>] (dump_backtrace_log_lvl) from [<c001457c>] (show_stack+0x24/0x2c)", &frame);
   return 0;
 }
 ]])
