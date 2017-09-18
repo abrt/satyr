@@ -21,6 +21,11 @@
 #define SATYR_THREAD_H
 
 /**
+ * @file
+ * @brief Thread
+ */
+
+/**
  * Functions declared here work with all thread types. Furthermore, for problem
  * types that do not have a thread structure because they are always
  * single-threaded, you can pass the stacktrace structure directly:

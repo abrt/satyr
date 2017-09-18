@@ -21,6 +21,11 @@
 #ifndef SATYR_RUBY_STACKTRACE_H
 #define SATYR_RUBY_STACKTRACE_H
 
+/**
+ * @file
+ * @brief Ruby stack trace
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

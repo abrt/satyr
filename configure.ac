@@ -15,6 +15,35 @@ AC_PROG_CC
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 AM_PROG_CC_C_O
+AC_ARG_ENABLE(doxygen-docs,
+    AS_HELP_STRING([--enable-doxygen-docs],
+	[build DOXYGEN documentation (requires Doxygen)]),
+    [enable_doxygen_docs=$enableval],
+    [enable_doxygen_docs=no]
+)
+
+# Doxygen Documentation
+
+AC_PATH_PROG(DOXYGEN, doxygen, no)
+
+AC_MSG_CHECKING([whether to build Doxygen documentation])
+
+if test "$DOXYGEN" = "no" ; then
+    have_doxygen=no
+else
+    have_doxygen=yes
+fi
+
+if test "$enable_doxygen_docs" = "yes" ; then
+    if test "$have_doxygen" = "no"; then
+        AC_MSG_ERROR([Building Doxygen docs explicitly required, but Doxygen not found])
+    fi
+    AC_MSG_RESULT(yes)
+else
+    AC_MSG_RESULT(no)
+fi
+
+AM_CONDITIONAL(DOXYGEN_DOCS_ENABLED, test "$enable_doxygen_docs" = "yes")
 
 # Initialize the test suite.
 AC_CONFIG_TESTDIR(tests)
@@ -141,6 +170,9 @@ AC_CHECK_LIB([stdc++], [__cxa_demangle], [], [echo "error: stdc++ library not fo
 AC_CONFIG_FILES([
 	satyr.pc
 	Makefile
+	apidoc/Makefile
+	apidoc/Doxygen
+	apidoc/html/Makefile
 	lib/Makefile
 	python/Makefile
 	python/doc/Makefile

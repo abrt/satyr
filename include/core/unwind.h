@@ -20,6 +20,11 @@
 #ifndef SATYR_CORE_UNWIND_H
 #define SATYR_CORE_UNWIND_H
 
+/**
+ * @file
+ * @brief Core unwind
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -21,6 +21,11 @@
 #ifndef SATYR_JS_PLATFORM_H
 #define SATYR_JS_PLATFORM_H
 
+/**
+ * @file
+ * @brief Platform JavaScript platform
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
