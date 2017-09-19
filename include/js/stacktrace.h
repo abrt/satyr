@@ -21,6 +21,11 @@
 #ifndef SATYR_JS_STACKTRACE_H
 #define SATYR_JS_STACKTRACE_H
 
+/**
+ * @file
+ * @brief JavaScript stack trace
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -2,6 +2,7 @@
 .deps
 .libs
 Makefile
+Doxyfile
 *.o
 Makefile.in
 ar-lib
@@ -36,6 +37,12 @@ build/*
 /docs/btparser.out
 /docs/btparser.toc
 /docs/doxygen
+
+/apidoc/html/*.html
+/apidoc/html/*.css
+/apidoc/html/*.js
+/apidoc/html/*.png
+/apidoc/html/search
 
 /lib/.deps
 /lib/.libs
