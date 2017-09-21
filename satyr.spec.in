@@ -42,6 +42,7 @@ BuildRequires: %{libelf_devel}
 BuildRequires: binutils-devel
 BuildRequires: rpm-devel
 BuildRequires: libtool
+BuildRequires: doxygen
 BuildRequires: pkgconfig
 BuildRequires: automake
 BuildRequires: gcc-c++
@@ -106,7 +107,8 @@ Python 3 bindings for %{name}.
 %if ! %{?with_python3}
         --without-python3 \
 %endif
-        --disable-static
+        --disable-static \
+        --enable-doxygen-docs
 
 make %{?_smp_mflags}
 
@@ -134,6 +136,8 @@ make check|| {
 %{_libdir}/lib*.so.*
 
 %files devel
+# The complex pattern below (instead of simlpy *) excludes Makefile{.am,.in}:
+%doc apidoc/html/*.{html,png,css,js}
 %{_includedir}/*
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*

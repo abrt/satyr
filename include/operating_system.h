@@ -20,6 +20,11 @@
 #ifndef SATYR_OPERATING_SYSTEM_H
 #define SATYR_OPERATING_SYSTEM_H
 
+/**
+ * @file
+ * @brief Operating system
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
