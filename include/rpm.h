@@ -173,9 +173,9 @@ char *
 sr_rpm_package_to_json(struct sr_rpm_package *package,
                        bool recursive);
 
-struct sr_rpm_package *
-sr_rpm_package_from_json(struct sr_json_value *list, bool recursive,
-                         char **error_message);
+int
+sr_rpm_package_from_json(struct sr_rpm_package **rpm_package, struct sr_json_value *list,
+                         bool recursive, char **error_message);
 
 bool
 sr_rpm_package_parse_nvr(const char *text,

@@ -615,18 +615,19 @@ fail:
     return NULL;
 }
 
-struct sr_rpm_package *
-sr_rpm_package_from_json(struct sr_json_value *json, bool recursive, char **error_message)
+int
+sr_rpm_package_from_json(struct sr_rpm_package **rpm_package, struct sr_json_value *json,
+                         bool recursive, char **error_message)
 {
     if (!recursive)
     {
-        return single_rpm_pacakge_from_json(json, error_message);
+        *rpm_package = single_rpm_pacakge_from_json(json, error_message);
+        return 0;
     }
     else
     {
         if (!JSON_CHECK_TYPE(json, SR_JSON_ARRAY, "package list"))
-            return NULL;
-
+            return -1;
         struct sr_rpm_package *result = NULL;
 
         struct sr_json_value *pkg_json;
@@ -639,13 +640,12 @@ sr_rpm_package_from_json(struct sr_json_value *json, bool recursive, char **erro
             result = sr_rpm_package_append(result, pkg);
         }
 
-        if (result == NULL && error_message)
-            *error_message = sr_strdup("No RPM packages present");
-        return result;
+        *rpm_package = result;
+        return 0;
 
 fail:
         sr_rpm_package_free(result, true);
-        return NULL;
+        return -2;
     }
 }
 
