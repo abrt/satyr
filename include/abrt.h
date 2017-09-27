@@ -80,8 +80,8 @@ sr_abrt_create_core_stacktrace_from_core_hook(const char *directory,
 struct sr_rpm_package *
 sr_abrt_parse_dso_list(const char *text);
 
-struct sr_rpm_package *
-sr_abrt_rpm_packages_from_dir(const char *directory,
+int
+sr_abrt_rpm_packages_from_dir(const char *directory, struct sr_rpm_package **packages,
                               char **error_message);
 
 struct sr_operating_system *
