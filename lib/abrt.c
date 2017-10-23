@@ -373,9 +373,9 @@ rpm_dso_list_from_dir(struct sr_rpm_package *packages,
 }
 
 static bool
-file_exist(const char *directory, const char *filename)
+is_packaged(const char *directory)
 {
-    char *path = sr_build_path(directory, filename, NULL);
+    char *path = sr_build_path(directory, "package", NULL);
 
     bool retval = false;
     if (access(path, F_OK) == 0)
@@ -385,34 +385,30 @@ file_exist(const char *directory, const char *filename)
     return retval;
 }
 
-static bool
-is_packaged(const char *directory)
-{
-    return file_exist(directory, "package");
-}
-
-int
-sr_abrt_rpm_packages_from_dir(const char *directory, struct sr_rpm_package **packages,
+struct sr_rpm_package *
+sr_abrt_rpm_packages_from_dir(const char *directory,
                               char **error_message)
 {
+    struct sr_rpm_package *packages = NULL;
+
     /* if unpackaged do not attach package data */
     if (is_packaged(directory))
     {
-        *packages = sr_rpm_package_new();
-        *packages = rpm_pkg_from_dir(*packages, directory, error_message);
-        if (!*packages)
-            return -1;
+        packages = sr_rpm_package_new();
+        packages = rpm_pkg_from_dir(packages, directory, error_message);
+        if (!packages)
+            return NULL;
     }
 
     /* if dso_list doesn't exist, do not attach it */
     if (file_exist(directory, "dso_list"))
     {
-        *packages = rpm_dso_list_from_dir(*packages, directory, error_message);
-        if (!*packages)
-            return -2;
+        packages = rpm_dso_list_from_dir(packages, directory, error_message);
+        if (!packages)
+            return NULL;
     }
 
-    return 0;
+    return packages;
 }
 
 static char *
@@ -495,35 +491,6 @@ finito:
     return result;
 }
 
-static char *
-get_component(const char *directory,
-              char **error_message)
-{
-    if (is_packaged(directory))
-        return file_contents(directory, "component", error_message);
-
-    /* create component from executable basename concatenated with '-unpackaged' str */
-    if (file_exist(directory, "executable"))
-    {
-        char *executable = file_contents(directory, "executable", error_message);
-        if (executable)
-        {
-            const char *basename = strrchr(executable, '/');
-            if (basename)
-                ++basename;
-            else
-                basename = executable;
-
-            char *artificial_component = sr_asprintf("%s-unpackaged", basename);
-
-            free(executable);
-            return artificial_component;
-        }
-    }
-
-    return NULL;
-}
-
 struct sr_operating_system *
 sr_abrt_operating_system_from_dir(const char *directory,
                                   char **error_message)
@@ -600,10 +567,14 @@ sr_abrt_report_from_dir(const char *directory,
     }
 
     /* Component name. */
-    report->component_name = get_component(directory, error_message);
+    report->component_name = file_contents(directory, "component", error_message);
 
     /* RPM packages. */
-    if (sr_abrt_rpm_packages_from_dir(directory, &report->rpm_packages, error_message) < 0 )
+    *error_message = NULL;
+    report->rpm_packages = sr_abrt_rpm_packages_from_dir(
+        directory, error_message);
+
+    if (!report->rpm_packages && *error_message)
     {
         sr_report_free(report);
         return NULL;
