@@ -255,6 +255,9 @@ sr_report_to_json(struct sr_report *report)
 
         free(rpms_str_indented);
     }
+    /* If there is no package, attach empty list (packages is a mandatory field) */
+    else
+        sr_strbuf_append_strf(strbuf, ",   \"packages\": []\n");
 
     /* Custom entries.
      *    "auth" : {   "foo": "blah"
@@ -349,8 +352,7 @@ sr_report_from_json(struct sr_json_value *root, char **error_message)
     if (packages)
     {
         /* In the future, we'll choose the parsing function according to OS here. */
-        report->rpm_packages = sr_rpm_package_from_json(packages, true, error_message);
-        if (!report->rpm_packages)
+        if (sr_rpm_package_from_json(&report->rpm_packages, packages, true, error_message) < 0)
             goto fail;
     }
 
@@ -441,7 +443,6 @@ struct sr_report *
 sr_report_from_json_text(const char *report, char **error_message)
 {
     struct sr_json_value *json_root = sr_json_parse(report, error_message);
-
     if (!json_root)
         return NULL;
 
