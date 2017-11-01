@@ -1,3 +1,9 @@
+satyr 0.24
+==========
+Allowed reporting of unpackaged problems, this is usefull for custom problem
+collection using custom installation of FAF. Added doxygen HTML documentation
+generation. Tests and bugfixies.
+
 satyr 0.23
 ==========
 Allow rpm to be optional at build time.

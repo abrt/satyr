@@ -157,6 +157,12 @@ make check|| {
 %endif
 
 %changelog
+* Wed Nov 1 2017 Julius Milan <jmilan@redhat.com> 0.24-1
+- New upstream version
+  - Allow to report unpackaged problems
+  - apidoc: generate html docs using doxygen
+  - Fix parsing of subset of arm kernel oopses
+
 * Mon Mar 13 2017 Matej Habrnal <mhabrnal@redhat.com> 0.23-1
 - New upstream version
   - Allow rpm to be optional at build time
