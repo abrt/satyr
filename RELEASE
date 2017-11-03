@@ -1,53 +1,30 @@
 Releasing a new version of satyr
 --------------------------------
 
-1. Check that all changes from all work computers are commited. Then
+1. Check that all changes from all work computers are committed. Then
 check, that the local clone of the program is up-to-date:
 $ git status
 $ git pull
 
 
-2. Increase a version number in gen-version script (option DEF_VER=x.y).
-(x.y = the new version number)
-
-
-3. Check all the changes in the ChangeLog since the last release, and
-if any change modifies the satyr library interface, increase the
+2. If any change modifies the satyr library interface, increase the
 CURRENT number in lib/Makefile.am:
 libsatyr_la_LDFLAGS = -version-info 2:1:0
-                                       ^
-Document this change in the ChangeLog:
-* lib/Makefile.am (libsatyr_la_LDFLAGS): Increase CURRENT
-library version number, as the library interface changed since the
-last release.
 
 
-4. Update NEWS file to include user-visible, important informations
+3. Update NEWS file to include user-visible, important informations
 about the new release. Provide the date of the release (Released
-YYYY-MM-DD. Document this change in the ChangeLog:
+YYYY-MM-DD).
 * NEWS: Document recent changes.
 
 
-5. Read and update the README file, if you see that some change made
+4. Read and update the README file, if you see that some change made
 since the last release expanded the project scope, or added
-significant new functionality. Document this change in the ChangeLog.
+significant new functionality.
 
 
-6. Read and update the man page, to be sure that it's synchronized
-with the code. Document changes in the ChangeLog.
+5. Read and update the man page, to be sure that it's synchronized
+with the code.
 
 
-7. Commit all the new changes. Tag the new release using `git tag x.y`
-(x.y = the new version number). Push the changes to the git server
-using `git push && git push --tags`.
-
-
-Creating a satyr-x.y.tar.xz
----------------------------
-1. Set the new version to satyr-version and run autoconf
-(x.y = the new version number):
-`echo -n x.y > satyr-version && autoconf --force`
-
-
-2. Create satyr-x.y.tar.xz
-`make dist-xz`
+6. Run make release-{minor,major}, when all changes are committed.
