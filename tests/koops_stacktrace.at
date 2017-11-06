@@ -258,6 +258,8 @@ main(void)
 
   check("../../kerneloopses/arm-hung-task-oops", "dump_backtrace_log_lvl", "kthread", 6, 2, 0, NULL, NULL);
 
+  check("../../kerneloopses/arm-hung-task-oops-2", "shmem_getpage_gfp", "SyS_write", 7, 0, 53, NULL, NULL);
+
   return 0;
 }
 ]])

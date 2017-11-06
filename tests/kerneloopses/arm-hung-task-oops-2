@@ -1,0 +1,44 @@
+Unable to handle kernel NULL pointer dereference at virtual address 00000009
+pgd = e8a60000
+[00000009] *pgd=00000000
+Internal error: Oops: 805 [#1] SMP ARM
+Modules linked in: smsc95xx usbnet mii ses enclosure snd_soc_omap_mcbsp omapdrm drm_kms_helper snd_soc_omap_abe_twl6040 snd_soc_twl6040 snd_soc_omap_mcpdm snd_soc_omap drm omap_aes snd_soc_core fb_sys_fops omap_wdt omap4_keypad omap_ocp2scp encoder_tfp410 encoder_tpd12s015 snd_compress connector_hdmi connector_dvi omap_des pwm_twl_led pwm_twl snd_pcm_dmaengine ac97_bus snd_pcm leds_gpio omapdss snd_timer snd spi_omap2_mcspi gpio_twl6040 soundcore uas usb_storage mmc_block phy_generic pbias_regulator ti_abb_regulator ehci_omap ohci_omap3 omap_hsmmc phy_twl6030_usb mmc_core omap2430 musb_hdrc udc_core phy_omap_usb2 phy_omap_control
+CPU: 1 PID: 431 Comm: systemd-logind Not tainted 3.17.8-300.fc21.armv7hl #1
+task: ed16dd80 ti: e8a58000 task.ti: e8a58000
+PC is at shmem_getpage_gfp+0x584/0x72c
+LR is at shmem_getpage_gfp+0x454/0x72c
+pc : [<c0333330>]    lr : [<c0333200>]    psr: 80070113
+sp : e8a59dd8  ip : 2d2f9000  fp : 00000000
+r10: e89fa198  r9 : 00000001  r8 : 000200da
+r7 : 00000000  r6 : 00000003  r5 : 00000000  r4 : e89fa1c0
+r3 : ee1a44a0  r2 : 00000009  r1 : 00000000  r0 : 00000000
+Flags: Nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+Control: 10c5387d  Table: a8a6004a  DAC: 00000015
+Process systemd-logind (pid: 431, stack limit = 0xe8a58248)
+Stack: (0xe8a59dd8 to 0xe8a5a000)
+9dc0:                                                       00000020 ee1a3fc0
+9de0: e89fa29c 00000001 00000000 00000000 000000d0 00000000 c0aba922 00000009
+9e00: ed012400 ee1a44a0 b6f78000 e8a59efc e89fa29c bf000000 00000157 00000000
+9e20: 00001000 e8af6180 c0898e80 c031c7a0 000200da 00000000 e8a59e50 e8a59e54
+9e40: 00000000 00000000 00000000 00000000 e8af6180 c0385e88 54d0c68d 00000000
+9e60: 00000000 e89fa1c0 00000000 e8a59efc e89fa29c e8af6180 00000157 c031e698
+9e80: 00000001 00001000 e8a59f10 00000000 b6f78000 e8a58000 00000001 e8a59efc
+9ea0: e8af6180 e89fa238 e8a59f10 e8a58020 e8a58000 00000000 00000002 c031e744
+9ec0: 00000000 e8a58028 00000000 00001000 00002000 00000157 e8a59f88 e8af6180
+9ee0: ed16dd80 c036e4e4 00000157 0000002b b6ccd4c0 b6f78000 00000157 00000001
+9f00: 00000000 00000157 e8a59ef4 00000001 e8af6180 00000000 00000000 00000000
+9f20: ed16dd80 00000000 00000000 00000000 00000000 00000000 00000157 00000000
+9f40: 00000000 00000000 e8af6180 00000157 e8af6180 b6f78000 e8a59f88 c036ec10
+9f60: e8af6180 b6f78000 e8af6180 e8af6180 00000157 b6f78000 c020ebe4 e8a58000
+9f80: 00000000 c036f270 00000000 00000000 00000157 00000157 b6f78000 b810d690
+9fa0: 00000004 c020ea40 00000157 b6f78000 00000010 b6f78000 00000157 00000000
+9fc0: 00000157 b6f78000 b810d690 00000004 00000001 00050e2e 1be38448 00000002
+9fe0: 00000000 be8576f4 b6de90a4 b6e4cebc 60070110 00000010 00000000 00000000
+[<c0333330>] (shmem_getpage_gfp) from [<c031c7a0>] (generic_perform_write+0xa8/0x1c0)
+[<c031c7a0>] (generic_perform_write) from [<c031e698>] (__generic_file_write_iter+0x31c/0x38c)
+[<c031e698>] (__generic_file_write_iter) from [<c031e744>] (generic_file_write_iter+0x3c/0xc8)
+[<c031e744>] (generic_file_write_iter) from [<c036e4e4>] (new_sync_write+0x84/0xa8)
+[<c036e4e4>] (new_sync_write) from [<c036ec10>] (vfs_write+0xc0/0x1b0)
+[<c036ec10>] (vfs_write) from [<c036f270>] (SyS_write+0x48/0x88)
+[<c036f270>] (SyS_write) from [<c020ea40>] (ret_fast_syscall+0x0/0x30)
+Code: ea000005 e59d302c e59d2024 e3a00000 (e5823000)
