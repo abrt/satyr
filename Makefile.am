@@ -39,3 +39,34 @@ rpm: dist-xz satyr.spec
 	rpmbuild $(RPM_DIRS) -ba satyr.spec
 srpm: dist-xz satyr.spec
 	rpmbuild $(RPM_DIRS) -bs satyr.spec
+
+UPLOAD_URL ?= localhost
+
+upload: dist
+	scp $(distdir).tar.gz $$(test -n "$$UPLOAD_LOGIN" && echo "$$UPLOAD_LOGIN@")$(UPLOAD_URL)
+
+.PHONY: release-minor
+release-minor:
+	OLD_VER=$$(git describe --tags --match "[0-9]*" --abbrev=0 HEAD 2>/dev/null); \
+	MAJOR_VER=$$(echo $$OLD_VER | cut -d. -f 1); \
+	MINOR_VER=$$(echo $$OLD_VER | cut -d. -f 2); \
+	$(MAKE) release OLD_VER=$$OLD_VER NEW_VER="$$MAJOR_VER.$$((MINOR_VER+1))"
+
+.PHONY: release-major
+release-major:
+	OLD_VER=$$(git describe --tags --match "[0-9]*" --abbrev=0 HEAD 2>/dev/null); \
+	MAJOR_VER=$$(echo $$OLD_VER | cut -d. -f 1); \
+	$(MAKE) release OLD_VER=$$OLD_VER NEW_VER="$$((MAJOR_VER+1)).0"
+
+.PHONY: release
+release:
+	echo "* $$(LANG='en_US.UTF-8' date +'%a %b %d %Y') $$(git config --get user.name) <$$(git config --get user.email)> $$NEW_VER-1" | sort > /tmp/changelog.tmp; \
+	git log --oneline $$OLD_VER..HEAD | awk '{$$1=""; if (a[$$0]++ == 0) print "-" $$0} END {print ""}' | grep -v -e "- Merge" -e "- testsuite:" -e "- make:" >> /tmp/changelog.tmp; \
+	sed "$$(grep -n %changelog satyr.spec.in | cut -f1 -d: | head -1)"'r /tmp/changelog.tmp' -i satyr.spec.in; \
+	sed 's|DEF_VER=.*$$|DEF_VER='$$NEW_VER'|' -i gen-version; \
+	git add gen-version satyr.spec.in; \
+	git commit -s -m "Release $$NEW_VER"; \
+	git tag "$$NEW_VER"; \
+	echo -n "$$NEW_VER" > satyr-version
+	autoconf --force
+	$(MAKE) dist
