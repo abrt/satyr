@@ -488,6 +488,7 @@ fde_read_address(const uint8_t *p, unsigned len)
         uint32_t n4;
         uint64_t n8;
     } u;
+    u.n8 = 0;
 
     for (i = 0; i < len; i++)
         u.b[i] = *p++;
