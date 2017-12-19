@@ -147,7 +147,10 @@ is_removable_glib(const char *function_name,
         call_match(function_name, source_file, "smc_tree_abort", "gslice.c", "libglib", NULL) ||
         call_match(function_name, source_file, "g_thread_abort", "libglib", NULL) ||
         call_match(function_name, source_file, "_g_log_abort", "gmessages.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_log_default_handler", "gmessages.c", "libglib", NULL);
+        call_match(function_name, source_file, "g_log_default_handler", "gmessages.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_log_writer_default", "gmessages.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_log_structured_array", "gmessages.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "g_log_structured", "gmessages.c", "libglib", NULL);
 }
 
 static bool
