@@ -157,6 +157,14 @@ make check|| {
 %endif
 
 %changelog
+* Thu Jan 18 2018 Martin Kutlak <mkutlak@redhat.com> 0.25-1
+- New upstream version
+ - Normalization: actualize list of functions
+ - Fix some compilation warnings
+ - Allow to build python3 for rhel8
+ - Makefile: add make release-* subcommands
+ - Elfutils: Add missing stubs from earlier commit
+
 * Wed Nov 1 2017 Julius Milan <jmilan@redhat.com> 0.24-1
 - New upstream version
   - Allow to report unpackaged problems

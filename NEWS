@@ -1,3 +1,9 @@
+satyr 0.25
+==========
+Updated list of functions for normalization. Python3 build for RHEL8 was allowed.
+Added missing stubs for functions that were replaced. Some tweaks were added
+for compilation.
+
 satyr 0.24
 ==========
 Allowed reporting of unpackaged problems, this is usefull for custom problem
