@@ -126,8 +126,12 @@ make check|| {
     exit 1
 }
 
+%if 0%{?fedora} > 27
+# ldconfig is not needed
+%else
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
+%endif
 
 %files
 %doc README NEWS COPYING
