@@ -67,13 +67,6 @@ PKG_CHECK_MODULES([PYTHON], [python2],,[
     PYTHON_CFLAGS='-I/usr/include/python2.6'
 ])
 
-AC_ARG_ENABLE([python-manpage],
-              [AS_HELP_STRING([--disable-python-manpage],
-                              [Disable python bindings manpage build])],
-              [enable_python_manpage=$enableval],
-              [enable_python_manpage=yes])
-AM_CONDITIONAL(ENABLE_PYTHON_MANPAGE, [test $enable_python_manpage = yes])
-
 AC_ARG_ENABLE([static-python-module],
               [AS_HELP_STRING([--enable-static-python-module],
                               [Compile the python module so that it does not load libsatyr.so
