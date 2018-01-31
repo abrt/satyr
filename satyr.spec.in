@@ -134,7 +134,8 @@ make check|| {
 %endif
 
 %files
-%doc README NEWS COPYING
+%doc README NEWS
+%license COPYING
 %{_bindir}/satyr
 %{_mandir}/man1/%{name}.1*
 %{_libdir}/lib*.so.*
