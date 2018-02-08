@@ -40,11 +40,6 @@ rpm: dist-xz satyr.spec
 srpm: dist-xz satyr.spec
 	rpmbuild $(RPM_DIRS) -bs satyr.spec
 
-UPLOAD_URL ?= localhost
-
-upload: dist
-	scp $(distdir).tar.gz $$(test -n "$$UPLOAD_LOGIN" && echo "$$UPLOAD_LOGIN@")$(UPLOAD_URL)
-
 .PHONY: release-minor
 release-minor:
 	OLD_VER=$$(git describe --tags --match "[0-9]*" --abbrev=0 HEAD 2>/dev/null); \
@@ -69,4 +64,4 @@ release:
 	git tag "$$NEW_VER"; \
 	echo -n "$$NEW_VER" > satyr-version
 	autoconf --force
-	$(MAKE) dist
+	$(MAKE) dist-xz
