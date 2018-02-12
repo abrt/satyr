@@ -39,7 +39,7 @@ BuildRequires: pkgconfig
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: gdb
-BuildRequires: python-sphinx
+BuildRequires: python2-sphinx
 
 %description
 Satyr is a library that can be used to create and process microreports.
