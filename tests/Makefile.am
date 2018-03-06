@@ -86,10 +86,16 @@ DISTCLEANFILES = atconfig
 EXTRA_DIST += atlocal.in
 EXTRA_DIST += java_testcases.c
 
-if WITH_PYTHON3
+if WITH_PYTHON2
 TESTSUITEFLAGS =
 else
-TESTSUITEFLAGS = SKIP_PYTHON3=yes
+TESTSUITEFLAGS = "SKIP_PYTHON2=yes"
+endif
+
+if WITH_PYTHON3
+TESTSUITEFLAGS +=
+else
+TESTSUITEFLAGS += "SKIP_PYTHON3=yes"
 endif
 
 atconfig: $(top_builddir)/config.status
