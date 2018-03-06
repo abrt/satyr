@@ -1,5 +1,6 @@
 m4_define([AT_TEST_PYTHON],
 [AT_SETUP([python2_bindings_for_$1])
+AT_SKIP_IF([test -n "$SKIP_PYTHON2"])
 AT_CHECK([python2 ../../python/$1.py -v], 0, [ignore], [ignore])
 AT_CLEANUP
 
