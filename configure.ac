@@ -3,6 +3,7 @@ AC_CANONICAL_TARGET
 AC_CONFIG_HEADERS([lib/config.h])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AM_MAINTAINER_MODE
+PKG_PROG_PKG_CONFIG
 
 # Support silent build rules. Disable by either passing --disable-silent-rules
 # to ./configure or passing V=1 to make
