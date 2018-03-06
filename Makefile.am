@@ -36,7 +36,7 @@ RPM_DIRS = --define "_sourcedir `pwd`" \
 
 EXTRA_DIST += satyr.spec.in
 rpm: dist-xz satyr.spec
-	rpmbuild $(RPM_DIRS) -ba satyr.spec
+	rpmbuild $(RPM_DIRS) $(RPM_FLAGS) -ba satyr.spec
 srpm: dist-xz satyr.spec
 	rpmbuild $(RPM_DIRS) -bs satyr.spec
 
