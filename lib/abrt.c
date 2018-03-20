@@ -372,6 +372,33 @@ rpm_dso_list_from_dir(struct sr_rpm_package *packages,
     return packages;
 }
 
+static struct sr_rpm_package *
+rpm_interpreter_from_dir(struct sr_rpm_package *packages,
+                         const char *directory,
+                         char **error_message)
+{
+    char *interpreter_str = file_contents(directory, "interpreter",
+                                          error_message);
+    if (interpreter_str)
+    {
+        struct sr_rpm_package *interpreter_package = sr_rpm_package_new();
+        bool success = sr_rpm_package_parse_nevra(interpreter_str,
+                                                  &interpreter_package->name,
+                                                  &interpreter_package->epoch,
+                                                  &interpreter_package->version,
+                                                  &interpreter_package->release,
+                                                  &interpreter_package->architecture);
+
+        free(interpreter_str);
+        if (success)
+            packages = sr_rpm_package_append(packages, interpreter_package);
+        else
+            sr_rpm_package_free(interpreter_package, true);
+    }
+
+    return packages;
+}
+
 static bool
 file_exist(const char *directory, const char *filename)
 {
@@ -411,6 +438,10 @@ sr_abrt_rpm_packages_from_dir(const char *directory, struct sr_rpm_package **pac
         if (!*packages)
             return -2;
     }
+
+    /* attach interpreter as related package if exists */
+    if (file_exist(directory, "interpreter"))
+        *packages = rpm_interpreter_from_dir(*packages, directory, error_message);
 
     return 0;
 }
