@@ -258,6 +258,8 @@ sr_ruby_frame_parse(const char **input,
     /* Everything before the colon is the file name. */
     *p = '\0';
     frame->file_name = filename_lineno_in;
+    frame->file_name = anonymize_path(frame->file_name);
+
     filename_lineno_in = NULL;
 
     if(!sr_skip_char(&local_input, '`'))

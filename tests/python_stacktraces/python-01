@@ -19,6 +19,6 @@ Traceback (most recent call last):
     self.updateProgress(name, 0.0, "", "")
   File "/usr/share/PackageKit/helpers/yum/yumBackend.py", line 2593, in updateProgress
     pkg = self._getPackage(name)
-  File "/usr/share/PackageKit/helpers/yum/yumBackend.py", line 2534, in _getPackage
+  File "/home/user/PackageKit/helpers/yum/yumBackend.py", line 2534, in _getPackage
     sections = name.rsplit('-', 2)
 AttributeError: 'NoneType' object has no attribute 'rsplit'

@@ -237,6 +237,8 @@ sr_python_frame_parse(const char **input,
         frame->file_name = inside;
     }
 
+    frame->file_name = anonymize_path(frame->file_name);
+
     location->column += strlen(frame->file_name);
 
     if (0 == sr_skip_string(&local_input, "\", line "))

@@ -31,6 +31,9 @@
 #include <fcntl.h>
 #include <ctype.h>
 
+#define ANONYMIZED_PATH "/home/anonymized"
+
+
 /* The prototype is in C++ header cxxabi.h, let's just copypaste it here
  * instead of fiddling with include directories */
 char* __cxa_demangle(const char* mangled_name, char* output_buffer,
@@ -848,4 +851,24 @@ sr_demangle_symbol(const char *sym)
         warn("__cxa_demangle failed on symbol '%s' with status %d", sym, status);
 
     return demangled;
+}
+
+char*
+anonymize_path(char *orig_path)
+{
+    if (!orig_path)
+        return orig_path;
+    char* new_path = orig_path;
+    if (strncmp(orig_path, "/home/", strlen("/home/")) == 0)
+    {
+        new_path = strchr(new_path + strlen("/home/"), '/');
+        if (new_path)
+        {
+            // Join /home/anonymized/ and ^
+            new_path = sr_asprintf("%s%s", ANONYMIZED_PATH, new_path);
+            free(orig_path);
+            return new_path;
+        }
+    }
+    return orig_path;
 }

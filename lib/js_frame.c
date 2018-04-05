@@ -344,6 +344,7 @@ sr_js_frame_parse_v8(const char **input,
      * ^^^^^^^^^^^^^^^^^
      */
     frame->file_name = sr_strndup(local_input, token - local_input);
+    frame->file_name = anonymize_path(frame->file_name);
 
     location->column += sr_skip_char_cspan(&local_input, "\n");
 
