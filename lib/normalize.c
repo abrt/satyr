@@ -150,7 +150,8 @@ is_removable_glib(const char *function_name,
         call_match(function_name, source_file, "g_log_default_handler", "gmessages.c", "libglib", NULL) ||
         call_match(function_name, source_file, "g_log_writer_default", "gmessages.c", "libglib", NULL) ||
         call_match(function_name, source_file, "g_log_structured_array", "gmessages.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_log_structured", "gmessages.c", "libglib", NULL);
+        call_match(function_name, source_file, "g_log_structured", "gmessages.c", "libglib", NULL) ||
+        call_match(function_name, source_file, "default_log_handler", "main.c", NULL);
 }
 
 static bool
@@ -268,14 +269,15 @@ is_removable_other(const char *function_name,
         call_match(function_name, source_file, "wl_log", "wayland-util.c", NULL) ||
         call_match(function_name, source_file, "display_protocol_error", "wayland-client.c", NULL) ||
         call_match(function_name, source_file, "display_handle_error", "wayland-client.c", NULL) ||
-        call_match(function_name, source_file, "x_io_error", "libmutter", NULL) ||
+        call_match(function_name, source_file, "x_io_error", "libmutter", "meta-xwayland.c",NULL) ||
         call_match(function_name, source_file, "__ioremap_calle ", "ioremap.c", NULL) ||
         call_match(function_name, source_file, "ioremap_nocache", "ioremap.c", NULL) ||
         call_match(function_name, source_file, "wpa_msg", "wpa_debug.c", NULL) ||
         call_match(function_name, source_file, "js::gc::FinalizeArenas(js::FreeOp*, js::gc::ArenaHeader**, js::gc::ArenaList&, js::gc::AllocKind, js::SliceBudget&)\"js::Shape::finalize(js::FreeOp*)", "", NULL) ||
         call_match(function_name, source_file, "WTF::StringImpl::endsWith(char const*, unsigned int, bool) const", "", NULL) ||
         call_match(function_name, source_file, "mozilla::plugins::child::_invokedefault(_NPP*, NPObject*, _NPVariant const*, unsigned int, _NPVariant*)", "", NULL) ||
-        call_match(function_name, source_file, "xitk_signal_handler", "xitk.c", "xine", NULL);
+        call_match(function_name, source_file, "xitk_signal_handler", "xitk.c", "xine", NULL) ||
+        call_match(function_name, source_file, "dump_gjs_stack_on_signal_handler", "main.c", NULL);
 }
 
 static bool
@@ -385,7 +387,7 @@ sr_gdb_is_exit_frame(struct sr_gdb_frame *frame)
 {
     return
         sr_gdb_frame_calls_func(frame, "__run_exit_handlers", "exit.c", NULL) ||
-        sr_gdb_frame_calls_func(frame, "raise", "pt-raise.c", "libc.so", "libc-", "libpthread.so", NULL) ||
+        sr_gdb_frame_calls_func(frame, "raise", "pt-raise.c", "libc.so", "libc-", "libpthread.so", "raise.c", NULL) ||
         sr_gdb_frame_calls_func(frame, "__GI_raise", "raise.c", NULL) ||
         sr_gdb_frame_calls_func(frame, "exit", "exit.c", NULL) ||
         sr_gdb_frame_calls_func(frame, "abort", "abort.c", "libc.so", "libc-", NULL) ||
