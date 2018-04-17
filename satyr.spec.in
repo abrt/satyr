@@ -1,12 +1,17 @@
 %{!?python2_sitearch: %global python2_sitearch %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
-%bcond_without python2
-
 %if 0%{?fedora} || 0%{?rhel} > 7
-  %define with_python3 1
+# Enable python3 build by default
+%bcond_without python3
 %else
-  # EL doesn't have Python 3
-  %define with_python3 0
+%bcond_with python3
+%endif
+
+%if 0%{?rhel} > 7 || 0%{?fedora} > 28
+# Disable python2 build by default
+%bcond_with python2
+%else
+%bcond_without python2
 %endif
 
 %if 0%{?suse_version}
@@ -30,9 +35,9 @@ Source0: https://github.com/abrt/%{name}/archive/%{version}/%{name}-%{version}.t
 %if %{with python2}
 BuildRequires: %{python2_devel}
 %endif # with python2
-%if 0%{?with_python3}
+%if %{with python3}
 BuildRequires: python3-devel
-%endif # if with_python3
+%endif # with python3
 BuildRequires: %{libdw_devel}
 BuildRequires: %{libelf_devel}
 BuildRequires: binutils-devel
@@ -43,7 +48,12 @@ BuildRequires: pkgconfig
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: gdb
+%if %{with python2}
 BuildRequires: python2-sphinx
+%endif # with python2
+%if %{with python3}
+BuildRequires: python3-sphinx
+%endif # with python3
 
 %description
 Satyr is a library that can be used to create and process microreports.
@@ -75,7 +85,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 Python bindings for %{name}.
 %endif #with python2
 
-%if 0%{?with_python3}
+%if %{with python3}
 %package -n python3-satyr
 %{?python_provide:%python_provide python3-satyr}
 # Remove before F30
@@ -87,16 +97,19 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python3-satyr
 Python 3 bindings for %{name}.
-%endif # if with_python3
+%endif # if with python3
 
 %prep
 %setup -q
 
 %build
 %configure \
-%if ! %{?with_python3}
+%if %{without python2}
+        --without-python2 \
+%endif # with python2
+%if %{without python3}
         --without-python3 \
-%endif
+%endif # with python3
 %{?_without_python2} \
         --disable-static \
         --enable-doxygen-docs
