@@ -165,6 +165,23 @@ make check|| {
 %endif
 
 %changelog
+* Tue Apr 17 2018 Matej Habrnal <mhabrnal@redhat.com> 0.26-1
+- spec: fix Allow python2 to be optional at build time
+- python: Allow python2 to be optional at build time
+- configure: use PKG_PROG_PKG_CONFIG to detect pkg-config
+- makefile: add RPM_FLAGS variable to rpmbuild
+- Allow python2 to be optional at build time
+- autogen: correctly parse buildrequires from spec file
+- normalization: actualize list of functions
+- Append Python interpreter as related package
+- spec: Update Python 2 dependency declarations
+- makefile: create .tar.xz with make release
+- remove 2+ years old changelog entries
+- remove Groups
+- we do not build for el6 any more
+- mark license as license
+- ldconfig is not needed in rawhide
+
 * Thu Jan 18 2018 Martin Kutlak <mkutlak@redhat.com> 0.25-1
 - New upstream version
  - Normalization: actualize list of functions

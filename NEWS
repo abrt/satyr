@@ -1,3 +1,8 @@
+satyr 0.26
+==========
+Updated list of functions for normalization. Python3 build for RHEL8 was allowed.
+Allow build without Python2.
+
 satyr 0.25
 ==========
 Updated list of functions for normalization. Python3 build for RHEL8 was allowed.
