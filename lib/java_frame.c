@@ -468,7 +468,10 @@ const char *sr_java_frame_parse_frame_url(struct sr_java_frame *frame, const cha
         sr_location_add(location, 0, sr_skip_char_cspan(&cursor, path_stop));
 
         if (mark != cursor)
+        {
             frame->class_path = sr_strndup(mark, cursor - mark);
+            frame->class_path = anonymize_path(frame->class_path);
+        }
     }
 
     if (*cursor != ']' && *cursor != '\n')
@@ -522,8 +525,11 @@ sr_java_frame_parse(const char **input,
             if (sr_java_frame_parse_is_native_method(mark))
                 frame->is_native = true;
             else if (!sr_java_frame_parse_is_unknown_source(mark))
+            {
                 /* DO NOT set file_name if input says that source isn't known */
                 frame->file_name = sr_strndup(mark, cursor - mark);
+                frame->file_name = anonymize_path(frame->file_name);
+            }
         }
 
         if (*cursor == ':')

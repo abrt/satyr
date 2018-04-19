@@ -6,7 +6,7 @@ from test_helpers import *
 path = '../python_stacktraces/python-01'
 contents = load_input_contents(path)
 frames_expected = 11
-expected_short_text = '''#1 _getPackage in /usr/share/PackageKit/helpers/yum/yumBackend.py:2534
+expected_short_text = '''#1 _getPackage in /home/anonymized/PackageKit/helpers/yum/yumBackend.py:2534
 #2 updateProgress in /usr/share/PackageKit/helpers/yum/yumBackend.py:2593
 #3 _do_start in /usr/share/PackageKit/helpers/yum/yumBackend.py:2551
 #4 start in /usr/lib/python2.6/site-packages/urlgrabber/progress.py:129
@@ -76,16 +76,16 @@ class TestPythonStacktrace(BindingsTestCase):
         self.assertEqual(self.trace.to_short_text(6), expected_short_text)
 
     def test_bthash(self):
-        self.assertEqual(self.trace.get_bthash(), 'fa0a7ff4b65f18661a6ce102eb787ff0d77ff12f')
+        self.assertEqual(self.trace.get_bthash(), 'eabeeae89433bb3b3d9eb8190659dcf057ab3cd1')
 
     def test_duphash(self):
         expected_plain = '''Thread
-/usr/share/PackageKit/helpers/yum/yumBackend.py:2534
+/home/anonymized/PackageKit/helpers/yum/yumBackend.py:2534
 /usr/share/PackageKit/helpers/yum/yumBackend.py:2593
 /usr/share/PackageKit/helpers/yum/yumBackend.py:2551
 '''
         self.assertEqual(self.trace.get_duphash(flags=satyr.DUPHASH_NOHASH, frames=3), expected_plain)
-        self.assertEqual(self.trace.get_duphash(), '2c8e509a33966a08df1dd8b2348e850d1bc5b776')
+        self.assertEqual(self.trace.get_duphash(), '8c8273cddf94e10fc0349284afcff8970056d9e5')
 
     def test_crash_thread(self):
         self.assertTrue(self.trace.crash_thread is self.trace)

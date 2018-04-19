@@ -462,6 +462,18 @@ main(void)
   /** next frame **/
   sr_java_frame_init(&frame);
   frame.name = sr_strdup("com.redhat.abrt.duke.nuke");
+  frame.file_name = sr_strdup("duke.java");
+  frame.class_path = sr_strdup("/home/anonymized/lib/java/foo.class");
+
+  c = "    at com.redhat.abrt.duke.nuke(duke.java:-1) [file:/home/user/lib/java/foo.class]\n";
+  sr_location_init(&location);
+  location.line = 2;
+  location.column = 0;
+  check(c, &frame, c + strlen(c), &location);
+
+  /** next frame **/
+  sr_java_frame_init(&frame);
+  frame.name = sr_strdup("com.redhat.abrt.duke.nuke");
   frame.is_native = true;
 
   c = "    at com.redhat.abrt.duke.nuke(Native Method)\n";

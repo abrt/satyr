@@ -406,6 +406,9 @@ sr_parse_os_release(const char *input,
                     void (*callback)(char*, char*, void*),
                     void *data);
 
+char*
+anonymize_path(char *file_name);
+
 /**
  * Demangles C++ symbol.
  * @returns

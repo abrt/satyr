@@ -102,6 +102,13 @@ main(void)
                 33,
                 63);
 
+    check_valid("at    ContextifyScript.Script.runInThisContext    (/home/user/vm.js:25:33)",
+                "ContextifyScript.Script.runInThisContext",
+                "/home/anonymized/vm.js",
+                25,
+                33,
+                74);
+
     check_valid("at    ContextifyScript.Script.runInThisContext    (vm.js:25:33)  ",
                 "ContextifyScript.Script.runInThisContext",
                 "vm.js",

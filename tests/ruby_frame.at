@@ -38,7 +38,7 @@ main(void)
         "/usr/share/ruby/vendor_ruby/will_crash.rb", 13, "func", false, 2, 1);
 
   check("/home/u/work/will:crash/will_crash.rb:30:in `block in <class:WillClass>'",
-        "/home/u/work/will:crash/will_crash.rb", 30, "class:WillClass", true, 1, 0);
+        "/home/anonymized/work/will:crash/will_crash.rb", 30, "class:WillClass", true, 1, 0);
 
   check("./will_ruby_raise:8:in `<main>'",
         "./will_ruby_raise", 8, "main", true, 0, 0);

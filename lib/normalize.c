@@ -632,6 +632,15 @@ sr_normalize_core_thread(struct sr_core_thread *thread)
         frame = next_frame;
     }
 
+    /* Anonymize file_name if contains /home/<user>/...
+     */
+    frame = thread->frames;
+    while (frame)
+    {
+        frame->file_name = anonymize_path(frame->file_name);
+        frame = frame->next;
+    }
+
     /* If the first frame has address 0x0000 and its name is '??', it
      * is a dereferenced null, and we remove it. This frame is not
      * really invalid, but it affects stacktrace quality rating. See
