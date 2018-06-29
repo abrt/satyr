@@ -281,7 +281,7 @@ get_backtrace(const char *core_file, const char *executable)
   args[i++] = (char*)"-ex";
   args[i++] = sr_asprintf("core-file %s", core_file);
   args[i++] = (char*)"-ex";
-  args[i++] = (char*)"thread apply all -ascending backtrace 1024 full";
+  args[i++] = (char*)"thread apply all -ascending backtrace full 1024";
   args[i++] = (char*)"-ex";
   args[i++] = (char*)"info sharedlib";
   args[i++] = (char*)"-ex";
