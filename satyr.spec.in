@@ -165,6 +165,10 @@ make check|| {
 %endif
 
 %changelog
+* Fri Oct 05 2018 Martin Kutlak <mkutlak@redhat.com> 0.27-1
+- Improve truncated backtrace format for python and core
+- Anonymize paths in frames
+
 * Tue Apr 17 2018 Matej Habrnal <mhabrnal@redhat.com> 0.26-1
 - spec: fix Allow python2 to be optional at build time
 - python: Allow python2 to be optional at build time
