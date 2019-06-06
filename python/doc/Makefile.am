@@ -132,8 +132,3 @@ EXTRA_DIST = \
 	report.rst \
 	stacktrace.rst \
 	clustering.rst
-if WITH_PYTHON2
-man3_MANS = _build/man/satyr-python.3
-
-_build/man/satyr-python.3: conf.py man
-endif
