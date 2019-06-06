@@ -1,5 +1,3 @@
-%{!?python2_sitearch: %global python2_sitearch %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
-
 %if 0%{?fedora} || 0%{?rhel} > 7
 # Enable python3 build by default
 %bcond_without python3
@@ -7,20 +5,10 @@
 %bcond_with python3
 %endif
 
-%if 0%{?rhel} > 7 || 0%{?fedora} > 28
-# Disable python2 build by default
-%bcond_with python2
-%else
-%bcond_without python2
-%endif
-
 %if 0%{?suse_version}
-  %define python2_sitearch %{python_sitearch}
-  %define python2_devel python-devel
   %define libdw_devel libdw-devel
   %define libelf_devel libelf-devel
 %else
-  %define python2_devel python2-devel
   %define libdw_devel elfutils-devel
   %define libelf_devel elfutils-libelf-devel
 %endif
@@ -32,9 +20,6 @@ Summary: Tools to create anonymous, machine-friendly problem reports
 License: GPLv2+
 URL: https://github.com/abrt/satyr
 Source0: https://github.com/abrt/%{name}/archive/%{version}/%{name}-%{version}.tar.xz
-%if %{with python2}
-BuildRequires: %{python2_devel}
-%endif # with python2
 %if %{with python3}
 BuildRequires: python3-devel
 %endif # with python3
@@ -48,9 +33,6 @@ BuildRequires: pkgconfig
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: gdb
-%if %{with python2}
-BuildRequires: python2-sphinx
-%endif # with python2
 %if %{with python3}
 BuildRequires: python3-sphinx
 %endif # with python3
@@ -71,20 +53,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %description devel
 Development libraries and headers for %{name}.
 
-%if %{with python2}
-%package -n python2-satyr
-%{?python_provide:%python_provide python2-satyr}
-# Remove before F30
-Provides: %{name}-python = %{version}-%{release}
-Provides: %{name}-python%{?_isa} = %{version}-%{release}
-Obsoletes: %{name}-python < 0.24
-Summary: Python bindings for %{name}
-Requires: %{name}%{?_isa} = %{version}-%{release}
-
-%description -n python2-satyr
-Python bindings for %{name}.
-%endif #with python2
-
 %if %{with python3}
 %package -n python3-satyr
 %{?python_provide:%python_provide python3-satyr}
@@ -104,13 +72,9 @@ Python 3 bindings for %{name}.
 
 %build
 %configure \
-%if %{without python2}
-        --without-python2 \
-%endif # with python2
 %if %{without python3}
         --without-python3 \
 %endif # with python3
-%{?_without_python2} \
         --disable-static \
         --enable-doxygen-docs
 
@@ -150,13 +114,6 @@ make check|| {
 %{_includedir}/*
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*
-
-%if %{with python2}
-%files -n python2-satyr
-%dir %{python2_sitearch}/%{name}
-%{python2_sitearch}/%{name}/*
-%{_mandir}/man3/satyr-python.3*
-%endif # with python2
 
 %if 0%{?with_python3}
 %files -n python3-satyr

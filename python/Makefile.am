@@ -68,32 +68,6 @@ PYEXTLDFLAGS = \
     -module \
     -avoid-version
 
-if WITH_PYTHON2
-py2satyrdir = $(pyexecdir)/satyr
-
-py2satyr_PYTHON = \
-    __init__.py
-
-py2satyr_LTLIBRARIES = _satyr.la
-
-_satyr_la_SOURCES = $(PYEXTFILES)
-_satyr_la_CPPFLAGS = \
-    $(PYEXTCPPFLAGS) \
-    $(PYTHON_CFLAGS)
-_satyr_la_LDFLAGS = \
-    $(PYEXTLDFLAGS) \
-    -export-symbols-regex init_satyr
-
-# Depending on the configure option, we either link libsatyr.so dynamically (as
-# is usual), or directly include its object files (by including the
-# convenience library).
-if ENABLE_STATIC_PYTHON_MODULE
-_satyr_la_LIBADD = ../lib/libsatyr_conv.la
-else
-_satyr_la_LIBADD = ../lib/libsatyr.la
-endif
-endif
-
 if WITH_PYTHON3
 py3satyrdir = $(py3execdir)/satyr
 
@@ -120,3 +94,6 @@ else
 _satyr3_la_LIBADD = ../lib/libsatyr.la
 endif
 endif
+
+EXTRA_DIST = \
+    __init__.py
