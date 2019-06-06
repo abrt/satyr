@@ -143,9 +143,19 @@ AM_CONDITIONAL(WITH_PYTHON3, [test $with_python3 = yes])
 AC_CHECK_LIB([bfd], [main])
 AC_CHECK_LIB([dl], [main])
 
-PKG_CHECK_MODULES([LIBDW], [libdw], [AC_DEFINE([HAVE_LIBDW], [], [libdw found])], [true])
-PKG_CHECK_MODULES([LIBELF], [libelf], [AC_DEFINE([HAVE_LIBELF], [], [libelf found])], [true])
-PKG_CHECK_MODULES([LIBUNWIND], [libunwind-coredump], [AC_DEFINE([HAVE_LIBUNWIND], [], [libunwind found])], [true])
+PKG_CHECK_MODULES([LIBDW], [libdw], [AC_DEFINE([HAVE_LIBDW], [], [libdw found])])
+PKG_CHECK_MODULES([LIBELF], [libelf], [AC_DEFINE([HAVE_LIBELF], [], [libelf found])])
+
+AC_ARG_WITH([unwinder],
+            [AS_HELP_STRING([--with-unwinder=@<:@elfutils/libunwind@:>@],
+                            [call stack unwinder to use @<:@default=elfutils@:>@])],
+            [],
+            [with_unwinder=elfutils])
+AS_IF([test "x$with_unwinder" = "xlibunwind"],
+      [PKG_CHECK_MODULES([LIBUNWIND],
+                         [libunwind-coredump],
+                         [AC_DEFINE([WITH_LIBUNWIND], [], [use libunwind for unwinding])])],
+      [AC_DEFINE([WITH_LIBDWFL], [], [use elfutils for unwinding])])
 
 # rpm
 AC_ARG_WITH([rpm],

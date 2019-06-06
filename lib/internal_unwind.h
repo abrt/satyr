@@ -26,15 +26,6 @@
 
 #include "config.h"
 
-/* define macros indicating what unwinder are we using */
-#if (defined HAVE_LIBDW && defined HAVE_LIBELF)
-#  define WITH_LIBDWFL
-#endif
-
-#if !defined WITH_LIBDWFL && (defined HAVE_LIBDW && defined HAVE_LIBELF && defined HAVE_LIBUNWIND)
-#  define WITH_LIBUNWIND
-#endif
-
 /* Error/warning reporting macros. Allows the error reporting code to be less
  * verbose with the restrictions that:
  *  - pointer to error message pointer must be always named "error_msg"
