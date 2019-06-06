@@ -27,11 +27,11 @@
 #include "config.h"
 
 /* define macros indicating what unwinder are we using */
-#if (defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF && defined HAVE_LIBDW && defined HAVE_ELFUTILS_LIBDWFL_H && defined HAVE_DWFL_NEXT_THREAD)
+#if (defined HAVE_LIBDW && defined HAVE_LIBELF)
 #  define WITH_LIBDWFL
 #endif
 
-#if !defined WITH_LIBDWFL && (defined HAVE_LIBUNWIND && defined HAVE_LIBUNWIND_COREDUMP && defined HAVE_LIBUNWIND_GENERIC && defined HAVE_LIBUNWIND_COREDUMP_H && defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF && defined HAVE_LIBDW && defined HAVE_ELFUTILS_LIBDWFL_H)
+#if !defined WITH_LIBDWFL && (defined HAVE_LIBDW && defined HAVE_LIBELF && defined HAVE_LIBUNWIND)
 #  define WITH_LIBUNWIND
 #endif
 

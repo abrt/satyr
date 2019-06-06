@@ -141,27 +141,11 @@ AM_CONDITIONAL(WITH_PYTHON3, [test $with_python3 = yes])
 
 # Check BFD
 AC_CHECK_LIB([bfd], [main])
-
-# elfutils
-AC_CHECK_HEADERS([dwarf.h elfutils/libdw.h elfutils/libdwfl.h gelf.h libelf.h])
-AC_CHECK_LIB([elf], [main])
-# dwfl is actually part of libdw, at least on Fedora
-AC_CHECK_LIB([dw], [main])
-AC_CHECK_LIB([dwfl], [main])
 AC_CHECK_LIB([dl], [main])
-elfutils_unwinder=0
-AC_CHECK_FUNC(dwfl_getthreads,
-  AC_DEFINE(HAVE_DWFL_NEXT_THREAD, [], [Have function dwfl_getthreads for coredump unwinding])
-  elfutils_unwinder=1
-)
 
-# libunwind
-if test "$elfutils_unwinder" != "1"; then
-  AC_CHECK_HEADERS([libunwind-coredump.h])
-  AC_CHECK_LIB([unwind], [main])
-  AC_CHECK_LIB([unwind-generic], [main])
-  AC_CHECK_LIB([unwind-coredump], [main])
-fi
+PKG_CHECK_MODULES([LIBDW], [libdw], [AC_DEFINE([HAVE_LIBDW], [], [libdw found])], [true])
+PKG_CHECK_MODULES([LIBELF], [libelf], [AC_DEFINE([HAVE_LIBELF], [], [libelf found])], [true])
+PKG_CHECK_MODULES([LIBUNWIND], [libunwind-coredump], [AC_DEFINE([HAVE_LIBUNWIND], [], [libunwind found])], [true])
 
 # rpm
 AC_ARG_WITH([rpm],
