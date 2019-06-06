@@ -22,7 +22,7 @@
 #include "config.h"
 #include "strbuf.h"
 
-#if (defined HAVE_DWARF_H && defined HAVE_ELFUTILS_LIBDW_H && defined HAVE_LIBELF_H && defined HAVE_GELF_H && defined HAVE_LIBELF)
+#if (defined HAVE_LIBDW && defined HAVE_LIBELF)
 #  define WITH_ELFUTILS
 #endif
 
