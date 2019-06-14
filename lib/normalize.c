@@ -151,7 +151,8 @@ is_removable_glib(const char *function_name,
         call_match(function_name, source_file, "g_log_writer_default", "gmessages.c", "libglib", NULL) ||
         call_match(function_name, source_file, "g_log_structured_array", "gmessages.c", "libglib", NULL) ||
         call_match(function_name, source_file, "g_log_structured", "gmessages.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "default_log_handler", "main.c", NULL);
+        call_match(function_name, source_file, "default_log_handler", "main.c", NULL) ||
+        call_match(function_name, source_file, "g_signal_emit_by_name", "gsignal.c", "libgobject", NULL);
 }
 
 static bool
@@ -277,7 +278,8 @@ is_removable_other(const char *function_name,
         call_match(function_name, source_file, "WTF::StringImpl::endsWith(char const*, unsigned int, bool) const", "", NULL) ||
         call_match(function_name, source_file, "mozilla::plugins::child::_invokedefault(_NPP*, NPObject*, _NPVariant const*, unsigned int, _NPVariant*)", "", NULL) ||
         call_match(function_name, source_file, "xitk_signal_handler", "xitk.c", "xine", NULL) ||
-        call_match(function_name, source_file, "dump_gjs_stack_on_signal_handler", "main.c", NULL);
+        call_match(function_name, source_file, "dump_gjs_stack_on_signal_handler", "main.c", NULL) ||
+        call_match(function_name, source_file, "meta_run", "libmutter", "main.c", NULL);
 }
 
 static bool
