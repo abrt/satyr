@@ -55,7 +55,7 @@ release-major:
 
 .PHONY: release
 release:
-	echo "* $$(LANG='en_US.UTF-8' date +'%a %b %d %Y') $$(git config --get user.name) <$$(git config --get user.email)> $$NEW_VER-1" | sort > /tmp/changelog.tmp; \
+	echo "* $$(LC_TIME='en_US.UTF-8' date +'%a %b %d %Y') $$(git config --get user.name) <$$(git config --get user.email)> $$NEW_VER-1" | sort > /tmp/changelog.tmp; \
 	git log --oneline $$OLD_VER..HEAD | awk '{$$1=""; if (a[$$0]++ == 0) print "-" $$0} END {print ""}' | grep -v -e "- Merge" -e "- testsuite:" -e "- make:" >> /tmp/changelog.tmp; \
 	sed "$$(grep -n %changelog satyr.spec.in | cut -f1 -d: | head -1)"'r /tmp/changelog.tmp' -i satyr.spec.in; \
 	sed 's|DEF_VER=.*$$|DEF_VER='$$NEW_VER'|' -i gen-version; \
