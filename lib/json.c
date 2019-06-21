@@ -356,9 +356,9 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                     continue;
 
                 case ']':
-                    if (top->type == SR_JSON_ARRAY)
+                    if (top && top->type == SR_JSON_ARRAY)
                         flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
-                    else if (!state.settings.settings & SR_JSON_RELAXED_COMMAS)
+                    else if (!top || (!state.settings.settings & SR_JSON_RELAXED_COMMAS))
                     {
                         location->column = e_off;
                         location->message = sr_strdup("Unexpected ]");
