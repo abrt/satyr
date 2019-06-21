@@ -122,6 +122,9 @@ make check|| {
 %endif
 
 %changelog
+* Fri Jun 21 2019 Ernestas Kulik <ekulik@redhat.com> 0.28-1
+- Release version 0.28
+
 * Fri Oct 05 2018 Martin Kutlak <mkutlak@redhat.com> 0.27-1
 - Improve truncated backtrace format for python and core
 - Anonymize paths in frames
