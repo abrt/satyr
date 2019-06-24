@@ -571,7 +571,7 @@ sr_elf_get_eh_frame(const char *filename,
         return NULL;
     }
 
-    uint64_t exec_base = -1;
+    uint64_t exec_base = UINT64_MAX;
     int i;
     for (i = 0; i < phnum; i++)
     {
@@ -593,7 +593,7 @@ sr_elf_get_eh_frame(const char *filename,
         }
     }
 
-    if (-1 == exec_base)
+    if (exec_base == UINT64_MAX)
     {
         *error_message = sr_asprintf("Can't determine executable base for %s",
                                      filename);

@@ -106,7 +106,7 @@ sr_gdb_sharedlib_find_address(struct sr_gdb_sharedlib *first,
 {
     struct sr_gdb_sharedlib *tmp = first;
 
-    if (address == -1)
+    if (address == UINT64_MAX)
         return NULL;
 
     while (tmp)
