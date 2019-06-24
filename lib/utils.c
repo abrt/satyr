@@ -32,7 +32,8 @@
 #include <ctype.h>
 
 #define ANONYMIZED_PATH "/home/anonymized"
-
+/* Maximum allowed size of a file when reading into memory. Currently 20 MB. */
+#define FILE_SIZE_LIMIT 20000000L
 
 /* The prototype is in C++ header cxxabi.h, let's just copypaste it here
  * instead of fiddling with include directories */
@@ -302,10 +303,9 @@ sr_file_to_string(const char *filename,
 
     lseek(fd, 0, SEEK_SET); /* No reason to fail. */
 
-    static const size_t FILE_SIZE_LIMIT = 20000000; /* ~ 20 MB */
     if (size > FILE_SIZE_LIMIT)
     {
-        *error_message = sr_asprintf("Input file too big (%lld). Maximum size is %zu.",
+        *error_message = sr_asprintf("Input file too big (%lld). Maximum size is %ld.",
                                      (long long)size,
                                      FILE_SIZE_LIMIT);
 

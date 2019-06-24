@@ -351,8 +351,7 @@ get_signal_number(Elf *e, const char *elf_file)
     }
 
     /* Go through phdrs, look for prstatus note */
-    int i;
-    for (i = 0; i < nphdr; i++)
+    for (size_t i = 0; i < nphdr; i++)
     {
         GElf_Phdr phdr;
         if (gelf_getphdr(e, i, &phdr) != &phdr)

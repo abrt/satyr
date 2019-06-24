@@ -451,7 +451,7 @@ void
 sr_ruby_frame_append_to_str(struct sr_ruby_frame *frame,
                             struct sr_strbuf *dest)
 {
-    for (int i = 0; i < frame->rescue_level; i++)
+    for (uint32_t i = 0; i < frame->rescue_level; i++)
     {
         sr_strbuf_append_str(dest, "rescue in ");
     }
