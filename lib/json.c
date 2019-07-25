@@ -1,7 +1,7 @@
 /*
     json.c
 
-    Copyright (C) 2012  James McLaughlin et al.
+    Copyright (C) 2012, 2013, 2014  James McLaughlin et al.
     https://github.com/udp/json-parser
 
     Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@
 #include "strbuf.h"
 #include "location.h"
 #include "utils.h"
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -48,16 +49,24 @@ sr_json_value_none = { 0 };
 static unsigned char
 hex_value(char c)
 {
-    if (c >= 'A' && c <= 'F')
-        return (c - 'A') + 10;
-
-    if (c >= 'a' && c <= 'f')
-        return (c - 'a') + 10;
-
-    if (c >= '0' && c <= '9')
+    if (isdigit(c))
         return c - '0';
 
-    return 0xFF;
+    switch (c) {
+    case 'a': case 'A': return 0x0A;
+    case 'b': case 'B': return 0x0B;
+    case 'c': case 'C': return 0x0C;
+    case 'd': case 'D': return 0x0D;
+    case 'e': case 'E': return 0x0E;
+    case 'f': case 'F': return 0x0F;
+    default: return 0xFF;
+    }
+}
+
+static int
+would_overflow(long long value, char b)
+{
+    return ((LLONG_MAX - (b - '0')) / 10) < value;
 }
 
 struct json_state
@@ -68,13 +77,13 @@ struct json_state
    unsigned long used_memory;
    unsigned int uint_max;
    unsigned long ulong_max;
+
+   const char *ptr;
 };
 
 static void *
 json_alloc(struct json_state *state, unsigned long size, int zero)
 {
-    void * mem;
-
     if ((state->ulong_max - state->used_memory) < size)
         return 0;
 
@@ -84,10 +93,7 @@ json_alloc(struct json_state *state, unsigned long size, int zero)
         return 0;
     }
 
-    if (!(mem = zero ? calloc (size, 1) : malloc (size)))
-        return 0;
-
-    return mem;
+    return zero ? calloc(size, 1) : malloc(size);
 }
 
 static int
@@ -111,14 +117,21 @@ new_value(struct json_state *state,
         switch (value->type)
         {
         case SR_JSON_ARRAY:
+            if (value->u.array.length == 0)
+               break;
+
             value->u.array.values = (struct sr_json_value **)json_alloc(
                 state, value->u.array.length * sizeof(struct sr_json_value *), 0);
 
             if (!value->u.array.values)
                 return 0;
 
+            value->u.array.length = 0;
             break;
         case SR_JSON_OBJECT:
+            if (value->u.array.length == 0)
+               break;
+
             values_size = sizeof(*value->u.object.values) * value->u.object.length;
             (*(void**)&value->u.object.values) =
                 json_alloc(state, values_size + ((unsigned long)value->u.object.values), 0);
@@ -127,6 +140,7 @@ new_value(struct json_state *state,
                 return 0;
 
             value->_reserved.object_mem = (*(char**)&value->u.object.values) + values_size;
+            value->u.object.length = 0;
             break;
         case SR_JSON_STRING:
             value->u.string.ptr = (char*)
@@ -135,13 +149,12 @@ new_value(struct json_state *state,
             if (!value->u.string.ptr)
                 return 0;
 
+            value->u.string.length = 0;
             break;
 
         default:
             break;
-        };
-
-        value->u.array.length = 0;
+        }
 
         return 1;
     }
@@ -165,31 +178,54 @@ new_value(struct json_state *state,
 }
 
 #define e_off \
-   ((int) (i - cur_line_begin))
+   ((int) (state.ptr - cur_line_begin))
 
 #define whitespace \
-   case '\n': ++location->line;  cur_line_begin = i; \
+   case '\n': ++location->line;  cur_line_begin = state.ptr; \
    case ' ': case '\t': case '\r'
 
 #define string_add(b)  \
-   do { if (!state.first_pass) string [string_length] = b;  ++ string_length; } while (0);
+   do { if (!state.first_pass) string[string_length] = b; ++string_length; } while (0);
 
-const static int
-   flag_next = 1, flag_reproc = 2, flag_need_comma = 4, flag_seek_value = 8, flag_exponent = 16,
-   flag_got_exponent_sign = 32, flag_escaped = 64, flag_string = 128, flag_need_colon = 256,
-   flag_done = 512;
+static const long
+    flag_next             = 1 << 0,
+    flag_reproc           = 1 << 1,
+    flag_need_comma       = 1 << 2,
+    flag_seek_value       = 1 << 3,
+    flag_escaped          = 1 << 4,
+    flag_string           = 1 << 5,
+    flag_need_colon       = 1 << 6,
+    flag_done             = 1 << 7,
+    flag_num_negative     = 1 << 8,
+    flag_num_zero         = 1 << 9,
+    flag_num_e            = 1 << 10,
+    flag_num_e_got_sign   = 1 << 11,
+    flag_num_e_negative   = 1 << 12,
+    flag_num_got_decimal  = 1 << 13;
 
 struct sr_json_value *
 sr_json_parse_ex(struct sr_json_settings *settings,
                   const char *json,
                   struct sr_location *location)
 {
-    const char *cur_line_begin, *i;
-    struct sr_json_value *top, *root, *alloc = 0;
-    struct json_state state;
-    int flags;
+    const char *cur_line_begin;
+    struct sr_json_value *top, *root, *alloc = NULL;
+    struct json_state state = { 0 };
+    int flags = 0;
+    double num_digits = 0, num_e = 0, num_fraction = 0;
 
-    memset(&state, 0, sizeof(struct json_state));
+    size_t length = strlen(json);
+    const char *end = json + length;
+
+    /* Skip UTF-8 BOM */
+    if (length >= 3 && ((unsigned char)json[0]) == 0xEF
+                    && ((unsigned char)json[1]) == 0xBB
+                    && ((unsigned char)json[2]) == 0xBF)
+    {
+        json += 3;
+        length -= 3;
+    }
+
     memcpy(&state.settings, settings, sizeof(struct sr_json_settings));
     state.uint_max = UINT_MAX - 8; /* limit of how much can be added before next check */
     state.ulong_max = ULONG_MAX - 8;
@@ -207,26 +243,9 @@ sr_json_parse_ex(struct sr_json_settings *settings,
         location->line = 1;
         cur_line_begin = json;
 
-        for (i = json ;; ++ i)
+        for (state.ptr = json ;; ++state.ptr)
         {
-            char b = *i;
-
-            if (flags & flag_done)
-            {
-                if (!b)
-                    break;
-
-                switch (b)
-                {
-                whitespace:
-                    continue;
-
-                default:
-                    location->column = e_off;
-                    location->message = sr_asprintf("Trailing garbage: `%c`", b);
-                    goto e_failed;
-                };
-            }
+            char b = *state.ptr;
 
             if (flags & flag_string)
             {
@@ -253,22 +272,48 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                     case 't':  string_add ('\t');  break;
                     case 'u':
 
-                        if ((uc_b1 = hex_value(*++i)) == 0xFF || (uc_b2 = hex_value(*++i)) == 0xFF
-                            || (uc_b3 = hex_value(*++i)) == 0xFF || (uc_b4 = hex_value(*++i)) == 0xFF)
+                        if (end - state.ptr <= 4 ||
+                                (uc_b1 = hex_value(*++state.ptr)) == 0xFF ||
+                                (uc_b2 = hex_value(*++state.ptr)) == 0xFF ||
+                                (uc_b3 = hex_value(*++state.ptr)) == 0xFF ||
+                                (uc_b4 = hex_value(*++state.ptr)) == 0xFF)
                         {
                             location->column = e_off;
                             location->message = sr_asprintf("Invalid character value `%c`", b);
                             goto e_failed;
                         }
 
-                        uc_b1 = uc_b1 * 16 + uc_b2;
-                        uc_b2 = uc_b3 * 16 + uc_b4;
+                        uc_b1 = (uc_b1 << 4) | uc_b2;
+                        uc_b2 = (uc_b3 << 4) | uc_b4;
+                        uchar = (uc_b1 << 8) | uc_b2;
 
-                        uchar = ((char) uc_b1) * 256 + uc_b2;
-
-                        if (uc_b1 == 0 && uc_b2 <= 0x7F)
+                        if ((uchar & 0xF800) == 0xD800)
                         {
-                            string_add((char) uchar);
+                            json_uchar uchar2;
+
+                            if (end - state.ptr <= 6 ||
+                                    (*++state.ptr) != '\\' ||
+                                    (*++state.ptr) != 'u' ||
+                                    (uc_b1 = hex_value(*++state.ptr)) == 0xFF ||
+                                    (uc_b2 = hex_value(*++state.ptr)) == 0xFF ||
+                                    (uc_b3 = hex_value(*++state.ptr)) == 0xFF ||
+                                    (uc_b4 = hex_value(*++state.ptr)) == 0xFF)
+                            {
+                                location->column = e_off;
+                                location->message = sr_asprintf("Invalid character value `%c`", b);
+                                goto e_failed;
+                            }
+
+                            uc_b1 = (uc_b1 << 4) | uc_b2;
+                            uc_b2 = (uc_b3 << 4) | uc_b4;
+                            uchar2 = (uc_b1 << 8) | uc_b2;
+
+                            uchar = 0x010000 | ((uchar & 0x3FF) << 10) | (uchar2 & 0x3FF);
+                        }
+
+                        if (uchar <= 0x7F)
+                        {
+                            string_add((char)uchar);
                             break;
                         }
 
@@ -278,27 +323,42 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                                 string_length += 2;
                             else
                             {
-                                string[string_length ++] = 0xC0 | ((uc_b2 & 0xC0) >> 6) | ((uc_b1 & 0x3) << 3);
-                                string[string_length ++] = 0x80 | (uc_b2 & 0x3F);
+                                string[string_length++] = 0xC0 | (uchar >> 6);
+                                string[string_length++] = 0x80 | (uchar & 0x3F);
+                            }
+
+                            break;
+                        }
+
+                        if (uchar <= 0xFFFF)
+                        {
+                            if (state.first_pass)
+                                string_length += 3;
+                            else
+                            {
+                                string[string_length++] = 0xE0 | (uchar >> 12);
+                                string[string_length++] = 0x80 | ((uchar >> 6) & 0x3F);
+                                string[string_length++] = 0x80 | (uchar & 0x3F);
                             }
 
                             break;
                         }
 
                         if (state.first_pass)
-                            string_length += 3;
+                            string_length += 4;
                         else
                         {
-                            string[string_length ++] = 0xE0 | ((uc_b1 & 0xF0) >> 4);
-                            string[string_length ++] = 0x80 | ((uc_b1 & 0xF) << 2) | ((uc_b2 & 0xC0) >> 6);
-                            string[string_length ++] = 0x80 | (uc_b2 & 0x3F);
+                            string[string_length++] = 0xF0 | (uchar >> 18);
+                            string[string_length++] = 0x80 | ((uchar >> 12) & 0x3F);
+                            string[string_length++] = 0x80 | ((uchar >> 6) & 0x3F);
+                            string[string_length++] = 0x80 | (uchar & 0x3F);
                         }
 
                         break;
 
                     default:
                         string_add (b);
-                    };
+                    }
 
                     continue;
                 }
@@ -347,6 +407,23 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                 }
             }
 
+            if (flags & flag_done)
+            {
+                if (!b)
+                    break;
+
+                switch (b)
+                {
+                whitespace:
+                    continue;
+
+                default:
+                    location->column = e_off;
+                    location->message = sr_asprintf("Trailing garbage: `%c`", b);
+                    goto e_failed;
+                }
+            }
+
             if (flags & flag_seek_value)
             {
                 switch (b)
@@ -357,7 +434,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                 case ']':
                     if (top && top->type == SR_JSON_ARRAY)
                         flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
-                    else if (!top || !(state.settings.settings & SR_JSON_RELAXED_COMMAS))
+                    else
                     {
                         location->column = e_off;
                         location->message = sr_strdup("Unexpected ]");
@@ -420,8 +497,13 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                         string_length = 0;
                         continue;
                     case 't':
-                        if (*(++ i) != 'r' || *(++ i) != 'u' || *(++ i) != 'e')
+                        if ((end - state.ptr) < 3 ||
+                                *(++state.ptr) != 'r' ||
+                                *(++state.ptr) != 'u' ||
+                                *(++state.ptr) != 'e')
+                        {
                             goto e_unknown_value;
+                        }
 
                         if (!new_value(&state, &top, &root, &alloc, SR_JSON_BOOLEAN))
                             goto e_alloc_failure;
@@ -430,8 +512,14 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                         flags |= flag_next;
                         break;
                     case 'f':
-                        if (*(++ i) != 'a' || *(++ i) != 'l' || *(++ i) != 's' || *(++ i) != 'e')
+                        if ((end - state.ptr) < 4 ||
+                                *(++state.ptr) != 'a' ||
+                                *(++state.ptr) != 'l' ||
+                                *(++state.ptr) != 's' ||
+                                *(++state.ptr) != 'e')
+                        {
                             goto e_unknown_value;
+                        }
 
                         if (!new_value(&state, &top, &root, &alloc, SR_JSON_BOOLEAN))
                             goto e_alloc_failure;
@@ -439,8 +527,13 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                         flags |= flag_next;
                         break;
                     case 'n':
-                        if (*(++ i) != 'u' || *(++ i) != 'l' || *(++ i) != 'l')
+                        if ((end - state.ptr) < 3 ||
+                                *(++state.ptr) != 'u' ||
+                                *(++state.ptr) != 'l' ||
+                                *(++state.ptr) != 'l')
+                        {
                             goto e_unknown_value;
+                        }
 
                         if (!new_value(&state, &top, &root, &alloc, SR_JSON_NULL))
                             goto e_alloc_failure;
@@ -453,16 +546,40 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                             if (!new_value(&state, &top, &root, &alloc, SR_JSON_INTEGER))
                                 goto e_alloc_failure;
 
-                            flags &= ~ (flag_exponent | flag_got_exponent_sign);
-                            if (state.first_pass)
-                                continue;
+                            if (!state.first_pass)
+                            {
+                                while (isdigit(b) || b == '+' || b == '-' ||
+                                        b == 'e' || b == 'E' || b == '.')
+                                {
+                                    if ((++state.ptr) == end)
+                                    {
+                                        b = 0;
+                                        break;
+                                    }
 
-                            if (top->type == SR_JSON_DOUBLE)
-                                top->u.dbl = strtod(i, (char**)&i);
-                            else
-                                top->u.integer = strtoll(i, (char**)&i, 10);
+                                    b = *state.ptr;
+                                }
 
-                            flags |= flag_next | flag_reproc;
+                                flags |= flag_next | flag_reproc;
+                                break;
+                            }
+
+                            flags &= ~ (flag_num_negative | flag_num_e |
+                                    flag_num_e_got_sign | flag_num_e_negative |
+                                    flag_num_zero);
+
+                            num_digits = 0;
+                            num_fraction = 0;
+                            num_e = 0;
+
+                            if (b != '-')
+                            {
+                                flags |= flag_reproc;
+                                break;
+                            }
+
+                            flags |= flag_num_negative;
+                            continue;
                         }
                         else
                         {
@@ -484,7 +601,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                         continue;
 
                     case '"':
-                        if (flags & flag_need_comma && !(state.settings.settings & SR_JSON_RELAXED_COMMAS))
+                        if (flags & flag_need_comma)
                         {
                             location->column = e_off;
                             location->message = sr_strdup("Expected , before \"");
@@ -514,30 +631,128 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                 case SR_JSON_INTEGER:
                 case SR_JSON_DOUBLE:
                     if (isdigit (b))
-                        continue;
-
-                    if (b == 'e' || b == 'E')
                     {
-                        if (!(flags & flag_exponent))
-                        {
-                            flags |= flag_exponent;
-                            top->type = SR_JSON_DOUBLE;
+                        ++num_digits;
 
+                        if (top->type == SR_JSON_INTEGER || flags & flag_num_e)
+                        {
+                            if (!(flags & flag_num_e))
+                            {
+                                if (flags & flag_num_zero)
+                                {
+                                    location->column = e_off;
+                                    location->message = sr_asprintf("Unexpected `0` before `%c`", b);
+                                    goto e_failed;
+                                }
+
+                                if (num_digits == 1 && b == '0')
+                                    flags |= flag_num_zero;
+                            }
+                            else
+                            {
+                                flags |= flag_num_e_got_sign;
+                                num_e = (num_e * 10) + (b - '0');
+                                continue;
+                            }
+
+                            if (would_overflow(top->u.integer, b))
+                            {
+                                --num_digits;
+                                --state.ptr;
+                                top->type = SR_JSON_DOUBLE;
+                                top->u.dbl = (double)top->u.integer;
+                                continue;
+                            }
+
+                            top->u.integer = (top->u.integer * 10) + (b - '0');
                             continue;
                         }
+
+                        if (flags & flag_num_got_decimal)
+                            num_fraction = (num_fraction * 10) + (b - '0');
+                        else
+                            top->u.dbl = (top->u.dbl * 10) + (b - '0');
+
+                        continue;
                     }
-                    else if (b == '+' || b == '-')
+
+                    if (b == '+' || b == '-')
                     {
-                        if (flags & flag_exponent && !(flags & flag_got_exponent_sign))
+                        if ((flags & flag_num_e) && !(flags & flag_num_e_got_sign))
                         {
-                            flags |= flag_got_exponent_sign;
+                            flags |= flag_num_e_got_sign;
+
+                            if (b == '-')
+                                flags |= flag_num_e_negative;
+
                             continue;
                         }
                     }
                     else if (b == '.' && top->type == SR_JSON_INTEGER)
                     {
+                        if (!num_digits)
+                        {
+                            location->column = e_off;
+                            location->message = sr_asprintf("Expected digit before `.`");
+                            goto e_failed;
+                        }
+
                         top->type = SR_JSON_DOUBLE;
+                        top->u.dbl = (double)top->u.integer;
+
+                        flags |= flag_num_got_decimal;
+                        num_digits = 0;
                         continue;
+                    }
+
+                    if (!(flags & flag_num_e))
+                    {
+                        if (top->type == SR_JSON_DOUBLE)
+                        {
+                            if (!num_digits)
+                            {
+                                location->column = e_off;
+                                location->message = sr_asprintf("Expected digit after `.`");
+                                goto e_failed;
+                            }
+
+                            top->u.dbl += num_fraction / pow(10.0, num_digits);
+                        }
+
+                        if (b == 'e' || b == 'E')
+                        {
+                            flags |= flag_num_e;
+
+                            if (top->type == SR_JSON_INTEGER)
+                            {
+                                top->type = SR_JSON_DOUBLE;
+                                top->u.dbl = (double)top->u.integer;
+                            }
+
+                            num_digits = 0;
+                            flags &= ~ flag_num_zero;
+
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if (!num_digits)
+                        {
+                            location->column = e_off;
+                            location->message = sr_asprintf("Expected digit after `e`");
+                            goto e_failed;
+                        }
+
+                        top->u.dbl *= pow(10.0, (flags & flag_num_e_negative) ? -num_e : num_e);
+                    }
+
+                    if (flags & flag_num_negative)
+                    {
+                        if (top->type == SR_JSON_INTEGER)
+                            top->u.integer = -top->u.integer;
+                        else
+                            top->u.dbl = -top->u.dbl;
                     }
 
                     flags |= flag_next | flag_reproc;
@@ -550,7 +765,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
             if (flags & flag_reproc)
             {
                 flags &= ~ flag_reproc;
-                -- i;
+                --state.ptr;
             }
 
             if (flags & flag_next)

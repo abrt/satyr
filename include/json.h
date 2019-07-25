@@ -47,10 +47,7 @@ struct sr_strbuf;
 struct sr_json_settings
 {
    unsigned long max_memory;
-   int settings;
 };
-
-#define SR_JSON_RELAXED_COMMAS 1
 
 enum sr_json_type
 {
