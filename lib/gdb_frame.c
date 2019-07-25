@@ -282,7 +282,7 @@ sr_gdb_frame_append_to_str(struct sr_gdb_frame *frame,
         if (frame->function_name)
             sr_strbuf_append_str(str, " at");
         sr_strbuf_append_strf(str, " %s", frame->source_file);
-        if (frame->source_line != -1)
+        if (frame->source_line != UINT32_MAX)
             sr_strbuf_append_strf(str, ":%"PRIu32, frame->source_line);
     }
 

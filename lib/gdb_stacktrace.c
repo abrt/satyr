@@ -272,7 +272,7 @@ sr_gdb_stacktrace_find_crash_thread(struct sr_gdb_stacktrace *stacktrace)
      * thread by that value.
      */
     struct sr_gdb_thread *thread;
-    if (stacktrace->crash_tid != -1)
+    if (stacktrace->crash_tid != UINT32_MAX)
     {
         thread = stacktrace->threads;
         while (thread)

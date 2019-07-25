@@ -50,6 +50,9 @@ struct sr_core_frame
      * method from null class pointer (address is a low number --
      * offset to the class).
      *
+     * The address might also be unknown, in which case this field is
+     * equal to UINT64_MAX = 2^64 - 1.
+     *
      * Some programs generate machine code during runtime (JavaScript
      * engines, JVM, the Gallium llvmpipe driver).
      */

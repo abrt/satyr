@@ -25,6 +25,7 @@
 #include "thread.h"
 #include "stacktrace.h"
 #include "internal_utils.h"
+#include <limits.h>
 #include <string.h>
 
 /* Method table */
@@ -270,7 +271,7 @@ sr_core_frame_to_json(struct sr_core_frame *frame)
 {
     struct sr_strbuf *strbuf = sr_strbuf_new();
 
-    if (frame->address != -1)
+    if (frame->address != ULONG_MAX)
     {
         sr_strbuf_append_strf(strbuf,
                               ",   \"address\": %"PRIu64"\n",
@@ -284,7 +285,7 @@ sr_core_frame_to_json(struct sr_core_frame *frame)
         sr_strbuf_append_str(strbuf, "\n");
     }
 
-    if (frame->build_id_offset != -1)
+    if (frame->build_id_offset != ULONG_MAX)
     {
         sr_strbuf_append_strf(strbuf,
                               ",   \"build_id_offset\": %"PRIu64"\n",

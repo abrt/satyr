@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 #include <assert.h>
 
 typedef unsigned short json_uchar;
@@ -190,10 +191,8 @@ sr_json_parse_ex(struct sr_json_settings *settings,
 
     memset(&state, 0, sizeof(struct json_state));
     memcpy(&state.settings, settings, sizeof(struct sr_json_settings));
-    memset(&state.uint_max, 0xFF, sizeof(state.uint_max));
-    memset(&state.ulong_max, 0xFF, sizeof(state.ulong_max));
-    state.uint_max -= 8; /* limit of how much can be added before next check */
-    state.ulong_max -= 8;
+    state.uint_max = UINT_MAX - 8; /* limit of how much can be added before next check */
+    state.ulong_max = ULONG_MAX - 8;
 
     for (state.first_pass = 1; state.first_pass >= 0; --state.first_pass)
     {
@@ -358,7 +357,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                 case ']':
                     if (top && top->type == SR_JSON_ARRAY)
                         flags = (flags & ~ (flag_need_comma | flag_seek_value)) | flag_next;
-                    else if (!top || (!state.settings.settings & SR_JSON_RELAXED_COMMAS))
+                    else if (!top || !(state.settings.settings & SR_JSON_RELAXED_COMMAS))
                     {
                         location->column = e_off;
                         location->message = sr_strdup("Unexpected ]");
@@ -485,7 +484,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                         continue;
 
                     case '"':
-                        if (flags & flag_need_comma && (!state.settings.settings & SR_JSON_RELAXED_COMMAS))
+                        if (flags & flag_need_comma && !(state.settings.settings & SR_JSON_RELAXED_COMMAS))
                         {
                             location->column = e_off;
                             location->message = sr_strdup("Expected , before \"");

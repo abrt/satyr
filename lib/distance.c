@@ -25,8 +25,8 @@
 #include "sha1.h"
 #include "gdb/thread.h"
 #include "internal_utils.h"
-#include <stdlib.h>
 #include <assert.h>
+#include <stdint.h>
 #include <string.h>
 
 float
@@ -199,8 +199,8 @@ distance_levenshtein(struct sr_thread *thread1,
     int n = frame_count2 + 1;
 
     // store only two last rows and columns instead of whole 2D array
-    SR_ASSERT(n <= SIZE_MAX - 1);
-    SR_ASSERT(m <= SIZE_MAX - (n + 1));
+    SR_ASSERT(n <= INT32_MAX - 1);
+    SR_ASSERT(m <= INT32_MAX - (n + 1));
     int *dist = sr_malloc_array(sizeof(int), m + n + 1);
     int *dist1 = sr_malloc_array(sizeof(int), m + n + 1);
 

@@ -481,7 +481,6 @@ read_cie(Dwarf_CFI_Entry *cfi,
 static uint64_t
 fde_read_address(const uint8_t *p, unsigned len)
 {
-    int i;
     union {
         uint8_t b[8];
         /* uint16_t n2; */
@@ -490,7 +489,7 @@ fde_read_address(const uint8_t *p, unsigned len)
     } u;
     u.n8 = 0;
 
-    for (i = 0; i < len; i++)
+    for (unsigned i = 0; i < len; i++)
         u.b[i] = *p++;
 
     return (len == 4 ? (uint64_t)u.n4 : u.n8);
@@ -571,9 +570,8 @@ sr_elf_get_eh_frame(const char *filename,
         return NULL;
     }
 
-    uint64_t exec_base = -1;
-    int i;
-    for (i = 0; i < phnum; i++)
+    uint64_t exec_base = UINT64_MAX;
+    for (unsigned i = 0; i < phnum; i++)
     {
         GElf_Phdr phdr;
         if (gelf_getphdr(elf, i, &phdr) != &phdr)
@@ -593,7 +591,7 @@ sr_elf_get_eh_frame(const char *filename,
         }
     }
 
-    if (-1 == exec_base)
+    if (exec_base == UINT64_MAX)
     {
         *error_message = sr_asprintf("Can't determine executable base for %s",
                                      filename);
