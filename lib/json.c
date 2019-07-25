@@ -85,12 +85,12 @@ static void *
 json_alloc(struct json_state *state, unsigned long size, int zero)
 {
     if ((state->ulong_max - state->used_memory) < size)
-        return 0;
+        return NULL;
 
     if (state->settings.max_memory
         && (state->used_memory += size) > state->settings.max_memory)
     {
-        return 0;
+        return NULL;
     }
 
     return zero ? calloc(size, 1) : malloc(size);
@@ -227,7 +227,8 @@ sr_json_parse_ex(struct sr_json_settings *settings,
     }
 
     memcpy(&state.settings, settings, sizeof(struct sr_json_settings));
-    state.uint_max = UINT_MAX - 8; /* limit of how much can be added before next check */
+    /* limit of how much can be added before next check */
+    state.uint_max = UINT_MAX - 8;
     state.ulong_max = ULONG_MAX - 8;
 
     for (state.first_pass = 1; state.first_pass >= 0; --state.first_pass)
@@ -237,7 +238,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
         char *string = NULL;
         unsigned string_length = 0;
 
-        top = root = 0;
+        top = root = NULL;
         flags = flag_seek_value;
 
         location->line = 1;
@@ -265,11 +266,11 @@ sr_json_parse_ex(struct sr_json_settings *settings,
 
                     switch (b)
                     {
-                    case 'b':  string_add ('\b');  break;
-                    case 'f':  string_add ('\f');  break;
-                    case 'n':  string_add ('\n');  break;
-                    case 'r':  string_add ('\r');  break;
-                    case 't':  string_add ('\t');  break;
+                    case 'b': string_add('\b'); break;
+                    case 'f': string_add('\f'); break;
+                    case 'n': string_add('\n'); break;
+                    case 'r': string_add('\r'); break;
+                    case 't': string_add('\t'); break;
                     case 'u':
 
                         if (end - state.ptr <= 4 ||
@@ -385,10 +386,10 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                         break;
                     case SR_JSON_OBJECT:
                         if (state.first_pass)
-                            (*(char**) &top->u.object.values) += string_length + 1;
+                            (*(char**)&top->u.object.values) += string_length + 1;
                         else
                         {
-                            top->u.object.values [top->u.object.length].name =
+                            top->u.object.values[top->u.object.length].name =
                                 (char*)top->_reserved.object_mem;
 
                             (*(char**)&top->_reserved.object_mem) += string_length + 1;
@@ -541,7 +542,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                         flags |= flag_next;
                         break;
                     default:
-                        if (isdigit (b) || b == '-')
+                        if (isdigit(b) || b == '-')
                         {
                             if (!new_value(&state, &top, &root, &alloc, SR_JSON_INTEGER))
                                 goto e_alloc_failure;
@@ -804,7 +805,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                     };
                 }
 
-                if ( (++ top->parent->u.array.length) > state.uint_max)
+                if ((++top->parent->u.array.length) > state.uint_max)
                     goto e_overflow;
 
                 top = top->parent;
@@ -972,6 +973,7 @@ static char *type_names[] = {
    [SR_JSON_BOOLEAN] = "boolean",
    [SR_JSON_NULL]    = "null",
 };
+
 bool
 json_check_type(struct sr_json_value *value, enum sr_json_type type,
                 const char *name, char **error_message)
