@@ -582,10 +582,21 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                             flags |= flag_num_negative;
                             continue;
                         }
+                        else if (!b)
+                        {
+                            /* End of file reached, but not expected */
+                            location->column = e_off;
+                            location->message = sr_strdup(top
+                                    ? "Unexpected EOF"
+                                    : "Empty input");
+                            goto e_failed;
+                        }
                         else
                         {
+                            /* Unexpected character in input */
                             location->column = e_off;
-                            location->message = sr_asprintf("Unexpected `%c` when seeking value", b);
+                            location->message = sr_asprintf("Unexpected `%c` when "
+                                    "seeking value", b);
                             goto e_failed;
                         }
                     }

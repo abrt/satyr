@@ -226,6 +226,7 @@ AT_TESTFUN([sr_json_invalid],
 [[
 #include "json.h"
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* Note: Square brackets are sometimes written as \x5b and \x5d to circumvent
@@ -238,16 +239,28 @@ main(void)
   char *error_message = NULL;
   struct sr_json_value *value = NULL;
 
-  /* Empty input is not valid */
+  /* Empty input is not allowed */
   value = sr_json_parse("", &error_message);
   assert(value == NULL);
-  assert(error_message != NULL);
+  assert(strcmp(error_message, "Line 1, column 0: Empty input") == 0);
   free(error_message);
 
-  /* Mismatched bracket */
+  /* Mismatched closing bracket */
+  value = sr_json_parse("\x5d", &error_message);
+  assert(value == NULL);
+  assert(strcmp(error_message, "Line 1, column 0: Unexpected `\x5d`") == 0);
+  free(error_message);
+
+  /* Mismatched opening bracket */
   value = sr_json_parse("\x5b", &error_message);
   assert(value == NULL);
-  assert(error_message != NULL);
+  assert(strcmp(error_message, "Line 1, column 1: Unexpected EOF") == 0);
+  free(error_message);
+
+  /* Mismatched quote */
+  value = sr_json_parse("\x5b true, null, \"unfinished string  ", &error_message);
+  assert(value == NULL);
+  assert(strcmp(error_message, "Line 1, column 34: Unexpected EOF in string") == 0);
   free(error_message);
 
   /* Mismatched bracket reprise */
