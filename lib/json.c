@@ -438,7 +438,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                     else
                     {
                         location->column = e_off;
-                        location->message = sr_strdup("Unexpected ]");
+                        location->message = sr_strdup("Unexpected `]`");
                         goto e_failed;
                     }
 
@@ -455,7 +455,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                         else
                         {
                             location->column = e_off;
-                            location->message = sr_asprintf("Expected , before %c", b);
+                            location->message = sr_asprintf("Expected `,` before `%c`", b);
                             goto e_failed;
                         }
                     }
@@ -469,7 +469,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                         else
                         {
                             location->column = e_off;
-                            location->message = sr_asprintf("Expected : before %c", b);
+                            location->message = sr_asprintf("Expected `:` before `%c`", b);
                             goto e_failed;
                         }
                     }
@@ -585,7 +585,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                         else
                         {
                             location->column = e_off;
-                            location->message = sr_asprintf("Unexpected %c when seeking value", b);
+                            location->message = sr_asprintf("Unexpected `%c` when seeking value", b);
                             goto e_failed;
                         }
                     }
@@ -605,7 +605,7 @@ sr_json_parse_ex(struct sr_json_settings *settings,
                         if (flags & flag_need_comma)
                         {
                             location->column = e_off;
-                            location->message = sr_strdup("Expected , before \"");
+                            location->message = sr_strdup("Expected `,` before `\"`");
                             goto e_failed;
                         }
 
@@ -985,7 +985,8 @@ json_check_type(struct sr_json_value *value, enum sr_json_type type,
     char *type_str = type_names[type];
 
     if (error_message)
-        *error_message = sr_asprintf("Invalid type of %s; %s expected", name, type_str);
+        *error_message = sr_asprintf("Invalid type of `%s`; `%s` expected",
+                name, type_str);
     return false;
 }
 
