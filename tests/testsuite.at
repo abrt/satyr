@@ -3,6 +3,7 @@
 
 m4_include([utils.at])
 m4_include([strbuf.at])
+m4_include([json.at])
 m4_include([gdb_frame.at])
 m4_include([gdb_thread.at])
 m4_include([gdb_stacktrace.at])

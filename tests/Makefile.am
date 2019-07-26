@@ -51,6 +51,7 @@ TESTSUITE_AT =		\
   testsuite.at		\
   utils.at 		\
   strbuf.at		\
+  json.at		\
   gdb_frame.at 		\
   gdb_thread.at 	\
   gdb_stacktrace.at  	\
