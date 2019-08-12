@@ -33,6 +33,7 @@ BuildRequires: pkgconfig
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: gdb
+BuildRequires: gperf
 %if %{with python3}
 BuildRequires: python3-sphinx
 %endif # with python3

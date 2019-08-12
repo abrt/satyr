@@ -18,6 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "normalize.h"
+#include "normalize_hash.h"
 #include "gdb/frame.h"
 #include "gdb/thread.h"
 #include "gdb/stacktrace.h"
@@ -60,226 +61,6 @@ call_match(const char *function_name,
 
     va_end(source_files);
     return success;
-}
-
-static bool
-is_removable_vim(const char *function_name,
-                 const char *source_file)
-{
-    return
-        call_match(function_name, source_file, "may_core_dump", "os_unix.c", NULL) ||
-        call_match(function_name, source_file, "mch_exit", "os_unix.c", NULL);
-}
-
-static bool
-is_removable_jvm(const char *function_name,
-                 const char *source_file)
-{
-    return
-        call_match(function_name, source_file, "os::abort", "os_linux.cpp", NULL) ||
-        call_match(function_name, source_file, "VMError::report_and_die", "vmError.cpp", NULL) ||
-        call_match(function_name, source_file, "JVM_handle_linux_signal", "os_linux_x86.cpp", NULL);
-}
-
-static bool
-is_removable_dbus(const char *function_name,
-                  const char *source_file)
-{
-    return
-        call_match(function_name, source_file, "gerror_to_dbus_error_message", "dbus-gobject.c", NULL) ||
-        call_match(function_name, source_file, "dbus_g_method_return_error", "dbus-gobject.c", NULL) ||
-        call_match(function_name, source_file, "message_queue_dispatch", "dbus-gmain.c", NULL) ||
-        call_match(function_name, source_file, "_dbus_abort", "dbus-sysdeps.c", "libdbus", NULL) ||
-        call_match(function_name, source_file, "dbus_connection_dispatch", "dbus-connection.c", "libdbus", NULL);
-}
-
-static bool
-is_removable_gdk(const char *function_name,
-                 const char *source_file)
-{
-    return
-        call_match(function_name, source_file, "gdk_x_error", "gdkmain-x11.c", NULL) ||
-        call_match(function_name, source_file, "gdk_threads_dispatch", "gdk.c", NULL) ||
-        call_match(function_name, source_file, "gdk_event_dispatch", "gdkevents-x11.c", "gdkevents.c", NULL) ||
-        call_match(function_name, source_file, "gdk_event_source_dispatch", "gdkeventsource.c", NULL) ||
-        call_match(function_name, source_file, "_gdk_x11_display_error_event", "gdkdisplay-x11.c", "libgdk", NULL);
-}
-
-static bool
-is_removable_glib(const char *function_name,
-                  const char *source_file)
-{
-    return
-        call_match(function_name, source_file, "g_log", "gmessages.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_logv", "gmessages.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_assertion_message", "gtestutils.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_assertion_message_expr", "gtestutils.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_closure_invoke", "gclosure.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "g_free", "gmem.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_type_class_meta_marshal", "gclosure.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_signal_emit_valist", "gsignal.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "signal_emit_unlocked_R", "gsignal.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "g_signal_emit", "gsignal.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "g_idle_dispatch", "gmain.c", "gutf8.c", NULL) ||
-        call_match(function_name, source_file, "g_object_dispatch_properties_changed", "gobject.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "g_object_notify_dispatcher", "gobject.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "g_object_unref", "gobject.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "g_object_run_dispose", "gobject.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "g_object_new", "gobject.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "g_object_newv", "gobject.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "g_main_context_dispatch", "gmain.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_main_context_iterate", "gmain.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_main_dispatch", "gmain.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_main_loop_run", "gmain.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_timeout_dispatch", "gmain.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_thread_pool_thread_proxy", "gthreadpool.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_thread_create_proxy", "gthread.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_cclosure_marshal_VOID__BOXED", "gmarshal.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "g_cclosure_marshal_VOID__VOID", "gclosure.c", "gmarshal.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "g_object_notify", "gobject.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "Glib::exception_handlers_invoke()", "libglibmm", NULL) ||
-        call_match(function_name, source_file, "g_signal_handlers_destroy", "gsignal.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "g_vasprintf", "gprintf.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_strdup_vprintf", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_strdup_printf", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_print", "libglib", NULL) ||
-        call_match(function_name, source_file, "invalid_closure_notify", "gsignal.c", "libgobject", NULL) ||
-        call_match(function_name, source_file, "smc_tree_abort", "gslice.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_thread_abort", "libglib", NULL) ||
-        call_match(function_name, source_file, "_g_log_abort", "gmessages.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_log_default_handler", "gmessages.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_log_writer_default", "gmessages.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_log_structured_array", "gmessages.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "g_log_structured", "gmessages.c", "libglib", NULL) ||
-        call_match(function_name, source_file, "default_log_handler", "main.c", NULL) ||
-        call_match(function_name, source_file, "g_signal_emit_by_name", "gsignal.c", "libgobject", NULL);
-}
-
-static bool
-is_removable_libstdcpp(const char *function_name,
-                       const char *source_file)
-{
-    return
-        call_match(function_name, source_file, "__gnu_cxx::__verbose_terminate_handler", "vterminate.cc", NULL) ||
-        call_match(function_name, source_file, "__cxxabiv1::__terminate", "eh_terminate.cc", NULL) ||
-        call_match(function_name, source_file, "std::terminate", "eh_terminate.cc", NULL) ||
-        call_match(function_name, source_file, "__cxxabiv1::__cxa_throw", "eh_throw.cc", NULL) ||
-        call_match(function_name, source_file, "__cxxabiv1::__cxa_rethrow", "eh_throw.cc", NULL) ||
-        call_match(function_name, source_file, "__verbose_terminate_handler", "vterminate.cc", NULL) ||
-        call_match(function_name, source_file, "__cxxabiv1::__cxa_pure_virtual", "pure.cc", NULL);
-}
-
-static bool
-is_removable_linux(const char *function_name,
-                   const char *source_file)
-{
-    return call_match(function_name, source_file, "__kernel_vsyscall", "", NULL);
-}
-
-static bool
-is_removable_xorg(const char *function_name,
-                  const char *source_file)
-{
-    return
-        call_match(function_name, source_file, "_XReply", "xcb_io.c", NULL) ||
-        call_match(function_name, source_file, "_XError", "XlibInt.c", NULL) ||
-        call_match(function_name, source_file, "XSync", "Sync.c", NULL) ||
-        call_match(function_name, source_file, "process_responses", "xcb_io.c", NULL) ||
-        call_match(function_name, source_file, "OsSigHandler", "osinit.c", NULL) ||
-        call_match(function_name, source_file, "FatalError", "log.c", NULL) ||
-        call_match(function_name, source_file, "AbortServer", "log.c", NULL) ||
-        call_match(function_name, source_file, "AbortDDX", "xf86Init.c", NULL) ||
-        call_match(function_name, source_file, "ddxGiveUp", "xf86Init.c", NULL) ||
-        call_match(function_name, source_file, "OsAbort", "utils.c", NULL) ||
-        call_match(function_name, source_file, "handle_error", "xcb_io.c", "libX11", NULL) ||
-        call_match(function_name, source_file, "_XIOError", "XlibInt.c", "libX11", NULL) ||
-        call_match(function_name, source_file, "_XEventsQueued", "xcb_io.c", "libX11", NULL) ||
-        call_match(function_name, source_file, "handle_response", "xcb_io.c", "libX11", NULL);
-}
-
-static bool
-is_removable_glibc(const char *function_name,
-                   const char *source_file)
-{
-    return
-        call_match(function_name, source_file, "_start", "", NULL) ||
-        call_match(function_name, source_file, "__libc_start_main", "libc", NULL) ||
-        call_match(function_name, source_file, "clone", "clone.S", "libc", NULL) ||
-        call_match(function_name, source_file, "poll", "libc", NULL) ||
-        call_match(function_name, source_file, "_IO_new_fclose", "iofclose.c", "libc", NULL) ||
-        call_match(function_name, source_file, "_IO_vfprintf_internal", "vfprintf.c", "libc", NULL) ||
-        call_match(function_name, source_file, "_IO_default_xsputn", "genops.c", "libc", NULL) ||
-        call_match(function_name, source_file, "_IO_wdefault_xsputn", "wgenops.c", "libc", NULL) ||
-        call_match(function_name, source_file, "__libc_message", "libc_fatal.c", "libc", NULL) ||
-        call_match(function_name, source_file, "start_thread", "pthread_create.c", "libpthread", NULL);
-}
-
-static bool
-is_removable_other(const char *function_name,
-                   const char *source_file)
-{
-    return
-        call_match(function_name, source_file, "assert_cursor", "intel_display.c", NULL) ||
-        call_match(function_name, source_file, "assert_device_not_suspended", "intel_uncore.c", NULL) ||
-        call_match(function_name, source_file, "assert_pipe", "intel_display.c", NULL) ||
-        call_match(function_name, source_file, "assert_plane", "intel_display.c", NULL) ||
-        call_match(function_name, source_file, "assert_transcoder_disabled", "intel_display.c", NULL) ||
-        call_match(function_name, source_file, "btrfs_assert_delayed_root_empty", "delayed-inode.c", "btrfs", NULL) ||
-        call_match(function_name, source_file, "_cogl_set_error", "cogl-error.c", "libcogl", NULL) ||
-        call_match(function_name, source_file, "defaultCrashHandler", "kcrash.cpp", "libKF5Crash", NULL) ||
-        call_match(function_name, source_file, "_dl_signal_error", "dl-error.c", "ld-linux", NULL) ||
-        call_match(function_name, source_file, "error_dialog_response_cb", "", NULL) ||
-        call_match(function_name, source_file, "do_warn", "_warnings.c", "libpython",NULL) ||
-        call_match(function_name, source_file, "QMessageLogger::fatal(char const*, ...) const", "", NULL) ||
-        call_match(function_name, source_file, "nsProfileLock::FatalSignalHandler(int, siginfo_t*, void*)", "", NULL) ||
-        call_match(function_name, source_file, "qt_message_output", "qglobal.cpp", "libQtCore", NULL) ||
-        call_match(function_name, source_file, "qt_message_output(QtMsgType, char const*)", "", NULL) ||
-        call_match(function_name, source_file, "signalHandler(int, siginfo_t*, void*)", "", NULL) ||
-        call_match(function_name, source_file, "FatalSignalHandler", "nsProfileLock.cpp", "libxul", NULL) ||
-        call_match(function_name, source_file, "Foam::error::abort()", "", NULL) ||
-        call_match(function_name, source_file, "JS_AbortIfWrongThread", "libmozjs", NULL) ||
-        call_match(function_name, source_file, "Crash::defaultCrashHandler(int)", "libkdeui", "libKF5Crash", NULL) ||
-        call_match(function_name, source_file, "Py_FatalError", "pythonrun.c", "libpython", NULL) ||
-        call_match(function_name, source_file, "__btrfs_abort_transaction", "btrfs", NULL) ||
-        call_match(function_name, source_file, "assert_pch_hdmi_disabled", "", NULL) ||
-        call_match(function_name, source_file, "assert_pll", "", NULL) ||
-        call_match(function_name, source_file, "core::system::abort()", "", NULL) ||
-        call_match(function_name, source_file, "ddd_assert_fail", "assert.C", NULL) ||
-        call_match(function_name, source_file, "debug_dma_assert_idle", "", NULL) ||
-        call_match(function_name, source_file, "error_handler", "", NULL) ||
-        call_match(function_name, source_file, "fatal_error_signal", "", NULL) ||
-        call_match(function_name, source_file, "fatal_handler", "signal.c", "libfreerdp", NULL) ||
-        call_match(function_name, source_file, "gpf_notice", "", NULL) ||
-        call_match(function_name, source_file, "log", "", NULL) ||
-        call_match(function_name, source_file, "_log", "", NULL) ||
-        call_match(function_name, source_file, "log_assert_failed", "", NULL) ||
-        call_match(function_name, source_file, "mozalloc_abort", "mozalloc_abort.cpp", "libmozalloc", NULL) ||
-        call_match(function_name, source_file, "mozalloc_abort(char const*)", "libmozalloc", "content-container", "plugin-container", NULL) ||
-        call_match(function_name, source_file, "note_interrupt", "spurious.c", "vmlinux", NULL) ||
-        call_match(function_name, source_file, "print_bad_pte", "memory.c", "vmlinux", NULL) ||
-        call_match(function_name, source_file, "print_oops_end_marker", "panic.c", "vmlinux", NULL) ||
-        call_match(function_name, source_file, "printk", "printk.c", "vmlinux", NULL) ||
-        call_match(function_name, source_file, "qupzilla_signal_handler", "main.cpp", "qupzilla", NULL) ||
-        call_match(function_name, source_file, "rb_bug", "error.c", "libruby", NULL) ||
-        call_match(function_name, source_file, "sighandler", "", NULL) ||
-        call_match(function_name, source_file, "signalHandler(int)", "", NULL) ||
-        call_match(function_name, source_file, "signal_abort", "signal.c", NULL) ||
-        call_match(function_name, source_file, "signal_handler", "", NULL) ||
-        call_match(function_name, source_file, "sys_abort", "error.c", "libgfortran", NULL) ||
-        call_match(function_name, source_file, "terminate_due_to_signal", "emacs.c", "emacs", NULL) ||
-        call_match(function_name, source_file, "wl_log", "wayland-util.c", NULL) ||
-        call_match(function_name, source_file, "display_protocol_error", "wayland-client.c", NULL) ||
-        call_match(function_name, source_file, "display_handle_error", "wayland-client.c", NULL) ||
-        call_match(function_name, source_file, "x_io_error", "libmutter", "meta-xwayland.c",NULL) ||
-        call_match(function_name, source_file, "__ioremap_calle ", "ioremap.c", NULL) ||
-        call_match(function_name, source_file, "ioremap_nocache", "ioremap.c", NULL) ||
-        call_match(function_name, source_file, "wpa_msg", "wpa_debug.c", NULL) ||
-        call_match(function_name, source_file, "js::gc::FinalizeArenas(js::FreeOp*, js::gc::ArenaHeader**, js::gc::ArenaList&, js::gc::AllocKind, js::SliceBudget&)\"js::Shape::finalize(js::FreeOp*)", "", NULL) ||
-        call_match(function_name, source_file, "WTF::StringImpl::endsWith(char const*, unsigned int, bool) const", "", NULL) ||
-        call_match(function_name, source_file, "mozilla::plugins::child::_invokedefault(_NPP*, NPObject*, _NPVariant const*, unsigned int, _NPVariant*)", "", NULL) ||
-        call_match(function_name, source_file, "xitk_signal_handler", "xitk.c", "xine", NULL) ||
-        call_match(function_name, source_file, "dump_gjs_stack_on_signal_handler", "main.c", NULL) ||
-        call_match(function_name, source_file, "meta_run", "libmutter", "main.c", NULL);
 }
 
 static bool
@@ -401,6 +182,39 @@ sr_gdb_is_exit_frame(struct sr_gdb_frame *frame)
         sr_gdb_frame_calls_func(frame, "kill", "syscall-template.S", NULL);
 }
 
+static bool
+sr_gdb_frame_is_removable(const char *function_name,
+                          const char *source_file)
+{
+    struct RemovableFrame const *removable_frame;
+    char const *const *source_files;
+
+    if (NULL == function_name || NULL == source_file)
+    {
+        return false;
+    }
+
+    removable_frame = in_word_set(function_name, strlen(function_name));
+    if (NULL == removable_frame)
+    {
+        return false;
+    }
+
+    source_files = removable_frame->source_files;
+
+    while (NULL != source_files && NULL != *source_files)
+    {
+        if (NULL != strstr(source_file, *source_files))
+        {
+            return true;
+        }
+
+        source_files++;
+    }
+
+    return false;
+}
+
 void
 sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
 {
@@ -459,18 +273,8 @@ sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
         struct sr_gdb_frame *next_frame = frame->next;
 
         /* Remove frames which are not a cause of the crash. */
-        bool removable =
-            is_removable_dbus(frame->function_name, frame->source_file) ||
-            is_removable_gdk(frame->function_name, frame->source_file) ||
-            is_removable_glib(frame->function_name, frame->source_file) ||
-            is_removable_glibc(frame->function_name, frame->source_file) ||
-            is_removable_libstdcpp(frame->function_name, frame->source_file) ||
-            is_removable_linux(frame->function_name, frame->source_file) ||
-            is_removable_xorg(frame->function_name, frame->source_file) ||
-            is_removable_jvm(frame->function_name, frame->source_file) ||
-            is_removable_vim(frame->function_name, frame->source_file) ||
-            is_removable_other(frame->function_name, frame->source_file);
-
+        bool removable = sr_gdb_frame_is_removable(frame->function_name,
+                                                   frame->source_file);
         bool removable_with_above =
             is_removable_glibc_with_above(frame->function_name, frame->source_file) ||
             sr_gdb_is_exit_frame(frame);
@@ -605,18 +409,8 @@ sr_normalize_core_thread(struct sr_core_thread *thread)
         struct sr_core_frame *next_frame = frame->next;
 
         /* Remove frames which are not a cause of the crash. */
-        bool removable =
-            is_removable_dbus(frame->function_name, frame->file_name) ||
-            is_removable_gdk(frame->function_name, frame->file_name) ||
-            is_removable_glib(frame->function_name, frame->file_name) ||
-            is_removable_glibc(frame->function_name, frame->file_name) ||
-            is_removable_libstdcpp(frame->function_name, frame->file_name) ||
-            is_removable_linux(frame->function_name, frame->file_name) ||
-            is_removable_xorg(frame->function_name, frame->file_name) ||
-            is_removable_jvm(frame->function_name, frame->file_name) ||
-            is_removable_vim(frame->function_name, frame->file_name) ||
-            is_removable_other(frame->function_name, frame->file_name);
-
+        bool removable = sr_gdb_frame_is_removable(frame->function_name,
+                                                   frame->file_name);
         bool removable_with_above =
             is_removable_glibc_with_above(frame->function_name, frame->file_name)  ||
             sr_core_thread_is_exit_frame(frame);

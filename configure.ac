@@ -46,6 +46,12 @@ fi
 
 AM_CONDITIONAL(DOXYGEN_DOCS_ENABLED, test "$enable_doxygen_docs" = "yes")
 
+AC_PATH_PROG([GPERF], [gperf], [no])
+if test "x$GPERF" = "xno"
+then
+    AC_MSG_ERROR(["gperf not found in the search path."])
+fi
+
 # Initialize the test suite.
 AC_CONFIG_TESTDIR(tests)
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
