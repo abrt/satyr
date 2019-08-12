@@ -51,6 +51,7 @@ build/*
 /lib/stamp-h1
 /lib/config.h
 /lib/config.h.in
+/lib/normalize_hash.h
 
 /python/*.l[ao]
 /python/doc/conf.py

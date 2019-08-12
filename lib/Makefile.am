@@ -51,6 +51,7 @@ libsatyr_conv_la_SOURCES = \
 	koops_frame.c \
 	koops_stacktrace.c \
 	location.c \
+	normalize_hash.h \
 	normalize.c \
 	operating_system.c \
 	python_frame.c \
@@ -66,6 +67,12 @@ libsatyr_conv_la_SOURCES = \
 	strbuf.c \
 	unstrip.c \
 	utils.c
+
+BUILT_SOURCES = \
+	normalize_hash.h
+
+normalize_hash.h: normalize_hash.gperf
+	$(GPERF) --output-file=$@ $<
 
 libsatyr_conv_la_CFLAGS = \
 	-Wall -Wformat=2 -std=gnu99 -D_GNU_SOURCE -I$(top_srcdir)/include \
@@ -113,3 +120,9 @@ libsatyr_la_LDFLAGS = -version-info 3:0:0 -export-symbols-regex '^sr_'
 # interfaces 5, 6 and (obviously) the current, 7. The libtool
 # version of your library would be 7:3:2 , because the Age
 # is 7-5 = 2.
+
+CLEANFILES = \
+	normalize_hash.h
+
+EXTRA_DIST = \
+	normalize_hash.gperf

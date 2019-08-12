@@ -1,0 +1,187 @@
+%define slot-name symbol_offset
+%delimiters=|
+%includes
+%language=ANSI-C
+%null-strings
+%pic
+%readonly-tables
+%struct-type
+%{
+    #include <stddef.h>
+%}
+struct RemovableFrame
+{
+    int symbol_offset;
+    /* You do what you gotta do…
+     * Extend as needed or massage gperf into allocating the array on the heap.
+     */
+    char const *source_files[4];
+};
+%%
+# Using pipe as delimiter to accommodate C++ symbols having commas and whatnot.
+#
+# Also be mindful of the struct above, because things will start breaking if you
+# add more file names than the array can hold.
+#
+# ViM
+may_core_dump| { "os_unix.c", NULL, }
+mch_exit| { "os_unix.c", NULL, }
+# JVM
+os::abort| { "os_linux.cpp", NULL, }
+VMError::report_and_die| { "vmError.cpp", NULL, }
+JVM_handle_linux_signal| { "os_linux_x86.cpp", NULL, }
+# D-Bus
+gerror_to_dbus_error_message| { "dbus-gobject.c", NULL, }
+dbus_g_method_return_error| { "dbus-gobject.c", NULL, }
+message_queue_dispatch| { "dbus-gmain.c", NULL, }
+_dbus_abort| { "dbus-sysdeps.c", "libdbus", NULL, }
+dbus_connection_dispatch| { "dbus-connection.c", "libdbus", NULL, }
+# GTK
+gdk_x_error| { "gdkmain-x11.c", NULL, }
+gdk_threads_dispatch| { "gdk.c", NULL, }
+gdk_event_dispatch| { "gdkevents-x11.c", "gdkevents.c", NULL, }
+gdk_event_source_dispatch| { "gdkeventsource.c", NULL, }
+_gdk_x11_display_error_event| { "gdkdisplay-x11.c", "libgdk", NULL, }
+# GLib
+g_log| { "gmessages.c", "libglib", NULL, }
+g_logv| { "gmessages.c", "libglib", NULL, }
+g_assertion_message| { "gtestutils.c", "libglib", NULL, }
+g_assertion_message_expr| { "gtestutils.c", "libglib", NULL, }
+g_closure_invoke| { "gclosure.c", "libgobject", NULL, }
+g_free| { "gmem.c", "libglib", NULL, }
+g_type_class_meta_marshal| { "gclosure.c", "libglib", NULL, }
+g_signal_emit_valist| { "gsignal.c", "libgobject", NULL, }
+signal_emit_unlocked_R| { "gsignal.c", "libgobject", NULL, }
+g_signal_emit| { "gsignal.c", "libgobject", NULL, }
+g_idle_dispatch| { "gmain.c", "gutf8.c", NULL, }
+g_object_dispatch_properties_changed| { "gobject.c", "libgobject", NULL, }
+g_object_notify_dispatcher| { "gobject.c", "libgobject", NULL, }
+g_object_unref| { "gobject.c", "libgobject", NULL, }
+g_object_run_dispose| { "gobject.c", "libgobject", NULL, }
+g_object_new| { "gobject.c", "libgobject", NULL, }
+g_object_newv| { "gobject.c", "libgobject", NULL, }
+g_main_context_dispatch| { "gmain.c", "libglib", NULL, }
+g_main_context_iterate| { "gmain.c", "libglib", NULL, }
+g_main_dispatch| { "gmain.c", "libglib", NULL, }
+g_main_loop_run| { "gmain.c", "libglib", NULL, }
+g_timeout_dispatch| { "gmain.c", "libglib", NULL, }
+g_thread_pool_thread_proxy| { "gthreadpool.c", "libglib", NULL, }
+g_thread_create_proxy| { "gthread.c", "libglib", NULL, }
+g_cclosure_marshal_VOID__BOXED| { "gmarshal.c", "libgobject", NULL, }
+g_cclosure_marshal_VOID__VOID| { "gclosure.c", "gmarshal.c", "libgobject", NULL, }
+g_object_notify| { "gobject.c", "libgobject", NULL, }
+Glib::exception_handlers_invoke()| { "libglibmm", NULL, }
+g_signal_handlers_destroy| { "gsignal.c", "libgobject", NULL, }
+g_vasprintf| { "gprintf.c", "libglib", NULL, }
+g_strdup_vprintf| { "libglib", NULL, }
+g_strdup_printf| { "libglib", NULL, }
+g_print| { "libglib", NULL, }
+invalid_closure_notify| { "gsignal.c", "libgobject", NULL, }
+smc_tree_abort| { "gslice.c", "libglib", NULL, }
+g_thread_abort| { "libglib", NULL, }
+_g_log_abort| { "gmessages.c", "libglib", NULL, }
+g_log_default_handler| { "gmessages.c", "libglib", NULL, }
+g_log_writer_default| { "gmessages.c", "libglib", NULL, }
+g_log_structured_array| { "gmessages.c", "libglib", NULL, }
+g_log_structured| { "gmessages.c", "libglib", NULL, }
+default_log_handler| { "main.c", NULL, }
+g_signal_emit_by_name| { "gsignal.c", "libgobject", NULL, }
+# libstdc++
+__gnu_cxx::__verbose_terminate_handler| { "vterminate.cc", NULL, }
+__cxxabiv1::__terminate| { "eh_terminate.cc", NULL, }
+std::terminate| { "eh_terminate.cc", NULL, }
+__cxxabiv1::__cxa_throw| { "eh_throw.cc", NULL, }
+__cxxabiv1::__cxa_rethrow| { "eh_throw.cc", NULL, }
+__verbose_terminate_handler| { "vterminate.cc", NULL, }
+__cxxabiv1::__cxa_pure_virtual| { "pure.cc", NULL, }
+# Linux
+__kernel_vsyscall| { "", NULL, }
+# X
+_XReply| { "xcb_io.c", NULL, }
+_XError| { "XlibInt.c", NULL, }
+XSync| { "Sync.c", NULL, }
+process_responses| { "xcb_io.c", NULL, }
+OsSigHandler| { "osinit.c", NULL, }
+FatalError| { "log.c", NULL, }
+AbortServer| { "log.c", NULL, }
+AbortDDX| { "xf86Init.c", NULL, }
+ddxGiveUp| { "xf86Init.c", NULL, }
+OsAbort| { "utils.c", NULL, }
+handle_error| { "xcb_io.c", "libX11", NULL, }
+_XIOError| { "XlibInt.c", "libX11", NULL, }
+_XEventsQueued| { "xcb_io.c", "libX11", NULL, }
+handle_response| { "xcb_io.c", "libX11", NULL, }
+# glibc
+_start| { "", NULL, }
+__libc_start_main| { "libc", NULL, }
+clone| { "clone.S", "libc", NULL, }
+poll| { "libc", NULL, }
+_IO_new_fclose| { "iofclose.c", "libc", NULL, }
+_IO_vfprintf_internal| { "vfprintf.c", "libc", NULL, }
+_IO_default_xsputn| { "genops.c", "libc", NULL, }
+_IO_wdefault_xsputn| { "wgenops.c", "libc", NULL, }
+__libc_message| { "libc_fatal.c", "libc", NULL, }
+start_thread| { "pthread_create.c", "libpthread", NULL, }
+# Misc
+assert_cursor| { "intel_display.c", NULL, }
+assert_device_not_suspended| { "intel_uncore.c", NULL, }
+assert_pipe| { "intel_display.c", NULL, }
+assert_plane| { "intel_display.c", NULL, }
+assert_transcoder_disabled| { "intel_display.c", NULL, }
+btrfs_assert_delayed_root_empty| { "delayed-inode.c", "btrfs", NULL, }
+_cogl_set_error| { "cogl-error.c", "libcogl", NULL, }
+defaultCrashHandler| { "kcrash.cpp", "libKF5Crash", NULL, }
+_dl_signal_error| { "dl-error.c", "ld-linux", NULL, }
+error_dialog_response_cb| { "", NULL, }
+do_warn| { "_warnings.c", "libpython",NULL, }
+QMessageLogger::fatal(char const*, ...) const| { "", NULL, }
+nsProfileLock::FatalSignalHandler(int, siginfo_t*, void*)| { "", NULL, }
+qt_message_output| { "qglobal.cpp", "libQtCore", NULL, }
+qt_message_output(QtMsgType, char const*)| { "", NULL, }
+signalHandler(int, siginfo_t*, void*)| { "", NULL, }
+FatalSignalHandler| { "nsProfileLock.cpp", "libxul", NULL, }
+Foam::error::abort()| { "", NULL, }
+JS_AbortIfWrongThread| { "libmozjs", NULL, }
+Crash::defaultCrashHandler(int)| { "libkdeui", "libKF5Crash", NULL, }
+Py_FatalError| { "pythonrun.c", "libpython", NULL, }
+__btrfs_abort_transaction| { "btrfs", NULL, }
+assert_pch_hdmi_disabled| { "", NULL, }
+assert_pll| { "", NULL, }
+core::system::abort()| { "", NULL, }
+ddd_assert_fail| { "assert.C", NULL, }
+debug_dma_assert_idle| { "", NULL, }
+error_handler| { "", NULL, }
+fatal_error_signal| { "", NULL, }
+fatal_handler| { "signal.c", "libfreerdp", NULL, }
+gpf_notice| { "", NULL, }
+log| { "", NULL, }
+_log| { "", NULL, }
+log_assert_failed| { "", NULL, }
+mozalloc_abort| { "mozalloc_abort.cpp", "libmozalloc", NULL, }
+mozalloc_abort(char const*)| { "libmozalloc", "content-container", "plugin-container", NULL, }
+note_interrupt| { "spurious.c", "vmlinux", NULL, }
+print_bad_pte| { "memory.c", "vmlinux", NULL, }
+print_oops_end_marker| { "panic.c", "vmlinux", NULL, }
+printk| { "printk.c", "vmlinux", NULL, }
+qupzilla_signal_handler| { "main.cpp", "qupzilla", NULL, }
+rb_bug| { "error.c", "libruby", NULL, }
+sighandler| { "", NULL, }
+signalHandler(int)| { "", NULL, }
+signal_abort| { "signal.c", NULL, }
+signal_handler| { "", NULL, }
+sys_abort| { "error.c", "libgfortran", NULL, }
+terminate_due_to_signal| { "emacs.c", "emacs", NULL, }
+wl_log| { "wayland-util.c", NULL, }
+display_protocol_error| { "wayland-client.c", NULL, }
+display_handle_error| { "wayland-client.c", NULL, }
+x_io_error| { "libmutter", "meta-xwayland.c",NULL, }
+__ioremap_calle| { "ioremap.c", NULL, }
+ioremap_nocache| { "ioremap.c", NULL, }
+wpa_msg| { "wpa_debug.c", NULL, }
+js::gc::FinalizeArenas(js::FreeOp*, js::gc::ArenaHeader**, js::gc::ArenaList&, js::gc::AllocKind, js::SliceBudget&)| { "", NULL, }
+js::Shape::finalize(js::FreeOp*)| { "", NULL, }
+WTF::StringImpl::endsWith(char const*, unsigned int, bool) const| { "", NULL, }
+mozilla::plugins::child::_invokedefault(_NPP*, NPObject*, _NPVariant const*, unsigned int, _NPVariant*)| { "", NULL, }
+xitk_signal_handler| { "xitk.c", "xine", NULL, }
+dump_gjs_stack_on_signal_handler| { "main.c", NULL, }
+meta_run| { "libmutter", "main.c", NULL, }
