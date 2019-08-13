@@ -23,14 +23,13 @@
 #include "stacktrace.h"
 #include "thread.h"
 
-struct sr_json_value;
 struct sr_strbuf;
 
 typedef struct sr_stacktrace* (*parse_fn_t)(const char *, char **);
 typedef struct sr_stacktrace* (*parse_location_fn_t)(const char **, struct sr_location *);
 typedef char* (*to_short_text_fn_t)(struct sr_stacktrace*, int);
 typedef char* (*to_json_fn_t)(struct sr_stacktrace *);
-typedef struct sr_stacktrace* (*from_json_fn_t)(struct sr_json_value *, char **);
+typedef struct sr_stacktrace* (*from_json_fn_t)(json_object *, char **);
 typedef char* (*get_reason_fn_t)(struct sr_stacktrace *);
 typedef struct sr_thread* (*find_crash_thread_fn_t)(struct sr_stacktrace *);
 typedef struct sr_thread* (*threads_fn_t)(struct sr_stacktrace *);

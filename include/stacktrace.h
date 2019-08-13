@@ -44,7 +44,7 @@ extern "C" {
 
 #include "report_type.h"
 
-struct sr_json_value;
+#include <json.h>
 
 struct sr_stacktrace
 {
@@ -106,7 +106,7 @@ sr_stacktrace_to_json(struct sr_stacktrace *stacktrace);
  * Deserialize stacktrace from its json representation.
  */
 struct sr_stacktrace*
-sr_stacktrace_from_json(enum sr_report_type, struct sr_json_value *root, char **error_message);
+sr_stacktrace_from_json(enum sr_report_type, json_object *root, char **error_message);
 
 /**
  * Deserialize stacktrace from its json representation.

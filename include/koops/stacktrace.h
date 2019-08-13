@@ -33,10 +33,10 @@ extern "C" {
 #include "../report_type.h"
 #include <stdbool.h>
 #include <inttypes.h>
+#include <json.h>
 #include <stddef.h>
 
 struct sr_location;
-struct sr_json_value;
 
 struct sr_koops_stacktrace
 {
@@ -183,7 +183,7 @@ sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace);
  * Resulting stacktrace, or NULL on error.
  */
 struct sr_koops_stacktrace *
-sr_koops_stacktrace_from_json(struct sr_json_value *root, char **error_message);
+sr_koops_stacktrace_from_json(json_object *root, char **error_message);
 
 void
 sr_normalize_koops_stacktrace(struct sr_koops_stacktrace *stacktrace);

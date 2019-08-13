@@ -298,10 +298,15 @@ AT_TESTFUN([sr_js_platform_from_json], [[
 #define check(i_json_str, e_bool, e_runtime, e_engine, e_error_message) \
     do { \
         char *r_error_message = NULL; \
-        struct sr_json_value *i_json = sr_json_parse(i_json_str, &r_error_message); \
+        enum json_tokener_error error; \
+        json_object *i_json = json_tokener_parse_verbose(i_json_str, &error); \
+        if (NULL == i_json) \
+        { \
+            r_error_message = json_tokener_error_desc(error); \
+        } \
         assert(r_error_message == NULL || !"Failed to parse test JSON"); \
         sr_js_platform_t r_platform = sr_js_platform_from_json(i_json, &r_error_message); \
-        sr_json_value_free(i_json); \
+        json_object_put(i_json); \
         assert((!!r_platform) == e_bool || !"Should be to "#e_bool); \
         if (r_platform) { \
             if (r_error_message != NULL) { \

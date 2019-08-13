@@ -32,11 +32,11 @@ extern "C" {
 #include "../report_type.h"
 #include <stdbool.h>
 #include <inttypes.h>
+#include <json.h>
 
 struct sr_core_frame;
 struct sr_strbuf;
 struct sr_location;
-struct sr_json_value;
 
 /**
  * @brief A thread of execution on call stack of a core dump.
@@ -139,7 +139,7 @@ sr_core_thread_find_exit_frame(struct sr_core_thread *thread);
  * Resulting thread, or NULL on error.
  */
 struct sr_core_thread *
-sr_core_thread_from_json(struct sr_json_value *root,
+sr_core_thread_from_json(json_object *root,
                          char **error_message);
 
 char *

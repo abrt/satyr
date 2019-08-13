@@ -3,7 +3,6 @@ mainheaders_HEADERS = \
 	abrt.h \
 	deb.h \
 	distance.h \
-	json.h \
 	location.h \
 	normalize.h \
 	operating_system.h \

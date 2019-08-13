@@ -31,13 +31,13 @@ extern "C" {
 #endif
 
 #include "../report_type.h"
+#include <json.h>
 #include <stdbool.h>
 #include <stdint.h>
 
 struct sr_java_frame;
 struct sr_strbuf;
 struct sr_location;
-struct sr_json_value;
 
 /**
  * @brief A thread of execution of a JAVA-produced stack trace.
@@ -235,7 +235,7 @@ sr_java_thread_to_json(struct sr_java_thread *thread);
  * Resulting thread, or NULL on error.
  */
 struct sr_java_thread *
-sr_java_thread_from_json(struct sr_json_value *root, char **error_message);
+sr_java_thread_from_json(json_object *root, char **error_message);
 
 #ifdef __cplusplus
 }

@@ -31,11 +31,11 @@ extern "C" {
 #endif
 
 #include "../report_type.h"
+#include <json.h>
 #include <stdbool.h>
 #include <stdint.h>
 
 struct sr_strbuf;
-struct sr_json_value;
 
 /**
  * @brief Kernel oops stack frame.
@@ -241,7 +241,7 @@ sr_koops_frame_to_json(struct sr_koops_frame *frame);
  * Resulting frame, or NULL on error.
  */
 struct sr_koops_frame *
-sr_koops_frame_from_json(struct sr_json_value *root, char **error_message);
+sr_koops_frame_from_json(json_object *root, char **error_message);
 
 /**
  * Appends textual representation of the frame to the string buffer dest.

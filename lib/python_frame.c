@@ -371,48 +371,64 @@ sr_python_frame_to_json(struct sr_python_frame *frame)
 }
 
 struct sr_python_frame *
-sr_python_frame_from_json(struct sr_json_value *root, char **error_message)
+sr_python_frame_from_json(json_object *root, char **error_message)
 {
-    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "frame"))
+    if (!json_check_type(root, json_type_object, "frame", error_message))
         return NULL;
 
     struct sr_python_frame *result = sr_python_frame_new();
-    struct sr_json_value *val;
+    json_object *val;
 
     /* Source file name / special file */
-    if ((val = json_element(root, "file_name")))
+    if (json_object_object_get_ex(root, "file_name", &val))
     {
-        if (!JSON_CHECK_TYPE(val, SR_JSON_STRING, "file_name"))
+        const char *string;
+
+        if (!json_check_type(val, json_type_string, "file_name", error_message))
             goto fail;
+
+        string = json_object_get_string(val);
 
         result->special_file = false;
-        result->file_name = sr_strdup(val->u.string.ptr);
+        result->file_name = sr_strdup(string);
     }
-    else if ((val = json_element(root, "special_file")))
+    else if (json_object_object_get_ex(root, "special_file", &val))
     {
-        if (!JSON_CHECK_TYPE(val, SR_JSON_STRING, "special_file"))
+        const char *string;
+
+        if (!json_check_type(val, json_type_string, "special_file", error_message))
             goto fail;
 
+        string = json_object_get_string(val);
+
         result->special_file = true;
-        result->file_name = sr_strdup(val->u.string.ptr);
+        result->file_name = sr_strdup(string);
     }
 
     /* Function name / special function. */
-    if ((val = json_element(root, "function_name")))
+    if (json_object_object_get_ex(root, "function_name", &val))
     {
-        if (!JSON_CHECK_TYPE(val, SR_JSON_STRING, "function_name"))
+        const char *string;
+
+        if (!json_check_type(val, json_type_string, "function_name", error_message))
             goto fail;
+
+        string = json_object_get_string(val);
 
         result->special_function = false;
-        result->function_name = sr_strdup(val->u.string.ptr);
+        result->function_name = sr_strdup(string);
     }
-    else if ((val = json_element(root, "special_function")))
+    else if (json_object_object_get_ex(root, "special_function", &val))
     {
-        if (!JSON_CHECK_TYPE(val, SR_JSON_STRING, "special_function"))
+        const char *string;
+
+        if (!json_check_type(val, json_type_string, "special_function", error_message))
             goto fail;
 
+        string = json_object_get_string(val);
+
         result->special_function = true;
-        result->function_name = sr_strdup(val->u.string.ptr);
+        result->function_name = sr_strdup(string);
     }
 
     bool success =

@@ -199,13 +199,20 @@ check(char *input)
   assert(frame1);
 
   char *json = sr_ruby_frame_to_json(frame1);
-  char *error = NULL;
+  char *error_message = NULL;
 
-  struct sr_json_value *root = sr_json_parse(json, &error);
+  enum json_tokener_error error;
+  json_object *root = json_tokener_parse_verbose(json, &error);
+  if (NULL == root)
+  {
+      error_message = json_tokener_error_desc(error);
+  }
   assert(root);
-  struct sr_ruby_frame *frame2 = sr_ruby_frame_from_json(root, &error);
+  struct sr_ruby_frame *frame2 = sr_ruby_frame_from_json(root, &error_message);
   assert(frame2);
   assert(0 == sr_ruby_frame_cmp(frame1, frame2));
+
+  json_object_put(root);
 
   return 0;
 }

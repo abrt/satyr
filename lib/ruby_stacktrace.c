@@ -21,7 +21,6 @@
 #include "ruby/frame.h"
 #include "location.h"
 #include "utils.h"
-#include "json.h"
 #include "sha1.h"
 #include "report_type.h"
 #include "strbuf.h"
@@ -320,9 +319,9 @@ sr_ruby_stacktrace_to_json(struct sr_ruby_stacktrace *stacktrace)
 }
 
 struct sr_ruby_stacktrace *
-sr_ruby_stacktrace_from_json(struct sr_json_value *root, char **error_message)
+sr_ruby_stacktrace_from_json(json_object *root, char **error_message)
 {
-    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "stacktrace"))
+    if (!json_check_type(root, json_type_object, "stacktrace", error_message))
         return NULL;
 
     struct sr_ruby_stacktrace *result = sr_ruby_stacktrace_new();
@@ -332,17 +331,23 @@ sr_ruby_stacktrace_from_json(struct sr_json_value *root, char **error_message)
         goto fail;
 
     /* Frames. */
-    struct sr_json_value *stacktrace = json_element(root, "stacktrace");
-    if (stacktrace)
+    json_object *stacktrace;
+    if (json_object_object_get_ex(root, "stacktrace", &stacktrace))
     {
-        if (!JSON_CHECK_TYPE(stacktrace, SR_JSON_ARRAY, "stacktrace"))
+        size_t array_length;
+
+        if (!json_check_type(stacktrace, json_type_array, "stacktrace", error_message))
             goto fail;
 
-        struct sr_json_value *frame_json;
-        FOR_JSON_ARRAY(stacktrace, frame_json)
+        array_length = json_object_array_length(stacktrace);
+
+        for (size_t i = 0; i < array_length; i++)
         {
-            struct sr_ruby_frame *frame = sr_ruby_frame_from_json(frame_json,
-                error_message);
+            json_object *frame_json;
+            struct sr_ruby_frame *frame;
+
+            frame_json = json_object_array_get_idx(stacktrace, i);
+            frame = sr_ruby_frame_from_json(frame_json, error_message);
 
             if (!frame)
                 goto fail;

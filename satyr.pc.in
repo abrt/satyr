@@ -6,5 +6,6 @@ includedir=@includedir@
 Name: satyr
 Description: Automatic problem management with anonymous reports
 Version: @PACKAGE_VERSION@
+Requires: json-c
 Libs: -L${libdir} -lsatyr
 Cflags: -I${includedir}

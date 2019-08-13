@@ -102,7 +102,7 @@ sr_stacktrace_parse(enum sr_report_type type, const char *input, char **error_me
 }
 
 struct sr_stacktrace *
-sr_stacktrace_from_json(enum sr_report_type type, struct sr_json_value *root, char **error_message)
+sr_stacktrace_from_json(enum sr_report_type type, json_object *root, char **error_message)
 {
     return DISPATCH(dtable, type, from_json)(root, error_message);
 }
@@ -110,15 +110,27 @@ sr_stacktrace_from_json(enum sr_report_type type, struct sr_json_value *root, ch
 struct sr_stacktrace *
 sr_stacktrace_from_json_text(enum sr_report_type type, const char *input, char **error_message)
 {
-    struct sr_json_value *json_root = sr_json_parse(input, error_message);
+    enum json_tokener_error error;
+    json_object *json_root = json_tokener_parse_verbose(input, &error);
 
     if (!json_root)
+    {
+        if (NULL != error_message)
+        {
+            const char *description;
+
+            description = json_tokener_error_desc(error);
+
+            *error_message = sr_strdup(description);
+        }
+
         return NULL;
+    }
 
     struct sr_stacktrace *stacktrace =
         sr_stacktrace_from_json(type, json_root, error_message);
 
-    sr_json_value_free(json_root);
+    json_object_put(json_root);
     return stacktrace;
 }
 

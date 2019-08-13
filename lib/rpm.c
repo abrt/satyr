@@ -572,9 +572,9 @@ sr_rpm_package_to_json(struct sr_rpm_package *package,
 }
 
 static struct sr_rpm_package *
-single_rpm_package_from_json(struct sr_json_value *root, char **error_message)
+single_rpm_package_from_json(json_object *root, char **error_message)
 {
-    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "package"))
+    if (!json_check_type(root, json_type_object, "package", error_message))
         return NULL;
 
     struct sr_rpm_package *package = sr_rpm_package_new();
@@ -590,14 +590,18 @@ single_rpm_package_from_json(struct sr_json_value *root, char **error_message)
     if (!success)
         goto fail;
 
-    struct sr_json_value *role_json = json_element(root, "package_role");
-    if (role_json)
+    json_object *role_json;
+
+    if (json_object_object_get_ex(root, "package_role", &role_json))
     {
-        if (!JSON_CHECK_TYPE(role_json, SR_JSON_STRING, "package_role"))
+        if (!json_check_type(role_json, json_type_string, "package_role", error_message))
             goto fail;
 
         /* We only know "affected" so far. */
-        char *role = role_json->u.string.ptr;
+        const char *role;
+
+        role = json_object_get_string(role_json);
+
         if (0 != strcmp(role, "affected"))
         {
             if (error_message)
@@ -616,7 +620,7 @@ fail:
 }
 
 int
-sr_rpm_package_from_json(struct sr_rpm_package **rpm_package, struct sr_json_value *json,
+sr_rpm_package_from_json(struct sr_rpm_package **rpm_package, json_object *json,
                          bool recursive, char **error_message)
 {
     if (!recursive)
@@ -626,14 +630,21 @@ sr_rpm_package_from_json(struct sr_rpm_package **rpm_package, struct sr_json_val
     }
     else
     {
-        if (!JSON_CHECK_TYPE(json, SR_JSON_ARRAY, "package list"))
+        size_t array_length;
+
+        if (!json_check_type(json, json_type_array, "package list", error_message))
             return -1;
         struct sr_rpm_package *result = NULL;
 
-        struct sr_json_value *pkg_json;
-        FOR_JSON_ARRAY(json, pkg_json)
+        array_length = json_object_array_length(json);
+
+        for (size_t i = 0; i < array_length; i++)
         {
-            struct sr_rpm_package *pkg = single_rpm_package_from_json(pkg_json, error_message);
+            json_object *pkg_json;
+            struct sr_rpm_package *pkg;
+
+            pkg_json = json_object_array_get_idx(json, i);
+            pkg = single_rpm_package_from_json(pkg_json, error_message);
             if (!pkg)
                 goto fail;
 
