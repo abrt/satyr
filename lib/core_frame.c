@@ -240,10 +240,10 @@ sr_core_frame_append(struct sr_core_frame *dest,
 }
 
 struct sr_core_frame *
-sr_core_frame_from_json(struct sr_json_value *root,
+sr_core_frame_from_json(json_object *root,
                         char **error_message)
 {
-    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "frame"))
+    if (!json_check_type(root, json_type_object, "frame", error_message))
         return NULL;
 
     struct sr_core_frame *result = sr_core_frame_new();

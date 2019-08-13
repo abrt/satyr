@@ -31,11 +31,11 @@ extern "C" {
 #endif
 
 #include "../report_type.h"
+#include <json.h>
 #include <stdint.h>
 
 struct sr_python_frame;
 struct sr_location;
-struct sr_json_value;
 
 struct sr_python_stacktrace
 {
@@ -123,7 +123,7 @@ sr_python_stacktrace_to_json(struct sr_python_stacktrace *stacktrace);
  * Resulting stacktrace, or NULL on error.
  */
 struct sr_python_stacktrace *
-sr_python_stacktrace_from_json(struct sr_json_value *root, char **error_message);
+sr_python_stacktrace_from_json(json_object *root, char **error_message);
 
 #ifdef __cplusplus
 }

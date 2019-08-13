@@ -47,7 +47,8 @@ libsatyr_conv_la_SOURCES = \
 	java_frame.c \
 	java_thread.c \
 	java_stacktrace.c \
-	json.c \
+	json_utils.c \
+	json_utils.h \
 	koops_frame.c \
 	koops_stacktrace.c \
 	location.c \
@@ -77,12 +78,14 @@ normalize_hash.h: normalize_hash.gperf
 libsatyr_conv_la_CFLAGS = \
 	-Wall -Wformat=2 -std=gnu99 -D_GNU_SOURCE -I$(top_srcdir)/include \
 	$(GLIB_CFLAGS) \
+	$(JSON_CFLAGS) \
 	$(LIBDW_CFLAGS) \
 	$(LIBELF_CFLAGS) \
 	$(LIBUNWIND_CFLAGS) \
 	$(RPM_CFLAGS)
 libsatyr_conv_la_LIBADD = \
 	$(GLIB_LIBS) \
+	$(JSON_LIBS) \
 	$(LIBDW_LIBS) \
 	$(LIBELF_LIBS) \
 	$(LIBUNWIND_LIBS) \

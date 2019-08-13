@@ -618,9 +618,9 @@ sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace)
 }
 
 struct sr_koops_stacktrace *
-sr_koops_stacktrace_from_json(struct sr_json_value *root, char **error_message)
+sr_koops_stacktrace_from_json(json_object *root, char **error_message)
 {
-    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "stacktrace"))
+    if (!json_check_type(root, json_type_object, "stacktrace", error_message))
         return NULL;
 
     struct sr_koops_stacktrace *result = sr_koops_stacktrace_new();
@@ -634,22 +634,34 @@ sr_koops_stacktrace_from_json(struct sr_json_value *root, char **error_message)
         goto fail;
 
     /* Kernel taint flags. */
-    struct sr_json_value *taint_flags = json_element(root, "taint_flags");
-    if (taint_flags)
+    json_object *taint_flags;
+
+    if (json_object_object_get_ex(root, "taint_flags", &taint_flags))
     {
-        if (!JSON_CHECK_TYPE(taint_flags, SR_JSON_ARRAY, "taint_flags"))
+        size_t array_length;
+
+        if (!json_check_type(taint_flags, json_type_array, "taint_flags", error_message))
             goto fail;
 
-        struct sr_json_value *flag_json;
-        FOR_JSON_ARRAY(taint_flags, flag_json)
+        array_length = json_object_array_length(taint_flags);
+
+        for (size_t i = 0; i < array_length; i++)
         {
-            if (!JSON_CHECK_TYPE(flag_json, SR_JSON_STRING, "taint flag"))
+            json_object *flag_json;
+            const char *flag;
+
+            flag_json = json_object_array_get_idx(taint_flags, i);
+
+            if (!json_check_type(flag_json, json_type_string, "taint flag", error_message))
                 goto fail;
+
+            flag = json_object_get_string(flag_json);
 
             for (struct sr_taint_flag *f = sr_flags; f->name; f++)
             {
-                if (0 == strcmp(f->name, flag_json->u.string.ptr))
+                if (0 == strcmp(f->name, flag))
                 {
+                    /* WTF? */
                     *(bool *)((void *)result + f->member_offset) = true;
                     break;
                 }
@@ -659,47 +671,64 @@ sr_koops_stacktrace_from_json(struct sr_json_value *root, char **error_message)
     }
 
     /* Modules. */
-    struct sr_json_value *modules = json_element(root, "modules");
-    if (modules)
+    json_object *modules;
+
+    if (json_object_object_get_ex(root, "modules", &modules))
     {
-        if (!JSON_CHECK_TYPE(modules, SR_JSON_ARRAY, "modules"))
+        size_t array_length;
+        size_t i;
+
+        if (!json_check_type(modules, json_type_array, "modules", error_message))
             goto fail;
 
-        unsigned i = 0;
+        array_length = json_object_array_length(modules);
+
         size_t allocated = 128;
         result->modules = sr_malloc_array(allocated, sizeof(char*));
 
-        struct sr_json_value *mod_json;
-        FOR_JSON_ARRAY(modules, mod_json)
+        for (i = 0; i < array_length; i++)
         {
-            if (!JSON_CHECK_TYPE(mod_json, SR_JSON_STRING, "module"))
+            json_object *mod_json;
+            const char *module;
+
+            mod_json = json_object_array_get_idx(modules, i);
+
+            if (!json_check_type(mod_json, json_type_string, "module", error_message))
                 goto fail;
 
+            module = json_object_get_string(mod_json);
+
             /* need to keep the last element for NULL terminator */
-            if (i+1 == allocated)
+            if (i + 1 == allocated)
             {
                 allocated *= 2;
                 result->modules = sr_realloc(result->modules, allocated);
             }
-            result->modules[i] = sr_strdup(mod_json->u.string.ptr);
-            i++;
+            result->modules[i] = sr_strdup(module);
         }
 
         result->modules[i] = NULL;
     }
 
     /* Frames. */
-    struct sr_json_value *frames = json_element(root, "frames");
-    if (frames)
+    json_object *frames;
+
+    if (json_object_object_get_ex(root, "frames", &frames))
     {
-        if (!JSON_CHECK_TYPE(frames, SR_JSON_ARRAY, "frames"))
+        size_t array_length;
+
+        if (!json_check_type(frames, json_type_array, "frames", error_message))
             goto fail;
 
-        struct sr_json_value *frame_json;
-        FOR_JSON_ARRAY(frames, frame_json)
+        array_length = json_object_array_length(frames);
+
+        for (size_t i = 0; i < array_length; i++)
         {
-            struct sr_koops_frame *frame = sr_koops_frame_from_json(frame_json,
-                error_message);
+            json_object *frame_json;
+            struct sr_koops_frame *frame;
+
+            frame_json = json_object_array_get_idx(frames, i);
+            frame = sr_koops_frame_from_json(frame_json, error_message);
 
             if (!frame)
                 goto fail;

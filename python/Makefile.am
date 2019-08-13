@@ -81,6 +81,7 @@ py3satyr_LTLIBRARIES = _satyr3.la
 
 _satyr3_la_SOURCES = $(PYEXTFILES)
 _satyr3_la_CPPFLAGS = \
+    $(JSON_CFLAGS) \
     $(PYEXTCPPFLAGS) \
     $(PYTHON3_CFLAGS) \
     -Wno-error=declaration-after-statement

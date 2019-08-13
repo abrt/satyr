@@ -31,11 +31,11 @@ extern "C" {
 #endif
 
 #include "../report_type.h"
+#include <json.h>
 #include <stdint.h>
 
 struct sr_ruby_frame;
 struct sr_location;
-struct sr_json_value;
 
 struct sr_ruby_stacktrace
 {
@@ -69,7 +69,7 @@ char *
 sr_ruby_stacktrace_to_json(struct sr_ruby_stacktrace *stacktrace);
 
 struct sr_ruby_stacktrace *
-sr_ruby_stacktrace_from_json(struct sr_json_value *root, char **error_message);
+sr_ruby_stacktrace_from_json(json_object *root, char **error_message);
 
 #ifdef __cplusplus
 }

@@ -31,8 +31,7 @@ extern "C" {
 
 #include <stdbool.h>
 #include <inttypes.h>
-
-struct sr_json_value;
+#include <json.h>
 
 /* XXX: Should be moved to separated header once we support more package types.
  */
@@ -174,7 +173,7 @@ sr_rpm_package_to_json(struct sr_rpm_package *package,
                        bool recursive);
 
 int
-sr_rpm_package_from_json(struct sr_rpm_package **rpm_package, struct sr_json_value *list,
+sr_rpm_package_from_json(struct sr_rpm_package **rpm_package, json_object *list,
                          bool recursive, char **error_message);
 
 bool

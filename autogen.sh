@@ -23,7 +23,9 @@ build_depslist()
     sed 's/@@SATYR_VERSION@@/1/' < $PACKAGE.spec.in | sed 's/@.*@//' > $TEMPFILE
     rpmspec -P $TEMPFILE | grep "^\(Build\)\?Requires:" | \
         tr -s " " | tr "," "\n" | cut -f2- -d " " | \
-        grep -v "\(^\|python[23]-\)"$PACKAGE | sort -u | sed -E 's/^(.*) (.*)$/"\1 \2"/' | tr \" \'
+        grep -v "\(^\|python[23]-\)"$PACKAGE | sort -u | \
+        sed -E -e 's/^(.*) (.*)$/"\1 \2"/' -e 's|([[:alpha:]]+\(.+\))|"\1"|' | \
+        tr \" \'
     rm $TEMPFILE
 }
 

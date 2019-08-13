@@ -32,11 +32,11 @@ extern "C" {
 
 #include "platform.h"
 #include "../report_type.h"
+#include <json.h>
 #include <stdint.h>
 
 struct sr_js_frame;
 struct sr_location;
-struct sr_json_value;
 
 struct sr_js_stacktrace
 {
@@ -76,7 +76,7 @@ char *
 sr_js_stacktrace_to_json(struct sr_js_stacktrace *stacktrace);
 
 struct sr_js_stacktrace *
-sr_js_stacktrace_from_json(struct sr_json_value *root, char **error_message);
+sr_js_stacktrace_from_json(json_object *root, char **error_message);
 
 #ifdef __cplusplus
 }

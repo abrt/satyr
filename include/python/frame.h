@@ -31,12 +31,12 @@ extern "C" {
 #endif
 
 #include "../report_type.h"
+#include <json.h>
 #include <stdbool.h>
 #include <stdint.h>
 
 struct sr_location;
 struct sr_strbuf;
-struct sr_json_value;
 
 struct sr_python_frame
 {
@@ -185,7 +185,7 @@ sr_python_frame_to_json(struct sr_python_frame *frame);
  * Resulting frame, or NULL on error.
  */
 struct sr_python_frame *
-sr_python_frame_from_json(struct sr_json_value *root, char **error_message);
+sr_python_frame_from_json(json_object *root, char **error_message);
 
 /**
  * Appends textual representation of the frame to the string buffer dest.

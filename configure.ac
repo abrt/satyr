@@ -106,6 +106,8 @@ AM_CONDITIONAL(WITH_PYTHON3, [test $with_python3 = yes])
 AC_CHECK_LIB([bfd], [main])
 AC_CHECK_LIB([dl], [main])
 
+PKG_CHECK_MODULES([JSON], [json-c])
+
 PKG_CHECK_MODULES([LIBDW], [libdw], [AC_DEFINE([HAVE_LIBDW], [], [libdw found])])
 PKG_CHECK_MODULES([LIBELF], [libelf], [AC_DEFINE([HAVE_LIBELF], [], [libelf found])])
 

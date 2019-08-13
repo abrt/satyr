@@ -182,27 +182,32 @@ sr_core_thread_find_exit_frame(struct sr_core_thread *thread)
 }
 
 struct sr_core_thread *
-sr_core_thread_from_json(struct sr_json_value *root,
+sr_core_thread_from_json(json_object *root,
                          char **error_message)
 {
-    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "thread"))
+    if (!json_check_type(root, json_type_object, "thread", error_message))
         return NULL;
 
     struct sr_core_thread *result = sr_core_thread_new();
 
     /* Read frames. */
-    struct sr_json_value *frames = json_element(root, "frames");
-    if (frames)
+    json_object *frames;
+    if (json_object_object_get_ex(root, "frames", &frames))
     {
-        if (!JSON_CHECK_TYPE(frames, SR_JSON_ARRAY, "frames"))
+        size_t array_length;
+
+        if (!json_check_type(frames, json_type_array, "frames", error_message))
             goto fail;
 
-        struct sr_json_value *frame_json;
-        FOR_JSON_ARRAY(frames, frame_json)
-        {
-            struct sr_core_frame *frame = sr_core_frame_from_json(frame_json,
-                    error_message);
+        array_length = json_object_array_length(frames);
 
+        for (size_t i = 0; i < array_length; i++)
+        {
+            json_object *frame_json;
+            struct sr_core_frame *frame;
+
+            frame_json = json_object_array_get_idx(frames, i);
+            frame = sr_core_frame_from_json(frame_json, error_message);
             if (!frame)
                 goto fail;
 

@@ -31,11 +31,11 @@ extern "C" {
 
 #include "../report_type.h"
 #include <inttypes.h>
+#include <json.h>
 #include <stdbool.h>
 
 struct sr_strbuf;
 struct sr_location;
-struct sr_json_value;
 
 /**
  * @brief A function call on call stack of a core dump.
@@ -208,7 +208,7 @@ sr_core_frame_to_json(struct sr_core_frame *frame);
  * Resulting frame, or NULL on error.
  */
 struct sr_core_frame *
-sr_core_frame_from_json(struct sr_json_value *root,
+sr_core_frame_from_json(json_object *root,
                         char **error_message);
 
 /**

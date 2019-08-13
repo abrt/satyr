@@ -31,9 +31,9 @@ extern "C" {
 
 #include "report_type.h"
 #include <inttypes.h>
+#include <json.h>
 #include <stdbool.h>
 
-struct sr_json_value;
 struct sr_stacktrace;
 
 struct sr_report_custom_entry
@@ -88,7 +88,7 @@ char *
 sr_report_to_json(struct sr_report *report);
 
 struct sr_report *
-sr_report_from_json(struct sr_json_value *root, char **error_message);
+sr_report_from_json(json_object *root, char **error_message);
 
 struct sr_report *
 sr_report_from_json_text(const char *text, char **error_message);

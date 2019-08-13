@@ -127,9 +127,9 @@ sr_operating_system_to_json(struct sr_operating_system *operating_system)
 }
 
 struct sr_operating_system *
-sr_operating_system_from_json(struct sr_json_value *root, char **error_message)
+sr_operating_system_from_json(json_object *root, char **error_message)
 {
-    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "operating system"))
+    if (!json_check_type(root, json_type_object, "operating system", error_message))
         return NULL;
 
     struct sr_operating_system *result = sr_operating_system_new();

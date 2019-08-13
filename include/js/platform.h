@@ -31,9 +31,9 @@ extern "C" {
 #endif
 
 #include <inttypes.h>
+#include <json.h>
 
 struct sr_location;
-struct sr_json_value;
 
 enum sr_js_engine
 {
@@ -134,7 +134,7 @@ char *
 sr_js_platform_to_json(sr_js_platform_t platform);
 
 sr_js_platform_t
-sr_js_platform_from_json(struct sr_json_value *root, char **error_message);
+sr_js_platform_from_json(json_object *root, char **error_message);
 
 struct sr_js_stacktrace *
 sr_js_platform_parse_stacktrace(sr_js_platform_t platform, const char **input,

@@ -621,9 +621,9 @@ sr_java_frame_to_json(struct sr_java_frame *frame)
 }
 
 struct sr_java_frame *
-sr_java_frame_from_json(struct sr_json_value *root, char **error_message)
+sr_java_frame_from_json(json_object *root, char **error_message)
 {
-    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "frame"))
+    if (!json_check_type(root, json_type_object, "frame", error_message))
         return NULL;
 
     struct sr_java_frame *result = sr_java_frame_new();

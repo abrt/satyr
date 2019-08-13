@@ -313,9 +313,9 @@ sr_report_type_to_string(enum sr_report_type report_type)
 }
 
 struct sr_report *
-sr_report_from_json(struct sr_json_value *root, char **error_message)
+sr_report_from_json(json_object *root, char **error_message)
 {
-    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "root value"))
+    if (!json_check_type(root, json_type_object, "root value", error_message))
         return NULL;
 
     bool success;
@@ -326,11 +326,12 @@ sr_report_from_json(struct sr_json_value *root, char **error_message)
         goto fail;
 
     /* Reporter name and version. */
-    struct sr_json_value *reporter = json_element(root, "reporter");
-    if (reporter)
+    json_object *reporter;
+
+    if (json_object_object_get_ex(root, "reporter", &reporter))
     {
         success =
-            JSON_CHECK_TYPE(reporter, SR_JSON_OBJECT, "reporter") &&
+            json_check_type(reporter, json_type_object, "reporter", error_message) &&
             JSON_READ_STRING(reporter, "name", &report->reporter_name) &&
             JSON_READ_STRING(reporter, "version", &report->reporter_version);
 
@@ -339,8 +340,9 @@ sr_report_from_json(struct sr_json_value *root, char **error_message)
     }
 
     /* Operating system. */
-    struct sr_json_value *os = json_element(root, "os");
-    if (os)
+    json_object *os;
+
+    if (json_object_object_get_ex(root, "os", &os))
     {
         report->operating_system = sr_operating_system_from_json(os, error_message);
         if (!report->operating_system)
@@ -348,8 +350,9 @@ sr_report_from_json(struct sr_json_value *root, char **error_message)
     }
 
     /* Packages. */
-    struct sr_json_value *packages = json_element(root, "packages");
-    if (packages)
+    json_object *packages;
+
+    if (json_object_object_get_ex(root, "packages", &packages))
     {
         /* In the future, we'll choose the parsing function according to OS here. */
         if (sr_rpm_package_from_json(&report->rpm_packages, packages, true, error_message) < 0)
@@ -357,13 +360,14 @@ sr_report_from_json(struct sr_json_value *root, char **error_message)
     }
 
     /* Problem. */
-    struct sr_json_value *problem = json_element(root, "problem");
-    if (problem)
+    json_object *problem;
+
+    if (json_object_object_get_ex(root, "problem", &problem))
     {
         char *report_type;
 
         success =
-            JSON_CHECK_TYPE(problem, SR_JSON_OBJECT, "problem") &&
+            json_check_type(problem, json_type_object, "problem", error_message) &&
             JSON_READ_STRING(problem, "type", &report_type) &&
             JSON_READ_STRING(problem, "component", &report->component_name);
 
@@ -373,11 +377,12 @@ sr_report_from_json(struct sr_json_value *root, char **error_message)
         report->report_type = sr_report_type_from_string(report_type);
 
         /* User. */
-        struct sr_json_value *user = json_element(root, "user");
-        if (user)
+        json_object *user;
+
+        if (json_object_object_get_ex(root, "user", &user))
         {
             success =
-                JSON_CHECK_TYPE(user, SR_JSON_OBJECT, "user") &&
+                json_check_type(user, json_type_object, "user", error_message) &&
                 JSON_READ_BOOL(user, "root", &report->user_root) &&
                 JSON_READ_BOOL(user, "local", &report->user_local);
 
@@ -407,28 +412,32 @@ sr_report_from_json(struct sr_json_value *root, char **error_message)
     }
 
     /* Authentication entries. */
-    struct sr_json_value *extra = json_element(root, "auth");
-    if (extra)
+    json_object *extra;
+    if (json_object_object_get_ex(root, "auth", &extra))
     {
-        if (!JSON_CHECK_TYPE(extra, SR_JSON_OBJECT, "auth"))
-            goto fail;
+        lh_table *object;
 
-        const unsigned children = json_object_children_count(extra);
+        if (!json_check_type(extra, json_type_object, "auth", error_message))
+            goto fail;
 
         /* from the last children down to the first for easier testing :)
          * keep it as it is as long as sr_report_add_auth() does LIFO */
-        for (unsigned i = 1; i <= children; ++i)
+        object = json_object_get_object(extra);
+        for (struct lh_entry *entry = object->tail; NULL != entry; entry = entry->prev)
         {
-            const char *child_name = NULL;
-            struct sr_json_value *child_object = json_object_get_child(extra,
-                                                                       children - i,
-                                                                       &child_name);
+            const char *child_name;
+            json_object *child_value;
+            const char *string;
 
-            if (!JSON_CHECK_TYPE(child_object, SR_JSON_STRING, child_name))
+            child_name = lh_entry_k(entry);
+            child_value = lh_entry_v(entry);
+
+            if (!json_check_type(child_value, json_type_string, child_name, error_message))
                 continue;
 
-            const char *child_value = json_string_get_value(child_object);
-            sr_report_add_auth(report, child_name, child_value);
+            string = json_object_get_string(child_value);
+
+            sr_report_add_auth(report, child_name, string);
         }
     }
 
@@ -442,12 +451,23 @@ fail:
 struct sr_report *
 sr_report_from_json_text(const char *report, char **error_message)
 {
-    struct sr_json_value *json_root = sr_json_parse(report, error_message);
+    enum json_tokener_error error;
+    json_object *json_root = json_tokener_parse_verbose(report, &error);
     if (!json_root)
+    {
+        if (NULL != error_message)
+        {
+            const char *description;
+
+            description = json_tokener_error_desc(error);
+
+            *error_message = sr_strdup(description);
+        }
         return NULL;
+    }
 
     struct sr_report *result = sr_report_from_json(json_root, error_message);
 
-    sr_json_value_free(json_root);
+    json_object_put(json_root);
     return result;
 }

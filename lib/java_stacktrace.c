@@ -194,24 +194,31 @@ sr_java_stacktrace_to_json(struct sr_java_stacktrace *stacktrace)
 }
 
 struct sr_java_stacktrace *
-sr_java_stacktrace_from_json(struct sr_json_value *root, char **error_message)
+sr_java_stacktrace_from_json(json_object *root, char **error_message)
 {
-    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "stacktrace"))
+    if (!json_check_type(root, json_type_object, "stacktrace", error_message))
         return NULL;
 
     struct sr_java_stacktrace *result = sr_java_stacktrace_new();
 
-    struct sr_json_value *threads = json_element(root, "threads");
-    if (threads)
+    json_object *threads;
+
+    if (json_object_object_get_ex(root, "threads", &threads))
     {
-        if (!JSON_CHECK_TYPE(threads, SR_JSON_ARRAY, "threads"))
+        size_t array_length;
+
+        if (!json_check_type(threads, json_type_array, "threads", error_message))
             goto fail;
 
-        struct sr_json_value *thread_json;
-        FOR_JSON_ARRAY(threads, thread_json)
-        {
-            struct sr_java_thread *thread = sr_java_thread_from_json(thread_json, error_message);
+        array_length = json_object_array_length(threads);
 
+        for (size_t i = 0; i < array_length; i++)
+        {
+            json_object *thread_json;
+            struct sr_java_thread *thread;
+
+            thread_json = json_object_array_get_idx(threads, i);
+            thread = sr_java_thread_from_json(thread_json, error_message);
             if (!thread)
                 goto fail;
 

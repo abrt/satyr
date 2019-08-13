@@ -31,11 +31,11 @@ extern "C" {
 
 #include "../report_type.h"
 #include <inttypes.h>
+#include <json.h>
 #include <stdbool.h>
 
 struct sr_core_thread;
 struct sr_location;
-struct sr_json_value;
 
 /**
  * @brief A stack trace of a core dump.
@@ -116,7 +116,7 @@ sr_core_stacktrace_find_crash_thread(struct sr_core_stacktrace *stacktrace);
  * sr_core_stacktrace_to_json().
  */
 struct sr_core_stacktrace *
-sr_core_stacktrace_from_json(struct sr_json_value *root,
+sr_core_stacktrace_from_json(json_object *root,
                              char **error_message);
 
 struct sr_core_stacktrace *

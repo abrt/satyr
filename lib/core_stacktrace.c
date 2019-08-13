@@ -158,10 +158,10 @@ sr_core_stacktrace_find_crash_thread(struct sr_core_stacktrace *stacktrace)
 }
 
 struct sr_core_stacktrace *
-sr_core_stacktrace_from_json(struct sr_json_value *root,
+sr_core_stacktrace_from_json(json_object *root,
                              char **error_message)
 {
-    if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "stacktrace"))
+    if (!json_check_type(root, json_type_object, "stacktrace", error_message))
         return NULL;
 
     struct sr_core_stacktrace *result = sr_core_stacktrace_new();
@@ -175,31 +175,36 @@ sr_core_stacktrace_from_json(struct sr_json_value *root,
         goto fail;
 
     /* Read threads. */
-    struct sr_json_value *stacktrace = json_element(root, "stacktrace");
-    if (stacktrace)
+    json_object *stacktrace;
+    if (json_object_object_get_ex(root, "stacktrace", &stacktrace))
     {
-        if (!JSON_CHECK_TYPE(stacktrace, SR_JSON_ARRAY, "stacktrace"))
+        size_t array_length;
+
+        if (!json_check_type(stacktrace, json_type_array, "stacktrace", error_message))
             goto fail;
 
-        struct sr_json_value *json_thread;
-        FOR_JSON_ARRAY(stacktrace, json_thread)
-        {
-            struct sr_core_thread *thread = sr_core_thread_from_json(json_thread,
-                    error_message);
+        array_length = json_object_array_length(stacktrace);
 
+        for (size_t i = 0; i < array_length; i++)
+        {
+            json_object *json_thread;
+            struct sr_core_thread *thread;
+            json_object *crash_thread;
+
+            json_thread = json_object_array_get_idx(stacktrace, i);
+            thread = sr_core_thread_from_json(json_thread, error_message);
             if (!thread)
                 goto fail;
 
-            struct sr_json_value *crash_thread = json_element(json_thread, "crash_thread");
-            if (crash_thread)
+            if (json_object_object_get_ex(json_thread, "crash_thread", &crash_thread))
             {
-                if (!JSON_CHECK_TYPE(crash_thread, SR_JSON_BOOLEAN, "crash_thread"))
+                if (!json_check_type(crash_thread, json_type_boolean, "crash_thread", error_message))
                 {
                     sr_core_thread_free(thread);
                     goto fail;
                 }
 
-                if (crash_thread->u.boolean)
+                if (json_object_get_boolean(crash_thread))
                     result->crash_thread = thread;
             }
 
@@ -218,14 +223,26 @@ struct sr_core_stacktrace *
 sr_core_stacktrace_from_json_text(const char *text,
                                   char **error_message)
 {
-    struct sr_json_value *json_root = sr_json_parse(text, error_message);
+    enum json_tokener_error error;
+    json_object *json_root = json_tokener_parse_verbose(text, &error);
     if (!json_root)
+    {
+        if (NULL != error_message)
+        {
+            const char *description;
+
+            description = json_tokener_error_desc(error);
+
+            *error_message = sr_strdup(description);
+        }
+
         return NULL;
+    }
 
     struct sr_core_stacktrace *stacktrace =
         sr_core_stacktrace_from_json(json_root, error_message);
 
-    sr_json_value_free(json_root);
+    json_object_put(json_root);
     return stacktrace;
 }
 
