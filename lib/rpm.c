@@ -572,7 +572,7 @@ sr_rpm_package_to_json(struct sr_rpm_package *package,
 }
 
 static struct sr_rpm_package *
-single_rpm_pacakge_from_json(struct sr_json_value *root, char **error_message)
+single_rpm_package_from_json(struct sr_json_value *root, char **error_message)
 {
     if (!JSON_CHECK_TYPE(root, SR_JSON_OBJECT, "package"))
         return NULL;
@@ -621,7 +621,7 @@ sr_rpm_package_from_json(struct sr_rpm_package **rpm_package, struct sr_json_val
 {
     if (!recursive)
     {
-        *rpm_package = single_rpm_pacakge_from_json(json, error_message);
+        *rpm_package = single_rpm_package_from_json(json, error_message);
         return 0;
     }
     else
@@ -633,7 +633,7 @@ sr_rpm_package_from_json(struct sr_rpm_package **rpm_package, struct sr_json_val
         struct sr_json_value *pkg_json;
         FOR_JSON_ARRAY(json, pkg_json)
         {
-            struct sr_rpm_package *pkg = single_rpm_pacakge_from_json(pkg_json, error_message);
+            struct sr_rpm_package *pkg = single_rpm_package_from_json(pkg_json, error_message);
             if (!pkg)
                 goto fail;
 
