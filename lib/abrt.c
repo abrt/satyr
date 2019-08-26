@@ -380,7 +380,10 @@ rpm_interpreter_from_dir(struct sr_rpm_package *packages,
 
         g_free(interpreter_str);
         if (success)
+        {
+            interpreter_package->role = SR_ROLE_IN_CRASH;
             packages = sr_rpm_package_append(packages, interpreter_package);
+        }
         else
             sr_rpm_package_free(interpreter_package, true);
     }

@@ -546,6 +546,12 @@ sr_rpm_package_to_json(struct sr_rpm_package *package,
             case SR_ROLE_AFFECTED:
                 role = "affected";
                 break;
+            case SR_ROLE_IN_CRASH:
+                role = "in_crash";
+                break;
+            case SR_ROLE_OTHER:
+                role = "other";
+                break;
             default:
                 assert(0 && "Invalid role");
                 break;
@@ -596,19 +602,28 @@ single_rpm_package_from_json(json_object *root, char **error_message)
         if (!json_check_type(role_json, json_type_string, "package_role", error_message))
             goto fail;
 
-        /* We only know "affected" so far. */
         const char *role;
 
         role = json_object_get_string(role_json);
 
-        if (0 != strcmp(role, "affected"))
+        if (0 == strcmp(role, "affected"))
+        {
+            package->role = SR_ROLE_AFFECTED;
+        }
+        else if (0 == strcmp(role, "in_crash"))
+        {
+            package->role = SR_ROLE_IN_CRASH;
+        }
+        else if (0 == strcmp(role, "other"))
+        {
+            package->role = SR_ROLE_OTHER;
+        }
+        else
         {
             if (error_message)
                 *error_message = g_strdup_printf("Invalid package role %s", role);
             goto fail;
         }
-
-        package->role = SR_ROLE_AFFECTED;
     }
 
     return package;

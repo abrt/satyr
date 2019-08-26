@@ -45,7 +45,9 @@ enum sr_package_role
     /* The packages contains the executable or script the execution of which
      * caused the problem to manifest.
      */
-    SR_ROLE_AFFECTED
+    SR_ROLE_AFFECTED,
+    SR_ROLE_IN_CRASH,
+    SR_ROLE_OTHER
 };
 
 struct sr_rpm_consistency

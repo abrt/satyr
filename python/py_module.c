@@ -395,6 +395,8 @@ MOD_INIT
 
     PyModule_AddIntConstant(module, "ROLE_UNKNOWN", SR_ROLE_UNKNOWN);
     PyModule_AddIntConstant(module, "ROLE_AFFECTED", SR_ROLE_AFFECTED);
+    PyModule_AddIntConstant(module, "ROLE_IN_CRASH", SR_ROLE_IN_CRASH);
+    PyModule_AddIntConstant(module, "ROLE_OTHER", SR_ROLE_OTHER);
 
     return MOD_SUCCESS_VAL(module);
 }
