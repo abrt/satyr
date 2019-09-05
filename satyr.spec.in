@@ -81,10 +81,10 @@ Python 3 bindings for %{name}.
         --disable-static \
         --enable-doxygen-docs
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
 # Remove all libtool archives (*.la) from modules directory.
 find %{buildroot} -name "*.la" | xargs rm --
