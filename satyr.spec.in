@@ -83,7 +83,7 @@ Python 3 bindings for %{name}.
 %make_install
 
 # Remove all libtool archives (*.la) from modules directory.
-find %{buildroot} -name "*.la" | xargs rm --
+find %{buildroot} -name "*.la" -delete
 
 %check
 make check|| {
