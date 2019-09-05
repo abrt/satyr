@@ -59,10 +59,6 @@ Development libraries and headers for %{name}.
 %if %{with python3}
 %package -n python3-satyr
 %{?python_provide:%python_provide python3-satyr}
-# Remove before F30
-Provides: %{name}-python3 = %{version}-%{release}
-Provides: %{name}-python3%{?_isa} = %{version}-%{release}
-Obsoletes: %{name}-python3 < 0.24
 Summary: Python 3 bindings for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 
