@@ -25,8 +25,8 @@ EXTRA_DIST += autogen.sh RELEASE
 #UPLOAD_URI = user@fedorahosted.org:abrt
 #.PHONY: upload
 #upload:
-#	make dist-xz
-#	scp $(distdir).tar.xz $(UPLOAD_URI)
+#	make dist
+#	scp $(distdir).tar.gz $(UPLOAD_URI)
 
 RPM_DIRS = --define "_sourcedir `pwd`" \
            --define "_rpmdir `pwd`/build" \
@@ -35,9 +35,9 @@ RPM_DIRS = --define "_sourcedir `pwd`" \
            --define "_srcrpmdir `pwd`/build"
 
 EXTRA_DIST += satyr.spec.in
-rpm: dist-xz satyr.spec
+rpm: dist satyr.spec
 	rpmbuild $(RPM_DIRS) $(RPM_FLAGS) -ba satyr.spec
-srpm: dist-xz satyr.spec
+srpm: dist satyr.spec
 	rpmbuild $(RPM_DIRS) -bs satyr.spec
 
 .PHONY: release-minor
@@ -64,4 +64,4 @@ release:
 	git tag "$$NEW_VER"; \
 	echo -n "$$NEW_VER" > satyr-version
 	autoconf --force
-	$(MAKE) dist-xz
+	$(MAKE) dist
