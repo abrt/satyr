@@ -121,6 +121,23 @@ make check|| {
 %endif
 
 %changelog
+* Fri Oct 11 2019 Matěj Grabovský <mgrabovs@redhat.com> 0.29-1
+- spec: Switch sources tarball compression from xz to gzip
+- spec: Replace xargs rm with delete
+- spec: Remove provides for satyr-python3
+- spec: Replace make with rpm macros
+- Replace bundled JSON parser with json-c
+- lib: normalize: Hash removable function names
+- rpm: Fix typo in a static function name
+- json: Improve error messages on EOF
+- json: Use backticks consistently in error messages
+- json,style: Improve code style consistency slightly
+- json: Update to latest upstream version
+- core: Document unknown core frame address
+- style: Correct parenthesization for bitfield tests
+- style: Use specific integer types instead of the generic int
+- style: Use *_MAX constants instead of -1 in unsigned comparisons
+
 * Fri Jun 21 2019 Ernestas Kulik <ekulik@redhat.com> 0.28-1
 - Release version 0.28
 
