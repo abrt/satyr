@@ -259,6 +259,7 @@ main(void)
   check("../../kerneloopses/arm-hung-task-oops", "dump_backtrace_log_lvl", "kthread", 6, 2, 0, NULL, NULL);
 
   check("../../kerneloopses/arm-hung-task-oops-2", "shmem_getpage_gfp", "SyS_write", 7, 0, 53, NULL, NULL);
+  check("../../kerneloopses/rhbz-1518943", "amdgpu_vm_sdma_update", "entry_SYSCALL_64_after_hwframe", 17, 0, 87, NULL, NULL);
 
   return 0;
 }
