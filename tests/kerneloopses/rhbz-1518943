@@ -1,0 +1,49 @@
+BUG: kernel NULL pointer dereference, address: 0000000000000008
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 0 P4D 0 
+Oops: 0000 [#1] SMP NOPTI
+CPU: 1 PID: 1
+88243 Comm: QSGRenderThread Not tainted 5.3.6-300.fc31.x86_64 #1
+Hardware name: System manufacturer System Product Name/TUF B450-PRO GAMING, BIOS 1816 09/02/2019
+RIP: 0010:amdgpu_vm_sdma_commit+0x46/0x120 [amdgpu]
+Code: 18 65 48 8b 04 2
+5 28 00 00 00 48 89 44 24 08 31 c0 48 8b 47 08 4c 8b a2 88 01 00 00 4c 8b a8 80 00 00 00 48 8b 80 c8 00 00 00 <4c> 8b 70 08 41 8b 44 24 08 4d 8d 7e 88 85 c0 0f 84 37 f9 1e 00 49
+RSP: 0018:ffffad85491579a8 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffffad8549157b40 RCX: 0000000002888000
+RDX: ffff9caeb3c21400 RSI: 0000000000000000 RDI: ffffad8549157b40
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000001000
+R10: 00000000000000eb R11: 00000000000000e9 R12: ffff9caeb3c215f8
+R13: ffff9cae0e1ba800 R14: ffffad8549157b40 R15: 0000000000000000
+FS:  00007fd17b7fe700(0000) GS:ffff9caebe640000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000008 CR3: 000000064e8e8000 CR4: 0000000000340ee0
+Call Trace:
+ amdgpu_vm_sdma_update+0x17d/0x240 [amdgpu]
+ ? amdgpu_vm_num_entries+0x1e/0x70 [amdgpu]
+ amdgpu_vm_update_ptes+0x385/0x6b0 [amdgpu]
+ amdgpu_vm_bo_update_mapping+0xb3/0xe0 [amdgpu]
+ amdgpu_vm_clear_freed+0xcf/0x1a0 [amdgpu]
+ amdgpu_gem_va_ioctl+0x42c/0x550 [amdgpu]
+ ? amdgpu_gem_metadata_ioctl+0x190/0x190 [amdgpu]
+ drm_ioctl_kernel+0xaa/0xf0 [drm]
+ drm_ioctl+0x208/0x390 [drm]
+ ? amdgpu_gem_metadata_ioctl+0x190/0x190 [amdgpu]
+ ? pollwake+0x74/0x90
+ amdgpu_drm_ioctl+0x49/0x80 [amdgpu]
+ do_vfs_ioctl+0x405/0x660
+ ksys_ioctl+0x5e/0x90
+ __x64_sys_ioctl+0x16/0x20
+ do_syscall_64+0x5f/0x1a0
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x7fd1f18192fb
+Code: 0f 1e fa 48 8b 05 8d 9b 0c 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 5d 9b 0c 00 f7 d8 64 89 01 48
+RSP: 002b:00007fd17b7fd798 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007fd17b7fd7e0 RCX: 00007fd1f18192fb
+RDX: 00007fd17b7fd7e0 RSI: 00000000c0286448 RDI: 000000000000000b
+RBP: 00000000c0286448 R08: 0000000103c00000 R09: 000000000000000e
+R10: 000000000000000c R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 0000000000000002 R15: 00005653a61e5a40
+Modules linked in: fuse ip6t_REJECT nf_reject_ipv6 ip6t_rpfilter ipt_REJECT nf_reject_ipv4 xt_conntrack ebtable_nat ebtable_broute ip6table_nat ip6table_mangle ip6table_raw ip6table_security iptable_nat nf_nat iptable_mangle iptable_raw iptable_security nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 libcrc32c ip_set nfnetlink ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter sunrpc vfat fat squashfs zstd_decompress loop edac_mce_amd kvm_amd snd_hda_codec_generic ledtrig_audio snd_hda_codec_hdmi snd_hda_intel snd_hda_codec snd_hda_core snd_hwdep kvm snd_seq snd_seq_device irqbypass snd_pcm eeepc_wmi asus_wmi sparse_keymap snd_timer rfkill crct10dif_pclmul raid1 crc32_pclmul joydev video snd wmi_bmof ghash_clmulni_intel sp5100_tco k10temp ccp i2c_piix4 soundcore gpio_amdpt gpio_generic acpi_cpufreq binfmt_misc ip_tables hid_logitech_hidpp amdgpu amd_iommu_v2 gpu_sched i2c_algo_bit ttm drm_kms_helper drm uas crc32c_intel r8169 usb_storage hid_logitech_dj wmi
+ pinctrl_amd
+CR2: 0000000000000008

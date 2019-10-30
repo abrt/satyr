@@ -434,6 +434,13 @@ module_list_continues(const char *input)
         sr_skip_char_span(&input, "0123456789"))
         return false;
 
+    /* CR2 can also be spilled at the end:
+     * https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/arch/x86/mm/fault.c?id=8e998fc24de47c55b47a887f6c95ab91acd4a720#n824
+     */
+    if (sr_skip_string(&input, "CR2: ") &&
+        sr_skip_hexadecimal_uint(&input))
+        return false;
+
     /* Other conditions may need to be added */
 
     return true;
