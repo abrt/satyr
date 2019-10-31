@@ -101,6 +101,9 @@ sr_core_stacktrace_free(struct sr_core_stacktrace *stacktrace)
         sr_core_thread_free(thread);
     }
 
+    if (stacktrace->executable)
+        free(stacktrace->executable);
+
     free(stacktrace);
 }
 
@@ -112,6 +115,8 @@ sr_core_stacktrace_dup(struct sr_core_stacktrace *stacktrace)
 
     if (stacktrace->threads)
         result->threads = sr_core_thread_dup(stacktrace->threads, true);
+    if (stacktrace->executable)
+        result->executable = sr_strdup(stacktrace->executable);
 
     return result;
 }
