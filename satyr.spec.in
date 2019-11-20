@@ -34,11 +34,13 @@ BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: gdb
 BuildRequires: gperf
+BuildRequires: nettle-devel
 BuildRequires: pkgconfig(json-c)
 %if %{with python3}
 BuildRequires: python3-sphinx
 %endif # with python3
 Requires: json-c
+Requires: nettle
 
 %description
 Satyr is a library that can be used to create and process microreports.
