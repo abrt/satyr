@@ -79,6 +79,7 @@ libsatyr_conv_la_CFLAGS = \
 	-Wall -Wformat=2 -std=gnu99 -D_GNU_SOURCE -I$(top_srcdir)/include \
 	$(GLIB_CFLAGS) \
 	$(JSON_CFLAGS) \
+	$(NETTLE_CFLAGS) \
 	$(LIBDW_CFLAGS) \
 	$(LIBELF_CFLAGS) \
 	$(LIBUNWIND_CFLAGS) \
@@ -86,6 +87,7 @@ libsatyr_conv_la_CFLAGS = \
 libsatyr_conv_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(JSON_LIBS) \
+	$(NETTLE_LIBS) \
 	$(LIBDW_LIBS) \
 	$(LIBELF_LIBS) \
 	$(LIBUNWIND_LIBS) \

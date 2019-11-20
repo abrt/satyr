@@ -580,23 +580,24 @@ sr_distances_part_create(int m, int n, enum sr_distance_type dist_type,
 static uint32_t
 thread_list_checksum(struct sr_thread **threads, size_t n)
 {
-    struct sr_sha1_state sha1;
+    struct sha1_ctx ctx;
     int frame_count;
     union
     {
-        unsigned char hashbuf[SR_SHA1_RESULT_BIN_LEN];
+        unsigned char hashbuf[SHA1_DIGEST_SIZE];
         uint32_t truncated;
     } u;
 
-    sr_sha1_begin(&sha1);
+    sha1_init(&ctx);
 
     for (size_t i = 0; i < n; i++)
     {
         frame_count = sr_thread_frame_count(threads[i]);
-        sr_sha1_hash(&sha1, &frame_count, sizeof(frame_count));
+        sha1_update(&ctx, sizeof(frame_count), (void *)&frame_count);
     }
 
-    sr_sha1_end(&sha1, u.hashbuf);
+    sha1_digest(&ctx, SHA1_DIGEST_SIZE, u.hashbuf);
+
     return u.truncated;
 }
 
