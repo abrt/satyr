@@ -29,9 +29,6 @@
 extern "C" {
 #endif
 
-#include <byteswap.h>
-#include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
 
 #include <nettle/sha1.h>
