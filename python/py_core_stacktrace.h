@@ -35,7 +35,7 @@ extern "C" {
 struct sr_py_core_frame;
 struct sr_py_core_thread;
 
-PyTypeObject sr_py_core_stacktrace_type;
+extern PyTypeObject sr_py_core_stacktrace_type;
 
 /* The beginning of this structure has to have the same layout as
  * sr_py_multi_thread_stacktrace.

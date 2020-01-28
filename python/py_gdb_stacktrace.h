@@ -35,7 +35,7 @@ extern "C" {
 struct sr_py_gdb_frame;
 struct sr_py_gdb_thread;
 
-PyTypeObject sr_py_gdb_stacktrace_type;
+extern PyTypeObject sr_py_gdb_stacktrace_type;
 
 /* The beginning of this structure has to have the same layout as
  * sr_py_multi_thread_stacktrace.

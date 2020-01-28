@@ -32,7 +32,7 @@ extern "C" {
 #include <Python.h>
 #include <structmember.h>
 
-PyTypeObject sr_py_operating_system_type;
+extern PyTypeObject sr_py_operating_system_type;
 
 struct sr_py_operating_system
 {
