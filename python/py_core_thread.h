@@ -32,7 +32,7 @@ extern "C" {
 #include <Python.h>
 #include <structmember.h>
 
-PyTypeObject sr_py_core_thread_type;
+extern PyTypeObject sr_py_core_thread_type;
 
 /* The beginning of this structure has to have the same layout as
  * sr_py_base_thread.

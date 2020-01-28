@@ -33,7 +33,7 @@ extern "C" {
 #include <structmember.h>
 #include "gdb/frame.h"
 
-PyTypeObject sr_py_gdb_frame_type;
+extern PyTypeObject sr_py_gdb_frame_type;
 
 typedef sr_gdb_frame_address_t sr_py_gdb_frame_address_t;
 
