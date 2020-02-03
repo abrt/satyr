@@ -123,6 +123,13 @@ make check|| {
 %endif
 
 %changelog
+* Mon Feb 03 2020 Ernestas Kulik <ekulik@redhat.com> 0.30-1
+- Fix build failure with gcc -fno-common
+- lib: Remove superfluous includes
+- lib: Use Nettle for computing SHA-1 digests
+- lib: core_stacktrace: Plug leak
+- lib: koops_stacktrace: Don’t parse register as module
+
 * Fri Oct 11 2019 Matěj Grabovský <mgrabovs@redhat.com> 0.29-1
 - spec: Switch sources tarball compression from xz to gzip
 - spec: Replace xargs rm with delete

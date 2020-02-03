@@ -1,3 +1,9 @@
+satyr 0.30
+==========
+Fix registers being parsed as modules in kernel oopses in some cases
+Use Nettle for cryptographic calculations
+Fix builds with GCC 10
+
 satyr 0.28
 ==========
 Clean up build files, remove ability to build without an unwinder

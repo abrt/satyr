@@ -7,8 +7,8 @@ $ git status
 $ git pull
 
 
-2. If any change modifies the satyr library interface, increase the
-CURRENT number in lib/Makefile.am:
+2. In lib/Makefile.am, update the library version according to the libtool documentation
+(info(1) libtool or https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html):
 libsatyr_la_LDFLAGS = -version-info 2:1:0
 
 
