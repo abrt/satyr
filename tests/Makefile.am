@@ -1,3 +1,58 @@
+noinst_PROGRAMS = \
+	dump_core
+
+dump_core_SOURCES = dump_core.c
+dump_core_LDFLAGS = -static
+
+AM_CPPFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_CFLAGS) \
+	-I$(abs_top_srcdir)/include
+AM_LDFLAGS = \
+	$(GLIB_LIBS)
+LDADD = \
+	$(abs_top_builddir)/lib/libsatyr.la
+
+check_PROGRAMS = \
+	abrt \
+	cluster \
+	core_frame \
+	core_stacktrace \
+	core_thread \
+	gdb_sharedlib \
+	java_frame \
+	java_stacktrace \
+	java_thread \
+	koops_frame \
+	metrics \
+	normalize \
+	operating_system \
+	report \
+	rpm \
+	ruby_frame \
+	strbuf
+
+abrt_SOURCES = abrt.c
+cluster_SOURCES = cluster.c
+core_frame_SOURCES = core_frame.c
+EXTRA_core_stacktrace_DEPENDENCIES = dump_core
+core_stacktrace_SOURCES = core_stacktrace.c
+core_thread_SOURCES = core_thread.c
+gdb_sharedlib_SOURCES = gdb_sharedlib.c
+java_frame_SOURCES = java_frame.c
+java_stacktrace_SOURCES = java_stacktrace.c
+java_thread_SOURCES = java_thread.c
+koops_frame_SOURCES = koops_frame.c
+metrics_SOURCES = metrics.c
+normalize_SOURCES = normalize.c
+operating_system_SOURCES = operating_system.c
+report_SOURCES = report.c
+rpm_SOURCES = rpm.c
+ruby_frame_SOURCES = ruby_frame.c
+strbuf_SOURCES = strbuf.c
+
+TESTS = $(check_PROGRAMS)
+
 EXTRA_DIST = gdb_stacktraces \
              java_stacktraces \
              ruby_stacktraces \
@@ -53,27 +108,11 @@ TESTSUITE_AT =		\
   gdb_frame.at 		\
   gdb_thread.at 	\
   gdb_stacktrace.at  	\
-  gdb_sharedlib.at	\
-  java_frame.at 	\
-  java_thread.at 	\
-  java_stacktrace.at 	\
-  koops_frame.at	\
   koops_stacktrace.at   \
-  operating_system.at   \
-  core_frame.at         \
-  core_thread.at        \
-  core_stacktrace.at    \
-  ruby_frame.at		\
   ruby_stacktrace.at	\
   js_platform.at \
   js_frame.at \
   js_stacktrace.at \
-  normalize.at  	\
-  metrics.at 		\
-  cluster.at  		\
-  rpm.at		\
-  abrt.at               \
-  report.at		\
   python_bindings.at
 
 EXTRA_DIST += $(TESTSUITE_AT)
