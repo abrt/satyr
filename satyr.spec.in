@@ -38,7 +38,7 @@ BuildRequires: gdb
 BuildRequires: gperf
 BuildRequires: nettle-devel%{?_isa}
 BuildRequires: json-c-devel%{?_isa}
-BuildRequires: glib2-devel >= %{glib_ver}
+BuildRequires: glib2-devel%{?_isa}
 %if %{with python3}
 BuildRequires: python3-sphinx
 %endif # with python3
