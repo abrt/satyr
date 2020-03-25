@@ -214,7 +214,7 @@ check(char *input)
 
   json_object_put(root);
 
-  return 0;
+  return;
 }
 
 int
