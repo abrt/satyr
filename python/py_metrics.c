@@ -78,7 +78,7 @@ sr_py_distances_type =
     sizeof(struct sr_py_distances),    /* tp_basicsize */
     0,                          /* tp_itemsize */
     sr_py_distances_free,       /* tp_dealloc */
-    NULL,                       /* tp_print */
+    0,                          /* tp_vectorcall_offset */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
     NULL,                       /* tp_compare */
@@ -128,7 +128,7 @@ sr_py_distances_part_type =
     sizeof(struct sr_py_distances_part), /* tp_basicsize */
     0,                          /* tp_itemsize */
     sr_py_distances_part_free,  /* tp_dealloc */
-    NULL,                       /* tp_print */
+    0,                          /* tp_vectorcall_offset */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
     NULL,                       /* tp_compare */

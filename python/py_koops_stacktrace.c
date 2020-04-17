@@ -62,7 +62,7 @@ PyTypeObject sr_py_koops_stacktrace_type = {
     sizeof(struct sr_py_koops_stacktrace),        /* tp_basicsize */
     0,                              /* tp_itemsize */
     sr_py_koops_stacktrace_free,    /* tp_dealloc */
-    NULL,                           /* tp_print */
+    0,                              /* tp_vectorcall_offset */
     NULL,                           /* tp_getattr */
     NULL,                           /* tp_setattr */
     NULL,                           /* tp_compare */

@@ -66,7 +66,7 @@ PyTypeObject sr_py_single_stacktrace_type = {
     sizeof(struct sr_py_base_thread), /* tp_basicsize */
     0,                              /* tp_itemsize */
     NULL,                           /* tp_dealloc */
-    NULL,                           /* tp_print */
+    0,                              /* tp_vectorcall_offset */
     NULL,                           /* tp_getattr */
     NULL,                           /* tp_setattr */
     NULL,                           /* tp_compare */
@@ -137,7 +137,7 @@ PyTypeObject sr_py_multi_stacktrace_type = {
     sizeof(struct sr_py_multi_stacktrace), /* tp_basicsize */
     0,                              /* tp_itemsize */
     NULL,                           /* tp_dealloc */
-    NULL,                           /* tp_print */
+    0,                              /* tp_vectorcall_offset */
     NULL,                           /* tp_getattr */
     NULL,                           /* tp_setattr */
     NULL,                           /* tp_compare */

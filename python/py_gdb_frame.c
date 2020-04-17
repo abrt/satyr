@@ -131,7 +131,7 @@ sr_py_gdb_frame_type =
     sizeof(struct sr_py_gdb_frame),        /* tp_basicsize */
     0,                          /* tp_itemsize */
     sr_py_gdb_frame_free,       /* tp_dealloc */
-    NULL,                       /* tp_print */
+    0,                          /* tp_vectorcall_offset */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
     NULL,                       /* tp_compare */
