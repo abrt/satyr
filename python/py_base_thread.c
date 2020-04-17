@@ -69,7 +69,7 @@ sr_py_base_thread_type =
     sizeof(struct sr_py_base_thread), /* tp_basicsize */
     0,                          /* tp_itemsize */
     NULL,                       /* tp_dealloc */
-    NULL,                       /* tp_print */
+    0,                          /* tp_vectorcall_offset */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
     NULL,                       /* tp_compare */

@@ -67,7 +67,7 @@ sr_py_rpm_package_type =
     sizeof(struct sr_py_rpm_package), /* tp_basicsize */
     0,                          /* tp_itemsize */
     sr_py_rpm_package_free,     /* tp_dealloc */
-    NULL,                       /* tp_print */
+    0,                          /* tp_vectorcall_offset */
     NULL,                       /* tp_getattr */
     NULL,                       /* tp_setattr */
     NULL,                       /* tp_compare */
