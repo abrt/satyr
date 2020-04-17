@@ -213,8 +213,6 @@ check(char *input)
   assert(0 == sr_ruby_frame_cmp(frame1, frame2));
 
   json_object_put(root);
-
-  return 0;
 }
 
 int
