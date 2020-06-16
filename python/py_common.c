@@ -50,7 +50,7 @@ sr_py_setter_string(PyObject *self, PyObject *rhs, void *data)
 
     struct getset_offsets *gsoff = data;
 
-    char *newvalue = PyString_AsString(rhs);
+    const char *newvalue = PyString_AsString(rhs);
     if (!newvalue)
         return -1;
 
