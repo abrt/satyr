@@ -50,7 +50,7 @@ sr_py_setter_string(PyObject *self, PyObject *rhs, void *data)
 
     struct getset_offsets *gsoff = data;
 
-    const char *newvalue = PyString_AsString(rhs);
+    const char *newvalue = PyUnicode_AsUTF8(rhs);
     if (!newvalue)
         return -1;
 
