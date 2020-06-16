@@ -475,7 +475,7 @@ int sr_py_report_set_type(PyObject *self, PyObject *rhs, void *data)
         return -1;
     }
 
-    const char *type_str = PyString_AsString(rhs);
+    const char *type_str = PyUnicode_AsUTF8(rhs);
     if (!type_str)
         return -1;
 
