@@ -123,6 +123,16 @@ make check|| {
 %endif
 
 %changelog
+* Tue Aug 18 2020 Michal Fabik <mfabik@redhat.com> 0.31-1
+- Bump version-info before new release
+- spec: Make some dependencies architecture-dependent
+- Add GitHub Actions workflow for building PRs
+- autogen.sh: Pass --assumeyes to DNF
+- Remove #define PyString_AsString PyUnicode_AsUTF8
+- Fix -Wdiscarded-qualifiers warning
+- python: Adapt to changes made in PEP 590
+- tests: ruby_frame: Drop return
+
 * Mon Feb 03 2020 Ernestas Kulik <ekulik@redhat.com> 0.30-1
 - Fix build failure with gcc -fno-common
 - lib: Remove superfluous includes

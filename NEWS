@@ -1,3 +1,8 @@
+satyr 0.31
+==========
+Remove #define PyString_AsString PyUnicode_AsUTF8
+python: Adapt to changes made in PEP 590
+
 satyr 0.30
 ==========
 Fix registers being parsed as modules in kernel oopses in some cases
