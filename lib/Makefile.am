@@ -96,7 +96,7 @@ libsatyr_conv_la_LIBADD = \
 lib_LTLIBRARIES = libsatyr.la
 libsatyr_la_SOURCES = 
 libsatyr_la_LIBADD = libsatyr_conv.la
-libsatyr_la_LDFLAGS = -version-info 4:0:0 -export-symbols-regex '^sr_'
+libsatyr_la_LDFLAGS = -version-info 4:1:0 -export-symbols-regex '^sr_'
 
 # NOTE: when updating CURRENT, update it in ruby/lib/satyr.rb as well!
 
