@@ -40,16 +40,14 @@ bool
 sr_abrt_print_report_from_dir(const char *directory,
                               char **error_message);
 
-/* NOTE: the hash_fingerprints argument has no effect because fingerprint
- * generation is disabled. */
 bool
 sr_abrt_create_core_stacktrace(const char *directory,
-                               bool hash_fingerprints,
+                               bool unused,
                                char **error_message);
 bool
 sr_abrt_create_core_stacktrace_from_gdb(const char *directory,
                                         const char *gdb_output,
-                                        bool hash_fingerprints,
+                                        bool unused,
                                         char **error_message);
 
 

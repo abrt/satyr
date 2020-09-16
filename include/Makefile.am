@@ -20,7 +20,6 @@ mainheaders_HEADERS = \
 
 coreheadersdir = $(includedir)/satyr/core
 coreheaders_HEADERS = \
-	core/fingerprint.h \
 	core/frame.h \
 	core/stacktrace.h \
 	core/thread.h \

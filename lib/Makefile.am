@@ -22,7 +22,6 @@ libsatyr_conv_la_SOURCES = \
 	callgraph.c \
 	cluster.c \
 	core_stacktrace.c \
-	core_fingerprint.c \
 	core_frame.c \
 	core_thread.c \
 	core_unwind.c \

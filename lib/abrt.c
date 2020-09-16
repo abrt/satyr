@@ -26,7 +26,6 @@
 #include "core/stacktrace.h"
 #include "core/thread.h"
 #include "core/frame.h"
-#include "core/fingerprint.h"
 #include "python/stacktrace.h"
 #include "koops/stacktrace.h"
 #include "java/stacktrace.h"
@@ -91,7 +90,7 @@ fulfill_missing_values(struct sr_core_stacktrace *core_stacktrace)
 
 static bool
 create_core_stacktrace(const char *directory, const char *gdb_output,
-                       bool hash_fingerprints, char **error_message)
+                       bool unused, char **error_message)
 {
     char *executable_contents = file_contents(directory, "executable",
                                               error_message);
@@ -116,14 +115,6 @@ create_core_stacktrace(const char *directory, const char *gdb_output,
 
     fulfill_missing_values(core_stacktrace);
 
-#if 0
-    sr_core_fingerprint_generate(core_stacktrace,
-                                 error_message);
-
-    if (hash_fingerprints)
-        sr_core_fingerprint_hash(core_stacktrace);
-#endif
-
     char *json = sr_core_stacktrace_to_json(core_stacktrace);
 
     // Add newline to the end of core stacktrace file to make text
@@ -145,7 +136,7 @@ create_core_stacktrace(const char *directory, const char *gdb_output,
 bool
 sr_abrt_create_core_stacktrace_from_gdb(const char *directory,
                                         const char *gdb_output,
-                                        bool hash_fingerprints,
+                                        bool unused,
                                         char **error_message)
 {
     if (!gdb_output)
@@ -154,17 +145,15 @@ sr_abrt_create_core_stacktrace_from_gdb(const char *directory,
         return false;
     }
 
-    return create_core_stacktrace(directory, gdb_output, hash_fingerprints,
-                                  error_message);
+    return create_core_stacktrace(directory, gdb_output, unused, error_message);
 }
 
 bool
 sr_abrt_create_core_stacktrace(const char *directory,
-                               bool hash_fingerprints,
+                               bool unused,
                                char **error_message)
 {
-    return create_core_stacktrace(directory, NULL, hash_fingerprints,
-                                  error_message);
+    return create_core_stacktrace(directory, NULL, unused, error_message);
 }
 
 struct sr_core_stracetrace_unwind_state *
