@@ -1,0 +1,8 @@
+{
+        libgobject
+        Memcheck:Leak
+        ...
+        obj:/usr/*lib*/libgobject-*
+        ...
+        fun:_dl_init
+}
