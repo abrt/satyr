@@ -16,7 +16,7 @@
 
 #include "json_utils.h"
 
-#include <strbuf.h>
+#include "utils.h"
 
 #define DEFINE_JSON_READ(name, c_type, json_type, getter_suffix, converter)             \
     bool                                                                                \
@@ -69,50 +69,50 @@ json_check_type(json_object *object, json_type type,
 static char *
 sr_json_escape(const char *text)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
     const char *c = text;
     while (*c != '\0')
     {
         switch (*c)
         {
         case '"':
-            sr_strbuf_append_str(strbuf, "\\\"");
+            g_string_append(strbuf, "\\\"");
             break;
         case '\n':
-            sr_strbuf_append_str(strbuf, "\\n");
+            g_string_append(strbuf, "\\n");
             break;
         case '\\':
-            sr_strbuf_append_str(strbuf, "\\\\");
+            g_string_append(strbuf, "\\\\");
             break;
         case '\r':
-            sr_strbuf_append_str(strbuf, "\\r");
+            g_string_append(strbuf, "\\r");
             break;
         case '\f':
-            sr_strbuf_append_str(strbuf, "\\f");
+            g_string_append(strbuf, "\\f");
             break;
         case '\b':
-            sr_strbuf_append_str(strbuf, "\\b");
+            g_string_append(strbuf, "\\b");
             break;
         case '\t':
-            sr_strbuf_append_str(strbuf, "\\t");
+            g_string_append(strbuf, "\\t");
             break;
         default:
-            sr_strbuf_append_char(strbuf, *c);
+            g_string_append_c(strbuf, *c);
         }
 
         ++c;
     }
 
-    return sr_strbuf_free_nobuf(strbuf);
+    return g_string_free(strbuf, FALSE);
 }
 
-struct sr_strbuf *
-sr_json_append_escaped(struct sr_strbuf *strbuf, const char *str)
+GString *
+sr_json_append_escaped(GString *strbuf, const char *str)
 {
     char *escaped_str = sr_json_escape(str);
-    sr_strbuf_append_char(strbuf, '\"');
-    sr_strbuf_append_str(strbuf, escaped_str);
-    sr_strbuf_append_char(strbuf, '\"');
+    g_string_append_c(strbuf, '\"');
+    g_string_append(strbuf, escaped_str);
+    g_string_append_c(strbuf, '\"');
     free(escaped_str);
 
     return strbuf;

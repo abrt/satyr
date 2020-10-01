@@ -386,7 +386,6 @@ AT_TESTFUN([sr_js_platform_parse_frame], [[
 #include "location.h"
 #include "utils.h"
 #include "json.h"
-#include "strbuf.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -413,10 +412,10 @@ AT_TESTFUN([sr_js_platform_parse_frame], [[
                                                                  &r_location); \
         assert(r_frame != NULL || !"Failed with " #i_engine ", " #i_runtime); \
         if (sr_js_frame_cmp(r_frame, e_frame) != 0) { \
-            struct sr_strbuf *buf = sr_strbuf_new(); \
+            GString *buf = g_string_new(NULL); \
             sr_js_frame_append_to_str(r_frame, buf); \
-            fprintf(stderr, "%s\n", buf->buf); \
-            sr_strbuf_free(buf); \
+            fprintf(stderr, "%s\n", buf->str); \
+            g_string_free(buf, TRUE); \
             assert(!"Failed with " #i_engine ", " #i_runtime ", " #i_frame_str); \
         } \
     } while (0)

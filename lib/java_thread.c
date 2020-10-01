@@ -22,7 +22,6 @@
 #include "java/frame.h"
 #include "location.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "json.h"
 #include "generic_thread.h"
 #include "stacktrace.h"
@@ -35,7 +34,7 @@
 
 static void
 java_append_bthash_text(struct sr_java_thread *thread, enum sr_bthash_flags flags,
-                        struct sr_strbuf *strbuf);
+                        GString *strbuf);
 
 DEFINE_FRAMES_FUNC(java_frames, struct sr_java_thread)
 DEFINE_SET_FRAMES_FUNC(java_set_frames, struct sr_java_thread)
@@ -271,32 +270,35 @@ sr_java_thread_remove_frames_below_n(struct sr_java_thread *thread,
 
 void
 sr_java_thread_append_to_str(struct sr_java_thread *thread,
-                             struct sr_strbuf *dest)
+                             GString *dest)
 {
-    struct sr_strbuf *exception = sr_strbuf_new();
+    GString *exception = g_string_new(NULL);
     struct sr_java_frame *frame = thread->frames;
     while (frame)
     {
         if (frame->is_exception && exception->len > 0)
         {
-            sr_strbuf_prepend_strf(dest, "Caused by: %s\t...\n",
-                                   exception->buf);
-            sr_strbuf_clear(exception);
+            gchar *caused_by = g_strdup_printf("Caused by: %s\t...\n", exception->str);
+            g_string_prepend(dest, caused_by);
+            g_string_erase(exception, 0, -1);
+            g_free(caused_by);
         }
 
         sr_java_frame_append_to_str(frame, exception);
-        sr_strbuf_append_char(exception, '\n');
+        g_string_append_c(exception, '\n');
 
         frame = frame->next;
     }
 
     if (exception->len > 0)
-        sr_strbuf_prepend_str(dest, exception->buf);
+        g_string_prepend(dest, exception->str);
 
-    sr_strbuf_prepend_strf(dest, "Exception in thread \"%s\" ",
-                            thread->name ? thread->name : "");
+    gchar *ex_in_thread = g_strdup_printf("Exception in thread \"%s\" ",
+                                          thread->name ? thread->name : "");
+    g_string_prepend(dest, ex_in_thread);
+    g_free(ex_in_thread);
 
-    sr_strbuf_free(exception);
+    g_string_free(exception, TRUE);
 }
 
 struct sr_java_thread *
@@ -344,65 +346,65 @@ char *
 sr_java_thread_format_funs(struct sr_java_thread *thread)
 {
     struct sr_java_frame *frame = thread->frames;
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
 
     while (frame)
     {
         if (frame->name)
         {
-            sr_strbuf_append_str(buf, frame->name);
-            sr_strbuf_append_char(buf, '\n');
+            g_string_append(buf, frame->name);
+            g_string_append_c(buf, '\n');
         }
 
         frame = frame->next;
     }
 
-    return sr_strbuf_free_nobuf(buf);
+    return g_string_free(buf, FALSE);
 }
 
 char *
 sr_java_thread_to_json(struct sr_java_thread *thread)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     if (thread->name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"name\": ");
+        g_string_append(strbuf, ",   \"name\": ");
         sr_json_append_escaped(strbuf, thread->name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (thread->frames)
     {
-        sr_strbuf_append_str(strbuf, ",   \"frames\":\n");
+        g_string_append(strbuf, ",   \"frames\":\n");
         struct sr_java_frame *frame = thread->frames;
         while (frame)
         {
             if (frame == thread->frames)
-                sr_strbuf_append_str(strbuf, "      [ ");
+                g_string_append(strbuf, "      [ ");
             else
-                sr_strbuf_append_str(strbuf, "      , ");
+                g_string_append(strbuf, "      , ");
 
             char *frame_json = sr_java_frame_to_json(frame);
             char *indented_frame_json = sr_indent_except_first_line(frame_json, 8);
-            sr_strbuf_append_str(strbuf, indented_frame_json);
+            g_string_append(strbuf, indented_frame_json);
             free(indented_frame_json);
             free(frame_json);
             frame = frame->next;
             if (frame)
-                sr_strbuf_append_str(strbuf, "\n");
+                g_string_append(strbuf, "\n");
         }
 
-        sr_strbuf_append_str(strbuf, " ]\n");
+        g_string_append(strbuf, " ]\n");
     }
 
     if (strbuf->len > 0)
-        strbuf->buf[0] = '{';
+        strbuf->str[0] = '{';
     else
-        sr_strbuf_append_char(strbuf, '{');
+        g_string_append_c(strbuf, '{');
 
-    sr_strbuf_append_char(strbuf, '}');
-    return sr_strbuf_free_nobuf(strbuf);
+    g_string_append_c(strbuf, '}');
+    return g_string_free(strbuf, FALSE);
 }
 
 struct sr_java_thread *
@@ -451,7 +453,7 @@ fail:
 
 static void
 java_append_bthash_text(struct sr_java_thread *thread, enum sr_bthash_flags flags,
-                        struct sr_strbuf *strbuf)
+                        GString *strbuf)
 {
-    sr_strbuf_append_strf(strbuf, "Thread %s\n", OR_UNKNOWN(thread->name));
+    g_string_append_printf(strbuf, "Thread %s\n", OR_UNKNOWN(thread->name));
 }

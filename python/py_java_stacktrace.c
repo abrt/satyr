@@ -2,7 +2,6 @@
 #include "py_java_stacktrace.h"
 #include "py_java_thread.h"
 #include "py_java_frame.h"
-#include "strbuf.h"
 #include "java/stacktrace.h"
 #include "java/thread.h"
 #include "location.h"
@@ -141,10 +140,10 @@ PyObject *
 sr_py_java_stacktrace_str(PyObject *self)
 {
     struct sr_py_java_stacktrace *this = (struct sr_py_java_stacktrace *)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_strf(buf, "Java stacktrace with %zd threads",
+    GString *buf = g_string_new(NULL);
+    g_string_append_printf(buf, "Java stacktrace with %zd threads",
                            (ssize_t)(PyList_Size(this->threads)));
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

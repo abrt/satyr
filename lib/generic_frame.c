@@ -39,7 +39,7 @@ static struct frame_methods* dtable[SR_REPORT_NUM] =
 };
 
 void
-sr_frame_append_to_str(struct sr_frame *frame, struct sr_strbuf *strbuf)
+sr_frame_append_to_str(struct sr_frame *frame, GString *strbuf)
 {
     DISPATCH(dtable, frame->type, append_to_str)(frame, strbuf);
 }
@@ -77,7 +77,7 @@ sr_frame_cmp_distance(struct sr_frame *frame1, struct sr_frame *frame2)
 
 void
 frame_append_bthash_text(struct sr_frame *frame, enum sr_bthash_flags flags,
-                         struct sr_strbuf *strbuf)
+                         GString *strbuf)
 {
     DISPATCH(dtable, frame->type, frame_append_bthash_text)
             (frame, flags, strbuf);
@@ -85,7 +85,7 @@ frame_append_bthash_text(struct sr_frame *frame, enum sr_bthash_flags flags,
 
 void
 frame_append_duphash_text(struct sr_frame *frame, enum sr_duphash_flags flags,
-                          struct sr_strbuf *strbuf)
+                          GString *strbuf)
 {
     DISPATCH(dtable, frame->type, frame_append_duphash_text)
             (frame, flags, strbuf);

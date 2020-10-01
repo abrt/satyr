@@ -23,7 +23,6 @@
 #include "py_js_stacktrace.h"
 #include "py_base_stacktrace.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "js/frame.h"
 #include "js/stacktrace.h"
 #include "location.h"
@@ -176,10 +175,10 @@ PyObject *
 sr_py_js_stacktrace_str(PyObject *self)
 {
     struct sr_py_js_stacktrace *this = (struct sr_py_js_stacktrace *)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_strf(buf, "JavaScript stacktrace with %zd frames",
+    GString *buf = g_string_new(NULL);
+    g_string_append_printf(buf, "JavaScript stacktrace with %zd frames",
                          (ssize_t)(PyList_Size(this->frames)));
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

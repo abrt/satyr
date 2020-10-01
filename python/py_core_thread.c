@@ -21,7 +21,6 @@
 #include "py_base_thread.h"
 #include "py_core_thread.h"
 #include "py_core_frame.h"
-#include "strbuf.h"
 #include "core/thread.h"
 #include "core/frame.h"
 #include "utils.h"
@@ -125,10 +124,10 @@ PyObject *
 sr_py_core_thread_str(PyObject *self)
 {
     struct sr_py_core_thread *this = (struct sr_py_core_thread *)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_strf(buf, "Thread with %zd frames", (ssize_t)(PyList_Size(this->frames)));
+    GString *buf = g_string_new(NULL);
+    g_string_append_printf(buf, "Thread with %zd frames", (ssize_t)(PyList_Size(this->frames)));
 
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

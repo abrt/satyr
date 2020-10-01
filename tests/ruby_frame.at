@@ -230,7 +230,6 @@ AT_TESTFUN([sr_ruby_frame_append_to_str],
 #include "ruby/frame.h"
 #include "utils.h"
 #include "location.h"
-#include "strbuf.h"
 #include <assert.h>
 
 int
@@ -245,9 +244,9 @@ main(void)
   struct sr_ruby_frame *frame1 = sr_ruby_frame_parse(&input, &location);
   assert(frame1);
 
-  struct sr_strbuf *strbuf = sr_strbuf_new();
+  GString *strbuf = g_string_new(NULL);
   sr_ruby_frame_append_to_str(frame1, strbuf);
-  char *result = sr_strbuf_free_nobuf(strbuf);
+  char *result = g_string_free(strbuf, FALSE);
 
   assert(0 == strcmp(result, "rescue in block (2 levels) in func in /usr/share/ruby/vendor_ruby/will_crash.rb:13"));
 
@@ -261,7 +260,6 @@ AT_TESTFUN([sr_ruby_frame_generic_functions],
 #include "frame.h"
 #include "utils.h"
 #include "location.h"
-#include "strbuf.h"
 #include <assert.h>
 
 int
@@ -278,9 +276,9 @@ main(void)
 
   assert(sr_frame_next(frame1) == NULL);
 
-  struct sr_strbuf *strbuf = sr_strbuf_new();
+  GString *strbuf = g_string_new(NULL);
   sr_frame_append_to_str((struct sr_frame*)frame1, strbuf);
-  char *result = sr_strbuf_free_nobuf(strbuf);
+  char *result = g_string_free(strbuf, FALSE);
 
   assert(0 == strcmp(result, "rescue in block (2 levels) in func in /usr/share/ruby/vendor_ruby/will_crash.rb:13"));
 

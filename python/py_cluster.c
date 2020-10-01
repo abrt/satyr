@@ -1,8 +1,8 @@
 #include "py_common.h"
 #include "py_cluster.h"
 #include "py_metrics.h"
-#include "strbuf.h"
 #include "cluster.h"
+#include <glib.h>
 
 #define dendrogram_doc "satyr.Dendrogram - a dendrogram created by clustering algorithm\n\n" \
                        "Usage: satyr.Dendrogram(distances) - creates new dendrogram from a distance matrix"
@@ -117,10 +117,10 @@ PyObject *
 sr_py_dendrogram_str(PyObject *self)
 {
     struct sr_py_dendrogram *this = (struct sr_py_dendrogram*)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_strf(buf, "Dendrogram with %d objects",
+    GString *buf = g_string_new(NULL);
+    g_string_append_printf(buf, "Dendrogram with %d objects",
                           this->dendrogram->size);
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

@@ -186,7 +186,6 @@ main(void)
 AT_TESTFUN([sr_java_frame_append_to_str],
 [[
 #include "java/frame.h"
-#include "strbuf.h"
 #include "utils.h"
 #include "frame.h"
 #include <assert.h>
@@ -196,23 +195,23 @@ AT_TESTFUN([sr_java_frame_append_to_str],
 void
 check(struct sr_java_frame *frame, const char *expected)
 {
-  struct sr_strbuf *buf = sr_strbuf_new();
+  GString *buf = g_string_new(NULL);
   sr_java_frame_append_to_str(frame, buf);
 
   printf(
 "<==============================================================================>\n"
 "%s == %s\n"
 "<==============================================================================>\n",
-  expected, buf->buf);
+  expected, buf->str);
 
-  assert(strcmp(expected, buf->buf) == 0);
+  assert(strcmp(expected, buf->str) == 0);
 
-  struct sr_strbuf *buf2 = sr_strbuf_new();
+  GString *buf2 = g_string_new(NULL);
   sr_frame_append_to_str((struct sr_frame*)frame, buf2);
-  assert(strcmp(expected, buf2->buf) == 0);
+  assert(strcmp(expected, buf2->str) == 0);
 
-  sr_strbuf_free(buf);
-  sr_strbuf_free(buf2);
+  g_string_free(buf, TRUE);
+  g_string_free(buf2, TRUE);
 }
 
 int
@@ -276,7 +275,6 @@ AT_TESTFUN([sr_java_frame_parse],
 [[
 #include "java/frame.h"
 #include "location.h"
-#include "strbuf.h"
 #include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -296,7 +294,7 @@ check(char *input,
   assert(input == expected_input);
   if (frame)
   {
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
     sr_java_frame_append_to_str(frame, buf);
 
     char *tmp_input = sr_strdup(old_input);
@@ -305,7 +303,7 @@ check(char *input,
         tmp_input[len-1] = '\0';
 
     const char *fr1 = sr_skip_whitespace(tmp_input);
-    const char *fr2 = sr_skip_whitespace(buf->buf);
+    const char *fr2 = sr_skip_whitespace(buf->str);
 
     printf("<==============================================================================>\n");
     printf("'%s' == '%s'\n", fr1, fr2);
@@ -316,7 +314,7 @@ check(char *input,
      */
 
     free(tmp_input);
-    sr_strbuf_free(buf);
+    g_string_free(buf, TRUE);
 
     assert(0 == sr_java_frame_cmp(frame, expected_frame));
     puts(sr_location_to_string(&location));
@@ -510,7 +508,6 @@ AT_TESTFUN([sr_java_frame_parse_exception],
 [[
 #include "java/frame.h"
 #include "location.h"
-#include "strbuf.h"
 #include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -536,10 +533,10 @@ check(char *input,
   puts(sr_location_to_string(expected_location));
   if (frame)
   {
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
     sr_java_frame_append_to_str(frame, buf);
 
-    const char *fr2 = buf->buf;
+    const char *fr2 = buf->str;
 
     printf("<==============================================================================>\n");
     printf("'%s' == '%s'\n", expected, fr2);
@@ -547,7 +544,7 @@ check(char *input,
 
     assert(strcmp(expected, fr2) == 0);
 
-    sr_strbuf_free(buf);
+    g_string_free(buf, TRUE);
 
     struct sr_java_frame *tmp_expected = expected_frame;
     struct sr_java_frame *parsed = frame;

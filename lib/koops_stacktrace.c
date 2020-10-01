@@ -21,7 +21,6 @@
 #include "koops/frame.h"
 #include "utils.h"
 #include "json.h"
-#include "strbuf.h"
 #include "normalize.h"
 #include "generic_thread.h"
 #include "generic_stacktrace.h"
@@ -61,7 +60,7 @@ struct sr_taint_flag sr_flags[] = {
 
 static void
 koops_append_bthash_text(struct sr_koops_stacktrace *stacktrace,
-                         enum sr_bthash_flags flags, struct sr_strbuf *strbuf);
+                         enum sr_bthash_flags flags, GString *strbuf);
 
 DEFINE_FRAMES_FUNC(koops_frames, struct sr_koops_stacktrace)
 DEFINE_SET_FRAMES_FUNC(koops_set_frames, struct sr_koops_stacktrace)
@@ -516,7 +515,7 @@ sr_koops_stacktrace_parse_modules(const char **input)
 static char *
 taint_flags_to_json(struct sr_koops_stacktrace *stacktrace)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     struct sr_taint_flag *f;
     for (f = sr_flags; f->letter; f++)
@@ -524,18 +523,18 @@ taint_flags_to_json(struct sr_koops_stacktrace *stacktrace)
         bool val = *(bool *)((void *)stacktrace + f->member_offset);
         if (val == true)
         {
-            sr_strbuf_append_strf(strbuf, ", \"%s\"\n", f->name);
+            g_string_append_printf(strbuf, ", \"%s\"\n", f->name);
         }
     }
 
     if (strbuf->len == 0)
     {
-        sr_strbuf_free(strbuf);
+        g_string_free(strbuf, TRUE);
         return sr_strdup("[]");
     }
 
-    sr_strbuf_append_char(strbuf, ']');
-    char *result = sr_strbuf_free_nobuf(strbuf);
+    g_string_append_c(strbuf, ']');
+    char *result = g_string_free(strbuf, FALSE);
     result[0] = '[';
     result[strlen(result) - 2] = ' '; /* erase the last newline */
     return result;
@@ -544,84 +543,84 @@ taint_flags_to_json(struct sr_koops_stacktrace *stacktrace)
 char *
 sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     /* Raw oops. */
     if (stacktrace->raw_oops)
     {
-        sr_strbuf_append_str(strbuf, ",   \"raw_oops\": ");
+        g_string_append(strbuf, ",   \"raw_oops\": ");
         sr_json_append_escaped(strbuf, stacktrace->raw_oops);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     /* Kernel version. */
     if (stacktrace->version)
     {
-        sr_strbuf_append_str(strbuf, ",   \"version\": ");
+        g_string_append(strbuf, ",   \"version\": ");
         sr_json_append_escaped(strbuf, stacktrace->version);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     /* Kernel taint flags. */
     char *taint_flags = taint_flags_to_json(stacktrace);
     char *indented_taint_flags = sr_indent_except_first_line(taint_flags, strlen(",   \"taint_flags\": "));
     free(taint_flags);
-    sr_strbuf_append_strf(strbuf, ",   \"taint_flags\": %s\n", indented_taint_flags);
+    g_string_append_printf(strbuf, ",   \"taint_flags\": %s\n", indented_taint_flags);
     free(indented_taint_flags);
 
     /* Modules. */
     if (stacktrace->modules)
     {
-        sr_strbuf_append_strf(strbuf, ",   \"modules\":\n");
-        sr_strbuf_append_str(strbuf, "      [ ");
+        g_string_append_printf(strbuf, ",   \"modules\":\n");
+        g_string_append(strbuf, "      [ ");
 
         char **module = stacktrace->modules;
         while (*module)
         {
             if (module != stacktrace->modules)
-                sr_strbuf_append_str(strbuf, "      , ");
+                g_string_append(strbuf, "      , ");
 
             sr_json_append_escaped(strbuf, *module);
             ++module;
             if (*module)
-                sr_strbuf_append_str(strbuf, "\n");
+                g_string_append(strbuf, "\n");
         }
 
-        sr_strbuf_append_str(strbuf, " ]\n");
+        g_string_append(strbuf, " ]\n");
     }
 
     /* Frames. */
     if (stacktrace->frames)
     {
         struct sr_koops_frame *frame = stacktrace->frames;
-        sr_strbuf_append_str(strbuf, ",   \"frames\":\n");
+        g_string_append(strbuf, ",   \"frames\":\n");
         while (frame)
         {
             if (frame == stacktrace->frames)
-                sr_strbuf_append_str(strbuf, "      [ ");
+                g_string_append(strbuf, "      [ ");
             else
-                sr_strbuf_append_str(strbuf, "      , ");
+                g_string_append(strbuf, "      , ");
 
             char *frame_json = sr_koops_frame_to_json(frame);
             char *indented_frame_json = sr_indent_except_first_line(frame_json, 8);
-            sr_strbuf_append_str(strbuf, indented_frame_json);
+            g_string_append(strbuf, indented_frame_json);
             free(indented_frame_json);
             free(frame_json);
             frame = frame->next;
             if (frame)
-                sr_strbuf_append_str(strbuf, "\n");
+                g_string_append(strbuf, "\n");
         }
 
-        sr_strbuf_append_str(strbuf, " ]\n");
+        g_string_append(strbuf, " ]\n");
     }
 
     if (strbuf->len > 0)
-        strbuf->buf[0] = '{';
+        strbuf->str[0] = '{';
     else
-        sr_strbuf_append_char(strbuf, '{');
+        g_string_append_c(strbuf, '{');
 
-    sr_strbuf_append_char(strbuf, '}');
-    return sr_strbuf_free_nobuf(strbuf);
+    g_string_append_c(strbuf, '}');
+    return g_string_free(strbuf, FALSE);
 }
 
 struct sr_koops_stacktrace *
@@ -755,7 +754,7 @@ char *
 sr_koops_stacktrace_get_reason(struct sr_koops_stacktrace *stacktrace)
 {
     char *func = "<unknown>";
-    struct sr_strbuf *result = sr_strbuf_new();
+    GString *result = g_string_new(NULL);
 
     struct sr_koops_stacktrace *copy = sr_koops_stacktrace_dup(stacktrace);
     sr_normalize_koops_stacktrace(copy);
@@ -766,50 +765,50 @@ sr_koops_stacktrace_get_reason(struct sr_koops_stacktrace *stacktrace)
     if (stacktrace->reason)
     {
         if (strstr(stacktrace->reason, "general protection fault: "))
-            result = sr_strbuf_append_strf(result, "general protection fault in %s", func);
+            g_string_append_printf(result, "general protection fault in %s", func);
         else if (strstr(stacktrace->reason, "kernel paging request at"))
-            result = sr_strbuf_append_strf(result, "kernel paging request at %s", func);
+            g_string_append_printf(result, "kernel paging request at %s", func);
         else
-            result = sr_strbuf_append_str(result, stacktrace->reason);
+            g_string_append(result, stacktrace->reason);
     }
     else
     {
-        result = sr_strbuf_append_strf(result, "Kernel oops in %s", func);
+        g_string_append_printf(result, "Kernel oops in %s", func);
     }
 
     if (copy->frames && copy->frames->module_name)
-        result = sr_strbuf_append_strf(result, " [%s]", copy->frames->module_name);
+        g_string_append_printf(result, " [%s]", copy->frames->module_name);
 
     sr_koops_stacktrace_free(copy);
 
-    return sr_strbuf_free_nobuf(result);
+    return g_string_free(result, FALSE);
 }
 
 static void
 koops_append_bthash_text(struct sr_koops_stacktrace *stacktrace,
-                         enum sr_bthash_flags flags, struct sr_strbuf *strbuf)
+                         enum sr_bthash_flags flags, GString *strbuf)
 {
-    sr_strbuf_append_strf(strbuf, "Version: %s\n", OR_UNKNOWN(stacktrace->version));
+    g_string_append_printf(strbuf, "Version: %s\n", OR_UNKNOWN(stacktrace->version));
 
-    sr_strbuf_append_str(strbuf, "Flags: ");
+    g_string_append(strbuf, "Flags: ");
     for (struct sr_taint_flag *f = sr_flags; f->letter; f++)
     {
         bool val = *(bool *)((void *)stacktrace + f->member_offset);
         if (val == false)
             continue;
     }
-    sr_strbuf_append_char(strbuf, '\n');
+    g_string_append_c(strbuf, '\n');
 
-    sr_strbuf_append_str(strbuf, "Modules: ");
+    g_string_append(strbuf, "Modules: ");
     for (char **mod = stacktrace->modules; mod && *mod; mod++)
     {
-        sr_strbuf_append_str(strbuf, *mod);
+        g_string_append(strbuf, *mod);
         if (*(mod+1))
-            sr_strbuf_append_str(strbuf, ", ");
+            g_string_append(strbuf, ", ");
     }
-    sr_strbuf_append_char(strbuf, '\n');
+    g_string_append_c(strbuf, '\n');
 
-    sr_strbuf_append_char(strbuf, '\n');
+    g_string_append_c(strbuf, '\n');
 }
 
 void

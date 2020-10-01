@@ -22,7 +22,6 @@
 #include "java/thread.h"
 #include "java/frame.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "json.h"
 #include "generic_stacktrace.h"
 #include "internal_utils.h"
@@ -34,7 +33,7 @@
 
 static void
 java_append_bthash_text(struct sr_java_stacktrace *stacktrace, enum sr_bthash_flags flags,
-                        struct sr_strbuf *strbuf)
+                        GString *strbuf)
 {
     /* nop */
 }
@@ -162,35 +161,35 @@ sr_java_stacktrace_parse(const char **input, struct sr_location *location)
 char *
 sr_java_stacktrace_to_json(struct sr_java_stacktrace *stacktrace)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
-    sr_strbuf_append_str(strbuf, "{   \"threads\":");
+    g_string_append(strbuf, "{   \"threads\":");
     if (stacktrace->threads)
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     else
-        sr_strbuf_append_str(strbuf, " [");
+        g_string_append(strbuf, " [");
 
     struct sr_java_thread *thread = stacktrace->threads;
     while (thread)
     {
         if (thread == stacktrace->threads)
-            sr_strbuf_append_str(strbuf, "      [ ");
+            g_string_append(strbuf, "      [ ");
         else
-            sr_strbuf_append_str(strbuf, "      , ");
+            g_string_append(strbuf, "      , ");
 
         char *thread_json = sr_java_thread_to_json(thread);
         char *indented_thread_json = sr_indent_except_first_line(thread_json, 8);
-        sr_strbuf_append_str(strbuf, indented_thread_json);
+        g_string_append(strbuf, indented_thread_json);
         free(indented_thread_json);
         free(thread_json);
         thread = thread->next;
         if (thread)
-            sr_strbuf_append_str(strbuf, "\n");
+            g_string_append(strbuf, "\n");
     }
 
-    sr_strbuf_append_str(strbuf, " ]\n");
-    sr_strbuf_append_char(strbuf, '}');
-    return sr_strbuf_free_nobuf(strbuf);
+    g_string_append(strbuf, " ]\n");
+    g_string_append_c(strbuf, '}');
+    return g_string_free(strbuf, FALSE);
 }
 
 struct sr_java_stacktrace *

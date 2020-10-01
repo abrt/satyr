@@ -23,7 +23,6 @@
 #include "utils.h"
 #include "sha1.h"
 #include "report_type.h"
-#include "strbuf.h"
 #include "generic_stacktrace.h"
 #include "generic_thread.h"
 #include "internal_utils.h"
@@ -36,7 +35,7 @@
 
 static void
 ruby_append_bthash_text(struct sr_ruby_stacktrace *stacktrace, enum sr_bthash_flags flags,
-                          struct sr_strbuf *strbuf);
+                          GString *strbuf);
 
 DEFINE_FRAMES_FUNC(ruby_frames, struct sr_ruby_stacktrace)
 DEFINE_SET_FRAMES_FUNC(ruby_set_frames, struct sr_ruby_stacktrace)
@@ -274,48 +273,48 @@ fail:
 char *
 sr_ruby_stacktrace_to_json(struct sr_ruby_stacktrace *stacktrace)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     /* Exception class name. */
     if (stacktrace->exception_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"exception_name\": ");
+        g_string_append(strbuf, ",   \"exception_name\": ");
         sr_json_append_escaped(strbuf, stacktrace->exception_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     /* Frames. */
     if (stacktrace->frames)
     {
         struct sr_ruby_frame *frame = stacktrace->frames;
-        sr_strbuf_append_str(strbuf, ",   \"stacktrace\":\n");
+        g_string_append(strbuf, ",   \"stacktrace\":\n");
         while (frame)
         {
             if (frame == stacktrace->frames)
-                sr_strbuf_append_str(strbuf, "      [ ");
+                g_string_append(strbuf, "      [ ");
             else
-                sr_strbuf_append_str(strbuf, "      , ");
+                g_string_append(strbuf, "      , ");
 
             char *frame_json = sr_ruby_frame_to_json(frame);
             char *indented_frame_json = sr_indent_except_first_line(frame_json, 8);
-            sr_strbuf_append_str(strbuf, indented_frame_json);
+            g_string_append(strbuf, indented_frame_json);
             free(indented_frame_json);
             free(frame_json);
             frame = frame->next;
             if (frame)
-                sr_strbuf_append_str(strbuf, "\n");
+                g_string_append(strbuf, "\n");
         }
 
-        sr_strbuf_append_str(strbuf, " ]\n");
+        g_string_append(strbuf, " ]\n");
     }
 
     if (strbuf->len > 0)
-        strbuf->buf[0] = '{';
+        strbuf->str[0] = '{';
     else
-        sr_strbuf_append_char(strbuf, '{');
+        g_string_append_c(strbuf, '{');
 
-    sr_strbuf_append_char(strbuf, '}');
-    return sr_strbuf_free_nobuf(strbuf);
+    g_string_append_c(strbuf, '}');
+    return g_string_free(strbuf, FALSE);
 }
 
 struct sr_ruby_stacktrace *
@@ -385,8 +384,8 @@ sr_ruby_stacktrace_get_reason(struct sr_ruby_stacktrace *stacktrace)
 
 static void
 ruby_append_bthash_text(struct sr_ruby_stacktrace *stacktrace, enum sr_bthash_flags flags,
-                        struct sr_strbuf *strbuf)
+                        GString *strbuf)
 {
-    sr_strbuf_append_strf(strbuf, "Exception: %s\n", OR_UNKNOWN(stacktrace->exception_name));
-    sr_strbuf_append_char(strbuf, '\n');
+    g_string_append_printf(strbuf, "Exception: %s\n", OR_UNKNOWN(stacktrace->exception_name));
+    g_string_append_c(strbuf, '\n');
 }

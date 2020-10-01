@@ -34,8 +34,8 @@ extern "C" {
 #include <json.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <glib.h>
 
-struct sr_strbuf;
 
 /**
  * @brief Kernel oops stack frame.
@@ -248,7 +248,7 @@ sr_koops_frame_from_json(json_object *root, char **error_message);
  */
 void
 sr_koops_frame_append_to_str(struct sr_koops_frame *frame,
-                             struct sr_strbuf *dest);
+                             GString *dest);
 
 #ifdef __cplusplus
 }

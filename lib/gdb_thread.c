@@ -23,7 +23,6 @@
 #include "normalize.h"
 #include "location.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "generic_thread.h"
 #include "stacktrace.h"
 #include "internal_utils.h"
@@ -35,7 +34,7 @@
 
 static void
 gdb_append_bthash_text(struct sr_gdb_thread *thread, enum sr_bthash_flags flags,
-                       struct sr_strbuf *strbuf);
+                       GString *strbuf);
 
 DEFINE_FRAMES_FUNC(gdb_frames, struct sr_gdb_thread)
 DEFINE_SET_FRAMES_FUNC(gdb_set_frames, struct sr_gdb_thread)
@@ -283,25 +282,25 @@ sr_gdb_thread_remove_frames_below_n(struct sr_gdb_thread *thread,
 
 void
 sr_gdb_thread_append_to_str(struct sr_gdb_thread *thread,
-                            struct sr_strbuf *dest,
+                            GString *dest,
                             bool verbose)
 {
     int frame_count = sr_thread_frame_count(
             (struct sr_thread*) thread);
     if (verbose)
     {
-        sr_strbuf_append_strf(dest, "Thread no. %"PRIu32" (%d frames)\n",
+        g_string_append_printf(dest, "Thread no. %"PRIu32" (%d frames)\n",
                               thread->number,
                               frame_count);
     }
     else
-        sr_strbuf_append_str(dest, "Thread\n");
+        g_string_append(dest, "Thread\n");
 
     struct sr_gdb_frame *frame = thread->frames;
     while (frame)
     {
         sr_gdb_frame_append_to_str(frame, dest, verbose);
-        sr_strbuf_append_char(dest, '\n');
+        g_string_append_c(dest, '\n');
         frame = frame->next;
     }
 }
@@ -501,25 +500,25 @@ char *
 sr_gdb_thread_format_funs(struct sr_gdb_thread *thread)
 {
     struct sr_gdb_frame *frame = thread->frames;
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
 
     while (frame)
     {
         if (frame->function_name)
         {
-            sr_strbuf_append_str(buf, frame->function_name);
+            g_string_append(buf, frame->function_name);
             if (frame->library_name)
             {
-                sr_strbuf_append_char(buf, ' ');
-                sr_strbuf_append_str(buf, frame->library_name);
+                g_string_append_c(buf, ' ');
+                g_string_append(buf, frame->library_name);
             }
-            sr_strbuf_append_char(buf, '\n');
+            g_string_append_c(buf, '\n');
         }
 
         frame = frame->next;
     }
 
-    return sr_strbuf_free_nobuf(buf);
+    return g_string_free(buf, FALSE);
 }
 
 void
@@ -583,7 +582,7 @@ sr_gdb_thread_get_optimized(struct sr_gdb_thread *thread,
 
 static void
 gdb_append_bthash_text(struct sr_gdb_thread *thread, enum sr_bthash_flags flags,
-                       struct sr_strbuf *strbuf)
+                       GString *strbuf)
 {
-    sr_strbuf_append_strf(strbuf, "Thread %"PRIu32"\n", thread->number);
+    g_string_append_printf(strbuf, "Thread %"PRIu32"\n", thread->number);
 }

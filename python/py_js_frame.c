@@ -21,7 +21,6 @@
 #include "py_base_frame.h"
 #include "py_js_frame.h"
 #include "location.h"
-#include "strbuf.h"
 #include "utils.h"
 #include "js/frame.h"
 
@@ -161,32 +160,32 @@ PyObject *
 sr_py_js_frame_str(PyObject *self)
 {
     struct sr_py_js_frame *this = (struct sr_py_js_frame*)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
 
-    sr_strbuf_append_str(buf, "at ");
+    g_string_append(buf, "at ");
 
     if (this->frame->function_name)
     {
-        sr_strbuf_append_strf(buf, "%s (", this->frame->function_name);
+        g_string_append_printf(buf, "%s (", this->frame->function_name);
     }
 
     if (this->frame->file_name)
     {
-        sr_strbuf_append_str(buf, this->frame->file_name);
+        g_string_append(buf, this->frame->file_name);
     }
     else
     {
-        sr_strbuf_append_str(buf, "<unknown>");
+        g_string_append(buf, "<unknown>");
     }
 
-    sr_strbuf_append_strf(buf, ":%d:%d", this->frame->file_line, this->frame->line_column);
+    g_string_append_printf(buf, ":%d:%d", this->frame->file_line, this->frame->line_column);
 
     if (this->frame->function_name)
     {
-        sr_strbuf_append_str(buf, ")");
+        g_string_append(buf, ")");
     }
 
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

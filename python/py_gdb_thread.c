@@ -2,7 +2,6 @@
 #include "py_base_thread.h"
 #include "py_gdb_thread.h"
 #include "py_gdb_frame.h"
-#include "strbuf.h"
 #include "gdb/thread.h"
 #include "gdb/frame.h"
 #include "location.h"
@@ -171,11 +170,11 @@ PyObject *
 sr_py_gdb_thread_str(PyObject *self)
 {
     struct sr_py_gdb_thread *this = (struct sr_py_gdb_thread *)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_strf(buf, "Thread #%u with %zd frames",
+    GString *buf = g_string_new(NULL);
+    g_string_append_printf(buf, "Thread #%u with %zd frames",
                            this->thread->number,
                            (ssize_t)(PyList_Size(this->frames)));
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

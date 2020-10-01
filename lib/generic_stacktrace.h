@@ -23,8 +23,6 @@
 #include "stacktrace.h"
 #include "thread.h"
 
-struct sr_strbuf;
-
 typedef struct sr_stacktrace* (*parse_fn_t)(const char *, char **);
 typedef struct sr_stacktrace* (*parse_location_fn_t)(const char **, struct sr_location *);
 typedef char* (*to_short_text_fn_t)(struct sr_stacktrace*, int);
@@ -36,7 +34,7 @@ typedef struct sr_thread* (*threads_fn_t)(struct sr_stacktrace *);
 typedef void (*set_threads_fn_t)(struct sr_stacktrace *, struct sr_thread *);
 typedef void (*stacktrace_free_fn_t)(struct sr_stacktrace *);
 typedef void (*stacktrace_append_bthash_text_fn_t)(struct sr_stacktrace *, enum sr_bthash_flags,
-                                                   struct sr_strbuf *);
+                                                   GString *);
 
 struct stacktrace_methods
 {

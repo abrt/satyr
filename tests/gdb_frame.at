@@ -112,7 +112,6 @@ main(void)
 AT_TESTFUN([sr_gdb_frame_parseadd_operator],
 [[
 #include "gdb/frame.h"
-#include "strbuf.h"
 #include <assert.h>
 #include <string.h>
 
@@ -121,7 +120,7 @@ check(char *input, int parsed_length)
 {
   printf("Testing '%s' -> %d\n", input, parsed_length);
   char *old_input = input;
-  struct sr_strbuf *strbuf = sr_strbuf_new();
+  GString *strbuf = g_string_new(NULL);
   assert(parsed_length == sr_gdb_frame_parseadd_operator(&input, strbuf));
   printf("  input = '%s', old_input = '%s'\n", input, old_input);
 
@@ -129,10 +128,10 @@ check(char *input, int parsed_length)
   assert(*input == old_input[parsed_length]);
 
   /* Check that the strbuf has been modified accordingly to what was parsed. */
-  assert(0 == strncmp(strbuf->buf, old_input, parsed_length));
+  assert(0 == strncmp(strbuf->str, old_input, parsed_length));
   assert(strbuf->len == parsed_length);
 
-  sr_strbuf_free(strbuf);
+  g_string_free(strbuf, TRUE);
 }
 
 int

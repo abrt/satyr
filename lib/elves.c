@@ -20,7 +20,6 @@
 #include "elves.h"
 #include "utils.h"
 #include "config.h"
-#include "strbuf.h"
 
 #if (defined HAVE_LIBDW && defined HAVE_LIBELF)
 #  define WITH_ELFUTILS
@@ -36,6 +35,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <inttypes.h>
+#include <glib.h>
 
 /**
  * Finds a section by its name in an ELF file.
@@ -848,7 +848,7 @@ char *
 sr_elf_fde_to_json(struct sr_elf_fde *fde,
                    bool recursive)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     if (recursive)
     {
@@ -856,36 +856,36 @@ sr_elf_fde_to_json(struct sr_elf_fde *fde,
         while (loop)
         {
             if (loop == fde)
-                sr_strbuf_append_str(strbuf, "[ ");
+                g_string_append(strbuf, "[ ");
             else
-                sr_strbuf_append_str(strbuf, ", ");
+                g_string_append(strbuf, ", ");
 
             char *fde_json = sr_elf_fde_to_json(loop, false);
             char *indented_fde_json = sr_indent_except_first_line(fde_json, 2);
-            sr_strbuf_append_str(strbuf, indented_fde_json);
+            g_string_append(strbuf, indented_fde_json);
             free(indented_fde_json);
             free(fde_json);
             loop = loop->next;
             if (loop)
-                sr_strbuf_append_str(strbuf, "\n");
+                g_string_append(strbuf, "\n");
         }
 
-        sr_strbuf_append_str(strbuf, " ]");
+        g_string_append(strbuf, " ]");
     }
     else
     {
         /* Start address. */
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               "{   \"start_address\": %"PRIu64"\n",
                               fde->start_address);
 
         /* Length. */
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               ",   \"length\": %"PRIu64"\n",
                               fde->length);
 
-        sr_strbuf_append_str(strbuf, "}");
+        g_string_append(strbuf, "}");
     }
 
-    return sr_strbuf_free_nobuf(strbuf);
+    return g_string_free(strbuf, FALSE);
 }

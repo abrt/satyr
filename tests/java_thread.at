@@ -223,7 +223,6 @@ AT_TESTFUN([sr_java_thread_parse],
 #include "java/thread.h"
 #include "java/frame.h"
 #include "location.h"
-#include "strbuf.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -244,12 +243,12 @@ check(const char *input,
   assert(!expected_thread || thread);
   if (thread)
   {
-    struct sr_strbuf *output = sr_strbuf_new();
+    GString *output = g_string_new(NULL);
     sr_java_thread_append_to_str(thread, output);
     printf("--------------------------------------------------------------------------------\n"
-         "Parsed :\n%s", output->buf);
+         "Parsed :\n%s", output->str);
 
-    sr_strbuf_free(output);
+    g_string_free(output, TRUE);
 
     assert(*input == '\0');
     assert(0 == sr_java_thread_cmp(thread, expected_thread));

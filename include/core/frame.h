@@ -33,8 +33,8 @@ extern "C" {
 #include <inttypes.h>
 #include <json.h>
 #include <stdbool.h>
+#include <glib.h>
 
-struct sr_strbuf;
 struct sr_location;
 
 /**
@@ -216,7 +216,7 @@ sr_core_frame_from_json(json_object *root,
  */
 void
 sr_core_frame_append_to_str(struct sr_core_frame *frame,
-                            struct sr_strbuf *dest);
+                            GString *dest);
 
 #ifdef __cplusplus
 }

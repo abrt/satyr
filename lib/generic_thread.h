@@ -32,7 +32,7 @@ typedef int (*frame_count_fn_t)(struct sr_thread*);
 typedef struct sr_thread* (*next_thread_fn_t)(struct sr_thread*);
 typedef void (*set_next_thread_fn_t)(struct sr_thread*, struct sr_thread*);
 typedef void (*thread_append_bthash_text_fn_t)(struct sr_thread*, enum sr_bthash_flags,
-                                               struct sr_strbuf*);
+                                               GString*);
 typedef void (*thread_free_fn_t)(struct sr_thread*);
 typedef void (*normalize_fn_t)(struct sr_thread*);
 typedef bool (*remove_frame_fn_t)(struct sr_thread*, struct sr_frame*);
@@ -88,7 +88,7 @@ thread_no_next_thread(struct sr_thread *thread);
 
 void
 thread_no_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
-                      struct sr_strbuf *strbuf);
+                      GString *strbuf);
 
 void
 thread_no_normalization(struct sr_thread *thread);
@@ -96,6 +96,6 @@ thread_no_normalization(struct sr_thread *thread);
 /* Uses dispatch table but not intended for public use. */
 void
 thread_append_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
-                          struct sr_strbuf *strbuf);
+                          GString *strbuf);
 
 #endif

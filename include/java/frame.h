@@ -34,8 +34,8 @@ extern "C" {
 #include <json.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <glib.h>
 
-struct sr_strbuf;
 struct sr_location;
 
 struct sr_java_frame
@@ -215,7 +215,7 @@ sr_java_frame_cmp_distance(struct sr_java_frame *frame1,
  */
 void
 sr_java_frame_append_to_str(struct sr_java_frame *frame,
-                            struct sr_strbuf *dest);
+                            GString *dest);
 
 /**
  * If the input contains proper exception with frames, parse the exception,

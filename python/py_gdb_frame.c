@@ -24,7 +24,6 @@
 #include <inttypes.h>
 
 #include "location.h"
-#include "strbuf.h"
 #include "utils.h"
 #include "gdb/frame.h"
 
@@ -219,19 +218,19 @@ PyObject *
 sr_py_gdb_frame_str(PyObject *self)
 {
     struct sr_py_gdb_frame *this = (struct sr_py_gdb_frame*)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_strf(buf, "Frame #%u: ", this->frame->number);
+    GString *buf = g_string_new(NULL);
+    g_string_append_printf(buf, "Frame #%u: ", this->frame->number);
     if (!this->frame->function_name)
-        sr_strbuf_append_str(buf, "signal handler");
+        g_string_append(buf, "signal handler");
     else if (strncmp("??", this->frame->function_name, strlen("??")) == 0)
-        sr_strbuf_append_str(buf, "unknown function");
+        g_string_append(buf, "unknown function");
     else
-        sr_strbuf_append_strf(buf, "function %s", this->frame->function_name);
+        g_string_append_printf(buf, "function %s", this->frame->function_name);
     if (this->frame->address != (sr_py_gdb_frame_address_t) -1)
-        sr_strbuf_append_strf(buf, " @ 0x%016"PRIx64, this->frame->address);
+        g_string_append_printf(buf, " @ 0x%016"PRIx64, this->frame->address);
     if (this->frame->library_name)
-        sr_strbuf_append_strf(buf, " (%s)", this->frame->library_name);
-    char *str = sr_strbuf_free_nobuf(buf);
+        g_string_append_printf(buf, " (%s)", this->frame->library_name);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

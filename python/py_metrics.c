@@ -1,8 +1,9 @@
 #include "py_metrics.h"
 #include "py_base_thread.h"
 #include "py_common.h"
-#include "strbuf.h"
+#include "utils.h"
 #include "distance.h"
+#include <glib.h>
 
 #define distances_doc "satyr.Distances - class representing distances between objects\n\n" \
                       "Usage:\n\n" \
@@ -277,10 +278,10 @@ PyObject *
 sr_py_distances_str(PyObject *self)
 {
     struct sr_py_distances *this = (struct sr_py_distances *)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_strf(buf, "%d-by-%d distance matrix",
+    GString *buf = g_string_new(NULL);
+    g_string_append_printf(buf, "%d-by-%d distance matrix",
                            this->distances->m, this->distances->n);
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

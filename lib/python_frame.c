@@ -20,7 +20,6 @@
 #include "python/frame.h"
 #include "utils.h"
 #include "location.h"
-#include "strbuf.h"
 #include "json.h"
 #include "generic_frame.h"
 #include "thread.h"
@@ -33,10 +32,10 @@
 
 static void
 python_append_bthash_text(struct sr_python_frame *frame, enum sr_bthash_flags flags,
-                          struct sr_strbuf *strbuf);
+                          GString *strbuf);
 static void
 python_append_duphash_text(struct sr_python_frame *frame, enum sr_duphash_flags flags,
-                           struct sr_strbuf *strbuf);
+                           GString *strbuf);
 
 DEFINE_NEXT_FUNC(python_next, struct sr_frame, struct sr_python_frame)
 DEFINE_SET_NEXT_FUNC(python_set_next, struct sr_frame, struct sr_python_frame)
@@ -323,24 +322,24 @@ fail:
 char *
 sr_python_frame_to_json(struct sr_python_frame *frame)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     /* Source file name / special file. */
     if (frame->file_name)
     {
         if (frame->special_file)
-            sr_strbuf_append_str(strbuf, ",   \"special_file\": ");
+            g_string_append(strbuf, ",   \"special_file\": ");
         else
-            sr_strbuf_append_str(strbuf, ",   \"file_name\": ");
+            g_string_append(strbuf, ",   \"file_name\": ");
 
         sr_json_append_escaped(strbuf, frame->file_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     /* Source file line. */
     if (frame->file_line)
     {
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               ",   \"file_line\": %"PRIu32"\n",
                               frame->file_line);
     }
@@ -349,25 +348,25 @@ sr_python_frame_to_json(struct sr_python_frame *frame)
     if (frame->function_name)
     {
         if (frame->special_function)
-            sr_strbuf_append_str(strbuf, ",   \"special_function\": ");
+            g_string_append(strbuf, ",   \"special_function\": ");
         else
-            sr_strbuf_append_str(strbuf, ",   \"function_name\": ");
+            g_string_append(strbuf, ",   \"function_name\": ");
 
         sr_json_append_escaped(strbuf, frame->function_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     /* Line contents. */
     if (frame->line_contents)
     {
-        sr_strbuf_append_str(strbuf, ",   \"line_contents\": ");
+        g_string_append(strbuf, ",   \"line_contents\": ");
         sr_json_append_escaped(strbuf, frame->line_contents);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
-    strbuf->buf[0] = '{';
-    sr_strbuf_append_char(strbuf, '}');
-    return sr_strbuf_free_nobuf(strbuf);
+    strbuf->str[0] = '{';
+    g_string_append_c(strbuf, '}');
+    return g_string_free(strbuf, FALSE);
 }
 
 struct sr_python_frame *
@@ -447,24 +446,24 @@ fail:
 
 void
 sr_python_frame_append_to_str(struct sr_python_frame *frame,
-                              struct sr_strbuf *dest)
+                              GString *dest)
 {
     if (frame->file_name)
     {
-        sr_strbuf_append_strf(dest, "[%s%s%s",
+        g_string_append_printf(dest, "[%s%s%s",
                               (frame->special_file ? "<" : ""),
                               frame->file_name,
                               (frame->special_file ? ">" : ""));
 
         if (frame->file_line)
         {
-            sr_strbuf_append_strf(dest, ":%"PRIu32, frame->file_line);
+            g_string_append_printf(dest, ":%"PRIu32, frame->file_line);
         }
 
-        sr_strbuf_append_str(dest, "]");
+        g_string_append(dest, "]");
     }
 
-    sr_strbuf_append_strf(dest, " %s%s%s",
+    g_string_append_printf(dest, " %s%s%s",
                           (frame->special_function ? "<" : ""),
                           (frame->function_name ? frame->function_name : "??"),
                           (frame->special_function ? ">" : ""));
@@ -472,9 +471,9 @@ sr_python_frame_append_to_str(struct sr_python_frame *frame,
 
 static void
 python_append_bthash_text(struct sr_python_frame *frame, enum sr_bthash_flags flags,
-                          struct sr_strbuf *strbuf)
+                          GString *strbuf)
 {
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           "%s, %d, %"PRIu32", %s, %d, %s\n",
                           OR_UNKNOWN(frame->file_name),
                           frame->special_file,
@@ -486,10 +485,10 @@ python_append_bthash_text(struct sr_python_frame *frame, enum sr_bthash_flags fl
 
 static void
 python_append_duphash_text(struct sr_python_frame *frame, enum sr_duphash_flags flags,
-                          struct sr_strbuf *strbuf)
+                          GString *strbuf)
 {
     /* filename:line */
-    sr_strbuf_append_strf(strbuf, "%s:%"PRIu32"\n",
+    g_string_append_printf(strbuf, "%s:%"PRIu32"\n",
                           OR_UNKNOWN(frame->file_name),
                           frame->file_line);
 }

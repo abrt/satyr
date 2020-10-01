@@ -19,8 +19,8 @@
 */
 #include "location.h"
 #include "utils.h"
-#include "strbuf.h"
 #include <stdlib.h>
+#include <glib.h>
 
 void
 sr_location_init(struct sr_location *location)
@@ -52,16 +52,19 @@ sr_location_cmp(struct sr_location *location1,
 char *
 sr_location_to_string(struct sr_location *location)
 {
-    struct sr_strbuf strbuf;
-    sr_strbuf_init(&strbuf);
-    sr_strbuf_append_strf(&strbuf,
+    GString strbuf;
+    strbuf.allocated_len = 8;
+    strbuf.len = 0;
+    strbuf.str = sr_malloc(strbuf.allocated_len);
+    strbuf.str[0] = '\0';
+    g_string_append_printf(&strbuf,
                           "Line %d, column %d",
                           location->line,
                           location->column);
     if (location->message)
-        sr_strbuf_append_strf(&strbuf, ": %s", location->message);
+        g_string_append_printf(&strbuf, ": %s", location->message);
 
-    return strbuf.buf;
+    return strbuf.str;
 }
 
 

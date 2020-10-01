@@ -21,7 +21,6 @@
 #include "py_base_frame.h"
 #include "py_java_frame.h"
 #include "location.h"
-#include "strbuf.h"
 #include "utils.h"
 #include "java/frame.h"
 
@@ -168,39 +167,39 @@ PyObject *
 sr_py_java_frame_str(PyObject *self)
 {
     struct sr_py_java_frame *this = (struct sr_py_java_frame*)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
 
     if (this->frame->is_exception)
     {
-        sr_strbuf_append_str(buf, this->frame->name);
+        g_string_append(buf, this->frame->name);
         if (this->frame->message)
-            sr_strbuf_append_strf(buf, ": %s", this->frame->message);
+            g_string_append_printf(buf, ": %s", this->frame->message);
     }
     else
     {
-        sr_strbuf_append_str(buf, "\t");
+        g_string_append(buf, "\t");
         if (this->frame->name)
-            sr_strbuf_append_strf(buf, "at %s", this->frame->name);
+            g_string_append_printf(buf, "at %s", this->frame->name);
 
         if (this->frame->file_name)
-            sr_strbuf_append_strf(buf, "(%s", this->frame->file_name);
+            g_string_append_printf(buf, "(%s", this->frame->file_name);
 
         if (this->frame->file_line)
-            sr_strbuf_append_strf(buf, ":%d", this->frame->file_line);
+            g_string_append_printf(buf, ":%d", this->frame->file_line);
 
         if (this->frame->is_native)
-            sr_strbuf_append_str(buf, "(Native Method");
+            g_string_append(buf, "(Native Method");
 
-        sr_strbuf_append_str(buf, ")");
+        g_string_append(buf, ")");
     }
 
     /*
      * not present (parsed) at the moment
     if (this->frame->class_path)
-        sr_strbuf_append_strf(buf, "class_path:%s", this->frame->class_path);
+        g_string_append_printf(buf, "class_path:%s", this->frame->class_path);
     */
 
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

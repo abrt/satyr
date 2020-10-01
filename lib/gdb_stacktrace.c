@@ -22,7 +22,6 @@
 #include "gdb/frame.h"
 #include "gdb/sharedlib.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "location.h"
 #include "normalize.h"
 #include "generic_stacktrace.h"
@@ -37,7 +36,7 @@
 
 static void
 gdb_append_bthash_text(struct sr_gdb_stacktrace *stacktrace, enum sr_bthash_flags flags,
-                       struct sr_strbuf *strbuf);
+                       GString *strbuf);
 
 /* for not used/implemented methods */
 static char *
@@ -387,18 +386,18 @@ sr_gdb_stacktrace_quality_complex(struct sr_gdb_stacktrace *stacktrace)
 char *
 sr_gdb_stacktrace_to_text(struct sr_gdb_stacktrace *stacktrace, bool verbose)
 {
-    struct sr_strbuf *str = sr_strbuf_new();
+    GString *str = g_string_new(NULL);
     if (verbose)
     {
-        sr_strbuf_append_strf(str, "Thread count: %d\n",
+        g_string_append_printf(str, "Thread count: %d\n",
                               sr_gdb_stacktrace_get_thread_count(stacktrace));
     }
 
     if (stacktrace->crash && verbose)
     {
-        sr_strbuf_append_str(str, "Crash frame: ");
+        g_string_append(str, "Crash frame: ");
         sr_gdb_frame_append_to_str(stacktrace->crash, str, verbose);
-        sr_strbuf_append_char(str, '\n');
+        g_string_append_c(str, '\n');
     }
 
     struct sr_gdb_thread *thread = stacktrace->threads;
@@ -408,7 +407,7 @@ sr_gdb_stacktrace_to_text(struct sr_gdb_stacktrace *stacktrace, bool verbose)
         thread = thread->next;
     }
 
-    return sr_strbuf_free_nobuf(str);
+    return g_string_free(str, FALSE);
 }
 
 struct sr_gdb_frame *
@@ -586,24 +585,24 @@ sr_gdb_stacktrace_to_short_text(struct sr_gdb_stacktrace *stacktrace,
     struct sr_gdb_thread *optimized_thread
         = sr_gdb_thread_get_optimized(crash_thread, stacktrace->libs,
                                       max_frames);
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
     sr_gdb_thread_append_to_str(optimized_thread, strbuf, true);
 
     sr_gdb_thread_free(optimized_thread);
-    return sr_strbuf_free_nobuf(strbuf);
+    return g_string_free(strbuf, FALSE);
 }
 
 static void
 gdb_append_bthash_text(struct sr_gdb_stacktrace *stacktrace, enum sr_bthash_flags flags,
-                       struct sr_strbuf *strbuf)
+                       GString *strbuf)
 {
     for (struct sr_gdb_sharedlib *lib = stacktrace->libs;
          lib;
          lib = lib->next)
     {
-        sr_strbuf_append_strf(strbuf, "%"PRIx64"-%"PRIx64", %s\n", lib->from, lib->to,
+        g_string_append_printf(strbuf, "%"PRIx64"-%"PRIx64", %s\n", lib->from, lib->to,
                               OR_UNKNOWN(lib->soname));
     }
 
-    sr_strbuf_append_char(strbuf, '\n');
+    g_string_append_c(strbuf, '\n');
 }
