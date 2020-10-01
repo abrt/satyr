@@ -64,12 +64,6 @@ sr_malloc(size_t size);
  * Never returns NULL.
  */
 void *
-sr_mallocz(size_t size);
-
-/**
- * Never returns NULL.
- */
-void *
 sr_realloc(void *ptr, size_t size);
 
 /**
