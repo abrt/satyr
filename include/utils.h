@@ -75,12 +75,6 @@ sr_realloc(void *ptr, size_t size);
 /**
  * Never returns NULL.
  */
-void *
-sr_realloc_array(void *ptr, size_t elems, size_t elem_size);
-
-/**
- * Never returns NULL.
- */
 char *
 sr_vasprintf(const char *format, va_list p);
 

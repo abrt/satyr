@@ -469,7 +469,7 @@ sr_koops_stacktrace_parse_modules(const char **input)
             if (result_offset == result_size - 1)
             {
                 result_size *= 2;
-                result = sr_realloc_array(result, result_size, sizeof(char*));
+                result = g_realloc_n(result, result_size, sizeof(char*));
             }
 
             result[result_offset] = module;
