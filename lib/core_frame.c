@@ -59,7 +59,7 @@ struct frame_methods core_frame_methods =
 struct sr_core_frame *
 sr_core_frame_new()
 {
-    struct sr_core_frame *frame = sr_malloc(sizeof(struct sr_core_frame));
+    struct sr_core_frame *frame = g_malloc(sizeof(*frame));
     sr_core_frame_init(frame);
     return frame;
 }

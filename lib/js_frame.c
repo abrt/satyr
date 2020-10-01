@@ -66,7 +66,7 @@ struct sr_js_frame *
 sr_js_frame_new()
 {
     struct sr_js_frame *frame =
-        sr_malloc(sizeof(struct sr_js_frame));
+        g_malloc(sizeof(*frame));
 
     sr_js_frame_init(frame);
     return frame;

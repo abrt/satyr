@@ -67,7 +67,7 @@ unwind_thread(struct UCD_info *ui,
         if (!entry->function_name)
         {
             size_t funcname_len = 512;
-            char *funcname = sr_malloc(funcname_len);
+            char *funcname = g_malloc(funcname_len);
 
             if (unw_get_proc_name(&c, funcname, funcname_len, NULL) == 0)
                 entry->function_name = funcname;

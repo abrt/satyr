@@ -57,13 +57,6 @@ sr_debug_parser;
 /**
  * Never returns NULL.
  */
-void *
-sr_malloc(size_t size);
-
-/**
- * Never returns NULL.
- */
-void *
 sr_realloc(void *ptr, size_t size);
 
 /**

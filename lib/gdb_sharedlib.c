@@ -27,7 +27,7 @@
 struct sr_gdb_sharedlib *
 sr_gdb_sharedlib_new()
 {
-    struct sr_gdb_sharedlib *result = sr_malloc(sizeof(struct sr_gdb_sharedlib));
+    struct sr_gdb_sharedlib *result = g_malloc(sizeof(*result));
     sr_gdb_sharedlib_init(result);
     return result;
 }

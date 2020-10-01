@@ -166,7 +166,7 @@ static void
 check(bool success, char *input)
 {
   /* Function name must be ended with a space. */
-  char *input_with_space = sr_malloc(strlen(input) + 2);
+  char *input_with_space = g_malloc(strlen(input) + 2);
   strcpy(input_with_space, input);
   input_with_space[strlen(input)] = ' ';
   input_with_space[strlen(input) + 1] = '\0';

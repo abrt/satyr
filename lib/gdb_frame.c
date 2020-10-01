@@ -67,7 +67,7 @@ struct frame_methods gdb_frame_methods =
 struct sr_gdb_frame *
 sr_gdb_frame_new()
 {
-    struct sr_gdb_frame *frame = sr_malloc(sizeof(struct sr_gdb_frame));
+    struct sr_gdb_frame *frame = g_malloc(sizeof(*frame));
     sr_gdb_frame_init(frame);
     return frame;
 }

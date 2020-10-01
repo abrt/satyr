@@ -66,7 +66,7 @@ struct sr_java_thread *
 sr_java_thread_new()
 {
     struct sr_java_thread *thread =
-        sr_malloc(sizeof(*thread));
+        g_malloc(sizeof(*thread));
     sr_java_thread_init(thread);
     return thread;
 }

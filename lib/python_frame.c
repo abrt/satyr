@@ -60,7 +60,7 @@ struct sr_python_frame *
 sr_python_frame_new()
 {
     struct sr_python_frame *frame =
-        sr_malloc(sizeof(struct sr_python_frame));
+        g_malloc(sizeof(*frame));
 
     sr_python_frame_init(frame);
     return frame;

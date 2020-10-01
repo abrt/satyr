@@ -55,7 +55,7 @@ sr_location_to_string(struct sr_location *location)
     GString strbuf;
     strbuf.allocated_len = 8;
     strbuf.len = 0;
-    strbuf.str = sr_malloc(strbuf.allocated_len);
+    strbuf.str = g_malloc(strbuf.allocated_len);
     strbuf.str[0] = '\0';
     g_string_append_printf(&strbuf,
                           "Line %d, column %d",

@@ -38,7 +38,7 @@ struct sr_rpm_package *
 sr_rpm_package_new()
 {
     struct sr_rpm_package *package =
-        sr_malloc(sizeof(struct sr_rpm_package));
+        g_malloc(sizeof(*package));
 
     sr_rpm_package_init(package);
     return package;
@@ -791,7 +791,7 @@ struct sr_rpm_consistency *
 sr_rpm_consistency_new()
 {
     struct sr_rpm_consistency *consistency =
-        sr_malloc(sizeof(struct sr_rpm_consistency));
+        g_malloc(sizeof(*consistency));
 
     sr_rpm_consistency_init(consistency);
     return consistency;

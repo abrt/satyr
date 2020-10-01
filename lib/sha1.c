@@ -27,7 +27,7 @@ sr_sha1_hash_string(const char *str)
 {
     struct sha1_ctx ctx;
     char bin_hash[SHA1_DIGEST_SIZE];
-    char *hex_hash = sr_malloc(SHA1_HEX_DIGEST_SIZE + 1);
+    char *hex_hash = g_malloc(SHA1_HEX_DIGEST_SIZE + 1);
 
     sha1_init(&ctx);
     sha1_update(&ctx, strlen(str), (const unsigned char *)str);

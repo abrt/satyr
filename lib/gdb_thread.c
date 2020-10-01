@@ -65,7 +65,7 @@ struct thread_methods gdb_thread_methods =
 struct sr_gdb_thread *
 sr_gdb_thread_new()
 {
-    struct sr_gdb_thread *thread = sr_malloc(sizeof(struct sr_gdb_thread));
+    struct sr_gdb_thread *thread = g_malloc(sizeof(*thread));
     sr_gdb_thread_init(thread);
     return thread;
 }

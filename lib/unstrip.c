@@ -73,7 +73,7 @@ sr_unstrip_parse(const char *unstrip_output)
         line = sr_skip_non_whitespace(line);
         unsigned mod_name_len = line - mod_name;
 
-        struct sr_unstrip_entry *entry = sr_malloc(sizeof(struct sr_unstrip_entry));
+        struct sr_unstrip_entry *entry = g_malloc(sizeof(*entry));
         entry->start = start;
         entry->length = length;
         entry->build_id = sr_strndup(build_id, build_id_len);

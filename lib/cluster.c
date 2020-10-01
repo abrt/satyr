@@ -28,7 +28,7 @@
 struct sr_dendrogram *
 sr_dendrogram_new(int size)
 {
-    struct sr_dendrogram *dendrogram = sr_malloc(sizeof(struct sr_dendrogram));
+    struct sr_dendrogram *dendrogram = g_malloc(sizeof(*dendrogram));
 
     assert(size > 1);
 
@@ -264,7 +264,7 @@ sr_distances_cluster_objects(struct sr_distances *distances)
 struct sr_cluster *
 sr_cluster_new(int size)
 {
-    struct sr_cluster *cluster = sr_malloc(sizeof(struct sr_cluster));
+    struct sr_cluster *cluster = g_malloc(sizeof(*cluster));
 
     cluster->size = size;
     cluster->objects = g_malloc_n(size, sizeof(*cluster->objects));

@@ -83,7 +83,7 @@ struct sr_js_stacktrace *
 sr_js_stacktrace_new()
 {
     struct sr_js_stacktrace *stacktrace =
-        sr_malloc(sizeof(struct sr_js_stacktrace));
+        g_malloc(sizeof(*stacktrace));
 
     sr_js_stacktrace_init(stacktrace);
     return stacktrace;
