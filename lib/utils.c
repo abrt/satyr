@@ -84,13 +84,6 @@ check_overflow_size_t(size_t a, size_t b)
 }
 
 void *
-sr_malloc_array(size_t elems, size_t elem_size)
-{
-    check_overflow_size_t(elems, elem_size);
-    return sr_malloc(elems * elem_size);
-}
-
-void *
 sr_mallocz(size_t size)
 {
     void *ptr = sr_malloc(size);

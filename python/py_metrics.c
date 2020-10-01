@@ -439,7 +439,7 @@ sr_py_distances_part_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
 
     if (PyList_Check(dist_list))
     {
-        part->distances = sr_malloc_array(sizeof(float), part->len);
+        part->distances = g_malloc_n(sizeof(float), part->len);
         int i;
         for (i = 0; i < PyList_Size(dist_list); i++)
         {

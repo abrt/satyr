@@ -201,8 +201,8 @@ distance_levenshtein(struct sr_thread *thread1,
     // store only two last rows and columns instead of whole 2D array
     SR_ASSERT(n <= INT32_MAX - 1);
     SR_ASSERT(m <= INT32_MAX - (n + 1));
-    int *dist = sr_malloc_array(sizeof(int), m + n + 1);
-    int *dist1 = sr_malloc_array(sizeof(int), m + n + 1);
+    int *dist = g_malloc_n(sizeof(int), m + n + 1);
+    int *dist1 = g_malloc_n(sizeof(int), m + n + 1);
 
     // first row and column having distance equal to their position
     for (int i = m; i > 0; --i)
@@ -325,7 +325,7 @@ sr_distances_new(int m, int n)
 
     distances->m = m;
     distances->n = n;
-    distances->distances = sr_malloc_array(
+    distances->distances = g_malloc_n(
                                get_distance_position(distances, m - 1, n - 1) + 1,
                                sizeof(*distances->distances)
                            );
@@ -609,7 +609,7 @@ sr_distances_part_compute(struct sr_distances_part *part,
 
     int i,j;
     size_t dist_idx;
-    part->distances = sr_malloc_array(sizeof(float), part->len);
+    part->distances = g_malloc_n(sizeof(float), part->len);
 
     for (dist_idx = 0, i = part->m_begin, j = part->n_begin;
          dist_idx < part->len;
