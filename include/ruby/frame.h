@@ -34,9 +34,9 @@ extern "C" {
 #include <json.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <glib.h>
 
 struct sr_location;
-struct sr_strbuf;
 
 struct sr_ruby_frame
 {
@@ -90,7 +90,7 @@ struct sr_ruby_frame *
 sr_ruby_frame_from_json(json_object *root, char **error_message);
 
 void
-sr_ruby_frame_append_to_str(struct sr_ruby_frame *frame, struct sr_strbuf *dest);
+sr_ruby_frame_append_to_str(struct sr_ruby_frame *frame, GString *dest);
 
 #ifdef __cplusplus
 }

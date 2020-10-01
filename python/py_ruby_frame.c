@@ -21,7 +21,6 @@
 #include "py_base_frame.h"
 #include "py_ruby_frame.h"
 #include "location.h"
-#include "strbuf.h"
 #include "utils.h"
 #include "ruby/frame.h"
 
@@ -165,45 +164,45 @@ PyObject *
 sr_py_ruby_frame_str(PyObject *self)
 {
     struct sr_py_ruby_frame *this = (struct sr_py_ruby_frame*)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
 
 
     if (this->frame->file_name)
     {
-        sr_strbuf_append_str(buf, this->frame->file_name);
+        g_string_append(buf, this->frame->file_name);
     }
 
     if (this->frame->file_line)
     {
-        sr_strbuf_append_strf(buf, ":%d", this->frame->file_line);
+        g_string_append_printf(buf, ":%d", this->frame->file_line);
     }
 
     if (this->frame->function_name)
     {
-        sr_strbuf_append_str(buf, ":in `");
+        g_string_append(buf, ":in `");
 
         unsigned int i;
         for (i = 0; i < this->frame->rescue_level; i++)
         {
-            sr_strbuf_append_str(buf, "rescue in ");
+            g_string_append(buf, "rescue in ");
         }
 
         if (this->frame->block_level == 1)
         {
-            sr_strbuf_append_str(buf, "block in ");
+            g_string_append(buf, "block in ");
         }
         else if (this->frame->block_level > 1)
         {
-            sr_strbuf_append_strf(buf, "block (%d levels) in ", this->frame->block_level);
+            g_string_append_printf(buf, "block (%d levels) in ", this->frame->block_level);
         }
 
-        sr_strbuf_append_strf(buf, "%s%s%s'",
+        g_string_append_printf(buf, "%s%s%s'",
                               (this->frame->special_function ? "<" : ""),
                               this->frame->function_name,
                               (this->frame->special_function ? ">" : ""));
     }
 
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

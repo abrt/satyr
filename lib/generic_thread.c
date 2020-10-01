@@ -24,7 +24,6 @@
 #include "generic_thread.h"
 #include "stacktrace.h"
 #include "sha1.h"
-#include "strbuf.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -109,7 +108,7 @@ thread_no_next_thread(struct sr_thread *thread)
 
 void
 thread_no_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
-                      struct sr_strbuf *strbuf)
+                      GString *strbuf)
 {
     /* nop */
 }
@@ -178,7 +177,7 @@ sr_thread_set_next(struct sr_thread *cur, struct sr_thread *next)
 
 void
 thread_append_bthash_text(struct sr_thread *thread, enum sr_bthash_flags flags,
-                          struct sr_strbuf *strbuf)
+                          GString *strbuf)
 {
     DISPATCH(dtable, thread->type, thread_append_bthash_text)
             (thread, flags, strbuf);
@@ -224,7 +223,7 @@ sr_thread_get_duphash(struct sr_thread *thread, int nframes, char *prefix,
                       enum sr_duphash_flags flags)
 {
     char *ret;
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     /* Normalization is destructive, we need to make a copy. */
     thread = sr_thread_dup(thread);
@@ -234,7 +233,7 @@ sr_thread_get_duphash(struct sr_thread *thread, int nframes, char *prefix,
 
     /* User supplied hash text prefix. */
     if (prefix)
-        sr_strbuf_append_str(strbuf, prefix);
+        g_string_append(strbuf, prefix);
 
     /* Here would be the place to append thread-specific information. However,
      * no current problem type has any for duphash. So we just append
@@ -245,7 +244,7 @@ sr_thread_get_duphash(struct sr_thread *thread, int nframes, char *prefix,
             (thread, flags, strbuf);
     */
     if (!(flags & SR_DUPHASH_KOOPS_COMPAT))
-        sr_strbuf_append_str(strbuf, "Thread\n");
+        g_string_append(strbuf, "Thread\n");
 
     /* Number of nframes, (almost) not limited if nframes = 0. */
     if (nframes == 0)
@@ -266,15 +265,15 @@ sr_thread_get_duphash(struct sr_thread *thread, int nframes, char *prefix,
 
     if ((flags & SR_DUPHASH_KOOPS_COMPAT) && strbuf->len == 0)
     {
-        sr_strbuf_free(strbuf);
+        g_string_free(strbuf, TRUE);
         ret = NULL;
     }
     else if (flags & SR_DUPHASH_NOHASH)
-        ret = sr_strbuf_free_nobuf(strbuf);
+        ret = g_string_free(strbuf, FALSE);
     else
     {
-        ret = sr_sha1_hash_string(strbuf->buf);
-        sr_strbuf_free(strbuf);
+        ret = sr_sha1_hash_string(strbuf->str);
+        g_string_free(strbuf, TRUE);
     }
 
     sr_thread_free(thread);

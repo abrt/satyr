@@ -42,9 +42,9 @@
 extern "C" {
 #endif
 
+#include <glib.h>
 #include "report_type.h"
 
-struct sr_strbuf;
 
 struct sr_frame
 {
@@ -68,7 +68,7 @@ sr_frame_set_next(struct sr_frame *cur, struct sr_frame *next);
  * Appends textual representation of the frame to buffer strbuf.
  */
 void
-sr_frame_append_to_str(struct sr_frame *frame, struct sr_strbuf *strbuf);
+sr_frame_append_to_str(struct sr_frame *frame, GString *strbuf);
 
 /**
  * Compares two frames. Returns 0 on equality. Frames of distinct type are

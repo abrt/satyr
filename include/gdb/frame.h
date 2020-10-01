@@ -32,8 +32,8 @@ extern "C" {
 #include "../report_type.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include <glib.h>
 
-struct sr_strbuf;
 struct sr_location;
 
 typedef uint64_t sr_gdb_frame_address_t;
@@ -226,7 +226,7 @@ sr_gdb_frame_append(struct sr_gdb_frame *dest,
  */
 void
 sr_gdb_frame_append_to_str(struct sr_gdb_frame *frame,
-                           struct sr_strbuf *dest,
+                           GString *dest,
                            bool verbose);
 
 /**
@@ -278,7 +278,7 @@ sr_gdb_frame_parse_frame_start(const char **input,
  */
 int
 sr_gdb_frame_parseadd_operator(const char **input,
-                               struct sr_strbuf *target);
+                               GString *target);
 
 /**
  * Parses a part of function name from the input.

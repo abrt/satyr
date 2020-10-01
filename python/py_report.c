@@ -32,8 +32,8 @@
 
 #include "report.h"
 #include "operating_system.h"
-#include "strbuf.h"
 #include "rpm.h"
+#include <glib.h>
 
 #define report_doc "satyr.Report - report containing all data relevant to a software problem\n\n" \
                    "Usage:\n\n" \
@@ -432,16 +432,16 @@ PyObject *
 sr_py_report_str(PyObject *object)
 {
     struct sr_py_report *this = (struct sr_py_report*)object;
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
 
     char *type = sr_report_type_to_string(this->report->report_type);
-    sr_strbuf_append_strf(buf, "Report, type: %s", type);
+    g_string_append_printf(buf, "Report, type: %s", type);
     free(type);
 
     if (this->report->component_name)
-        sr_strbuf_append_strf(buf, ", component: %s", this->report->component_name);
+        g_string_append_printf(buf, ", component: %s", this->report->component_name);
 
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

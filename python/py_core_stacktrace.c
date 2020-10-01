@@ -22,10 +22,10 @@
 #include "py_core_thread.h"
 #include "py_core_frame.h"
 #include "py_common.h"
-#include "strbuf.h"
 #include "core/stacktrace.h"
 #include "core/thread.h"
 #include "stacktrace.h"
+#include <glib.h>
 
 #define stacktrace_doc "satyr.CoreStacktrace - class representing a core stacktrace\n\n" \
                        "Usage:\n\n" \
@@ -178,10 +178,10 @@ PyObject *
 sr_py_core_stacktrace_str(PyObject *self)
 {
     struct sr_py_core_stacktrace *this = (struct sr_py_core_stacktrace *)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_strf(buf, "Core stacktrace with %zd threads",
+    GString *buf = g_string_new(NULL);
+    g_string_append_printf(buf, "Core stacktrace with %zd threads",
                            (ssize_t)(PyList_Size(this->threads)));
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

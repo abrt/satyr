@@ -2,7 +2,6 @@
 #include "py_base_thread.h"
 #include "py_java_thread.h"
 #include "py_java_frame.h"
-#include "strbuf.h"
 #include "java/thread.h"
 #include "java/frame.h"
 #include "location.h"
@@ -162,13 +161,13 @@ PyObject *
 sr_py_java_thread_str(PyObject *self)
 {
     struct sr_py_java_thread *this = (struct sr_py_java_thread *)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_str(buf, "Thread");
+    GString *buf = g_string_new(NULL);
+    g_string_append(buf, "Thread");
     if (this->thread->name)
-        sr_strbuf_append_strf(buf, " %s", this->thread->name);
+        g_string_append_printf(buf, " %s", this->thread->name);
 
-    sr_strbuf_append_strf(buf, " with %zd frames", (ssize_t)(PyList_Size(this->frames)));
-    char *str = sr_strbuf_free_nobuf(buf);
+    g_string_append_printf(buf, " with %zd frames", (ssize_t)(PyList_Size(this->frames)));
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

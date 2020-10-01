@@ -21,7 +21,6 @@
 #include "operating_system.h"
 #include "utils.h"
 #include "json.h"
-#include "strbuf.h"
 #include "internal_utils.h"
 #include <string.h>
 #include <ctype.h>
@@ -66,64 +65,64 @@ sr_operating_system_free(struct sr_operating_system *operating_system)
 char *
 sr_operating_system_to_json(struct sr_operating_system *operating_system)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     if (operating_system->name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"name\": ");
+        g_string_append(strbuf, ",   \"name\": ");
         sr_json_append_escaped(strbuf, operating_system->name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (operating_system->version)
     {
-        sr_strbuf_append_str(strbuf, ",   \"version\": ");
+        g_string_append(strbuf, ",   \"version\": ");
         sr_json_append_escaped(strbuf, operating_system->version);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (operating_system->architecture)
     {
-        sr_strbuf_append_str(strbuf, ",   \"architecture\": ");
+        g_string_append(strbuf, ",   \"architecture\": ");
         sr_json_append_escaped(strbuf, operating_system->architecture);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (operating_system->cpe)
     {
-        sr_strbuf_append_str(strbuf, ",   \"cpe\": ");
+        g_string_append(strbuf, ",   \"cpe\": ");
         sr_json_append_escaped(strbuf, operating_system->cpe);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (operating_system->desktop)
     {
-        sr_strbuf_append_str(strbuf, ",   \"desktop\": ");
+        g_string_append(strbuf, ",   \"desktop\": ");
         sr_json_append_escaped(strbuf, operating_system->desktop);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (operating_system->variant)
     {
-        sr_strbuf_append_str(strbuf, ",   \"variant\": ");
+        g_string_append(strbuf, ",   \"variant\": ");
         sr_json_append_escaped(strbuf, operating_system->variant);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (operating_system->uptime > 0)
     {
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               ",   \"uptime\": %"PRIu64"\n",
                               operating_system->uptime);
     }
 
     if (strbuf->len > 0)
-        strbuf->buf[0] = '{';
+        strbuf->str[0] = '{';
     else
-        sr_strbuf_append_char(strbuf, '{');
+        g_string_append_c(strbuf, '{');
 
-    sr_strbuf_append_char(strbuf, '}');
-    return sr_strbuf_free_nobuf(strbuf);
+    g_string_append_c(strbuf, '}');
+    return g_string_free(strbuf, FALSE);
 }
 
 struct sr_operating_system *

@@ -64,7 +64,6 @@ libsatyr_conv_la_SOURCES = \
 	js_frame.c \
 	js_stacktrace.c \
 	sha1.c \
-	strbuf.c \
 	unstrip.c \
 	utils.c
 

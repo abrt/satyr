@@ -20,7 +20,6 @@
 #include "rpm.h"
 #include "utils.h"
 #include "json.h"
-#include "strbuf.h"
 #include "config.h"
 #include "internal_utils.h"
 #include <errno.h>
@@ -467,7 +466,7 @@ char *
 sr_rpm_package_to_json(struct sr_rpm_package *package,
                        bool recursive)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     if (recursive)
     {
@@ -475,65 +474,65 @@ sr_rpm_package_to_json(struct sr_rpm_package *package,
         while (p)
         {
             if (p == package)
-                sr_strbuf_append_str(strbuf, "[ ");
+                g_string_append(strbuf, "[ ");
             else
-                sr_strbuf_append_str(strbuf, ", ");
+                g_string_append(strbuf, ", ");
 
             char *package_json = sr_rpm_package_to_json(p, false);
             char *indented_package_json = sr_indent_except_first_line(package_json, 2);
-            sr_strbuf_append_str(strbuf, indented_package_json);
+            g_string_append(strbuf, indented_package_json);
             free(indented_package_json);
             free(package_json);
             p = p->next;
             if (p)
-                sr_strbuf_append_str(strbuf, "\n");
+                g_string_append(strbuf, "\n");
         }
 
-        sr_strbuf_append_str(strbuf, " ]");
+        g_string_append(strbuf, " ]");
     }
     else
     {
         /* Name. */
         if (package->name)
         {
-            sr_strbuf_append_str(strbuf, ",   \"name\": ");
+            g_string_append(strbuf, ",   \"name\": ");
             sr_json_append_escaped(strbuf, package->name);
-            sr_strbuf_append_str(strbuf, "\n");
+            g_string_append(strbuf, "\n");
         }
 
         /* Epoch. */
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               ",   \"epoch\": %"PRIu32"\n",
                               package->epoch);
 
         /* Version. */
         if (package->version)
         {
-            sr_strbuf_append_str(strbuf, ",   \"version\": ");
+            g_string_append(strbuf, ",   \"version\": ");
             sr_json_append_escaped(strbuf, package->version);
-            sr_strbuf_append_str(strbuf, "\n");
+            g_string_append(strbuf, "\n");
         }
 
         /* Release. */
         if (package->release)
         {
-            sr_strbuf_append_str(strbuf, ",   \"release\": ");
+            g_string_append(strbuf, ",   \"release\": ");
             sr_json_append_escaped(strbuf, package->release);
-            sr_strbuf_append_str(strbuf, "\n");
+            g_string_append(strbuf, "\n");
         }
 
         /* Architecture. */
         if (package->architecture)
         {
-            sr_strbuf_append_str(strbuf, ",   \"architecture\": ");
+            g_string_append(strbuf, ",   \"architecture\": ");
             sr_json_append_escaped(strbuf, package->architecture);
-            sr_strbuf_append_str(strbuf, "\n");
+            g_string_append(strbuf, "\n");
         }
 
         /* Install time. */
         if (package->install_time > 0)
         {
-            sr_strbuf_append_strf(strbuf,
+            g_string_append_printf(strbuf,
                                   ",   \"install_time\": %"PRIu64"\n",
                                   package->install_time);
         }
@@ -552,23 +551,23 @@ sr_rpm_package_to_json(struct sr_rpm_package *package,
                 break;
             }
 
-            sr_strbuf_append_strf(strbuf, ",   \"package_role\": \"%s\"\n", role);
+            g_string_append_printf(strbuf, ",   \"package_role\": \"%s\"\n", role);
         }
 
         /* Consistency. */
         if (package->consistency)
         {
             // TODO
-            //sr_strbuf_append_strf(strbuf,
+            //g_string_append_printf(strbuf,
             //                      ",   \"consistency\": \"%s\"\n",
             //                      package->architecture);
         }
 
-        strbuf->buf[0] = '{';
-        sr_strbuf_append_str(strbuf, "}");
+        strbuf->str[0] = '{';
+        g_string_append(strbuf, "}");
     }
 
-    return sr_strbuf_free_nobuf(strbuf);
+    return g_string_free(strbuf, FALSE);
 }
 
 static struct sr_rpm_package *

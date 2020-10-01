@@ -30,7 +30,6 @@
 #include "operating_system.h"
 #include "rpm.h"
 #include "internal_utils.h"
-#include "strbuf.h"
 #include <string.h>
 #include <assert.h>
 
@@ -127,55 +126,55 @@ dismantle_object(char *obj)
 static char *
 problem_object_string(struct sr_report *report, const char *report_type)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     /* Report type. */
     assert(report_type);
-    sr_strbuf_append_str(strbuf, "{   \"type\": ");
+    g_string_append(strbuf, "{   \"type\": ");
     sr_json_append_escaped(strbuf, report_type);
-    sr_strbuf_append_str(strbuf, "\n");
+    g_string_append(strbuf, "\n");
 
     /* Component name. */
     if (report->component_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"component\": ");
+        g_string_append(strbuf, ",   \"component\": ");
         sr_json_append_escaped(strbuf, report->component_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (report->report_type != SR_REPORT_KERNELOOPS)
     {
         /* User type (not applicable to koopses). */
-        sr_strbuf_append_strf(strbuf, ",   \"user\": {   \"root\": %s\n"  \
+        g_string_append_printf(strbuf, ",   \"user\": {   \"root\": %s\n"  \
                                       "            ,   \"local\": %s\n" \
                                       "            }\n",
                               report->user_root ? "true" : "false",
                               report->user_local ? "true" : "false");
     }
 
-    sr_strbuf_append_strf(strbuf, ",   \"serial\": %"PRIu32"\n", report->serial);
+    g_string_append_printf(strbuf, ",   \"serial\": %"PRIu32"\n", report->serial);
 
     /* Stacktrace. */
     if (report->stacktrace)
     {
         char *stacktrace = sr_stacktrace_to_json(report->stacktrace);
         dismantle_object(stacktrace);
-        sr_strbuf_append_str(strbuf, stacktrace);
+        g_string_append(strbuf, stacktrace);
         free(stacktrace);
     }
 
-    sr_strbuf_append_str(strbuf, "}");
+    g_string_append(strbuf, "}");
 
-    return sr_strbuf_free_nobuf(strbuf);
+    return g_string_free(strbuf, FALSE);
 }
 
 char *
 sr_report_to_json(struct sr_report *report)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     /* Report version. */
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           "{   \"ureport_version\": %"PRIu32"\n",
                           report->report_version);
 
@@ -201,9 +200,9 @@ sr_report_to_json(struct sr_report *report)
         break;
     }
 
-    sr_strbuf_append_str(strbuf, ",   \"reason\": ");
+    g_string_append(strbuf, ",   \"reason\": ");
     sr_json_append_escaped(strbuf, reason);
-    sr_strbuf_append_str(strbuf, "\n");
+    g_string_append(strbuf, "\n");
     free(reason);
 
     /* Reporter name and version. */
@@ -215,7 +214,7 @@ sr_report_to_json(struct sr_report *report)
                                  report->reporter_version);
     char *reporter_indented = sr_indent_except_first_line(reporter, strlen(",   \"reporter\": "));
     free(reporter);
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           ",   \"reporter\": %s\n",
                           reporter_indented);
     free(reporter_indented);
@@ -226,7 +225,7 @@ sr_report_to_json(struct sr_report *report)
         char *opsys_str = sr_operating_system_to_json(report->operating_system);
         char *opsys_str_indented = sr_indent_except_first_line(opsys_str, strlen(",   \"os\": "));
         free(opsys_str);
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               ",   \"os\": %s\n",
                               opsys_str_indented);
 
@@ -238,7 +237,7 @@ sr_report_to_json(struct sr_report *report)
     char *problem_indented = sr_indent_except_first_line(problem, strlen(",   \"problem\": "));
     free(problem);
     free(report_type);
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           ",   \"problem\": %s\n",
                           problem_indented);
     free(problem_indented);
@@ -249,7 +248,7 @@ sr_report_to_json(struct sr_report *report)
         char *rpms_str = sr_rpm_package_to_json(report->rpm_packages, true);
         char *rpms_str_indented = sr_indent_except_first_line(rpms_str, strlen(",   \"packages\": "));
         free(rpms_str);
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               ",   \"packages\": %s\n",
                               rpms_str_indented);
 
@@ -257,7 +256,7 @@ sr_report_to_json(struct sr_report *report)
     }
     /* If there is no package, attach empty list (packages is a mandatory field) */
     else
-        sr_strbuf_append_strf(strbuf, ",   \"packages\": []\n");
+        g_string_append_printf(strbuf, ",   \"packages\": []\n");
 
     /* Custom entries.
      *    "auth" : {   "foo": "blah"
@@ -267,28 +266,28 @@ sr_report_to_json(struct sr_report *report)
     struct sr_report_custom_entry *iter = report->auth_entries;
     if (iter)
     {
-        sr_strbuf_append_strf(strbuf, ",   \"auth\": {   ");
+        g_string_append_printf(strbuf, ",   \"auth\": {   ");
         sr_json_append_escaped(strbuf, iter->key);
-        sr_strbuf_append_str(strbuf, ": ");
+        g_string_append(strbuf, ": ");
         sr_json_append_escaped(strbuf, iter->value);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
 
         /* the first entry is prefix with '{', see lines above */
         iter = iter->next;
         while (iter)
         {
-            sr_strbuf_append_strf(strbuf, "            ,   ");
+            g_string_append_printf(strbuf, "            ,   ");
             sr_json_append_escaped(strbuf, iter->key);
-            sr_strbuf_append_str(strbuf, ": ");
+            g_string_append(strbuf, ": ");
             sr_json_append_escaped(strbuf, iter->value);
-            sr_strbuf_append_str(strbuf, "\n");
+            g_string_append(strbuf, "\n");
             iter = iter->next;
         }
-        sr_strbuf_append_str(strbuf, "            } ");
+        g_string_append(strbuf, "            } ");
     }
 
-    sr_strbuf_append_str(strbuf, "}");
-    return sr_strbuf_free_nobuf(strbuf);
+    g_string_append(strbuf, "}");
+    return g_string_free(strbuf, FALSE);
 }
 
 enum sr_report_type

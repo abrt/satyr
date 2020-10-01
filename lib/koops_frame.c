@@ -19,7 +19,6 @@
 */
 #include "koops/frame.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "json.h"
 #include "generic_frame.h"
 #include "thread.h"
@@ -34,10 +33,10 @@
 
 static void
 koops_append_bthash_text(struct sr_koops_frame *frame, enum sr_bthash_flags flags,
-                         struct sr_strbuf *strbuf);
+                         GString *strbuf);
 static void
 koops_append_duphash_text(struct sr_koops_frame *frame, enum sr_duphash_flags flags,
-                          struct sr_strbuf *strbuf);
+                          GString *strbuf);
 
 DEFINE_NEXT_FUNC(koops_next, struct sr_frame, struct sr_koops_frame)
 DEFINE_SET_NEXT_FUNC(koops_set_next, struct sr_frame, struct sr_koops_frame)
@@ -593,80 +592,80 @@ sr_koops_parse_function(const char **input,
 char *
 sr_koops_frame_to_json(struct sr_koops_frame *frame)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     if (frame->address != 0)
     {
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               "{   \"address\": %"PRIu64"\n",
                               frame->address);
     }
 
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           "%s   \"reliable\": %s\n",
                           frame->address == 0 ? "{" : ",",
                           frame->reliable ? "true" : "false");
 
     if (frame->function_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"function_name\": ");
+        g_string_append(strbuf, ",   \"function_name\": ");
         sr_json_append_escaped(strbuf, frame->function_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           ",   \"function_offset\": %"PRIu64"\n",
                           frame->function_offset);
 
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           ",   \"function_length\": %"PRIu64"\n",
                           frame->function_length);
 
     if (frame->module_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"module_name\": ");
+        g_string_append(strbuf, ",   \"module_name\": ");
         sr_json_append_escaped(strbuf, frame->module_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (frame->from_address != 0)
     {
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               ",   \"from_address\": %"PRIu64"\n",
                               frame->from_address);
     }
 
     if (frame->from_function_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"from_function_name\": ");
+        g_string_append(strbuf, ",   \"from_function_name\": ");
         sr_json_append_escaped(strbuf, frame->from_function_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           ",   \"from_function_offset\": %"PRIu64"\n",
                           frame->from_function_offset);
 
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           ",   \"from_function_length\": %"PRIu64"\n",
                           frame->from_function_length);
 
     if (frame->from_module_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"from_module_name\": ");
+        g_string_append(strbuf, ",   \"from_module_name\": ");
         sr_json_append_escaped(strbuf, frame->from_module_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (frame->special_stack)
     {
-        sr_strbuf_append_str(strbuf, ",   \"special_stack\": ");
+        g_string_append(strbuf, ",   \"special_stack\": ");
         sr_json_append_escaped(strbuf, frame->special_stack);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
-    sr_strbuf_append_str(strbuf, "}");
-    return sr_strbuf_free_nobuf(strbuf);
+    g_string_append(strbuf, "}");
+    return g_string_free(strbuf, FALSE);
 }
 
 struct sr_koops_frame *
@@ -702,24 +701,24 @@ sr_koops_frame_from_json(json_object *root, char **error_message)
 
 void
 sr_koops_frame_append_to_str(struct sr_koops_frame *frame,
-                             struct sr_strbuf *str)
+                             GString *str)
 {
     if (frame->special_stack)
-        sr_strbuf_append_strf(str, "[%s] ", frame->special_stack);
+        g_string_append_printf(str, "[%s] ", frame->special_stack);
 
-    sr_strbuf_append_strf(str, "%s%s",
+    g_string_append_printf(str, "%s%s",
                           (frame->reliable ? "" : "? "),
                           (frame->function_name ? frame->function_name : "??"));
 
     if (frame->module_name)
-        sr_strbuf_append_strf(str, " in %s", frame->module_name);
+        g_string_append_printf(str, " in %s", frame->module_name);
 }
 
 static void
 koops_append_bthash_text(struct sr_koops_frame *frame, enum sr_bthash_flags flags,
-                         struct sr_strbuf *strbuf)
+                         GString *strbuf)
 {
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           "0x%"PRIx64", %d, %s, 0x%"PRIx64", 0x%"PRIx64", %s, "
                           "0x%"PRIx64", %s, 0x%"PRIx64", 0x%"PRIx64", %s\n",
                           frame->address,
@@ -737,14 +736,14 @@ koops_append_bthash_text(struct sr_koops_frame *frame, enum sr_bthash_flags flag
 
 static void
 koops_append_duphash_text(struct sr_koops_frame *frame, enum sr_duphash_flags flags,
-                         struct sr_strbuf *strbuf)
+                         GString *strbuf)
 {
     /* ABRT's koops hashing skipped unreliable frames entirely */
     if ((flags & SR_DUPHASH_KOOPS_COMPAT) && !frame->reliable)
         return;
 
     if (frame->function_name)
-        sr_strbuf_append_strf(strbuf, "%s\n", frame->function_name);
+        g_string_append_printf(strbuf, "%s\n", frame->function_name);
     else
-        sr_strbuf_append_strf(strbuf, "0x%"PRIx64"\n", frame->address);
+        g_string_append_printf(strbuf, "0x%"PRIx64"\n", frame->address);
 }

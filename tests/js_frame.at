@@ -5,7 +5,6 @@ AT_BANNER([JavaScript frames])
 AT_TESTFUN([sr_js_frame_parse_v8], [[
 #include "js/frame.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "location.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -64,10 +63,10 @@ AT_TESTFUN([sr_js_frame_parse_v8], [[
         sr_location_init(&r_location); \
         struct sr_js_frame *r_frame = sr_js_frame_parse_v8(&r_input, &r_location); \
         if (r_frame != NULL) { \
-            struct sr_strbuf *buf = sr_strbuf_new(); \
+            GString *buf = g_string_new(NULL); \
             sr_js_frame_append_to_str(r_frame, buf); \
-            fprintf(stderr, "NULL != '%s'\n", buf->buf); \
-            sr_strbuf_free(buf); \
+            fprintf(stderr, "NULL != '%s'\n", buf->str); \
+            g_string_free(buf, TRUE); \
             assert(!i_input); \
         } \
         assert(r_location.message || !i_input); \
@@ -468,7 +467,6 @@ AT_TESTFUN([sr_js_frame_append_to_str], [[
 #include "js/frame.h"
 #include "utils.h"
 #include "location.h"
-#include "strbuf.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -484,9 +482,9 @@ main(void)
   struct sr_js_frame *frame1 = sr_js_frame_parse(&input, &location);
   assert(frame1);
 
-  struct sr_strbuf *strbuf = sr_strbuf_new();
+  GString *strbuf = g_string_new(NULL);
   sr_js_frame_append_to_str(frame1, strbuf);
-  char *result = sr_strbuf_free_nobuf(strbuf);
+  char *result = g_string_free(strbuf, FALSE);
 
   if (sr_strcmp0(result, line) != 0) {
       fprintf(stderr, "'%s'\n  !=\n'%s'\n", result, line);
@@ -505,7 +503,6 @@ AT_TESTFUN([sr_js_frame_generic_functions], [[
 #include "frame.h"
 #include "utils.h"
 #include "location.h"
-#include "strbuf.h"
 #include <string.h>
 #include <assert.h>
 
@@ -521,9 +518,9 @@ main(void)
 
   assert(sr_frame_next((struct sr_frame *)frame1) == NULL);
 
-  struct sr_strbuf *strbuf = sr_strbuf_new();
+  GString *strbuf = g_string_new(NULL);
   sr_frame_append_to_str((struct sr_frame*)frame1, strbuf);
-  char *result = sr_strbuf_free_nobuf(strbuf);
+  char *result = g_string_free(strbuf, FALSE);
 
   assert(0 == strcmp(result, "at process._tickCallback (internal/process/next_tick.js:98:9)"));
 

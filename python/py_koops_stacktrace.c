@@ -2,7 +2,6 @@
 #include "py_koops_stacktrace.h"
 #include "py_base_stacktrace.h"
 #include "py_common.h"
-#include "strbuf.h"
 #include "koops/frame.h"
 #include "koops/stacktrace.h"
 #include "location.h"
@@ -218,10 +217,10 @@ PyObject *
 sr_py_koops_stacktrace_str(PyObject *self)
 {
     struct sr_py_koops_stacktrace *this = (struct sr_py_koops_stacktrace *)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_strf(buf, "Kerneloops with %zd frames",
+    GString *buf = g_string_new(NULL);
+    g_string_append_printf(buf, "Kerneloops with %zd frames",
                            (ssize_t)(PyList_Size(this->frames)));
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

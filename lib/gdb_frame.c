@@ -19,7 +19,6 @@
 */
 #include "gdb/frame.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "location.h"
 #include "generic_frame.h"
 #include "thread.h"
@@ -35,10 +34,10 @@
 
 static void
 gdb_append_bthash_text(struct sr_gdb_frame *frame, enum sr_bthash_flags flags,
-                       struct sr_strbuf *strbuf);
+                       GString *strbuf);
 static void
 gdb_append_duphash_text(struct sr_gdb_frame *frame, enum sr_duphash_flags flags,
-                        struct sr_strbuf *strbuf);
+                        GString *strbuf);
 
 DEFINE_NEXT_FUNC(gdb_next, struct sr_frame, struct sr_gdb_frame)
 DEFINE_SET_NEXT_FUNC(gdb_set_next, struct sr_frame, struct sr_gdb_frame)
@@ -265,29 +264,29 @@ sr_gdb_frame_append(struct sr_gdb_frame *dest,
 
 void
 sr_gdb_frame_append_to_str(struct sr_gdb_frame *frame,
-                           struct sr_strbuf *str,
+                           GString *str,
                             bool verbose)
 {
     if (verbose)
-        sr_strbuf_append_strf(str, " #%"PRIu32, frame->number);
+        g_string_append_printf(str, " #%"PRIu32, frame->number);
     else
-        sr_strbuf_append_str(str, " ");
+        g_string_append(str, " ");
 
     if (frame->function_type)
-        sr_strbuf_append_strf(str, " %s", frame->function_type);
+        g_string_append_printf(str, " %s", frame->function_type);
     if (frame->function_name)
-        sr_strbuf_append_strf(str, " %s", frame->function_name);
+        g_string_append_printf(str, " %s", frame->function_name);
     if (verbose && frame->source_file)
     {
         if (frame->function_name)
-            sr_strbuf_append_str(str, " at");
-        sr_strbuf_append_strf(str, " %s", frame->source_file);
+            g_string_append(str, " at");
+        g_string_append_printf(str, " %s", frame->source_file);
         if (frame->source_line != UINT32_MAX)
-            sr_strbuf_append_strf(str, ":%"PRIu32, frame->source_line);
+            g_string_append_printf(str, ":%"PRIu32, frame->source_line);
     }
 
     if (frame->signal_handler_called)
-        sr_strbuf_append_str(str, " <signal handler called>");
+        g_string_append(str, " <signal handler called>");
 }
 
 /**
@@ -374,7 +373,7 @@ sr_gdb_frame_parse_frame_start(const char **input, uint32_t *number)
 
 int
 sr_gdb_frame_parseadd_operator(const char **input,
-                               struct sr_strbuf *target)
+                               GString *target)
 {
     const char *local_input = *input;
     if (0 == sr_skip_string(&local_input, "operator"))
@@ -383,8 +382,8 @@ sr_gdb_frame_parseadd_operator(const char **input,
 #define OP(x) \
     if (0 < sr_skip_string(&local_input, x))      \
     {                                             \
-        sr_strbuf_append_str(target, "operator"); \
-        sr_strbuf_append_str(target, x);          \
+        g_string_append(target, "operator"); \
+        g_string_append(target, x);          \
         int length = local_input - *input;        \
         *input = local_input;                     \
         return length;                            \
@@ -423,7 +422,7 @@ sr_gdb_frame_parse_function_name_chunk(const char **input,
                                        char **target)
 {
     const char *local_input = *input;
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
     while (*local_input)
     {
         if (0 < sr_gdb_frame_parseadd_operator(&local_input, buf))
@@ -439,7 +438,7 @@ sr_gdb_frame_parse_function_name_chunk(const char **input,
                     local_input -= 2;
                 }
                 else
-                    sr_strbuf_append_char(buf, ' ');
+                    g_string_append_c(buf, ' ');
             }
         }
 
@@ -449,17 +448,17 @@ sr_gdb_frame_parse_function_name_chunk(const char **input,
                 break;
         }
 
-        sr_strbuf_append_char(buf, *local_input);
+        g_string_append_c(buf, *local_input);
         ++local_input;
     }
 
     if (buf->len == 0)
     {
-        sr_strbuf_free(buf);
+        g_string_free(buf, TRUE);
         return 0;
     }
 
-    *target = sr_strbuf_free_nobuf(buf);
+    *target = g_string_free(buf, FALSE);
     int total_char_count = local_input - *input;
     *input = local_input;
     return total_char_count;
@@ -486,8 +485,8 @@ int sr_gdb_frame_parse_function_name_template_args(const char **input,
     if (0 == sr_skip_string(&local_input, " [with "))
         return 0;
 
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_str(buf, " [with ");
+    GString *buf = g_string_new(NULL);
+    g_string_append(buf, " [with ");
     int depth = 1;
     while (*local_input)
     {
@@ -496,19 +495,19 @@ int sr_gdb_frame_parse_function_name_template_args(const char **input,
         else if (']' == *local_input && --depth == 0)
             break;
 
-        sr_strbuf_append_char(buf, *local_input);
+        g_string_append_c(buf, *local_input);
         ++local_input;
     }
 
     if (!sr_skip_char(&local_input, ']'))
     {
-        sr_strbuf_free(buf);
+        g_string_free(buf, TRUE);
         return 0;
     }
 
-    sr_strbuf_append_char(buf, ']');
+    g_string_append_c(buf, ']');
 
-    *target = sr_strbuf_free_nobuf(buf);
+    *target = g_string_free(buf, FALSE);
     int total_char_count = local_input - *input;
     *input = local_input;
     return total_char_count;
@@ -521,8 +520,8 @@ sr_gdb_frame_parse_function_name_braces(const char **input, char **target)
     if (!sr_skip_char(&local_input, '('))
         return 0;
 
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_char(buf, '(');
+    GString *buf = g_string_new(NULL);
+    g_string_append_c(buf, '(');
     while (true)
     {
         char *namechunk = NULL;
@@ -530,7 +529,7 @@ sr_gdb_frame_parse_function_name_braces(const char **input, char **target)
             0 < sr_gdb_frame_parse_function_name_braces(&local_input, &namechunk) ||
             0 < sr_gdb_frame_parse_function_name_template(&local_input, &namechunk))
         {
-            sr_strbuf_append_str(buf, namechunk);
+            g_string_append(buf, namechunk);
             free(namechunk);
         }
         else
@@ -539,12 +538,12 @@ sr_gdb_frame_parse_function_name_braces(const char **input, char **target)
 
     if (!sr_skip_char(&local_input, ')'))
     {
-        sr_strbuf_free(buf);
+        g_string_free(buf, TRUE);
         return 0;
     }
 
-    sr_strbuf_append_char(buf, ')');
-    *target = sr_strbuf_free_nobuf(buf);
+    g_string_append_c(buf, ')');
+    *target = g_string_free(buf, FALSE);
     int total_char_count = local_input - *input;
     *input = local_input;
     return total_char_count;
@@ -557,8 +556,8 @@ sr_gdb_frame_parse_function_name_template(const char **input, char **target)
     if (!sr_skip_char(&local_input, '<'))
         return 0;
 
-    struct sr_strbuf *buf = sr_strbuf_new();
-    sr_strbuf_append_char(buf, '<');
+    GString *buf = g_string_new(NULL);
+    g_string_append_c(buf, '<');
     while (true)
     {
         char *namechunk = NULL;
@@ -576,7 +575,7 @@ sr_gdb_frame_parse_function_name_template(const char **input, char **target)
             0 < sr_gdb_frame_parse_function_name_braces(&local_input, &namechunk) ||
             0 < sr_gdb_frame_parse_function_name_template(&local_input, &namechunk))
         {
-            sr_strbuf_append_str(buf, namechunk);
+            g_string_append(buf, namechunk);
             free(namechunk);
         }
         else
@@ -585,12 +584,12 @@ sr_gdb_frame_parse_function_name_template(const char **input, char **target)
 
     if (!sr_skip_char(&local_input, '>'))
     {
-        sr_strbuf_free(buf);
+        g_string_free(buf, TRUE);
         return 0;
     }
 
-    sr_strbuf_append_char(buf, '>');
-    *target = sr_strbuf_free_nobuf(buf);
+    g_string_append_c(buf, '>');
+    *target = g_string_free(buf, FALSE);
     int total_char_count = local_input - *input;
     *input = local_input;
     return total_char_count;
@@ -613,7 +612,7 @@ sr_gdb_frame_parse_function_name(const char **input,
 
     const char *local_input = *input;
     /* Up to three parts of function name. */
-    struct sr_strbuf *buf0 = sr_strbuf_new(), *buf1 = NULL;
+    GString *buf0 = g_string_new(NULL), *buf1 = NULL;
 
     /* First character:
        '~' for destructor
@@ -631,7 +630,7 @@ sr_gdb_frame_parse_function_name(const char **input,
             --local_input;
         else
         {
-            sr_strbuf_append_char(buf0, first);
+            g_string_append_c(buf0, first);
             ++location->column;
         }
     }
@@ -641,14 +640,14 @@ sr_gdb_frame_parse_function_name(const char **input,
                                                             &namechunk);
         if (0 < chars)
         {
-            sr_strbuf_append_str(buf0, namechunk);
+            g_string_append(buf0, namechunk);
             free(namechunk);
             location->column += chars;
         }
         else
         {
             location->message = "Expected function name.";
-            sr_strbuf_free(buf0);
+            g_string_free(buf0, TRUE);
             return false;
         }
     }
@@ -676,7 +675,7 @@ sr_gdb_frame_parse_function_name(const char **input,
         if (0 == chars)
             break;
 
-        sr_strbuf_append_str(buf0, namechunk);
+        g_string_append(buf0, namechunk);
         free(namechunk);
         location->column += chars;
     }
@@ -685,7 +684,7 @@ sr_gdb_frame_parse_function_name(const char **input,
     char space;
     if (!sr_parse_char_limited(&local_input, SR_space, &space))
     {
-        sr_strbuf_free(buf0);
+        g_string_free(buf0, TRUE);
         location->message = "Space or newline expected after function name.";
         return false;
     }
@@ -695,16 +694,16 @@ sr_gdb_frame_parse_function_name(const char **input,
     int chars = sr_skip_string(&local_input, "const");
     if (0 < chars)
     {
-        sr_strbuf_append_char(buf0, space);
+        g_string_append_c(buf0, space);
         sr_location_eat_char(location, space);
-        sr_strbuf_append_str(buf0, "const");
+        g_string_append(buf0, "const");
         location->column += chars;
 
         /* Check the empty space after function name again.*/
         if (!sr_parse_char_limited(&local_input, SR_space, &space))
         {
             /* Function name MUST be ended by empty space. */
-            sr_strbuf_free(buf0);
+            g_string_free(buf0, TRUE);
             location->message = "Space or newline expected after function name.";
             return false;
         }
@@ -721,8 +720,8 @@ sr_gdb_frame_parse_function_name(const char **input,
         /* Eat the space separator first. */
         sr_location_eat_char(location, space);
 
-        buf1 = sr_strbuf_new();
-        sr_strbuf_append_str(buf1, namechunk);
+        buf1 = g_string_new(NULL);
+        g_string_append(buf1, namechunk);
         free(namechunk);
         location->column += chars;
 
@@ -746,7 +745,7 @@ sr_gdb_frame_parse_function_name(const char **input,
             if (0 == chars)
                 break;
 
-            sr_strbuf_append_str(buf1, namechunk);
+            g_string_append(buf1, namechunk);
             free(namechunk);
             location->column += chars;
         }
@@ -754,8 +753,8 @@ sr_gdb_frame_parse_function_name(const char **input,
         /* Function name MUST be ended by empty space. */
         if (!sr_parse_char_limited(&local_input, SR_space, &space))
         {
-            sr_strbuf_free(buf0);
-            sr_strbuf_free(buf1);
+            g_string_free(buf0, TRUE);
+            g_string_free(buf1, TRUE);
             location->message = "Space or newline expected after function name.";
             return false;
         }
@@ -765,18 +764,18 @@ sr_gdb_frame_parse_function_name(const char **input,
     chars = sr_skip_string(&local_input, "const");
     if (0 < chars)
     {
-        struct sr_strbuf *buf = buf1 ? buf1 : buf0;
-        sr_strbuf_append_char(buf, space);
+        GString *buf = buf1 ? buf1 : buf0;
+        g_string_append_c(buf, space);
         sr_location_eat_char(location, space);
-        sr_strbuf_append_str(buf, "const");
+        g_string_append(buf, "const");
         location->column += chars;
 
         /* Check the empty space after function name again.*/
         if (!sr_skip_char_limited(&local_input, SR_space))
         {
             /* Function name MUST be ended by empty space. */
-            sr_strbuf_free(buf0);
-            sr_strbuf_free(buf1);
+            g_string_free(buf0, TRUE);
+            g_string_free(buf1, TRUE);
             location->message = "Space or newline expected after function name.";
             return false;
         }
@@ -787,12 +786,12 @@ sr_gdb_frame_parse_function_name(const char **input,
 
     if (buf1)
     {
-        *function_name = sr_strbuf_free_nobuf(buf1);
-        *function_type = sr_strbuf_free_nobuf(buf0);
+        *function_name = g_string_free(buf1, FALSE);
+        *function_type = g_string_free(buf0, FALSE);
     }
     else
     {
-        *function_name = sr_strbuf_free_nobuf(buf0);
+        *function_name = g_string_free(buf0, FALSE);
         *function_type = NULL;
     }
 
@@ -1179,9 +1178,9 @@ sr_gdb_frame_parse_header(const char **input,
 
 static void
 gdb_append_bthash_text(struct sr_gdb_frame *frame, enum sr_bthash_flags flags,
-                       struct sr_strbuf *strbuf)
+                       GString *strbuf)
 {
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           "%s, %s, %" PRIu32 ", %s, %" PRIu32 ", %d, 0x%" PRIx64 ", %s\n",
                           OR_UNKNOWN(frame->function_name),
                           OR_UNKNOWN(frame->function_type),
@@ -1195,19 +1194,19 @@ gdb_append_bthash_text(struct sr_gdb_frame *frame, enum sr_bthash_flags flags,
 
 static void
 gdb_append_duphash_text(struct sr_gdb_frame *frame, enum sr_duphash_flags flags,
-                        struct sr_strbuf *strbuf)
+                        GString *strbuf)
 {
     /* Taken from btparser. */
-    sr_strbuf_append_str(strbuf, " ");
+    g_string_append(strbuf, " ");
 
     if (frame->function_type)
-        sr_strbuf_append_strf(strbuf, " %s", frame->function_type);
+        g_string_append_printf(strbuf, " %s", frame->function_type);
 
     if (frame->function_name)
-        sr_strbuf_append_strf(strbuf, " %s", frame->function_name);
+        g_string_append_printf(strbuf, " %s", frame->function_name);
 
     if (frame->signal_handler_called)
-        sr_strbuf_append_str(strbuf, " <signal handler called>");
+        g_string_append(strbuf, " <signal handler called>");
 
-    sr_strbuf_append_str(strbuf, "\n");
+    g_string_append(strbuf, "\n");
 }

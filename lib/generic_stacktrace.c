@@ -21,7 +21,6 @@
 #include <stdlib.h>
 
 #include "internal_utils.h"
-#include "strbuf.h"
 #include "location.h"
 #include "sha1.h"
 #include "json.h"
@@ -58,22 +57,22 @@ stacktrace_to_short_text(struct sr_stacktrace *stacktrace, int max_frames)
     if (!thread)
         return NULL;
 
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
     struct sr_frame *frame;
     int i = 0;
 
     for (frame = sr_thread_frames(thread); frame; frame = sr_frame_next(frame))
     {
         i++;
-        sr_strbuf_append_strf(strbuf, "#%d ", i);
+        g_string_append_printf(strbuf, "#%d ", i);
         sr_frame_append_to_str(frame, strbuf);
-        sr_strbuf_append_char(strbuf, '\n');
+        g_string_append_c(strbuf, '\n');
 
         if (max_frames && i >= max_frames)
             break;
     }
 
-    return sr_strbuf_free_nobuf(strbuf);
+    return g_string_free(strbuf, FALSE);
 }
 
 /* Uses the dispatch table but should not be exposed to library users directly. */
@@ -184,7 +183,7 @@ char *
 sr_stacktrace_get_bthash(struct sr_stacktrace *stacktrace, enum sr_bthash_flags flags)
 {
     char *ret;
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     /* Append data contained in the stacktrace structure. */
     DISPATCH(dtable, stacktrace->type, stacktrace_append_bthash_text)
@@ -206,15 +205,15 @@ sr_stacktrace_get_bthash(struct sr_stacktrace *stacktrace, enum sr_bthash_flags 
 
         /* Blank line in between threads. */
         if (sr_thread_next(thread))
-            sr_strbuf_append_char(strbuf, '\n');
+            g_string_append_c(strbuf, '\n');
     }
 
     if (flags & SR_BTHASH_NOHASH)
-        ret = sr_strbuf_free_nobuf(strbuf);
+        ret = g_string_free(strbuf, FALSE);
     else
     {
-        ret = sr_sha1_hash_string(strbuf->buf);
-        sr_strbuf_free(strbuf);
+        ret = sr_sha1_hash_string(strbuf->str);
+        g_string_free(strbuf, TRUE);
     }
 
     return ret;

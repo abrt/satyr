@@ -23,7 +23,6 @@
 #include <inttypes.h>
 
 #include "frame.h"
-#include "strbuf.h"
 
 #define frame_doc "satyr.BaseFrame - base class for call frames"
 
@@ -96,10 +95,10 @@ PyObject *
 sr_py_base_frame_short_string(PyObject *self, PyObject *args)
 {
     struct sr_frame *frame = ((struct sr_py_base_frame*)self)->frame;
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     sr_frame_append_to_str(frame, strbuf);
-    char *str = sr_strbuf_free_nobuf(strbuf);
+    char *str = g_string_free(strbuf, FALSE);
 
     PyObject *result = PyString_FromString(str);
     free(str);

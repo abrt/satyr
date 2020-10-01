@@ -26,7 +26,6 @@
 #include "location.h"
 #include "normalize.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "unstrip.h"
 #include "json.h"
 #include "generic_stacktrace.h"
@@ -37,12 +36,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <glib.h>
 
 /* Method table */
 
 static void
 core_append_bthash_text(struct sr_core_stacktrace *stacktrace, enum sr_bthash_flags flags,
-                        struct sr_strbuf *strbuf);
+                        GString *strbuf);
 
 DEFINE_THREADS_FUNC(core_threads, struct sr_core_stacktrace)
 DEFINE_SET_THREADS_FUNC(core_set_threads, struct sr_core_stacktrace)
@@ -254,30 +254,30 @@ sr_core_stacktrace_from_json_text(const char *text,
 char *
 sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
-    sr_strbuf_append_strf(strbuf,
+    GString *strbuf = g_string_new(NULL);
+    g_string_append_printf(strbuf,
                           "{   \"signal\": %"PRIu16"\n",
                           stacktrace->signal);
 
     if (stacktrace->executable)
     {
-        sr_strbuf_append_str(strbuf, ",   \"executable\": ");
+        g_string_append(strbuf, ",   \"executable\": ");
         sr_json_append_escaped(strbuf, stacktrace->executable);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (stacktrace->only_crash_thread)
-        sr_strbuf_append_str(strbuf, ",   \"only_crash_thread\": true\n");
+        g_string_append(strbuf, ",   \"only_crash_thread\": true\n");
 
-    sr_strbuf_append_str(strbuf, ",   \"stacktrace\":\n");
+    g_string_append(strbuf, ",   \"stacktrace\":\n");
 
     struct sr_core_thread *thread = stacktrace->threads;
     while (thread)
     {
         if (thread == stacktrace->threads)
-            sr_strbuf_append_str(strbuf, "      [ ");
+            g_string_append(strbuf, "      [ ");
         else
-            sr_strbuf_append_str(strbuf, "      , ");
+            g_string_append(strbuf, "      , ");
 
         bool crash_thread = (thread == stacktrace->crash_thread);
         /* If we don't know the crash thread, just take the first one. */
@@ -287,17 +287,17 @@ sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
         char *thread_json = sr_core_thread_to_json(thread, crash_thread);
         char *indented_thread_json = sr_indent_except_first_line(thread_json, 8);
 
-        sr_strbuf_append_str(strbuf, indented_thread_json);
+        g_string_append(strbuf, indented_thread_json);
         free(indented_thread_json);
         free(thread_json);
         thread = thread->next;
         if (thread)
-            sr_strbuf_append_str(strbuf, "\n");
+            g_string_append(strbuf, "\n");
     }
 
-    sr_strbuf_append_str(strbuf, " ]\n");
-    sr_strbuf_append_char(strbuf, '}');
-    return sr_strbuf_free_nobuf(strbuf);
+    g_string_append(strbuf, " ]\n");
+    g_string_append_c(strbuf, '}');
+    return g_string_free(strbuf, FALSE);
 }
 
 struct sr_core_stacktrace *
@@ -389,9 +389,9 @@ sr_core_stacktrace_get_reason(struct sr_core_stacktrace *stacktrace)
 
 static void
 core_append_bthash_text(struct sr_core_stacktrace *stacktrace, enum sr_bthash_flags flags,
-                        struct sr_strbuf *strbuf)
+                        GString *strbuf)
 {
-    sr_strbuf_append_strf(strbuf, "Executable: %s\n", OR_UNKNOWN(stacktrace->executable));
-    sr_strbuf_append_strf(strbuf, "Signal: %"PRIu16"\n", stacktrace->signal);
-    sr_strbuf_append_char(strbuf, '\n');
+    g_string_append_printf(strbuf, "Executable: %s\n", OR_UNKNOWN(stacktrace->executable));
+    g_string_append_printf(strbuf, "Signal: %"PRIu16"\n", stacktrace->signal);
+    g_string_append_c(strbuf, '\n');
 }

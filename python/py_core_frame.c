@@ -21,7 +21,6 @@
 #include "py_base_frame.h"
 #include "py_core_frame.h"
 
-#include "strbuf.h"
 #include "utils.h"
 #include "core/frame.h"
 
@@ -149,26 +148,26 @@ PyObject *
 sr_py_core_frame_str(PyObject *self)
 {
     struct sr_py_core_frame *this = (struct sr_py_core_frame*)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
 
     if (this->frame->address != 0)
-        sr_strbuf_append_strf(buf, "[0x%016"PRIx64"] ", this->frame->address);
+        g_string_append_printf(buf, "[0x%016"PRIx64"] ", this->frame->address);
 
     if (this->frame->function_name)
-        sr_strbuf_append_strf(buf, "%s ",  this->frame->function_name);
+        g_string_append_printf(buf, "%s ",  this->frame->function_name);
 
     if (this->frame->build_id)
-        sr_strbuf_append_strf(buf, "%s+0x%"PRIx64" ", this->frame->build_id,
+        g_string_append_printf(buf, "%s+0x%"PRIx64" ", this->frame->build_id,
                               this->frame->build_id_offset);
 
     if (this->frame->file_name)
-        sr_strbuf_append_strf(buf, "[%s] ", this->frame->file_name);
+        g_string_append_printf(buf, "[%s] ", this->frame->file_name);
 
     if (this->frame->fingerprint)
-        sr_strbuf_append_strf(buf, "fingerprint: %s (%shashed)", this->frame->fingerprint,
+        g_string_append_printf(buf, "fingerprint: %s (%shashed)", this->frame->fingerprint,
                               (this->frame->fingerprint_hashed ? "" : "not "));
 
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

@@ -36,6 +36,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include <assert.h>
+#include <glib.h>
 
 #define SR_lower "abcdefghijklmnopqrstuvwxyz"
 #define SR_upper "ABCDEFGHIJKLMNOPQRSTUVWXYZ"

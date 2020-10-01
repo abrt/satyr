@@ -1,11 +1,4 @@
-/*
-    py_operating_system.c
-
-    Copyright (C) 2013  Red Hat, Inc.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
+/* py_operating_system.c Copyright (C) 2013  Red Hat, Inc.  This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
 
     This program is distributed in the hope that it will be useful,
@@ -22,7 +15,8 @@
 #include "py_operating_system.h"
 
 #include "operating_system.h"
-#include "strbuf.h"
+#include "utils.h"
+#include <glib.h>
 
 #define operating_system_doc "satyr.OperatingSystem - describes an operating system\n\n" \
                              "Usage:\n\n" \
@@ -145,21 +139,21 @@ PyObject *
 sr_py_operating_system_str(PyObject *object)
 {
     struct sr_py_operating_system *this = (struct sr_py_operating_system*)object;
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
 
-    sr_strbuf_append_str(buf,
+    g_string_append(buf,
         this->operating_system->name ? this->operating_system->name : "(unknown)");
 
     if (this->operating_system->version)
-        sr_strbuf_append_strf(buf, " %s", this->operating_system->version);
+        g_string_append_printf(buf, " %s", this->operating_system->version);
 
     if (this->operating_system->architecture)
-        sr_strbuf_append_strf(buf, " (%s)", this->operating_system->architecture);
+        g_string_append_printf(buf, " (%s)", this->operating_system->architecture);
 
     if (this->operating_system->cpe)
-        sr_strbuf_append_strf(buf, ", CPE: %s", this->operating_system->cpe);
+        g_string_append_printf(buf, ", CPE: %s", this->operating_system->cpe);
 
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

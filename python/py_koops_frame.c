@@ -24,7 +24,6 @@
 #include <inttypes.h>
 
 #include "location.h"
-#include "strbuf.h"
 #include "utils.h"
 #include "koops/frame.h"
 
@@ -172,47 +171,47 @@ PyObject *
 sr_py_koops_frame_str(PyObject *self)
 {
     struct sr_py_koops_frame *this = (struct sr_py_koops_frame*)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
     if (this->frame->special_stack)
-        sr_strbuf_append_strf(buf, "[%s] ", this->frame->special_stack);
+        g_string_append_printf(buf, "[%s] ", this->frame->special_stack);
 
     if (this->frame->address != 0)
-        sr_strbuf_append_strf(buf, "[0x%016"PRIx64"] ", this->frame->address);
+        g_string_append_printf(buf, "[0x%016"PRIx64"] ", this->frame->address);
 
     if (!this->frame->reliable)
-        sr_strbuf_append_str(buf, "? ");
+        g_string_append(buf, "? ");
 
     if (this->frame->function_name)
-        sr_strbuf_append_str(buf, this->frame->function_name);
+        g_string_append(buf, this->frame->function_name);
 
     if (this->frame->function_offset)
-        sr_strbuf_append_strf(buf, "+0x%"PRIx64, this->frame->function_offset);
+        g_string_append_printf(buf, "+0x%"PRIx64, this->frame->function_offset);
 
     if (this->frame->function_length)
-        sr_strbuf_append_strf(buf, "/0x%"PRIx64, this->frame->function_length);
+        g_string_append_printf(buf, "/0x%"PRIx64, this->frame->function_length);
 
     if (this->frame->module_name)
-        sr_strbuf_append_strf(buf, " [%s]", this->frame->module_name);
+        g_string_append_printf(buf, " [%s]", this->frame->module_name);
 
     if (this->frame->from_function_name || this->frame->from_address)
-        sr_strbuf_append_str(buf, " from ");
+        g_string_append(buf, " from ");
 
     if (this->frame->from_address != 0)
-        sr_strbuf_append_strf(buf, "[0x%016"PRIx64"] ", this->frame->from_address);
+        g_string_append_printf(buf, "[0x%016"PRIx64"] ", this->frame->from_address);
 
     if (this->frame->from_function_name)
-        sr_strbuf_append_str(buf, this->frame->from_function_name);
+        g_string_append(buf, this->frame->from_function_name);
 
     if (this->frame->from_function_offset)
-        sr_strbuf_append_strf(buf, "+0x%"PRIx64, this->frame->from_function_offset);
+        g_string_append_printf(buf, "+0x%"PRIx64, this->frame->from_function_offset);
 
     if (this->frame->from_function_length)
-        sr_strbuf_append_strf(buf, "/0x%"PRIx64, this->frame->from_function_length);
+        g_string_append_printf(buf, "/0x%"PRIx64, this->frame->from_function_length);
 
     if (this->frame->from_module_name)
-        sr_strbuf_append_strf(buf, " [%s]", this->frame->from_module_name);
+        g_string_append_printf(buf, " [%s]", this->frame->from_module_name);
 
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

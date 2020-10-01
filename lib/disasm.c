@@ -21,10 +21,10 @@
 
 #include "disasm.h"
 #include "utils.h"
-#include "strbuf.h"
 #include <string.h>
 #include <stdio.h>
 #include <inttypes.h>
+#include <glib.h>
 
 /**
  * @brief Internal state of a disassembler.
@@ -197,15 +197,15 @@ sr_disasm_get_callee_addresses(char **instructions)
 char *
 sr_disasm_instructions_to_text(char **instructions)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
     while (*instructions)
     {
-        sr_strbuf_append_str(strbuf, *instructions);
-        sr_strbuf_append_char(strbuf, '\n');
+        g_string_append(strbuf, *instructions);
+        g_string_append_c(strbuf, '\n');
         ++instructions;
     }
 
-    return sr_strbuf_free_nobuf(strbuf);
+    return g_string_free(strbuf, FALSE);
 }
 
 char *

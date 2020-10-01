@@ -19,7 +19,6 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "java/frame.h"
-#include "strbuf.h"
 #include "location.h"
 #include "utils.h"
 #include "json.h"
@@ -38,10 +37,10 @@
 
 static void
 java_append_bthash_text(struct sr_java_frame *frame, enum sr_bthash_flags flags,
-                        struct sr_strbuf *strbuf);
+                        GString *strbuf);
 static void
 java_append_duphash_text(struct sr_java_frame *frame, enum sr_duphash_flags flags,
-                         struct sr_strbuf *strbuf);
+                         GString *strbuf);
 
 DEFINE_NEXT_FUNC(java_next, struct sr_frame, struct sr_java_frame)
 DEFINE_SET_NEXT_FUNC(java_set_next, struct sr_frame, struct sr_java_frame)
@@ -212,46 +211,46 @@ sr_java_frame_append(struct sr_java_frame *dest,
 
 void
 sr_java_frame_append_to_str(struct sr_java_frame *frame,
-                            struct sr_strbuf *dest)
+                            GString *dest)
 {
     if (frame->is_exception)
     {
         if (frame->name)
-            sr_strbuf_append_str(dest, frame->name);
+            g_string_append(dest, frame->name);
 
         if (frame->message)
-            sr_strbuf_append_strf(dest, ": %s", frame->message);
+            g_string_append_printf(dest, ": %s", frame->message);
     }
     else
     {
-        sr_strbuf_append_strf(dest, "\tat %s(",
+        g_string_append_printf(dest, "\tat %s(",
                               frame->name ? frame->name : "");
 
         if (frame->is_native)
-            sr_strbuf_append_str(dest, SR_JF_MARK_NATIVE_METHOD);
+            g_string_append(dest, SR_JF_MARK_NATIVE_METHOD);
         else if (!frame->file_name)
-            sr_strbuf_append_str(dest, SR_JF_MARK_UNKNOWN_SOURCE);
+            g_string_append(dest, SR_JF_MARK_UNKNOWN_SOURCE);
         else
-            sr_strbuf_append_str(dest, frame->file_name);
+            g_string_append(dest, frame->file_name);
 
         /* YES even if the frame is native method or source is unknown */
         /* WHY? Because it was parsed in this form */
         /* Ooops! Maybe the source file was empty string. Don't care! */
         if (frame->file_line)
-            sr_strbuf_append_strf(dest, ":%"PRIu32, frame->file_line);
+            g_string_append_printf(dest, ":%"PRIu32, frame->file_line);
 
-        sr_strbuf_append_str(dest, ")");
+        g_string_append(dest, ")");
 
         if (!frame->class_path)
-            sr_strbuf_append_str(dest, " [unknown]");
+            g_string_append(dest, " [unknown]");
         else
         {
-            sr_strbuf_append_str(dest, " [");
+            g_string_append(dest, " [");
 
             if (strchrnul(frame->class_path,':') > strchrnul(frame->class_path, '/'))
-                sr_strbuf_append_str(dest, "file:");
+                g_string_append(dest, "file:");
 
-            sr_strbuf_append_strf(dest, "%s]", frame->class_path);
+            g_string_append_printf(dest, "%s]", frame->class_path);
         }
     }
 }
@@ -566,25 +565,25 @@ sr_java_frame_parse(const char **input,
 char *
 sr_java_frame_to_json(struct sr_java_frame *frame)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     /* Name. */
     if (frame->name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"name\": ");
+        g_string_append(strbuf, ",   \"name\": ");
         sr_json_append_escaped(strbuf, frame->name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     /* File name. */
     if (frame->file_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"file_name\": ");
+        g_string_append(strbuf, ",   \"file_name\": ");
         sr_json_append_escaped(strbuf, frame->file_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
 
         /* File line. */
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               ",   \"file_line\": %"PRIu32"\n",
                               frame->file_line);
     }
@@ -592,32 +591,32 @@ sr_java_frame_to_json(struct sr_java_frame *frame)
     /* Class path. */
     if (frame->class_path)
     {
-        sr_strbuf_append_str(strbuf, ",   \"class_path\": ");
+        g_string_append(strbuf, ",   \"class_path\": ");
         sr_json_append_escaped(strbuf, frame->class_path);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     /* Is native? */
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           ",   \"is_native\": %s\n",
                           frame->is_native ? "true" : "false");
 
     /* Is exception? */
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           ",   \"is_exception\": %s\n",
                           frame->is_exception ? "true" : "false");
 
     /* Message. */
     if (frame->message)
     {
-        sr_strbuf_append_str(strbuf, ",   \"message\": ");
+        g_string_append(strbuf, ",   \"message\": ");
         sr_json_append_escaped(strbuf, frame->message);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
-    strbuf->buf[0] = '{';
-    sr_strbuf_append_str(strbuf, "}");
-    return sr_strbuf_free_nobuf(strbuf);
+    strbuf->str[0] = '{';
+    g_string_append(strbuf, "}");
+    return g_string_free(strbuf, FALSE);
 }
 
 struct sr_java_frame *
@@ -648,9 +647,9 @@ sr_java_frame_from_json(json_object *root, char **error_message)
 
 static void
 java_append_bthash_text(struct sr_java_frame *frame, enum sr_bthash_flags flags,
-                        struct sr_strbuf *strbuf)
+                        GString *strbuf)
 {
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           "%s, %s, %"PRIu32", %s, %d, %d, %s\n",
                           OR_UNKNOWN(frame->name),
                           OR_UNKNOWN(frame->file_name),
@@ -663,12 +662,12 @@ java_append_bthash_text(struct sr_java_frame *frame, enum sr_bthash_flags flags,
 
 static void
 java_append_duphash_text(struct sr_java_frame *frame, enum sr_duphash_flags flags,
-                         struct sr_strbuf *strbuf)
+                         GString *strbuf)
 {
     if (frame->name)
-        sr_strbuf_append_strf(strbuf, "%s\n", frame->name);
+        g_string_append_printf(strbuf, "%s\n", frame->name);
     else
-        sr_strbuf_append_strf(strbuf, "%s/%s:%"PRIu32"\n",
+        g_string_append_printf(strbuf, "%s/%s:%"PRIu32"\n",
                               OR_UNKNOWN(frame->class_path),
                               OR_UNKNOWN(frame->file_name),
                               frame->file_line);

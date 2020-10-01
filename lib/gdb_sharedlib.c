@@ -19,10 +19,10 @@
 */
 #include "gdb/sharedlib.h"
 #include "utils.h"
-#include "strbuf.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <glib.h>
 
 struct sr_gdb_sharedlib *
 sr_gdb_sharedlib_new()
@@ -218,10 +218,10 @@ sr_gdb_sharedlib_parse(const char *input)
             ++tmp;
 
         /* Shared Object Library */
-        struct sr_strbuf *buf = sr_strbuf_new();
+        GString *buf = g_string_new(NULL);
         while (*tmp && *tmp != '\n')
         {
-            sr_strbuf_append_char(buf, *tmp);
+            g_string_append_c(buf, *tmp);
             ++tmp;
         }
 
@@ -241,7 +241,7 @@ sr_gdb_sharedlib_parse(const char *input)
         current->from = from;
         current->to = to;
         current->symbols = symbols;
-        current->soname = sr_strbuf_free_nobuf(buf);
+        current->soname = g_string_free(buf, FALSE);
 
         /* we are on '\n' character, jump to next line */
         ++tmp;

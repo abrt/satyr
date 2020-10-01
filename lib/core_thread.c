@@ -20,7 +20,6 @@
 #include "core/thread.h"
 #include "core/frame.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "json.h"
 #include "generic_thread.h"
 #include "stacktrace.h"
@@ -225,41 +224,41 @@ fail:
 char *
 sr_core_thread_to_json(struct sr_core_thread *thread, bool is_crash_thread)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
     if (thread->frames)
     {
         if (is_crash_thread)
         {
-            sr_strbuf_append_str(strbuf, "{   \"crash_thread\": true\n");
-            sr_strbuf_append_str(strbuf, ",");
+            g_string_append(strbuf, "{   \"crash_thread\": true\n");
+            g_string_append(strbuf, ",");
         }
         else
-            sr_strbuf_append_str(strbuf, "{");
-        sr_strbuf_append_str(strbuf, "   \"frames\":\n");
+            g_string_append(strbuf, "{");
+        g_string_append(strbuf, "   \"frames\":\n");
 
         struct sr_core_frame *frame = thread->frames;
         while (frame)
         {
             if (frame == thread->frames)
-                sr_strbuf_append_str(strbuf, "      [ ");
+                g_string_append(strbuf, "      [ ");
             else
-                sr_strbuf_append_str(strbuf, "      , ");
+                g_string_append(strbuf, "      , ");
 
             char *frame_json = sr_core_frame_to_json(frame);
             char *indented_frame_json = sr_indent_except_first_line(frame_json, 8);
-            sr_strbuf_append_str(strbuf, indented_frame_json);
+            g_string_append(strbuf, indented_frame_json);
             free(indented_frame_json);
             free(frame_json);
             frame = frame->next;
             if (frame)
-                sr_strbuf_append_str(strbuf, "\n");
+                g_string_append(strbuf, "\n");
         }
 
-        sr_strbuf_append_str(strbuf, " ]\n");
-        sr_strbuf_append_str(strbuf, "}");
+        g_string_append(strbuf, " ]\n");
+        g_string_append(strbuf, "}");
     }
     else
-        sr_strbuf_append_str(strbuf, "{}");
+        g_string_append(strbuf, "{}");
 
-    return sr_strbuf_free_nobuf(strbuf);
+    return g_string_free(strbuf, FALSE);
 }

@@ -35,7 +35,6 @@ extern "C" {
 #include <json.h>
 
 struct sr_core_frame;
-struct sr_strbuf;
 struct sr_location;
 
 /**

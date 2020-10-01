@@ -24,7 +24,6 @@
 #include "core/stacktrace.h"
 #include "utils.h"
 #include "location.h"
-#include "strbuf.h"
 #include "cluster.h"
 #include "normalize.h"
 #include "report.h"
@@ -197,12 +196,12 @@ debug_normalize(int argc, char **argv)
 
     sr_normalize_gdb_thread(thread);
 
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
     sr_gdb_thread_append_to_str(thread, strbuf, false);
-    puts(strbuf->buf);
+    puts(strbuf->str);
 
     free(text);
-    sr_strbuf_free(strbuf);
+    g_string_free(strbuf, TRUE);
 }
 
 static void

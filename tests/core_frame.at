@@ -101,7 +101,6 @@ main(void)
 AT_TESTFUN([sr_core_frame_abstract_functions],
 [[
 #include "core/frame.h"
-#include "strbuf.h"
 #include "frame.h"
 #include <assert.h>
 
@@ -119,9 +118,9 @@ main(void)
 
   assert(sr_frame_next((struct sr_frame*)frame) == (void*)0xdeadbeef);
 
-  struct sr_strbuf *strbuf = sr_strbuf_new();
+  GString *strbuf = g_string_new(NULL);
   sr_frame_append_to_str((struct sr_frame*)frame, strbuf);
-  char *res = sr_strbuf_free_nobuf(strbuf);
+  char *res = g_string_free(strbuf, FALSE);
 
   assert(0 == strcmp(res, "[executable1] test1"));
   free(res);

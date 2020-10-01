@@ -21,7 +21,6 @@
 #include "py_base_frame.h"
 #include "py_python_frame.h"
 #include "location.h"
-#include "strbuf.h"
 #include "utils.h"
 #include "python/frame.h"
 
@@ -165,28 +164,28 @@ PyObject *
 sr_py_python_frame_str(PyObject *self)
 {
     struct sr_py_python_frame *this = (struct sr_py_python_frame*)self;
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
 
 
     if (this->frame->file_name)
-      sr_strbuf_append_strf(buf, "File \"%s%s%s\"",
+      g_string_append_printf(buf, "File \"%s%s%s\"",
                             (this->frame->special_file ? "<" : ""),
                             this->frame->file_name,
                             (this->frame->special_file ? ">" : ""));
 
     if (this->frame->file_line)
-      sr_strbuf_append_strf(buf, ", %d", this->frame->file_line);
+      g_string_append_printf(buf, ", %d", this->frame->file_line);
 
     if (this->frame->function_name)
-      sr_strbuf_append_strf(buf, ", in %s%s%s",
+      g_string_append_printf(buf, ", in %s%s%s",
                             (this->frame->special_function ? "<" : ""),
                             this->frame->function_name,
                             (this->frame->special_function ? ">" : ""));
 
     if (this->frame->line_contents)
-      sr_strbuf_append_strf(buf, "\n    %s", this->frame->line_contents);
+      g_string_append_printf(buf, "\n    %s", this->frame->line_contents);
 
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

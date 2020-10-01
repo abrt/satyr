@@ -50,7 +50,6 @@ TESTSUITE_AT =		\
   local.at 		\
   testsuite.at		\
   utils.at 		\
-  strbuf.at		\
   gdb_frame.at 		\
   gdb_thread.at 	\
   gdb_stacktrace.at  	\

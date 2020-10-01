@@ -19,7 +19,6 @@
 */
 #include "core/frame.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "json.h"
 #include "generic_frame.h"
 #include "thread.h"
@@ -27,15 +26,16 @@
 #include "internal_utils.h"
 #include <limits.h>
 #include <string.h>
+#include <glib.h>
 
 /* Method table */
 
 static void
 core_append_bthash_text(struct sr_core_frame *frame, enum sr_bthash_flags flags,
-                        struct sr_strbuf *strbuf);
+                        GString *strbuf);
 static void
 core_append_duphash_text(struct sr_core_frame *frame, enum sr_duphash_flags flags,
-                         struct sr_strbuf *strbuf);
+                         GString *strbuf);
 
 DEFINE_NEXT_FUNC(core_next, struct sr_frame, struct sr_core_frame)
 DEFINE_SET_NEXT_FUNC(core_set_next, struct sr_frame, struct sr_core_frame)
@@ -269,93 +269,93 @@ sr_core_frame_from_json(json_object *root,
 char *
 sr_core_frame_to_json(struct sr_core_frame *frame)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     if (frame->address != ULONG_MAX)
     {
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               ",   \"address\": %"PRIu64"\n",
                               frame->address);
     }
 
     if (frame->build_id)
     {
-        sr_strbuf_append_str(strbuf, ",   \"build_id\": ");
+        g_string_append(strbuf, ",   \"build_id\": ");
         sr_json_append_escaped(strbuf, frame->build_id);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (frame->build_id_offset != ULONG_MAX)
     {
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               ",   \"build_id_offset\": %"PRIu64"\n",
                               frame->build_id_offset);
     }
 
     if (frame->function_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"function_name\": ");
+        g_string_append(strbuf, ",   \"function_name\": ");
         sr_json_append_escaped(strbuf, frame->function_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (frame->file_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"file_name\": ");
+        g_string_append(strbuf, ",   \"file_name\": ");
         sr_json_append_escaped(strbuf, frame->file_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     if (frame->fingerprint)
     {
-        sr_strbuf_append_str(strbuf, ",   \"fingerprint\": ");
+        g_string_append(strbuf, ",   \"fingerprint\": ");
         sr_json_append_escaped(strbuf, frame->fingerprint);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
 
         if (frame->fingerprint_hashed == false)
-            sr_strbuf_append_str(strbuf, ",   \"fingerprint_hashed\": false\n");
+            g_string_append(strbuf, ",   \"fingerprint_hashed\": false\n");
     }
 
     if (strbuf->len > 0)
-        strbuf->buf[0] = '{';
+        strbuf->str[0] = '{';
     else
-        sr_strbuf_append_char(strbuf, '{');
+        g_string_append_c(strbuf, '{');
 
-    sr_strbuf_append_char(strbuf, '}');
-    return sr_strbuf_free_nobuf(strbuf);
+    g_string_append_c(strbuf, '}');
+    return g_string_free(strbuf, FALSE);
 }
 
 void
 sr_core_frame_append_to_str(struct sr_core_frame *frame,
-                            struct sr_strbuf *dest)
+                            GString *dest)
 {
     if (frame->file_name)
     {
         const char *basename = strrchr(frame->file_name, '/');
-        sr_strbuf_append_strf(dest, "[%s]", basename ? ++basename : frame->file_name);
+        g_string_append_printf(dest, "[%s]", basename ? ++basename : frame->file_name);
     }
 
     if (frame->function_name)
     {
-        sr_strbuf_append_strf(dest, " %s", frame->function_name);
+        g_string_append_printf(dest, " %s", frame->function_name);
     }
     else
     {
-        sr_strbuf_append_strf(dest, " %s+%"PRIu64, frame->build_id,
+        g_string_append_printf(dest, " %s+%"PRIu64, frame->build_id,
                               frame->build_id_offset);
     }
 }
 
 static void
 core_append_bthash_text(struct sr_core_frame *frame, enum sr_bthash_flags flags,
-                        struct sr_strbuf *strbuf)
+                        GString *strbuf)
 {
     if (frame->address)
-        sr_strbuf_append_strf(strbuf, "0x%"PRIx64", ", frame->address);
+        g_string_append_printf(strbuf, "0x%"PRIx64", ", frame->address);
     else
-        sr_strbuf_append_str(strbuf, "<unknown>, ");
+        g_string_append(strbuf, "<unknown>, ");
 
-    sr_strbuf_append_strf(strbuf, "%s+0x%"PRIx64", %s, %s\n",
+    g_string_append_printf(strbuf, "%s+0x%"PRIx64", %s, %s\n",
                           OR_UNKNOWN(frame->build_id),
                           frame->build_id_offset,
                           OR_UNKNOWN(frame->file_name),
@@ -364,25 +364,25 @@ core_append_bthash_text(struct sr_core_frame *frame, enum sr_bthash_flags flags,
 
 static void
 core_append_duphash_text(struct sr_core_frame *frame, enum sr_duphash_flags flags,
-                         struct sr_strbuf *strbuf)
+                         GString *strbuf)
 {
     /* Build id should be the preferred deduplication mechanism. */
     if (frame->build_id)
-        sr_strbuf_append_strf(strbuf, "%s+0x%"PRIx64"\n",
+        g_string_append_printf(strbuf, "%s+0x%"PRIx64"\n",
                               frame->build_id,
                               frame->build_id_offset);
 
     /* If we don't have it, try the function name. */
     else if (frame->function_name)
-        sr_strbuf_append_strf(strbuf, "  %s\n", frame->function_name);
+        g_string_append_printf(strbuf, "  %s\n", frame->function_name);
 
     /* Function fingerprint? */
     else if (frame->fingerprint)
-        sr_strbuf_append_strf(strbuf, "%s+0x%"PRIx64"\n",
+        g_string_append_printf(strbuf, "%s+0x%"PRIx64"\n",
                               frame->fingerprint,
                               frame->build_id_offset);
 
     /* Address should be better than nothing. */
     else
-        sr_strbuf_append_strf(strbuf, "0x%"PRIx64"\n", frame->address);
+        g_string_append_printf(strbuf, "0x%"PRIx64"\n", frame->address);
 }

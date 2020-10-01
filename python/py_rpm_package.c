@@ -22,7 +22,8 @@
 #include "py_rpm_package.h"
 
 #include "rpm.h"
-#include "strbuf.h"
+#include "utils.h"
+#include <glib.h>
 
 #define rpm_package_doc "satyr.RpmPackage - RPM package representation\n\n" \
                         "Usage:\n\n" \
@@ -157,35 +158,35 @@ PyObject *
 sr_py_rpm_package_str(PyObject *object)
 {
     struct sr_py_rpm_package *this = (struct sr_py_rpm_package*)object;
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
 
     if (this->rpm_package->name)
     {
-        sr_strbuf_append_str(buf, this->rpm_package->name);
+        g_string_append(buf, this->rpm_package->name);
 
         if (this->rpm_package->version)
         {
-            sr_strbuf_append_str(buf, "-");
+            g_string_append(buf, "-");
 
             if (this->rpm_package->epoch)
-                sr_strbuf_append_strf(buf, "%u:", (unsigned)this->rpm_package->epoch);
+                g_string_append_printf(buf, "%u:", (unsigned)this->rpm_package->epoch);
 
-            sr_strbuf_append_str(buf, this->rpm_package->version);
+            g_string_append(buf, this->rpm_package->version);
 
             if (this->rpm_package->release)
             {
-                sr_strbuf_append_strf(buf, "-%s", this->rpm_package->release);
+                g_string_append_printf(buf, "-%s", this->rpm_package->release);
 
                 if (this->rpm_package->architecture)
-                    sr_strbuf_append_strf(buf, ".%s", this->rpm_package->architecture);
+                    g_string_append_printf(buf, ".%s", this->rpm_package->architecture);
             }
         }
 
     }
     else
-        sr_strbuf_append_str(buf, "(unknown)");
+        g_string_append(buf, "(unknown)");
 
-    char *str = sr_strbuf_free_nobuf(buf);
+    char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
     free(str);
     return result;

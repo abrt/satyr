@@ -9,7 +9,6 @@ mainheaders_HEADERS = \
 	report.h \
 	report_type.h \
 	rpm.h \
-	strbuf.h \
 	utils.h \
 	stacktrace.h \
 	thread.h \

@@ -32,9 +32,9 @@ extern "C" {
 #include "../report_type.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include <glib.h>
 
 struct sr_gdb_frame;
-struct sr_strbuf;
 struct sr_location;
 struct sr_gdb_sharedlib;
 
@@ -192,7 +192,7 @@ sr_gdb_thread_remove_frames_below_n(struct sr_gdb_thread *thread,
  */
 void
 sr_gdb_thread_append_to_str(struct sr_gdb_thread *thread,
-                            struct sr_strbuf *dest,
+                            GString *dest,
                             bool verbose);
 
 /**

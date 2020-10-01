@@ -20,7 +20,6 @@
 #include "js/frame.h"
 #include "utils.h"
 #include "location.h"
-#include "strbuf.h"
 #include "json.h"
 #include "generic_frame.h"
 #include "thread.h"
@@ -34,10 +33,10 @@
 
 static void
 js_append_bthash_text(struct sr_js_frame *frame, enum sr_bthash_flags flags,
-                      struct sr_strbuf *strbuf);
+                      GString *strbuf);
 static void
 js_append_duphash_text(struct sr_js_frame *frame, enum sr_duphash_flags flags,
-                       struct sr_strbuf *strbuf);
+                       GString *strbuf);
 
 DEFINE_NEXT_FUNC(js_next, struct sr_frame, struct sr_js_frame)
 DEFINE_SET_NEXT_FUNC(js_set_next, struct sr_frame, struct sr_js_frame)
@@ -423,20 +422,20 @@ fail:
 char *
 sr_js_frame_to_json(struct sr_js_frame *frame)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     /* Source file name. */
     if (frame->file_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"file_name\": ");
+        g_string_append(strbuf, ",   \"file_name\": ");
         sr_json_append_escaped(strbuf, frame->file_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
     /* Source file line. */
     if (frame->file_line)
     {
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               ",   \"file_line\": %"PRIu32"\n",
                               frame->file_line);
     }
@@ -444,7 +443,7 @@ sr_js_frame_to_json(struct sr_js_frame *frame)
     /* Line column. */
     if (frame->line_column)
     {
-        sr_strbuf_append_strf(strbuf,
+        g_string_append_printf(strbuf,
                               ",   \"line_column\": %"PRIu32"\n",
                               frame->line_column);
     }
@@ -452,38 +451,38 @@ sr_js_frame_to_json(struct sr_js_frame *frame)
     /* Function name. */
     if (frame->function_name)
     {
-        sr_strbuf_append_str(strbuf, ",   \"function_name\": ");
+        g_string_append(strbuf, ",   \"function_name\": ");
         sr_json_append_escaped(strbuf, frame->function_name);
-        sr_strbuf_append_str(strbuf, "\n");
+        g_string_append(strbuf, "\n");
     }
 
-    strbuf->buf[0] = '{';
-    sr_strbuf_append_char(strbuf, '}');
-    return sr_strbuf_free_nobuf(strbuf);
+    strbuf->str[0] = '{';
+    g_string_append_c(strbuf, '}');
+    return g_string_free(strbuf, FALSE);
 }
 
 void
 sr_js_frame_append_to_str(struct sr_js_frame *frame,
-                          struct sr_strbuf *dest)
+                          GString *dest)
 {
-    sr_strbuf_append_str(dest, "at ");
+    g_string_append(dest, "at ");
     if (frame->function_name)
-        sr_strbuf_append_strf(dest, "%s (", frame->function_name);
+        g_string_append_printf(dest, "%s (", frame->function_name);
 
-    sr_strbuf_append_strf(dest, "%s:%"PRIu32":%"PRIu32,
+    g_string_append_printf(dest, "%s:%"PRIu32":%"PRIu32,
                           frame->file_name,
                           frame->file_line,
                           frame->line_column);
 
     if (frame->function_name)
-        sr_strbuf_append_str(dest, ")");
+        g_string_append(dest, ")");
 }
 
 static void
 js_append_bthash_text(struct sr_js_frame *frame, enum sr_bthash_flags flags,
-                      struct sr_strbuf *strbuf)
+                      GString *strbuf)
 {
-    sr_strbuf_append_strf(strbuf,
+    g_string_append_printf(strbuf,
                           "%s, %"PRIu32", %s\n",
                           OR_UNKNOWN(frame->file_name),
                           frame->file_line,
@@ -492,10 +491,10 @@ js_append_bthash_text(struct sr_js_frame *frame, enum sr_bthash_flags flags,
 
 static void
 js_append_duphash_text(struct sr_js_frame *frame, enum sr_duphash_flags flags,
-                       struct sr_strbuf *strbuf)
+                       GString *strbuf)
 {
     /* filename:line */
-    sr_strbuf_append_strf(strbuf, "%s:%"PRIu32"\n",
+    g_string_append_printf(strbuf, "%s:%"PRIu32"\n",
                           OR_UNKNOWN(frame->file_name),
                           frame->file_line);
 }

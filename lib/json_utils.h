@@ -18,6 +18,7 @@
 
 #include <json.h>
 #include <stdbool.h>
+#include <glib.h>
 
 /* Checks whether json value is of the right type and sets the error_message if
  * not. The "name" argument is used in the error message.
@@ -63,5 +64,5 @@ json_read_bool(json_object *object, const char *key_name, bool *dest,
 #define JSON_READ_BOOL(object, key_name, dest) \
     json_read_bool(object, key_name, dest, error_message)
 
-struct sr_strbuf *
-sr_json_append_escaped(struct sr_strbuf *strbuf, const char *str);
+GString *
+sr_json_append_escaped(GString *strbuf, const char *str);

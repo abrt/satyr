@@ -19,7 +19,6 @@
 */
 #include "utils.h"
 #include "location.h"
-#include "strbuf.h"
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -30,6 +29,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <ctype.h>
+#include <glib.h>
 
 #define ANONYMIZED_PATH "/home/anonymized"
 /* Maximum allowed size of a file when reading into memory. Currently 20 MB. */
@@ -694,53 +694,53 @@ sr_bin2hex(char *dst, const char *str, int count)
 char *
 sr_indent(const char *input, int spaces)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
     if (*input)
     {
         for (int i = 0; i < spaces; ++i)
-            sr_strbuf_append_char(strbuf, ' ');
+            g_string_append_c(strbuf, ' ');
     }
 
     char *indented = sr_indent_except_first_line(input, spaces);
-    sr_strbuf_append_str(strbuf, indented);
+    g_string_append(strbuf, indented);
     free(indented);
 
-    return sr_strbuf_free_nobuf(strbuf);
+    return g_string_free(strbuf, FALSE);
 }
 
 char *
 sr_indent_except_first_line(const char *input, int spaces)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
+    GString *strbuf = g_string_new(NULL);
 
     const char *c = input;
     while (*c)
     {
         if (*c == '\n')
         {
-            sr_strbuf_append_char(strbuf, '\n');
+            g_string_append_c(strbuf, '\n');
             if (*++c)
             {
                 for (int i = 0; i < spaces; ++i)
-                    sr_strbuf_append_char(strbuf, ' ');
+                    g_string_append_c(strbuf, ' ');
             }
 
             continue;
         }
         else
-            sr_strbuf_append_char(strbuf, *c);
+            g_string_append_c(strbuf, *c);
 
         ++c;
     }
 
-    return sr_strbuf_free_nobuf(strbuf);
+    return g_string_free(strbuf, FALSE);
 }
 
 char *
 sr_build_path(const char *first_element, ...)
 {
-    struct sr_strbuf *strbuf = sr_strbuf_new();
-    sr_strbuf_append_str(strbuf, first_element);
+    GString *strbuf = g_string_new(NULL);
+    g_string_append(strbuf, first_element);
 
     va_list elements;
     va_start(elements, first_element);
@@ -748,12 +748,12 @@ sr_build_path(const char *first_element, ...)
     const char *element;
     while ((element = va_arg(elements, const char *)))
     {
-        sr_strbuf_append_char(strbuf, '/');
-        sr_strbuf_append_str(strbuf, element);
+        g_string_append_c(strbuf, '/');
+        g_string_append(strbuf, element);
     }
 
     va_end(elements);
-    return sr_strbuf_free_nobuf(strbuf);
+    return g_string_free(strbuf, FALSE);
 }
 
 static void

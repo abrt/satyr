@@ -34,9 +34,9 @@ extern "C" {
 #include <json.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <glib.h>
 
 struct sr_java_frame;
-struct sr_strbuf;
 struct sr_location;
 
 /**
@@ -190,7 +190,7 @@ sr_java_thread_remove_frames_below_n(struct sr_java_thread *thread,
  */
 void
 sr_java_thread_append_to_str(struct sr_java_thread *thread,
-                             struct sr_strbuf *dest);
+                             GString *dest);
 
 /**
  * If the input contains proper thread with frames, parse the thread,

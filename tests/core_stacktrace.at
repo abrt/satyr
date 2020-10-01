@@ -210,7 +210,6 @@ AT_TESTFUN([sr_core_stacktrace_from_gdb_limit],
 #include "core/thread.h"
 #include "core/frame.h"
 #include "core/unwind.h"
-#include "strbuf.h"
 #include "utils.h"
 #include "report_type.h"
 #include <assert.h>
@@ -262,7 +261,7 @@ char *generate_coredump(int start)
 
   return sr_asprintf("%s.%s", coredump_pattern, mypid);
 }
-struct sr_strbuf *
+GString *
 get_backtrace(const char *core_file, const char *executable)
 {
   unsigned i = 0;
@@ -312,14 +311,17 @@ get_backtrace(const char *core_file, const char *executable)
   }
   close(p[1]);
 
-  struct sr_strbuf *gdb_buf = sr_strbuf_new();
-  sr_strbuf_init(gdb_buf);
+  GString *gdb_buf = g_string_new(NULL);
+  gdb_buf->allocated_len = 8;
+  gdb_buf->len = 0;
+  gdb_buf->str = sr_malloc(gdb_buf->allocated_len);
+  gdb_buf->str[0] = '\0';
   char buf[256];
   ssize_t size;
   while((size = read(p[0], buf, sizeof(buf)-1)) > 0 && errno != EINTR)
   {
     buf[size] = '\0';
-    sr_strbuf_append_str(gdb_buf, (const char*) buf);
+    g_string_append(gdb_buf, (const char*) buf);
   }
 
   int status, r;
@@ -337,12 +339,12 @@ main(int argc, char* argv[])
 {
   char *coredump_path = generate_coredump(257);
 
-  struct sr_strbuf *gdb_output = get_backtrace(coredump_path, argv[0]);
+  GString *gdb_output = get_backtrace(coredump_path, argv[0]);
   assert(gdb_output);
-  assert(gdb_output->buf);
+  assert(gdb_output->str);
 
   char *error_msg = NULL;
-  struct sr_core_stacktrace *core_stacktrace = sr_core_stacktrace_from_gdb(gdb_output->buf, coredump_path, argv[0], &error_msg);
+  struct sr_core_stacktrace *core_stacktrace = sr_core_stacktrace_from_gdb(gdb_output->str, coredump_path, argv[0], &error_msg);
   assert(!error_msg);
 
   struct sr_core_thread *threads = core_stacktrace->threads;
@@ -355,7 +357,7 @@ main(int argc, char* argv[])
   assert(nframes == CORE_STACKTRACE_FRAME_LIMIT);
 
   free(coredump_path);
-  sr_strbuf_free(gdb_output);
+  g_string_free(gdb_output, TRUE);
 
   return 0;
 }

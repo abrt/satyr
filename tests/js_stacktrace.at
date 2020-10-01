@@ -6,7 +6,6 @@ AT_TESTFUN([sr_js_stacktrace_parse_v8], [[
 #include "js/stacktrace.h"
 #include "js/frame.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "location.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -16,10 +15,10 @@ AT_TESTFUN([sr_js_stacktrace_parse_v8], [[
 void
 print_frame(FILE *out, struct sr_js_frame *frame)
 {
-    struct sr_strbuf *buf = sr_strbuf_new();
+    GString *buf = g_string_new(NULL);
     sr_js_frame_append_to_str(frame, buf);
-    fprintf(out, "%s", buf->buf);
-    sr_strbuf_free(buf);
+    fprintf(out, "%s", buf->str);
+    g_string_free(buf, TRUE);
 }
 
 void
@@ -373,7 +372,6 @@ AT_TESTFUN([sr_js_stacktrace_from_json], [[
 #include "js/stacktrace.h"
 #include "js/frame.h"
 #include "utils.h"
-#include "strbuf.h"
 #include "location.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -423,13 +421,13 @@ check(const char *filename, const char *json_filename)
     uint32_t i = 0;
     for (; f1 && f2; ++i) {
         if (0 != sr_js_frame_cmp(f1, f2)) {
-            struct sr_strbuf *buf1 = sr_strbuf_new();
+            GString *buf1 = g_string_new(NULL);
             sr_js_frame_append_to_str(f1, buf1);
 
-            struct sr_strbuf *buf2 = sr_strbuf_new();
+            GString *buf2 = g_string_new(NULL);
             sr_js_frame_append_to_str(f2, buf2);
 
-            fprintf(stderr, "Frames %i do not match:\n'%s' != '%s'\n", i, buf1->buf, buf2->buf);
+            fprintf(stderr, "Frames %i do not match:\n'%s' != '%s'\n", i, buf1->str, buf2->str);
 
             assert(!"Frames do not match");
         }
