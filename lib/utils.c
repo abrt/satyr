@@ -61,19 +61,6 @@ warn(const char *fmt, ...)
 
 }
 
-void *
-sr_realloc(void *ptr, size_t size)
-{
-    void *result = realloc(ptr, size);
-    /* When size is 0, realloc may return NULL on success. */
-    if (!result && size > 0)
-    {
-        fprintf(stderr, "sr_realloc: out of memory");
-        exit(1);
-    }
-    return result;
-}
-
 char *
 sr_vasprintf(const char *format, va_list p)
 {

@@ -57,11 +57,6 @@ sr_debug_parser;
 /**
  * Never returns NULL.
  */
-sr_realloc(void *ptr, size_t size);
-
-/**
- * Never returns NULL.
- */
 char *
 sr_vasprintf(const char *format, va_list p);
 

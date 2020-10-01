@@ -708,7 +708,7 @@ sr_koops_stacktrace_from_json(json_object *root, char **error_message)
             if (i + 1 == allocated)
             {
                 allocated *= 2;
-                result->modules = sr_realloc(result->modules, allocated);
+                result->modules = g_realloc(result->modules, allocated);
             }
             result->modules[i] = sr_strdup(module);
         }
