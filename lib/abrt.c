@@ -119,7 +119,7 @@ create_core_stacktrace(const char *directory, const char *gdb_output,
 
     // Add newline to the end of core stacktrace file to make text
     // editors happy.
-    json = sr_realloc(json, strlen(json) + 2);
+    json = g_realloc(json, strlen(json) + 2);
     strcat(json, "\n");
 
     char *core_backtrace_filename = sr_build_path(directory, "core_backtrace", NULL);
@@ -183,7 +183,7 @@ sr_abrt_get_core_stacktrace_from_core_hook_generate(pid_t thread_id,
 
     // Add newline to the end of core stacktrace file to make text
     // editors happy.
-    json = sr_realloc(json, strlen(json) + 2);
+    json = g_realloc(json, strlen(json) + 2);
     strcat(json, "\n");
 
     return json;

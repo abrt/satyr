@@ -310,7 +310,7 @@ debug_unwind_from_hook(int argc, char **argv)
     char *json = sr_core_stacktrace_to_json(core_stacktrace);
     // Add newline to the end of core stacktrace file to make text
     // editors happy.
-    json = sr_realloc(json, strlen(json) + 2);
+    json = g_realloc(json, strlen(json) + 2);
     strcat(json, "\n");
 
     time_t t = time(NULL);
