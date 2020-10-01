@@ -121,6 +121,7 @@ check_DATA = atconfig atlocal $(TESTSUITE)
 DISTCLEANFILES = atconfig
 EXTRA_DIST += atlocal.in
 EXTRA_DIST += java_testcases.c
+EXTRA_DIST += valgrind.supp
 
 TESTSUITEFLAGS =
 
@@ -144,3 +145,12 @@ AUTOTEST = $(AUTOM4TE) --language=autotest
 $(TESTSUITE): $(TESTSUITE_AT) $(srcdir)/package.m4
 	$(AUTOTEST) -I '$(srcdir)' -o $@.tmp $@.at
 	mv $@.tmp $@
+
+.PHONY: maintainer-check-valgrind
+maintainer-check-valgrind: $(check_DATA)
+	$(MAKE) check-local \
+			PRE_AT_CHECK='$(abs_top_builddir)/libtool --mode=execute $(VALGRIND)' \
+			VALGRIND_OPTS='--tool=memcheck --leak-check=full --show-reachable=yes --errors-for-leak-kinds=definite,indirect --error-exitcode=1 --suppressions=$(abs_top_builddir)/tests/valgrind.supp -q'
+
+.PHONY: maintainer-check
+maintainer-check: maintainer-check-valgrind

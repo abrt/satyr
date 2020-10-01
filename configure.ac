@@ -139,6 +139,8 @@ AC_ARG_WITH([rpm],
 # c++ symbol demangling
 AC_CHECK_LIB([stdc++], [__cxa_demangle], [], [echo "error: stdc++ library not found"; exit 1])
 
+AC_CHECK_PROGS([VALGRIND], [valgrind])
+
 AC_CONFIG_FILES([
 	satyr.pc
 	Makefile
