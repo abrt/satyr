@@ -191,7 +191,7 @@ touch_module(Dwfl_Module *mod, void **userdata, const char *name,
 
     if (filename)
     {
-        **tailp = sr_mallocz(sizeof(struct exe_mapping_data));
+        **tailp = g_malloc0(sizeof(struct exe_mapping_data));
         (**tailp)->start = (uint64_t)base;
         (**tailp)->filename = sr_strdup(filename);
         *tailp = &((**tailp)->next);
@@ -203,7 +203,7 @@ touch_module(Dwfl_Module *mod, void **userdata, const char *name,
 struct core_handle *
 open_coredump(const char *elf_file, const char *exe_file, char **error_msg)
 {
-    struct core_handle *ch = sr_mallocz(sizeof(*ch));
+    struct core_handle *ch = g_malloc0(sizeof(*ch));
     struct exe_mapping_data *head = NULL, **tail = &head;
 
     /* Initialize libelf, open the file and get its Elf handle. */
@@ -314,7 +314,7 @@ resolve_frame(Dwfl *dwfl, Dwarf_Addr ip, bool minus_one)
         ret = dwfl_module_build_id(mod, &build_id_bits, &bid_addr);
         if (ret > 0)
         {
-            frame->build_id = sr_mallocz(2*ret + 1);
+            frame->build_id = g_malloc0(2*ret + 1);
             sr_bin2hex(frame->build_id, (const char *)build_id_bits, ret);
         }
 

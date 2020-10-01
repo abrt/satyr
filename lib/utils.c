@@ -74,14 +74,6 @@ sr_malloc(size_t size)
 }
 
 void *
-sr_mallocz(size_t size)
-{
-    void *ptr = sr_malloc(size);
-    memset(ptr, 0, size);
-    return ptr;
-}
-
-void *
 sr_realloc(void *ptr, size_t size)
 {
     void *result = realloc(ptr, size);

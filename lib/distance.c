@@ -472,7 +472,7 @@ struct sr_distances_part *
 sr_distances_part_new(int m, int n, enum sr_distance_type dist_type,
                       int m_begin, int n_begin, size_t len)
 {
-    struct sr_distances_part *part = sr_mallocz(sizeof(*part));
+    struct sr_distances_part *part = g_malloc0(sizeof(*part));
 
     part->m = m;
     part->n = n;

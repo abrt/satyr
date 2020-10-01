@@ -409,7 +409,7 @@ read_cie(Dwarf_CFI_Entry *cfi,
     /* Default FDE encoding (i.e. no R in augmentation string) is
      * DW_EH_PE_absptr.
      */
-    struct cie *cie = sr_mallocz(sizeof(struct cie));
+    struct cie *cie = g_malloc0(sizeof(*cie));
     cie->cie_offset = cfi_offset;
     cie->ptr_len = encoded_size(DW_EH_PE_absptr, e_ident);
 

@@ -242,7 +242,7 @@ sr_core_stacktrace_from_core_hook_prepare(pid_t tid, char **error_msg)
     if (error_msg)
         *error_msg = NULL;
 
-    struct sr_core_stracetrace_unwind_state *state = sr_mallocz(sizeof(*state));
+    struct sr_core_stracetrace_unwind_state *state = g_malloc0(sizeof(*state));
     state->proc_cb.find_elf = dwfl_linux_proc_find_elf;
     state->proc_cb.find_debuginfo = find_debuginfo_none;
 
