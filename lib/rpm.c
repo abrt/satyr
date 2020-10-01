@@ -175,7 +175,7 @@ struct sr_rpm_package *
 sr_rpm_package_sort(struct sr_rpm_package *packages)
 {
     size_t count = sr_rpm_package_count(packages);
-    struct sr_rpm_package **array = sr_malloc_array(count, sizeof(struct sr_rpm_package*));
+    struct sr_rpm_package **array = g_malloc_n(count, sizeof(struct sr_rpm_package*));
 
     /* Copy the linked list to an array. */
     struct sr_rpm_package *list_loop = packages, **array_loop = array;
