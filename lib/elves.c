@@ -302,7 +302,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
             return NULL;
         }
 
-        struct sr_elf_plt_entry *entry = sr_malloc(sizeof(struct sr_elf_plt_entry));
+        struct sr_elf_plt_entry *entry = g_malloc(sizeof(*entry));
         entry->symbol_name = sr_strdup(elf_strptr(elf, stringtable,
                                                   symb.st_name));
 
@@ -750,7 +750,7 @@ sr_elf_get_eh_frame(const char *filename,
                 initial_location -= exec_base;
             }
 
-            struct sr_elf_fde *fde = sr_malloc(sizeof(struct sr_elf_fde));
+            struct sr_elf_fde *fde = g_malloc(sizeof(*fde));
             fde->exec_base = exec_base;
             fde->start_address = initial_location;
             fde->length = address_range;

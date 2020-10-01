@@ -78,7 +78,7 @@ struct stacktrace_methods gdb_stacktrace_methods =
 struct sr_gdb_stacktrace *
 sr_gdb_stacktrace_new()
 {
-    struct sr_gdb_stacktrace *stacktrace = sr_malloc(sizeof(struct sr_gdb_stacktrace));
+    struct sr_gdb_stacktrace *stacktrace = g_malloc(sizeof(*stacktrace));
     sr_gdb_stacktrace_init(stacktrace);
     return stacktrace;
 }

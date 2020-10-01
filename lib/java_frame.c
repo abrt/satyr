@@ -65,7 +65,7 @@ struct sr_java_frame *
 sr_java_frame_new()
 {
     struct sr_java_frame *frame =
-        sr_malloc(sizeof(*frame));
+        g_malloc(sizeof(*frame));
 
     sr_java_frame_init(frame);
     return frame;
@@ -75,7 +75,7 @@ struct sr_java_frame *
 sr_java_frame_new_exception()
 {
     struct sr_java_frame *frame =
-        sr_malloc(sizeof(*frame));
+        g_malloc(sizeof(*frame));
 
     sr_java_frame_init(frame);
     frame->is_exception = true;

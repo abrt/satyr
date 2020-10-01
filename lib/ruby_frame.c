@@ -61,7 +61,7 @@ struct sr_ruby_frame *
 sr_ruby_frame_new()
 {
     struct sr_ruby_frame *frame =
-        sr_malloc(sizeof(struct sr_ruby_frame));
+        g_malloc(sizeof(*frame));
 
     sr_ruby_frame_init(frame);
     return frame;

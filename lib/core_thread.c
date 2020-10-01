@@ -58,7 +58,7 @@ struct thread_methods core_thread_methods =
 struct sr_core_thread *
 sr_core_thread_new()
 {
-    struct sr_core_thread *thread = sr_malloc(sizeof(struct sr_core_thread));
+    struct sr_core_thread *thread = g_malloc(sizeof(*thread));
     sr_core_thread_init(thread);
     return thread;
 }

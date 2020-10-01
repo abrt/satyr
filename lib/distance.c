@@ -315,7 +315,7 @@ get_distance_position(const struct sr_distances *distances, int i, int j)
 struct sr_distances *
 sr_distances_new(int m, int n)
 {
-    struct sr_distances *distances = sr_malloc(sizeof(struct sr_distances));
+    struct sr_distances *distances = g_malloc(sizeof(*distances));
 
     /* The number of rows has to be smaller than columns. */
     if (m >= n)

@@ -105,7 +105,7 @@ struct sr_koops_stacktrace *
 sr_koops_stacktrace_new()
 {
     struct sr_koops_stacktrace *stacktrace =
-        sr_malloc(sizeof(struct sr_koops_stacktrace));
+        g_malloc(sizeof(*stacktrace));
 
     sr_koops_stacktrace_init(stacktrace);
     return stacktrace;

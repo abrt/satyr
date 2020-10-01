@@ -314,7 +314,7 @@ get_backtrace(const char *core_file, const char *executable)
   GString *gdb_buf = g_string_new(NULL);
   gdb_buf->allocated_len = 8;
   gdb_buf->len = 0;
-  gdb_buf->str = sr_malloc(gdb_buf->allocated_len);
+  gdb_buf->str = g_malloc(gdb_buf->allocated_len);
   gdb_buf->str[0] = '\0';
   char buf[256];
   ssize_t size;

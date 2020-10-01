@@ -70,8 +70,7 @@ struct stacktrace_methods core_stacktrace_methods =
 struct sr_core_stacktrace *
 sr_core_stacktrace_new()
 {
-    struct sr_core_stacktrace *stacktrace =
-        sr_malloc(sizeof(struct sr_core_stacktrace));
+    struct sr_core_stacktrace *stacktrace = g_malloc(sizeof(*stacktrace));
 
     sr_core_stacktrace_init(stacktrace);
     return stacktrace;

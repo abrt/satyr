@@ -61,7 +61,7 @@ struct sr_koops_frame *
 sr_koops_frame_new()
 {
     struct sr_koops_frame *frame =
-        sr_malloc(sizeof(struct sr_koops_frame));
+        g_malloc(sizeof(*frame));
 
     sr_koops_frame_init(frame);
     return frame;

@@ -62,18 +62,6 @@ warn(const char *fmt, ...)
 }
 
 void *
-sr_malloc(size_t size)
-{
-    void *ptr = malloc(size);
-    if (!ptr)
-    {
-        fprintf(stderr, "sr_malloc: out of memory");
-        exit(1);
-    }
-    return ptr;
-}
-
-void *
 sr_realloc(void *ptr, size_t size)
 {
     void *result = realloc(ptr, size);
@@ -100,7 +88,7 @@ sr_vasprintf(const char *format, va_list p)
     va_list p2;
     va_copy(p2, p);
     r = vsnprintf(NULL, 0, format, p);
-    string_ptr = sr_malloc(r+1);
+    string_ptr = g_malloc(r+1);
     r = vsnprintf(string_ptr, r+1, format, p2);
     va_end(p2);
 #endif
@@ -281,7 +269,7 @@ sr_file_to_string(const char *filename,
         return NULL;
     }
 
-    char *contents = sr_malloc(size + 1);
+    char *contents = g_malloc(size + 1);
     if (size != read(fd, contents, size))
     {
         *error_message = sr_asprintf("Unable to read from '%s'.", filename);

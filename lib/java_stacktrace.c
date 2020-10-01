@@ -65,7 +65,7 @@ struct sr_java_stacktrace *
 sr_java_stacktrace_new()
 {
     struct sr_java_stacktrace *stacktrace =
-        sr_malloc(sizeof(*stacktrace));
+        g_malloc(sizeof(*stacktrace));
 
     sr_java_stacktrace_init(stacktrace);
     return stacktrace;

@@ -82,7 +82,7 @@ struct sr_python_stacktrace *
 sr_python_stacktrace_new()
 {
     struct sr_python_stacktrace *stacktrace =
-        sr_malloc(sizeof(struct sr_python_stacktrace));
+        g_malloc(sizeof(*stacktrace));
 
     sr_python_stacktrace_init(stacktrace);
     return stacktrace;

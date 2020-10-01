@@ -49,7 +49,7 @@ static char *report_types[] =
 struct sr_report *
 sr_report_new()
 {
-    struct sr_report *report = sr_malloc(sizeof(struct sr_report));
+    struct sr_report *report = g_malloc(sizeof(*report));
     sr_report_init(report);
     return report;
 }
@@ -97,7 +97,7 @@ sr_report_free(struct sr_report *report)
 void
 sr_report_add_auth(struct sr_report *report, const char *key, const char *value)
 {
-    struct sr_report_custom_entry *new_entry = sr_malloc(sizeof(*new_entry));
+    struct sr_report_custom_entry *new_entry = g_malloc(sizeof(*new_entry));
     new_entry->key = sr_strdup(key);
     new_entry->value = sr_strdup(value);
 

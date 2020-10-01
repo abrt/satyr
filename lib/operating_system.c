@@ -30,7 +30,7 @@
 struct sr_operating_system *
 sr_operating_system_new()
 {
-    struct sr_operating_system *operating_system = sr_malloc(sizeof(struct sr_operating_system));
+    struct sr_operating_system *operating_system = g_malloc(sizeof(*operating_system));
     sr_operating_system_init(operating_system);
     return operating_system;
 }

@@ -81,7 +81,7 @@ struct sr_ruby_stacktrace *
 sr_ruby_stacktrace_new()
 {
     struct sr_ruby_stacktrace *stacktrace =
-        sr_malloc(sizeof(struct sr_ruby_stacktrace));
+        g_malloc(sizeof(*stacktrace));
 
     sr_ruby_stacktrace_init(stacktrace);
     return stacktrace;
