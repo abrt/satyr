@@ -342,7 +342,7 @@ sr_koops_stacktrace_parse(const char **input,
     parse_taint_flags(local_input, stacktrace);
 
     /* The "reason" is expected to be the first line of the input */
-    stacktrace->reason = sr_strndup(*input, strcspn(*input, "\n"));
+    stacktrace->reason = g_strndup(*input, strcspn(*input, "\n"));
 
     while (*local_input)
     {

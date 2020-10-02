@@ -76,9 +76,9 @@ sr_unstrip_parse(const char *unstrip_output)
         struct sr_unstrip_entry *entry = g_malloc(sizeof(*entry));
         entry->start = start;
         entry->length = length;
-        entry->build_id = sr_strndup(build_id, build_id_len);
-        entry->file_name = sr_strndup(file_name, file_name_len);
-        entry->mod_name = sr_strndup(mod_name, mod_name_len);
+        entry->build_id = g_strndup(build_id, build_id_len);
+        entry->file_name = g_strndup(file_name, file_name_len);
+        entry->mod_name = g_strndup(mod_name, mod_name_len);
         entry->next = NULL;
 
         if (!result)

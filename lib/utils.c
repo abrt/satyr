@@ -64,19 +64,7 @@ warn(const char *fmt, ...)
 char *
 sr_strdup(const char *s)
 {
-    return sr_strndup(s, strlen(s));
-}
-
-char *
-sr_strndup(const char *s, size_t n)
-{
-    char *result = strndup(s, n);
-    if (result == NULL)
-    {
-        fprintf(stderr, "satyr: out of memory");
-        exit(1);
-    }
-    return result;
+    return g_strndup(s, strlen(s));
 }
 
 void
@@ -346,7 +334,7 @@ sr_parse_char_span(const char **input, const char *accept, char **result)
     size_t count = strspn(*input, accept);
     if (count == 0)
         return 0;
-    *result = sr_strndup(*input, count);
+    *result = g_strndup(*input, count);
     *input += count;
     return count;
 }
@@ -367,7 +355,7 @@ sr_parse_char_cspan(const char **input, const char *reject, char **result)
     size_t count = strcspn(*input, reject);
     if (count == 0)
         return false;
-    *result = sr_strndup(*input, count);
+    *result = g_strndup(*input, count);
     *input += count;
     return true;
 }
@@ -401,7 +389,7 @@ sr_parse_string(const char **input, const char *string, char **result)
     }
     if (*local_string != '\0')
         return false;
-    *result = sr_strndup(string, local_input - *input);
+    *result = g_strndup(string, local_input - *input);
     *input = local_input;
     return true;
 }
@@ -713,8 +701,8 @@ sr_parse_os_release(const char *input, void (*callback)(char*, char*, void*),
             goto skip_line;
         }
 
-        char *key = sr_strndup(cursor, key_end - cursor);
-        char *value = sr_strndup(key_end + 1, value_end - key_end - 1);
+        char *key = g_strndup(cursor, key_end - cursor);
+        char *value = g_strndup(key_end + 1, value_end - key_end - 1);
         unescape_osinfo_value(value, value);
 
         warn("os-release:%u: parsed line: '%s'='%s'", line, key, value);

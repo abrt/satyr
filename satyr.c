@@ -167,7 +167,7 @@ debug_normalize(int argc, char **argv)
         {
         }
 
-        frame->function_name = sr_strndup(cur, end - cur);
+        frame->function_name = g_strndup(cur, end - cur);
         cur = end;
         sr_skip_whitespace(cur);
 
@@ -175,7 +175,7 @@ debug_normalize(int argc, char **argv)
         {
         }
 
-        frame->library_name = sr_strndup(cur, end - cur);
+        frame->library_name = g_strndup(cur, end - cur);
         cur = end;
         sr_skip_whitespace(cur);
 
@@ -183,7 +183,7 @@ debug_normalize(int argc, char **argv)
         {
         }
 
-        frame->source_file = sr_strndup(cur, end - cur);
+        frame->source_file = g_strndup(cur, end - cur);
 
         /* Skip the rest of the line. */
         while (*cur && *cur++ != '\n')

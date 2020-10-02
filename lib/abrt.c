@@ -226,7 +226,7 @@ sr_abrt_parse_dso_list(const char *text)
         }
 
         // Parse the package NEVRA.
-        char *nevra = sr_strndup(pos, end - pos);
+        char *nevra = g_strndup(pos, end - pos);
         struct sr_rpm_package *dso_package = sr_rpm_package_new();
         bool success = sr_rpm_package_parse_nevra(nevra,
                                                   &dso_package->name,
@@ -253,7 +253,7 @@ sr_abrt_parse_dso_list(const char *text)
             break;
         }
 
-        char *line = sr_strndup(pos, eol - pos);
+        char *line = g_strndup(pos, eol - pos);
         pos = strrchr(line, ' ');
         if (!pos)
         {
