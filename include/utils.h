@@ -64,12 +64,6 @@ sr_vasprintf(const char *format, va_list p);
  * Never returns NULL.
  */
 char *
-sr_asprintf(const char *format, ...) __sr_printf(1, 2);
-
-/**
- * Never returns NULL.
- */
-char *
 sr_strdup(const char *s);
 
 /**

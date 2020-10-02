@@ -49,7 +49,7 @@ sr_parse_coredump(const char *coredump_filename,
                   const char *executable_filename,
                   char **error_message)
 {
-    *error_message = sr_asprintf("satyr is built without unwind support");
+    *error_message = g_strdup_printf("satyr is built without unwind support");
     return NULL;
 }
 
@@ -60,7 +60,7 @@ sr_parse_coredump(const char *coredump_filename,
 struct sr_core_stracetrace_unwind_state *
 sr_core_stacktrace_from_core_hook_prepare(pid_t thread_id, char **error_message)
 {
-    *error_message = sr_asprintf("satyr is built without live process unwind support");
+    *error_message = g_strdup_printf("satyr is built without live process unwind support");
     return NULL;
 }
 
@@ -71,7 +71,7 @@ sr_core_stacktrace_from_core_hook_generate(pid_t thread_id,
                                            struct sr_core_stracetrace_unwind_state *state,
                                            char **error_message)
 {
-    *error_message = sr_asprintf("satyr is built without live process unwind support");
+    *error_message = g_strdup_printf("satyr is built without live process unwind support");
     return NULL;
 }
 
@@ -81,7 +81,7 @@ sr_core_stacktrace_from_core_hook(pid_t thread_id,
                                   int signum,
                                   char **error_message)
 {
-    *error_message = sr_asprintf("satyr is built without live process unwind support");
+    *error_message = g_strdup_printf("satyr is built without live process unwind support");
     return NULL;
 }
 

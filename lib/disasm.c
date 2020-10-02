@@ -37,7 +37,7 @@ struct sr_disasm_state *
 sr_disasm_init(const char *file_name,
                char **error_message)
 {
-    *error_message = sr_asprintf("satyr compiled without libopcodes");
+    *error_message = g_strdup_printf("satyr compiled without libopcodes");
     return NULL;
 }
 
@@ -56,7 +56,7 @@ sr_disasm_get_function_instructions(struct sr_disasm_state *state,
                                     uint64_t size,
                                     char **error_message)
 {
-    *error_message = sr_asprintf("satyr compiled without libopcodes");
+    *error_message = g_strdup_printf("satyr compiled without libopcodes");
     return NULL;
 }
 
@@ -214,6 +214,6 @@ sr_disasm_binary_to_text(struct sr_disasm_state *state,
                          uint64_t size,
                          char **error_message)
 {
-    *error_message = sr_asprintf("satyr compiled without libopcodes");
+    *error_message = g_strdup_printf("satyr compiled without libopcodes");
     return NULL;
 }

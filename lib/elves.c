@@ -66,7 +66,7 @@ find_elf_section_by_name(Elf *elf,
     size_t shdr_string_index;
     if (0 != elf_getshdrstrndx(elf, &shdr_string_index))
     {
-        *error_message = sr_asprintf("elf_getshdrstrndx failed");
+        *error_message = g_strdup_printf("elf_getshdrstrndx failed");
         return 0;
     }
 
@@ -80,7 +80,7 @@ find_elf_section_by_name(Elf *elf,
         GElf_Shdr shdr;
         if (gelf_getshdr(section, &shdr) != &shdr)
         {
-            *error_message = sr_asprintf("gelf_getshdr failed");
+            *error_message = g_strdup_printf("gelf_getshdr failed");
             return 0;
         }
 
@@ -90,7 +90,7 @@ find_elf_section_by_name(Elf *elf,
 
         if (!current_section_name)
         {
-            *error_message = sr_asprintf("elf_strptr failed");
+            *error_message = g_strdup_printf("elf_strptr failed");
             return 0;
         }
 
@@ -100,7 +100,7 @@ find_elf_section_by_name(Elf *elf,
             *data_dest = elf_getdata(section, NULL);
             if (!*data_dest)
             {
-                *error_message = sr_asprintf("elf_getdata failed");
+                *error_message = g_strdup_printf("elf_getdata failed");
                 return 0;
             }
 
@@ -110,7 +110,7 @@ find_elf_section_by_name(Elf *elf,
         }
     }
 
-    *error_message = sr_asprintf("Section %s not found", section_name);
+    *error_message = g_strdup_printf("Section %s not found", section_name);
     return 0;
 }
 #endif /* WITH_ELFUTILS */
@@ -124,7 +124,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
     int fd = open(filename, O_RDONLY);
     if (fd < 0)
     {
-        *error_message = sr_asprintf("Failed to open file %s: %s",
+        *error_message = g_strdup_printf("Failed to open file %s: %s",
                                      filename,
                                      strerror(errno));
 
@@ -135,7 +135,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
     Elf *elf = elf_begin(fd, ELF_C_READ, NULL);
     if (!elf)
     {
-        *error_message = sr_asprintf("Failed to run elf_begin on file %s: %s",
+        *error_message = g_strdup_printf("Failed to run elf_begin on file %s: %s",
                                      filename,
                                      elf_errmsg(-1));
 
@@ -154,7 +154,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
                                                         &find_section_error_message);
     if (0 == plt_section_index)
     {
-        *error_message = sr_asprintf("Failed to find .plt section for %s: %s",
+        *error_message = g_strdup_printf("Failed to find .plt section for %s: %s",
                                      filename,
                                      find_section_error_message);
 
@@ -176,7 +176,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
     {
         if (gelf_getshdr(section, &shdr) != &shdr)
         {
-            *error_message = sr_asprintf("gelf_getshdr failed for %s: %s",
+            *error_message = g_strdup_printf("gelf_getshdr failed for %s: %s",
                                          filename,
                                          elf_errmsg(-1));
 
@@ -191,7 +191,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
             rela_plt_data = elf_getdata(section, NULL);
             if (!rela_plt_data)
             {
-                *error_message = sr_asprintf("elf_getdata failed for %s: %s",
+                *error_message = g_strdup_printf("elf_getdata failed for %s: %s",
                                              filename,
                                              elf_errmsg(-1));
 
@@ -204,7 +204,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
             Elf_Scn *symbol_section = elf_getscn(elf, shdr.sh_link);
             if (!symbol_section)
             {
-                *error_message = sr_asprintf("elf_getscn failed for %s: %s",
+                *error_message = g_strdup_printf("elf_getscn failed for %s: %s",
                                              filename,
                                              elf_errmsg(-1));
 
@@ -216,7 +216,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
             plt_symbols = elf_getdata(symbol_section, NULL);
             if (!plt_symbols)
             {
-                *error_message = sr_asprintf("elf_getdata failed for %s: %s",
+                *error_message = g_strdup_printf("elf_getdata failed for %s: %s",
                                              filename,
                                              elf_errmsg(-1));
 
@@ -228,7 +228,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
             /* Get string table for the symbol table. */
             if (gelf_getshdr(symbol_section, &shdr) != &shdr)
             {
-                *error_message = sr_asprintf("gelf_getshdr failed for %s: %s",
+                *error_message = g_strdup_printf("gelf_getshdr failed for %s: %s",
                                              filename,
                                              elf_errmsg(-1));
 
@@ -244,7 +244,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
 
     if (0 == stringtable)
     {
-        *error_message = sr_asprintf("Unable to read symbol table for .plt for file %s",
+        *error_message = g_strdup_printf("Unable to read symbol table for .plt for file %s",
                                      filename);
 
         elf_end(elf);
@@ -279,7 +279,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
         GElf_Rela rela;
         if (gelf_getrela(rela_plt_data, *plt_index, &rela) != &rela)
         {
-            *error_message = sr_asprintf("gelf_getrela failed for %s: %s",
+            *error_message = g_strdup_printf("gelf_getrela failed for %s: %s",
                                          filename,
                                          elf_errmsg(-1));
 
@@ -292,7 +292,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
         GElf_Sym symb;
         if (gelf_getsym(plt_symbols, GELF_R_SYM(rela.r_info), &symb) != &symb)
         {
-            *error_message = sr_asprintf("gelf_getsym failed for %s: %s",
+            *error_message = g_strdup_printf("gelf_getsym failed for %s: %s",
                                          filename,
                                          elf_errmsg(-1));
 
@@ -322,7 +322,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
     close(fd);
     return result;
 #else /* WITH_ELFUTILS */
-    *error_message = sr_asprintf("satyr compiled without elfutils");
+    *error_message = g_strdup_printf("satyr compiled without elfutils");
     return NULL;
 #endif /* WITH_ELFUTILS */
 }
@@ -431,7 +431,7 @@ read_cie(Dwarf_CFI_Entry *cfi,
             cie->ptr_len = encoded_size(*augmentation_data, e_ident);
             if (cie->ptr_len != 4 && cie->ptr_len != 8)
             {
-                *error_message = sr_asprintf("Unknown FDE encoding (CIE %jx)",
+                *error_message = g_strdup_printf("Unknown FDE encoding (CIE %jx)",
                                              (uintmax_t)cfi_offset);
                 free(cie);
                 return NULL;
@@ -449,7 +449,7 @@ read_cie(Dwarf_CFI_Entry *cfi,
             unsigned size = encoded_size(*augmentation_data, e_ident);
             if (0 == size)
             {
-                *error_message = sr_asprintf("Unknown size for personality encoding (CIE %jx)",
+                *error_message = g_strdup_printf("Unknown size for personality encoding (CIE %jx)",
                                              (uintmax_t)cfi_offset);
 
                 free(cie);
@@ -460,7 +460,7 @@ read_cie(Dwarf_CFI_Entry *cfi,
             break;
         }
         default:
-            *error_message = sr_asprintf("Unknown augmentation char (CIE %jx)",
+            *error_message = g_strdup_printf("Unknown augmentation char (CIE %jx)",
                                          (uintmax_t)cfi_offset);
             free(cie);
             return NULL;
@@ -505,7 +505,7 @@ sr_elf_get_eh_frame(const char *filename,
     int fd = open(filename, O_RDONLY);
     if (fd < 0)
     {
-        *error_message = sr_asprintf("Failed to open file %s: %s",
+        *error_message = g_strdup_printf("Failed to open file %s: %s",
                                      filename,
                                      strerror(errno));
         return NULL;
@@ -515,7 +515,7 @@ sr_elf_get_eh_frame(const char *filename,
     Elf *elf = elf_begin(fd, ELF_C_READ, NULL);
     if (!elf)
     {
-        *error_message = sr_asprintf("Failed to run elf_begin on file %s: %s",
+        *error_message = g_strdup_printf("Failed to run elf_begin on file %s: %s",
                                      filename,
                                      elf_errmsg(-1));
         close(fd);
@@ -525,7 +525,7 @@ sr_elf_get_eh_frame(const char *filename,
     unsigned char *e_ident = (unsigned char *)elf_getident(elf, NULL);
     if (!e_ident)
     {
-        *error_message = sr_asprintf("elf_getident failed for %s: %s",
+        *error_message = g_strdup_printf("elf_getident failed for %s: %s",
                                      filename,
                                      elf_errmsg(-1));
         elf_end(elf);
@@ -543,7 +543,7 @@ sr_elf_get_eh_frame(const char *filename,
                                   &shdr,
                                   &find_section_error_message))
     {
-        *error_message = sr_asprintf("Failed to find .eh_frame section for %s: %s",
+        *error_message = g_strdup_printf("Failed to find .eh_frame section for %s: %s",
                                      filename,
                                      find_section_error_message);
 
@@ -562,7 +562,7 @@ sr_elf_get_eh_frame(const char *filename,
     size_t phnum;
     if (elf_getphdrnum(elf, &phnum) != 0)
     {
-        *error_message = sr_asprintf("elf_getphdrnum failed for %s: %s",
+        *error_message = g_strdup_printf("elf_getphdrnum failed for %s: %s",
                                      filename,
                                      elf_errmsg(-1));
         elf_end(elf);
@@ -576,7 +576,7 @@ sr_elf_get_eh_frame(const char *filename,
         GElf_Phdr phdr;
         if (gelf_getphdr(elf, i, &phdr) != &phdr)
         {
-            *error_message = sr_asprintf("gelf_getphdr failed for %s: %s",
+            *error_message = g_strdup_printf("gelf_getphdr failed for %s: %s",
                                          filename,
                                          elf_errmsg(-1));
             elf_end(elf);
@@ -593,7 +593,7 @@ sr_elf_get_eh_frame(const char *filename,
 
     if (exec_base == UINT64_MAX)
     {
-        *error_message = sr_asprintf("Can't determine executable base for %s",
+        *error_message = g_strdup_printf("Can't determine executable base for %s",
                                      filename);
 
         elf_end(elf);
@@ -642,7 +642,7 @@ sr_elf_get_eh_frame(const char *filename,
             if (cfi_offset_next > cfi_offset)
                 continue;
 
-            *error_message = sr_asprintf("dwarf_next_cfi failed for %s: %s",
+            *error_message = g_strdup_printf("dwarf_next_cfi failed for %s: %s",
                                          filename,
                                          dwarf_errmsg(-1));
 
@@ -669,7 +669,7 @@ sr_elf_get_eh_frame(const char *filename,
                                        &cie_error_message);
             if (!cie)
             {
-                *error_message = sr_asprintf("CIE reading failed for %s: %s",
+                *error_message = g_strdup_printf("CIE reading failed for %s: %s",
                                              filename,
                                              cie_error_message);
 
@@ -709,7 +709,7 @@ sr_elf_get_eh_frame(const char *filename,
 
             if (!cie)
             {
-                *error_message = sr_asprintf("CIE not found for FDE %jx in %s",
+                *error_message = g_strdup_printf("CIE not found for FDE %jx in %s",
                                              (uintmax_t)cfi_offset,
                                              filename);
 
@@ -774,7 +774,7 @@ sr_elf_get_eh_frame(const char *filename,
     close(fd);
     return result;
 #else /* WITH_ELFUTILS */
-    *error_message = sr_asprintf("satyr compiled without elfutils");
+    *error_message = g_strdup_printf("satyr compiled without elfutils");
     return NULL;
 #endif /* WITH_ELFUTILS */
 }

@@ -268,7 +268,7 @@ sr_java_stacktrace_get_reason(struct sr_java_stacktrace *stacktrace)
         }
     }
 
-    return sr_asprintf("Exception %s occurred in %s:%"PRIu32, exc, file, line);
+    return g_strdup_printf("Exception %s occurred in %s:%"PRIu32, exc, file, line);
 }
 
 struct sr_java_thread *

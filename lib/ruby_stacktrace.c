@@ -140,7 +140,7 @@ sr_ruby_stacktrace_parse(const char **input,
     stacktrace->frames = sr_ruby_frame_parse(&local_input, location);
     if (!stacktrace->frames)
     {
-        location->message = sr_asprintf("Topmost stacktrace frame not found: %s",
+        location->message = g_strdup_printf("Topmost stacktrace frame not found: %s",
                             location->message ? location->message : "(unknown reason)");
         goto fail;
     }
@@ -379,7 +379,7 @@ sr_ruby_stacktrace_get_reason(struct sr_ruby_stacktrace *stacktrace)
     if (stacktrace->exception_name)
         exc = stacktrace->exception_name;
 
-    return sr_asprintf("%s in %s:%"PRIu32, exc, file, line);
+    return g_strdup_printf("%s in %s:%"PRIu32, exc, file, line);
 }
 
 static void
