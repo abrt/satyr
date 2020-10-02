@@ -126,15 +126,15 @@ check(const char *path,
 
   if (stacktrace->frames)
   {
-      assert(0 == sr_strcmp0(stacktrace->frames->function_name, first_function_name));
-      assert(0 == sr_strcmp0(stacktrace->frames->special_stack, first_frame_stack));
+      assert(0 == g_strcmp0(stacktrace->frames->function_name, first_function_name));
+      assert(0 == g_strcmp0(stacktrace->frames->special_stack, first_frame_stack));
 
       struct sr_koops_frame *last = stacktrace->frames;
       while (last->next)
           last = last->next;
 
-      assert(0 == sr_strcmp0(last->function_name, last_function_name));
-      assert(0 == sr_strcmp0(last->special_stack, last_frame_stack));
+      assert(0 == g_strcmp0(last->function_name, last_function_name));
+      assert(0 == g_strcmp0(last->special_stack, last_frame_stack));
   }
   else
       assert(!first_function_name && !last_function_name && 0 == frame_count);

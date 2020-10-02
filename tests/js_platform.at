@@ -12,7 +12,7 @@ AT_TESTFUN([sr_js_engine_to_string], [[
 #define check(a_engine, a_expected) \
     do { \
         const char *value = sr_js_engine_to_string(a_engine); \
-        if (sr_strcmp0(value, a_expected) != 0) { \
+        if (g_strcmp0(value, a_expected) != 0) { \
             fprintf(stderr, "%s != %s\n", value, a_expected); \
             assert(!"sr_js_engine_to_string(" #a_engine ") != " #a_expected); \
         } \
@@ -66,7 +66,7 @@ AT_TESTFUN([sr_js_runtime_to_string], [[
 #define check(a_runtime, a_expected) \
     do { \
         const char *t_value = sr_js_runtime_to_string(a_runtime); \
-        if (sr_strcmp0(t_value, a_expected) != 0) { \
+        if (g_strcmp0(t_value, a_expected) != 0) { \
             fprintf(stderr, "%s != %s\n", t_value, a_expected); \
             assert(!"sr_js_runtime_to_string(" #a_runtime ") != " #a_expected); \
         } \
@@ -183,7 +183,7 @@ AT_TESTFUN([sr_js_platform_from_string], [[
             } \
         } \
         else { \
-            if (sr_strcmp0(r_error_message, e_error_message) != 0) { \
+            if (g_strcmp0(r_error_message, e_error_message) != 0) { \
                 fprintf(stderr, "%s != %s\n", r_error_message, e_error_message); \
                 assert(!"Got invalid error message: sr_js_platform_from_string(" \
                         #i_runtime_str "," #i_version_str ")"); \
@@ -242,7 +242,7 @@ AT_TESTFUN([sr_js_platform_to_json], [[
         sr_js_platform_init(platform, i_runtime, i_engine); \
         char *r_json = sr_js_platform_to_json(platform); \
         assert(r_json != NULL); \
-        if (sr_strcmp0(r_json, e_json) != 0) { \
+        if (g_strcmp0(r_json, e_json) != 0) { \
             fprintf(stderr, "%s\n!=\n%s\n", r_json, e_json); \
             assert(!"sr_js_platform_to_json(("#i_runtime","#i_engine"))");\
         } \
@@ -329,7 +329,7 @@ AT_TESTFUN([sr_js_platform_from_json], [[
             } \
         } \
         else{ \
-            if (sr_strcmp0(r_error_message, e_error_message) != 0) { \
+            if (g_strcmp0(r_error_message, e_error_message) != 0) { \
                 fprintf(stderr, "%s != %s\n", r_error_message, e_error_message); \
                 assert(!"Got invalid error message: sr_js_platform_from_json(" \
                         #i_json_str ")"); \

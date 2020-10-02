@@ -105,7 +105,7 @@ sr_rpm_package_cmp_nevra(struct sr_rpm_package *package1,
         return epoch;
 
     /* Architecture. */
-    int architecture = sr_strcmp0(package1->architecture,
+    int architecture = g_strcmp0(package1->architecture,
                                    package2->architecture);
     if (architecture != 0)
         return architecture;
@@ -118,17 +118,17 @@ sr_rpm_package_cmp_nvr(struct sr_rpm_package *package1,
                        struct sr_rpm_package *package2)
 {
     /* Name. */
-    int name = sr_strcmp0(package1->name, package2->name);
+    int name = g_strcmp0(package1->name, package2->name);
     if (name != 0)
         return name;
 
     /* Version. */
-    int version = sr_strcmp0(package1->version, package2->version);
+    int version = g_strcmp0(package1->version, package2->version);
     if (version != 0)
         return version;
 
     /* Release. */
-    int release = sr_strcmp0(package1->release, package2->release);
+    int release = g_strcmp0(package1->release, package2->release);
     if (release != 0)
         return release;
 
@@ -213,7 +213,7 @@ package_merge(struct sr_rpm_package *p1, struct sr_rpm_package *p2)
         return NULL;
 
     if (p1->architecture && p2->architecture &&
-        0 != sr_strcmp0(p1->architecture, p2->architecture))
+        0 != g_strcmp0(p1->architecture, p2->architecture))
         return NULL;
 
     struct sr_rpm_package *merged = sr_rpm_package_new();
@@ -822,7 +822,7 @@ sr_rpm_consistency_cmp(struct sr_rpm_consistency *consistency1,
                        struct sr_rpm_consistency *consistency2)
 {
     /* Path. */
-    int path = sr_strcmp0(consistency1->path, consistency2->path);
+    int path = g_strcmp0(consistency1->path, consistency2->path);
     if (path != 0)
         return path;
 

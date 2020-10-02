@@ -160,7 +160,7 @@ sr_java_frame_cmp(struct sr_java_frame *frame1,
     if (frame1->is_exception != frame2->is_exception)
         return frame1->is_exception ? 1 : -1;
 
-    int res = sr_strcmp0(frame1->name, frame2->name);
+    int res = g_strcmp0(frame1->name, frame2->name);
     if (res != 0)
         return res;
 
@@ -169,11 +169,11 @@ sr_java_frame_cmp(struct sr_java_frame *frame1,
         return 0;
 
     /* Method call comparsion */
-    res = sr_strcmp0(frame1->class_path, frame2->class_path);
+    res = g_strcmp0(frame1->class_path, frame2->class_path);
     if (res != 0)
         return res;
 
-    res = sr_strcmp0(frame1->file_name, frame2->file_name);
+    res = g_strcmp0(frame1->file_name, frame2->file_name);
     if (res != 0)
         return res;
 
@@ -187,7 +187,7 @@ int
 sr_java_frame_cmp_distance(struct sr_java_frame *frame1,
                            struct sr_java_frame *frame2)
 {
-    int res = sr_strcmp0(frame1->name, frame2->name);
+    int res = g_strcmp0(frame1->name, frame2->name);
     if (res != 0)
         return res;
 

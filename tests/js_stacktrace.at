@@ -36,7 +36,7 @@ check(char *filename, char *exc_name, unsigned frame_count,
     struct sr_js_stacktrace *stacktrace = sr_js_stacktrace_parse_v8(&input, &location);
     assert(stacktrace);
     assert(*input == '\0');
-    if (0 != sr_strcmp0(stacktrace->exception_name, exc_name)) {
+    if (0 != g_strcmp0(stacktrace->exception_name, exc_name)) {
         fprintf(stderr, "exception_name -> '%s' != '%s'\n", stacktrace->exception_name, exc_name);
         assert(!"Parsed exception name");
     }
@@ -98,7 +98,7 @@ check_invalid(const char *input, const char *error_message,
         fprintf(stderr, "Parsed '%s'\n", input);
         assert(!"Parsed invalid stacktrace");
     }
-    if (sr_strcmp0(error_message, location.message) != 0) {
+    if (g_strcmp0(error_message, location.message) != 0) {
         fprintf(stderr, "message -> '%s' != '%s'\n", location.message, error_message);
         assert(!"Error message doe not match");
     }
@@ -262,7 +262,7 @@ void
 check(struct sr_js_stacktrace *stacktrace, const char *expected)
 {
     char *reason = sr_js_stacktrace_get_reason(stacktrace);
-    if (sr_strcmp0(reason, expected) != 0) {
+    if (g_strcmp0(reason, expected) != 0) {
         fprintf(stderr, "reason -> '%s' != '%s'\n", reason, expected);
         assert(!"Invalid reason");
     }
@@ -346,7 +346,7 @@ check(char *filename, char *json_filename)
     }
 
     char *json = sr_js_stacktrace_to_json(stacktrace);
-    if (0 != sr_strcmp0(json, expected)) {
+    if (0 != g_strcmp0(json, expected)) {
         fprintf(stderr, "'%s'\n  !=\n'%s'\n", json, expected);
         abort();
     }
@@ -410,7 +410,7 @@ check(const char *filename, const char *json_filename)
         assert(!"Cannot parse JSON stacktrace");
     }
 
-    if (0 != sr_strcmp0(stacktrace1->exception_name, stacktrace2->exception_name)) {
+    if (0 != g_strcmp0(stacktrace1->exception_name, stacktrace2->exception_name)) {
         fprintf(stderr, "'%s': exception_name -> '%s' != '%s'\n", stacktrace1->exception_name, stacktrace2->exception_name);
         assert(!"Error names do no match");
     }

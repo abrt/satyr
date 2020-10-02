@@ -18,7 +18,7 @@ void check(enum sr_report_type type, const char *str)
 {
   const char *ret_str = sr_report_type_to_string(type);
   printf("sr_report_type_to_string(%d) -> %s == %s)\n", type, ret_str, str);
-  assert(0 == sr_strcmp0(sr_report_type_to_string(type), str));
+  assert(0 == g_strcmp0(sr_report_type_to_string(type), str));
 }
 
 int main(void)

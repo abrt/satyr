@@ -295,7 +295,7 @@ sr_report_type_from_string(const char *report_type_str)
 {
     for (int i = SR_REPORT_INVALID; i < SR_REPORT_NUM; i++)
     {
-        if (0 == sr_strcmp0(report_types[i], report_type_str))
+        if (0 == g_strcmp0(report_types[i], report_type_str))
             return i;
     }
 

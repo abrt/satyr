@@ -150,7 +150,7 @@ check(bool success,
     assert(strcmp(function_name, expected_function_name) == 0);
     assert(function_offset == expected_function_offset);
     assert(function_length == expected_function_length);
-    assert(sr_strcmp0(module_name, expected_module_name) == 0);
+    assert(g_strcmp0(module_name, expected_module_name) == 0);
     assert(*input == '\0');
     free(function_name);
     free(module_name);

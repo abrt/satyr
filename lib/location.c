@@ -44,7 +44,7 @@ sr_location_cmp(struct sr_location *location1,
         return columndiff;
 
     if (compare_messages)
-        return sr_strcmp0(location1->message, location2->message);
+        return g_strcmp0(location1->message, location2->message);
 
     return 0;
 }

@@ -2,26 +2,6 @@
 
 AT_BANNER([Utils])
 
-## ----------- ##
-## sr_strcmp0  ##
-## ----------- ##
-
-AT_TESTFUN([sr_strcmp0],
-[[
-#include "utils.h"
-#include <assert.h>
-int main(void)
-{
-  assert(0 == sr_strcmp0(NULL, NULL));
-  assert(0 == sr_strcmp0("abab", "abab"));
-  assert(0 > sr_strcmp0("aba", "abab"));
-  assert(0 > sr_strcmp0(NULL, "abab"));
-  assert(0 < sr_strcmp0("abab", NULL));
-  assert(0 < sr_strcmp0("abab", "aba"));
-  return 0;
-}
-]])
-
 ## ------------------ ##
 ## sr_strchr_location ##
 ## ------------------ ##
