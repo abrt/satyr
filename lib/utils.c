@@ -62,34 +62,6 @@ warn(const char *fmt, ...)
 }
 
 char *
-sr_vasprintf(const char *format, va_list p)
-{
-    int r;
-    char *string_ptr;
-
-#if 1
-    // GNU extension
-    r = vasprintf(&string_ptr, format, p);
-#else
-    // Bloat for systems that haven't got the GNU extension.
-    va_list p2;
-    va_copy(p2, p);
-    r = vsnprintf(NULL, 0, format, p);
-    string_ptr = g_malloc(r+1);
-    r = vsnprintf(string_ptr, r+1, format, p2);
-    va_end(p2);
-#endif
-
-    if (r < 0)
-    {
-        fprintf(stderr, "satyr: out of memory");
-        exit(1);
-    }
-
-    return string_ptr;
-}
-
-char *
 sr_strdup(const char *s)
 {
     return sr_strndup(s, strlen(s));
