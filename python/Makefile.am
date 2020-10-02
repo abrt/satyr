@@ -81,6 +81,7 @@ py3satyr_LTLIBRARIES = _satyr3.la
 
 _satyr3_la_SOURCES = $(PYEXTFILES)
 _satyr3_la_CPPFLAGS = \
+    $(GLIB_CFLAGS) \
     $(JSON_CFLAGS) \
     $(PYEXTCPPFLAGS) \
     $(PYTHON3_CFLAGS) \

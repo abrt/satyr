@@ -13,6 +13,8 @@
   %define libelf_devel elfutils-libelf-devel
 %endif
 
+%define glib_ver 2.43.4
+
 Name: satyr
 Version: @@SATYR_VERSION@@
 Release: 1%{?dist}
@@ -36,11 +38,13 @@ BuildRequires: gdb
 BuildRequires: gperf
 BuildRequires: nettle-devel%{?_isa}
 BuildRequires: json-c-devel%{?_isa}
+BuildRequires: glib2-devel >= %{glib_ver}
 %if %{with python3}
 BuildRequires: python3-sphinx
 %endif # with python3
 Requires: json-c%{?_isa}
 Requires: nettle%{?_isa}
+Requires: glib2%{?_isa} >= %{glib_ver}
 
 %description
 Satyr is a library that can be used to create and process microreports.

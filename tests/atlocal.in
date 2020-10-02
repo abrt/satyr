@@ -6,7 +6,7 @@ CC='@CC@'
 LIBTOOL="$abs_top_builddir/libtool"
 
 # We want no optimization.
-CFLAGS="@O0CFLAGS@ -I$abs_top_builddir/tests -I$abs_top_builddir/include -I$abs_top_builddir/lib -D_GNU_SOURCE @JSON_CFLAGS@"
+CFLAGS="@O0CFLAGS@ -I$abs_top_builddir/tests -I$abs_top_builddir/include -I$abs_top_builddir/lib -D_GNU_SOURCE @GLIB_CFLAGS@ @JSON_CFLAGS@"
 
 # Are special link options needed?
 LDFLAGS="@LDFLAGS@ $abs_top_builddir/lib/libsatyr.la"
