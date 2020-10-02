@@ -120,7 +120,7 @@ sr_stacktrace_from_json_text(enum sr_report_type type, const char *input, char *
 
             description = json_tokener_error_desc(error);
 
-            *error_message = sr_strdup(description);
+            *error_message = g_strdup(description);
         }
 
         return NULL;

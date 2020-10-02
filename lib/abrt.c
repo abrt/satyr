@@ -80,7 +80,7 @@ fulfill_missing_values(struct sr_core_stacktrace *core_stacktrace)
             if (!frame->file_name && frame->function_name
                 && strcmp("__kernel_vsyscall", frame->function_name) == 0)
             {
-                frame->file_name = sr_strdup("kernel");
+                frame->file_name = g_strdup("kernel");
             }
             frame = frame->next;
         }
@@ -462,7 +462,7 @@ desktop_from_dir(const char *directory,
     char *newline = strchrnul(desktop, '\n');
     *newline = '\0';
 
-    char *result = sr_strdup(desktop);
+    char *result = g_strdup(desktop);
     free(environ_contents);
 
     return result;
@@ -575,7 +575,7 @@ sr_abrt_operating_system_from_dir(const char *directory,
     if (!success)
     {
         sr_operating_system_free(os);
-        *error_message = sr_strdup("Failed to parse operating system release string");
+        *error_message = g_strdup("Failed to parse operating system release string");
         return NULL;
     }
 

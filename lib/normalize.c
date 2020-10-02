@@ -117,7 +117,7 @@ find_new_function_name_glibc(const char *function_name,
         call_match(function_name, source_file, "__" func "_sse42", func, "/sysdeps/", "libc.so", NULL) || \
         call_match(function_name, source_file, "__" func "_ia32", func, "/sysdeps", "libc.so", NULL)) \
         {                                                               \
-            return sr_strdup(func);                                     \
+            return g_strdup(func);                                     \
         }
 
         NORMALIZE_ARCH_SPECIFIC("memchr");

@@ -118,7 +118,7 @@ sr_ruby_stacktrace_dup(struct sr_ruby_stacktrace *stacktrace)
     memcpy(result, stacktrace, sizeof(struct sr_ruby_stacktrace));
 
     if (result->exception_name)
-        result->exception_name = sr_strdup(result->exception_name);
+        result->exception_name = g_strdup(result->exception_name);
 
     if (result->frames)
         result->frames = sr_ruby_frame_dup(result->frames, true);
@@ -150,7 +150,7 @@ sr_ruby_stacktrace_parse(const char **input,
      */
     if (!sr_skip_string(&local_input, ": "))
     {
-        location->message = sr_strdup("Unable to find the colon after first function name.");
+        location->message = g_strdup("Unable to find the colon after first function name.");
         goto fail;
     }
     location->column += strlen(": ");
@@ -160,7 +160,7 @@ sr_ruby_stacktrace_parse(const char **input,
      */
     if (!sr_parse_char_cspan(&local_input, "\t", &message_and_class))
     {
-        location->message = sr_strdup("Unable to find the exception type and message.");
+        location->message = g_strdup("Unable to find the exception type and message.");
         goto fail;
     }
 
@@ -174,7 +174,7 @@ sr_ruby_stacktrace_parse(const char **input,
     if (p < message_and_class || *p != '\n')
     {
         location->column--;
-        location->message = sr_strdup("Unable to find the new line character after "
+        location->message = g_strdup("Unable to find the new line character after "
                                       "the end of exception class");
         goto fail;
     }
@@ -186,7 +186,7 @@ sr_ruby_stacktrace_parse(const char **input,
     if (p < message_and_class || *p != ')')
     {
         location->column -= 2;
-        location->message = sr_strdup("Unable to find the ')' character identifying "
+        location->message = g_strdup("Unable to find the ')' character identifying "
                                       "the end of exception class");
         goto fail;
     }
@@ -202,11 +202,11 @@ sr_ruby_stacktrace_parse(const char **input,
 
     if (strlen(p) <= 0)
     {
-        location->message = sr_strdup("Unable to find the '(' character identifying "
+        location->message = g_strdup("Unable to find the '(' character identifying "
                                       "the beginning of the exception class");
         goto fail;
     }
-    stacktrace->exception_name = sr_strdup(p);
+    stacktrace->exception_name = g_strdup(p);
 
     /* /some/thing.rb:13:in `method': exception message (Exception::Class)\n\tfrom ...
      *                                                  ^
@@ -214,7 +214,7 @@ sr_ruby_stacktrace_parse(const char **input,
     p--;
     if (p < message_and_class || *p != '(')
     {
-        location->message = sr_strdup("Unable to find the '(' character identifying "
+        location->message = g_strdup("Unable to find the '(' character identifying "
                                       "the beginning of the exception class");
         goto fail;
     }
@@ -238,7 +238,7 @@ sr_ruby_stacktrace_parse(const char **input,
         int skipped = sr_skip_string(&local_input, "\tfrom ");
         if (!skipped)
         {
-            location->message = sr_strdup("Frame header not found.");
+            location->message = g_strdup("Frame header not found.");
             goto fail;
         }
         location->column += skipped;
@@ -253,7 +253,7 @@ sr_ruby_stacktrace_parse(const char **input,
         /* Eat newline (except at the end of file). */
         if (!sr_skip_char(&local_input, '\n') && *local_input != '\0')
         {
-            location->message = sr_strdup("Expected newline after stacktrace frame.");
+            location->message = g_strdup("Expected newline after stacktrace frame.");
             goto fail;
         }
         location->column = 0;

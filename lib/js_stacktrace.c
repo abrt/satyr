@@ -120,7 +120,7 @@ sr_js_stacktrace_dup(struct sr_js_stacktrace *stacktrace)
     memcpy(result, stacktrace, sizeof(struct sr_js_stacktrace));
 
     if (result->exception_name)
-        result->exception_name = sr_strdup(result->exception_name);
+        result->exception_name = g_strdup(result->exception_name);
 
     if (result->frames)
         result->frames = sr_js_frame_dup(result->frames, true);

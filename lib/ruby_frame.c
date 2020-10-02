@@ -102,10 +102,10 @@ sr_ruby_frame_dup(struct sr_ruby_frame *frame, bool siblings)
 
     /* Duplicate all strings. */
     if (result->file_name)
-        result->file_name = sr_strdup(result->file_name);
+        result->file_name = g_strdup(result->file_name);
 
     if (result->function_name)
-        result->function_name = sr_strdup(result->function_name);
+        result->function_name = g_strdup(result->function_name);
 
     return result;
 }
@@ -202,7 +202,7 @@ sr_ruby_frame_parse(const char **input,
     char *filename_lineno_in = NULL;
     if (!sr_parse_char_cspan(&local_input, "`", &filename_lineno_in))
     {
-        location->message = sr_strdup("Unable to find the '`' character "
+        location->message = g_strdup("Unable to find the '`' character "
                                       "identifying the beginning of function name.");
         goto fail;
     }
@@ -219,7 +219,7 @@ sr_ruby_frame_parse(const char **input,
     if (p < filename_lineno_in || 0 != strcmp(":in ", p))
     {
         location->column -= strlen(":in ");
-        location->message = sr_strdup("Unable to find ':in ' preceding the "
+        location->message = g_strdup("Unable to find ':in ' preceding the "
                                       "backtick character.");
         goto fail;
     }
@@ -238,7 +238,7 @@ sr_ruby_frame_parse(const char **input,
     int lineno_len = sr_parse_uint32((const char **)&p_copy, &frame->file_line);
     if (lineno_len <= 0)
     {
-        location->message = sr_strdup("Unable to find line number before ':in '");
+        location->message = g_strdup("Unable to find line number before ':in '");
         goto fail;
     }
 
@@ -249,7 +249,7 @@ sr_ruby_frame_parse(const char **input,
     if (p < filename_lineno_in || *p != ':')
     {
         location->column -= lineno_len;
-        location->message = sr_strdup("Unable to fin the ':' character "
+        location->message = g_strdup("Unable to fin the ':' character "
                                       "preceding the line number");
         goto fail;
     }
@@ -263,7 +263,7 @@ sr_ruby_frame_parse(const char **input,
 
     if(!sr_skip_char(&local_input, '`'))
     {
-        location->message = sr_strdup("Unable to find the '`' character "
+        location->message = g_strdup("Unable to find the '`' character "
                                       "identifying the beginning of function name.");
         goto fail;
     }
@@ -292,7 +292,7 @@ sr_ruby_frame_parse(const char **input,
         int len = sr_parse_uint32(&local_input, &frame->block_level);
         if (len == 0 || !sr_skip_string(&local_input, " levels) in "))
         {
-            location->message = sr_strdup("Unable to parse block depth.");
+            location->message = g_strdup("Unable to parse block depth.");
             goto fail;
         }
         location->column += len + strlen(" levels) in ");
@@ -306,7 +306,7 @@ sr_ruby_frame_parse(const char **input,
 
     if (!sr_parse_char_cspan(&local_input, "'>", &frame->function_name))
     {
-        location->message = sr_strdup("Unable to find the \"'\" character "
+        location->message = g_strdup("Unable to find the \"'\" character "
                                       "delimiting the function name.");
         goto fail;
     }
@@ -316,7 +316,7 @@ sr_ruby_frame_parse(const char **input,
     {
         if (!sr_skip_char(&local_input, '>'))
         {
-            location->message = sr_strdup("Unable to find the \">\" character "
+            location->message = g_strdup("Unable to find the \">\" character "
                                           "delimiting the function name.");
             goto fail;
         }
@@ -325,7 +325,7 @@ sr_ruby_frame_parse(const char **input,
 
     if (!sr_skip_char(&local_input, '\''))
     {
-        location->message = sr_strdup("Unable to find the \"'\" character "
+        location->message = g_strdup("Unable to find the \"'\" character "
                                       "delimiting the function name.");
         goto fail;
     }
@@ -414,7 +414,7 @@ sr_ruby_frame_from_json(json_object *root, char **error_message)
 
         string = json_object_get_string(val);
 
-        result->file_name = sr_strdup(string);
+        result->file_name = g_strdup(string);
     }
 
     /* Function name / special function. */
@@ -428,7 +428,7 @@ sr_ruby_frame_from_json(json_object *root, char **error_message)
         string = json_object_get_string(val);
 
         result->special_function = false;
-        result->function_name = sr_strdup(string);
+        result->function_name = g_strdup(string);
     }
     else if (json_object_object_get_ex(root, "special_function", &val))
     {
@@ -440,7 +440,7 @@ sr_ruby_frame_from_json(json_object *root, char **error_message)
         string = json_object_get_string(val);
 
         result->special_function = true;
-        result->function_name = sr_strdup(string);
+        result->function_name = g_strdup(string);
     }
 
     bool success =

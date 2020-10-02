@@ -61,12 +61,6 @@ warn(const char *fmt, ...)
 
 }
 
-char *
-sr_strdup(const char *s)
-{
-    return g_strndup(s, strlen(s));
-}
-
 void
 sr_struniq(char **strings, size_t *size)
 {

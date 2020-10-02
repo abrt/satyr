@@ -18,24 +18,24 @@ int
 main(void)
 {
   struct sr_gdb_frame *frame2 = sr_gdb_frame_new();
-  frame2->function_name = sr_strdup("write");
+  frame2->function_name = g_strdup("write");
   frame2->number = 2;
-  frame2->source_file = sr_strdup("gfileutils.c");
+  frame2->source_file = g_strdup("gfileutils.c");
   frame2->source_line = 120;
   frame2->address = 0x322160e7fdULL;
 
   struct sr_gdb_frame *frame1 = sr_gdb_frame_new();
-  frame1->function_name = sr_strdup("write_to_temp_file");
+  frame1->function_name = g_strdup("write_to_temp_file");
   frame1->number = 1;
-  frame1->source_file = sr_strdup("gfileutils.c");
+  frame1->source_file = g_strdup("gfileutils.c");
   frame1->source_line = 980;
   frame1->address = 0x322160e7fdULL;
   frame1->next = frame2;
 
   struct sr_gdb_frame *frame0 = sr_gdb_frame_new();
-  frame0->function_name = sr_strdup("fsync");
+  frame0->function_name = g_strdup("fsync");
   frame0->number = 0;
-  frame0->source_file = sr_strdup("../sysdeps/unix/syscall-template.S");
+  frame0->source_file = g_strdup("../sysdeps/unix/syscall-template.S");
   frame0->source_line = 82;
   frame0->address = 0x322160e7fdULL;
   frame0->next = frame1;
@@ -83,24 +83,24 @@ int
 main(void)
 {
   struct sr_gdb_frame *frame2 = sr_gdb_frame_new();
-  frame2->function_name = sr_strdup("write");
+  frame2->function_name = g_strdup("write");
   frame2->number = 2;
-  frame2->source_file = sr_strdup("gfileutils.c");
+  frame2->source_file = g_strdup("gfileutils.c");
   frame2->source_line = 120;
   frame2->address = 0x322160e7fdULL;
 
   struct sr_gdb_frame *frame1 = sr_gdb_frame_new();
-  frame1->function_name = sr_strdup("write_to_temp_file");
+  frame1->function_name = g_strdup("write_to_temp_file");
   frame1->number = 1;
-  frame1->source_file = sr_strdup("gfileutils.c");
+  frame1->source_file = g_strdup("gfileutils.c");
   frame1->source_line = 980;
   frame1->address = 0x322160e7fdULL;
   frame1->next = frame2;
 
   struct sr_gdb_frame *frame0 = sr_gdb_frame_new();
-  frame0->function_name = sr_strdup("fsync");
+  frame0->function_name = g_strdup("fsync");
   frame0->number = 0;
-  frame0->source_file = sr_strdup("../sysdeps/unix/syscall-template.S");
+  frame0->source_file = g_strdup("../sysdeps/unix/syscall-template.S");
   frame0->source_line = 82;
   frame0->address = 0x322160e7fdULL;
   frame0->next = frame1;
@@ -149,24 +149,24 @@ int
 main(void)
 {
   struct sr_gdb_frame *frame2 = sr_gdb_frame_new();
-  frame2->function_name = sr_strdup("write");
+  frame2->function_name = g_strdup("write");
   frame2->number = 2;
-  frame2->source_file = sr_strdup("gfileutils.c");
+  frame2->source_file = g_strdup("gfileutils.c");
   frame2->source_line = 120;
   frame2->address = 0x322160e7fdULL;
 
   struct sr_gdb_frame *frame1 = sr_gdb_frame_new();
-  frame1->function_name = sr_strdup("write_to_temp_file");
+  frame1->function_name = g_strdup("write_to_temp_file");
   frame1->number = 1;
-  frame1->source_file = sr_strdup("gfileutils.c");
+  frame1->source_file = g_strdup("gfileutils.c");
   frame1->source_line = 980;
   frame1->address = 0x322160e7fdULL;
   frame1->next = frame2;
 
   struct sr_gdb_frame *frame0 = sr_gdb_frame_new();
-  frame0->function_name = sr_strdup("fsync");
+  frame0->function_name = g_strdup("fsync");
   frame0->number = 0;
-  frame0->source_file = sr_strdup("../sysdeps/unix/syscall-template.S");
+  frame0->source_file = g_strdup("../sysdeps/unix/syscall-template.S");
   frame0->source_line = 82;
   frame0->address = 0x322160e7fdULL;
   frame0->next = frame1;

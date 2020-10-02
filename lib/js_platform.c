@@ -201,7 +201,7 @@ sr_js_platform_from_json(json_object *root, char **error_message)
 
     if (engine_str == NULL)
     {
-        *error_message = sr_strdup("No 'engine' member");
+        *error_message = g_strdup("No 'engine' member");
         goto fail;
     }
 
@@ -218,7 +218,7 @@ sr_js_platform_from_json(json_object *root, char **error_message)
 
     if (runtime_str == NULL)
     {
-        *error_message = sr_strdup("No 'runtime' member");
+        *error_message = g_strdup("No 'runtime' member");
         goto fail;
     }
 

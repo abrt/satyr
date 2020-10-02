@@ -48,7 +48,7 @@ gdb_return_null(struct sr_stacktrace *stacktrace)
 static struct sr_gdb_stacktrace *
 gdb_from_json(json_object *root, char **error_message)
 {
-    *error_message = sr_strdup("Not implemented");
+    *error_message = g_strdup("Not implemented");
     return NULL;
 }
 

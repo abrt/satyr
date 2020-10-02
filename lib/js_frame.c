@@ -107,10 +107,10 @@ sr_js_frame_dup(struct sr_js_frame *frame, bool siblings)
 
     /* Duplicate all strings. */
     if (result->file_name)
-        result->file_name = sr_strdup(result->file_name);
+        result->file_name = g_strdup(result->file_name);
 
     if (result->function_name)
-        result->function_name = sr_strdup(result->function_name);
+        result->function_name = g_strdup(result->function_name);
 
     return result;
 }
@@ -389,7 +389,7 @@ sr_js_frame_from_json(json_object *root, char **error_message)
 
         string = json_object_get_string(val);
 
-        result->file_name = sr_strdup(string);
+        result->file_name = g_strdup(string);
     }
 
     /* Function name. */
@@ -402,7 +402,7 @@ sr_js_frame_from_json(json_object *root, char **error_message)
 
         string = json_object_get_string(val);
 
-        result->function_name = sr_strdup(string);
+        result->function_name = g_strdup(string);
     }
 
     bool success =

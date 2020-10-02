@@ -139,16 +139,16 @@ sr_java_frame_dup(struct sr_java_frame *frame, bool siblings)
 
     /* Duplicate all strings. */
     if (result->file_name)
-        result->file_name = sr_strdup(result->file_name);
+        result->file_name = g_strdup(result->file_name);
 
     if (result->name)
-        result->name = sr_strdup(result->name);
+        result->name = g_strdup(result->name);
 
     if (result->class_path)
-        result->class_path = sr_strdup(result->class_path);
+        result->class_path = g_strdup(result->class_path);
 
     if (result->message)
-        result->message = sr_strdup(result->message);
+        result->message = g_strdup(result->message);
 
     return result;
 }

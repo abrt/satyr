@@ -147,13 +147,13 @@ sr_koops_stacktrace_dup(struct sr_koops_stacktrace *stacktrace)
         result->frames = sr_koops_frame_dup(result->frames, true);
 
     if (result->version)
-        result->version = sr_strdup(result->version);
+        result->version = g_strdup(result->version);
 
     if (result->raw_oops)
-        result->raw_oops = sr_strdup(result->raw_oops);
+        result->raw_oops = g_strdup(result->raw_oops);
 
     if (result->reason)
-        result->reason = sr_strdup(result->reason);
+        result->reason = g_strdup(result->reason);
 
     return result;
 }
@@ -336,7 +336,7 @@ sr_koops_stacktrace_parse(const char **input,
     char *alt_stack = NULL;
 
     /* Include the raw kerneloops text */
-    stacktrace->raw_oops = sr_strdup(*input);
+    stacktrace->raw_oops = g_strdup(*input);
 
     /* Looks for the "Tainted: " line in the whole input */
     parse_taint_flags(local_input, stacktrace);
@@ -393,7 +393,7 @@ sr_koops_stacktrace_parse(const char **input,
         if((frame = sr_koops_frame_parse(&local_input)))
         {
             if (alt_stack)
-                frame->special_stack = sr_strdup(alt_stack);
+                frame->special_stack = g_strdup(alt_stack);
 
             stacktrace->frames = sr_koops_frame_append(stacktrace->frames, frame);
             goto next_line;
@@ -530,7 +530,7 @@ taint_flags_to_json(struct sr_koops_stacktrace *stacktrace)
     if (strbuf->len == 0)
     {
         g_string_free(strbuf, TRUE);
-        return sr_strdup("[]");
+        return g_strdup("[]");
     }
 
     g_string_append_c(strbuf, ']');
@@ -710,7 +710,7 @@ sr_koops_stacktrace_from_json(json_object *root, char **error_message)
                 allocated *= 2;
                 result->modules = g_realloc(result->modules, allocated);
             }
-            result->modules[i] = sr_strdup(module);
+            result->modules[i] = g_strdup(module);
         }
 
         result->modules[i] = NULL;

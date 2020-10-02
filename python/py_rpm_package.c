@@ -128,16 +128,16 @@ sr_py_rpm_package_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
         return NULL;
 
     if (name)
-        rpm->rpm_package->name = sr_strdup(name);
+        rpm->rpm_package->name = g_strdup(name);
 
     if (rel)
-        rpm->rpm_package->release = sr_strdup(rel);
+        rpm->rpm_package->release = g_strdup(rel);
 
     if (version)
-        rpm->rpm_package->version = sr_strdup(version);
+        rpm->rpm_package->version = g_strdup(version);
 
     if (arch)
-        rpm->rpm_package->architecture = sr_strdup(arch);
+        rpm->rpm_package->architecture = g_strdup(arch);
 
     rpm->rpm_package->epoch = (uint32_t)epoch;
 

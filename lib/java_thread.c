@@ -111,7 +111,7 @@ sr_java_thread_dup(struct sr_java_thread *thread, bool siblings)
         result->frames = sr_java_frame_dup(result->frames, true);
 
     if (result->name)
-        result->name = sr_strdup(result->name);
+        result->name = g_strdup(result->name);
 
     return result;
 }

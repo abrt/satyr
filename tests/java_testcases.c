@@ -75,19 +75,19 @@ struct sr_java_frame
   struct sr_java_frame *exception0, *exception1, *exception2;
 
   exception0 = sr_java_frame_new_exception();
-  exception0->name = sr_strdup("java.lang.RuntimeException");
-  exception0->message = sr_strdup("java.lang.InvalidRangeException: undefined index");
+  exception0->name = g_strdup("java.lang.RuntimeException");
+  exception0->message = g_strdup("java.lang.InvalidRangeException: undefined index");
   exception0->next = create_real_stacktrace_top();
 
   exception1 = sr_java_frame_new_exception();
-  exception1->name = sr_strdup("java.lang.NullPointerException");
-  exception1->message = sr_strdup("null");
+  exception1->name = g_strdup("java.lang.NullPointerException");
+  exception1->message = g_strdup("null");
   exception1->next = create_real_stacktrace_middle();
   sr_java_frame_get_last(exception1->next)->next = exception0;
 
   exception2 = sr_java_frame_new_exception();
-  exception2->name = sr_strdup("java.lang.InvalidRangeException");
-  exception2->message = sr_strdup("null");
+  exception2->name = g_strdup("java.lang.InvalidRangeException");
+  exception2->message = g_strdup("null");
   exception2->next = create_real_stacktrace_bottom();
   sr_java_frame_get_last(exception2->next)->next = exception1;
 
@@ -99,7 +99,7 @@ struct sr_java_thread
 {
     struct sr_java_thread *thread;
     thread = sr_java_thread_new();
-    thread->name = sr_strdup("main");
+    thread->name = g_strdup("main");
     thread->frames = create_real_stacktrace_objects();
 
     return thread;

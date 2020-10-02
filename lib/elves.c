@@ -303,7 +303,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
         }
 
         struct sr_elf_plt_entry *entry = g_malloc(sizeof(*entry));
-        entry->symbol_name = sr_strdup(elf_strptr(elf, stringtable,
+        entry->symbol_name = g_strdup(elf_strptr(elf, stringtable,
                                                   symb.st_name));
 
         entry->address = (uint64_t)(plt_base + plt_offset);
