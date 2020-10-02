@@ -90,20 +90,6 @@ sr_vasprintf(const char *format, va_list p)
 }
 
 char *
-sr_asprintf(const char *format, ...)
-{
-    va_list p;
-    char *string_ptr;
-
-    va_start(p, format);
-    string_ptr = sr_vasprintf(format, p);
-    va_end(p);
-
-    return string_ptr;
-}
-
-
-char *
 sr_strdup(const char *s)
 {
     return sr_strndup(s, strlen(s));
@@ -226,7 +212,7 @@ sr_file_to_string(const char *filename,
     int fd = open(filename, O_RDONLY | O_LARGEFILE);
     if (fd < 0)
     {
-        *error_message = sr_asprintf("Unable to open '%s': %s.",
+        *error_message = g_strdup_printf("Unable to open '%s': %s.",
                                      filename,
                                      strerror(errno));
 
@@ -236,7 +222,7 @@ sr_file_to_string(const char *filename,
     off_t size = lseek(fd, 0, SEEK_END);
     if (size == (off_t)-1) /* EOVERFLOW? */
     {
-        *error_message = sr_asprintf("Unable to seek in '%s': %s.",
+        *error_message = g_strdup_printf("Unable to seek in '%s': %s.",
                                      filename,
                                      strerror(errno));
 
@@ -248,7 +234,7 @@ sr_file_to_string(const char *filename,
 
     if (size > FILE_SIZE_LIMIT)
     {
-        *error_message = sr_asprintf("Input file too big (%lld). Maximum size is %ld.",
+        *error_message = g_strdup_printf("Input file too big (%lld). Maximum size is %ld.",
                                      (long long)size,
                                      FILE_SIZE_LIMIT);
 
@@ -259,7 +245,7 @@ sr_file_to_string(const char *filename,
     char *contents = g_malloc(size + 1);
     if (size != read(fd, contents, size))
     {
-        *error_message = sr_asprintf("Unable to read from '%s'.", filename);
+        *error_message = g_strdup_printf("Unable to read from '%s'.", filename);
         close(fd);
         free(contents);
         return NULL;
@@ -281,7 +267,7 @@ sr_string_to_file(const char *filename,
     int fd = open(filename, O_WRONLY | O_LARGEFILE | O_TRUNC | O_CREAT, 0640);
     if (fd < 0)
     {
-        *error_message = sr_asprintf("Unable to open '%s': %s.",
+        *error_message = g_strdup_printf("Unable to open '%s': %s.",
                                      filename,
                                      strerror(errno));
 
@@ -296,7 +282,7 @@ sr_string_to_file(const char *filename,
         if (-1 == write_result)
             error = strerror(errno);
 
-        *error_message = sr_asprintf("Unable to write to '%s': %s.",
+        *error_message = g_strdup_printf("Unable to write to '%s': %s.",
                                      filename,
                                      error);
 
@@ -307,7 +293,7 @@ sr_string_to_file(const char *filename,
     int close_result = close(fd);
     if (-1 == close_result)
     {
-        *error_message = sr_asprintf("Unable to close '%s': %s.",
+        *error_message = g_strdup_printf("Unable to close '%s': %s.",
                                      filename,
                                      strerror(errno));
 
@@ -808,7 +794,7 @@ anonymize_path(char *orig_path)
         if (new_path)
         {
             // Join /home/anonymized/ and ^
-            new_path = sr_asprintf("%s%s", ANONYMIZED_PATH, new_path);
+            new_path = g_strdup_printf("%s%s", ANONYMIZED_PATH, new_path);
             free(orig_path);
             return new_path;
         }

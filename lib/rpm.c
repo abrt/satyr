@@ -324,14 +324,14 @@ header_to_rpm_info(Header header,
     if (!header_get_string(header, RPMTAG_NAME, &rpm->name))
     {
         sr_rpm_package_free(rpm, false);
-        *error_message = sr_asprintf("Failed to find package name.");
+        *error_message = g_strdup_printf("Failed to find package name.");
         return NULL;
     }
 
     bool success = header_get_uint32(header, RPMTAG_EPOCH, &rpm->epoch);
     if (!success)
     {
-        *error_message = sr_asprintf("Failed to find package epoch.");
+        *error_message = g_strdup_printf("Failed to find package epoch.");
         sr_rpm_package_free(rpm, false);
         return NULL;
     }
@@ -339,7 +339,7 @@ header_to_rpm_info(Header header,
     success = header_get_string(header, RPMTAG_VERSION, &rpm->version);
     if (!success)
     {
-        *error_message = sr_asprintf("Failed to find package version.");
+        *error_message = g_strdup_printf("Failed to find package version.");
         sr_rpm_package_free(rpm, false);
         return NULL;
     }
@@ -347,7 +347,7 @@ header_to_rpm_info(Header header,
     success = header_get_string(header, RPMTAG_RELEASE, &rpm->release);
     if (!success)
     {
-        *error_message = sr_asprintf("Failed to find package release.");
+        *error_message = g_strdup_printf("Failed to find package release.");
         sr_rpm_package_free(rpm, false);
         return NULL;
     }
@@ -355,7 +355,7 @@ header_to_rpm_info(Header header,
     success = header_get_string(header, RPMTAG_ARCH, &rpm->architecture);
     if (!success)
     {
-        *error_message = sr_asprintf("Failed to find package architecture.");
+        *error_message = g_strdup_printf("Failed to find package architecture.");
         sr_rpm_package_free(rpm, false);
         return NULL;
     }
@@ -364,7 +364,7 @@ header_to_rpm_info(Header header,
     success = header_get_uint32(header, RPMTAG_INSTALLTIME, &install_time);
     if (!success)
     {
-        *error_message = sr_asprintf("Failed to find package installation time.");
+        *error_message = g_strdup_printf("Failed to find package installation time.");
         sr_rpm_package_free(rpm, false);
         return NULL;
     }
@@ -385,7 +385,7 @@ sr_rpm_package_get_by_name(const char *name, char **error_message)
 #ifdef HAVE_LIBRPM
     if (rpmReadConfigFiles(NULL, NULL))
     {
-        *error_message = sr_asprintf("Failed to read RPM configuration files.");
+        *error_message = g_strdup_printf("Failed to read RPM configuration files.");
         return NULL;
     }
 
@@ -415,7 +415,7 @@ sr_rpm_package_get_by_name(const char *name, char **error_message)
     rpmtsFree(ts);
     return result;
 #else
-    *error_message = sr_asprintf("satyr compiled without rpm");
+    *error_message = g_strdup_printf("satyr compiled without rpm");
     return NULL;
 #endif
 }
@@ -427,7 +427,7 @@ sr_rpm_package_get_by_path(const char *path,
 #ifdef HAVE_LIBRPM
     if (rpmReadConfigFiles(NULL, NULL))
     {
-        *error_message = sr_asprintf("Failed to read RPM configuration files.");
+        *error_message = g_strdup_printf("Failed to read RPM configuration files.");
         return NULL;
     }
 
@@ -457,7 +457,7 @@ sr_rpm_package_get_by_path(const char *path,
     rpmtsFree(ts);
     return result;
 #else
-    *error_message = sr_asprintf("satyr compiled without rpm");
+    *error_message = g_strdup_printf("satyr compiled without rpm");
     return NULL;
 #endif
 }
@@ -604,7 +604,7 @@ single_rpm_package_from_json(json_object *root, char **error_message)
         if (0 != strcmp(role, "affected"))
         {
             if (error_message)
-                *error_message = sr_asprintf("Invalid package role %s", role);
+                *error_message = g_strdup_printf("Invalid package role %s", role);
             goto fail;
         }
 

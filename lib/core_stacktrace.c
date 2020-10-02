@@ -383,7 +383,7 @@ sr_core_stacktrace_get_reason(struct sr_core_stacktrace *stacktrace)
 {
     char *prog = stacktrace->executable ? stacktrace->executable : "<unknown>";
 
-    return sr_asprintf("Program %s was terminated by signal %"PRIu16, prog, stacktrace->signal);
+    return g_strdup_printf("Program %s was terminated by signal %"PRIu16, prog, stacktrace->signal);
 }
 
 static void

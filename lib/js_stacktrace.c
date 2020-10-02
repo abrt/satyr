@@ -368,7 +368,7 @@ sr_js_stacktrace_get_reason(struct sr_js_stacktrace *stacktrace)
     if (stacktrace->exception_name)
         exc = stacktrace->exception_name;
 
-    return sr_asprintf("%s at %s:%"PRIu32":%"PRIu32, exc, file, line, column);
+    return g_strdup_printf("%s at %s:%"PRIu32":%"PRIu32, exc, file, line, column);
 }
 
 static void

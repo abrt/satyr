@@ -59,7 +59,7 @@ json_check_type(json_object *object, json_type type,
 
         type_name = json_type_to_name(type);
 
-        *error_message = sr_asprintf("Invalid type of `%s`; `%s` expected",
+        *error_message = g_strdup_printf("Invalid type of `%s`; `%s` expected",
                 name, type_name);
     }
 

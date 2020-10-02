@@ -546,9 +546,9 @@ sr_normalize_gdb_paired_unknown_function_names(struct sr_gdb_thread *thread1,
         next_functions_similar(curr_frame1, curr_frame2))
     {
         free(curr_frame1->function_name);
-        curr_frame1->function_name = sr_asprintf("__unknown_function_%d", i);
+        curr_frame1->function_name = g_strdup_printf("__unknown_function_%d", i);
         free(curr_frame2->function_name);
-        curr_frame2->function_name = sr_asprintf("__unknown_function_%d", i);
+        curr_frame2->function_name = g_strdup_printf("__unknown_function_%d", i);
         i++;
     }
 
@@ -574,9 +574,9 @@ sr_normalize_gdb_paired_unknown_function_names(struct sr_gdb_thread *thread1,
                       strcmp(prev_frame1->library_name, prev_frame2->library_name)))
                 {
                     free(curr_frame1->function_name);
-                    curr_frame1->function_name = sr_asprintf("__unknown_function_%d", i);
+                    curr_frame1->function_name = g_strdup_printf("__unknown_function_%d", i);
                     free(curr_frame2->function_name);
-                    curr_frame2->function_name = sr_asprintf("__unknown_function_%d", i);
+                    curr_frame2->function_name = g_strdup_printf("__unknown_function_%d", i);
                     i++;
                     break;
                 }

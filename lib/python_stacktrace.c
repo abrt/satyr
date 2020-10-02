@@ -364,7 +364,7 @@ sr_python_stacktrace_get_reason(struct sr_python_stacktrace *stacktrace)
     if (stacktrace->exception_name)
         exc = stacktrace->exception_name;
 
-    return sr_asprintf("%s in %s:%"PRIu32, exc, file, line);
+    return g_strdup_printf("%s in %s:%"PRIu32, exc, file, line);
 }
 
 static void

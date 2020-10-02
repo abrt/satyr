@@ -259,7 +259,7 @@ char *generate_coredump(int start)
   if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
       errx(1, "gcore failed");
 
-  return sr_asprintf("%s.%s", coredump_pattern, mypid);
+  return g_strdup_printf("%s.%s", coredump_pattern, mypid);
 }
 GString *
 get_backtrace(const char *core_file, const char *executable)
@@ -276,9 +276,9 @@ get_backtrace(const char *core_file, const char *executable)
   args[i++] = (char*)"-iex";
   args[i++] = (char*)"set debug-file-directory /";
   args[i++] = (char*)"-ex";
-  args[i++] = sr_asprintf("file %s", executable);
+  args[i++] = g_strdup_printf("file %s", executable);
   args[i++] = (char*)"-ex";
-  args[i++] = sr_asprintf("core-file %s", core_file);
+  args[i++] = g_strdup_printf("core-file %s", core_file);
   args[i++] = (char*)"-ex";
   args[i++] = (char*)"thread apply all -ascending backtrace full 1024";
   args[i++] = (char*)"-ex";

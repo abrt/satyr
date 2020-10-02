@@ -306,7 +306,7 @@ rpm_pkg_from_dir(struct sr_rpm_package *packages,
     unsigned long epoch = strtoul(epoch_str, NULL, 10);
     if (epoch == ULONG_MAX)
     {
-        *error_message = sr_asprintf("Epoch '%s' is not a number", epoch_str);
+        *error_message = g_strdup_printf("Epoch '%s' is not a number", epoch_str);
         return NULL;
     }
     free(epoch_str);
@@ -485,25 +485,25 @@ occurrences_from_dir(const char *directory,
     if ((errno == ERANGE && (count == LONG_MAX || count == LONG_MIN))
             || (errno != 0 && count == 0))
     {
-        *error_message = sr_asprintf("'count' file does not contain number: %s", strerror(errno));
+        *error_message = g_strdup_printf("'count' file does not contain number: %s", strerror(errno));
         goto finito;
     }
 
     if (endptr == count_contents)
     {
-        *error_message = sr_asprintf("'count' file contains no digits: '%s'", count_contents);
+        *error_message = g_strdup_printf("'count' file contains no digits: '%s'", count_contents);
         goto finito;
     }
 
     if (*endptr != '\0')
     {
-        *error_message = sr_asprintf("'count' file has non-digit suffix: '%s'", endptr);
+        *error_message = g_strdup_printf("'count' file has non-digit suffix: '%s'", endptr);
         goto finito;
     }
 
     if (count < 0 || count > UINT32_MAX)
     {
-        *error_message = sr_asprintf("'count' file is out of range: '%s'", count_contents);
+        *error_message = g_strdup_printf("'count' file is out of range: '%s'", count_contents);
         goto finito;
     }
 
@@ -534,7 +534,7 @@ get_component(const char *directory,
             else
                 basename = executable;
 
-            char *artificial_component = sr_asprintf("%s-unpackaged", basename);
+            char *artificial_component = g_strdup_printf("%s-unpackaged", basename);
 
             free(executable);
             return artificial_component;

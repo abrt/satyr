@@ -209,7 +209,7 @@ sr_python_frame_parse(const char **input,
 
     if (0 == sr_skip_string(&local_input, "  File \""))
     {
-        location->message = sr_asprintf("Frame header not found.");
+        location->message = g_strdup_printf("Frame header not found.");
         return NULL;
     }
 
@@ -219,7 +219,7 @@ sr_python_frame_parse(const char **input,
     /* Parse file name */
     if (!sr_parse_char_cspan(&local_input, "\"", &frame->file_name))
     {
-        location->message = sr_asprintf("Unable to find the '\"' character "
+        location->message = g_strdup_printf("Unable to find the '\"' character "
                 "identifying the beginning of file name.");
 
         goto fail;
@@ -242,7 +242,7 @@ sr_python_frame_parse(const char **input,
 
     if (0 == sr_skip_string(&local_input, "\", line "))
     {
-        location->message = sr_asprintf("Line separator not found.");
+        location->message = g_strdup_printf("Line separator not found.");
         goto fail;
     }
 
@@ -252,7 +252,7 @@ sr_python_frame_parse(const char **input,
     int length = sr_parse_uint32(&local_input, &frame->file_line);
     if (0 == length)
     {
-        location->message = sr_asprintf("Line number not found.");
+        location->message = g_strdup_printf("Line number not found.");
         goto fail;
     }
 
@@ -262,7 +262,7 @@ sr_python_frame_parse(const char **input,
     {
         if (local_input[0] != '\n')
         {
-            location->message = sr_asprintf("Function name separator not found.");
+            location->message = g_strdup_printf("Function name separator not found.");
             goto fail;
         }
 
@@ -280,7 +280,7 @@ sr_python_frame_parse(const char **input,
         /* Parse function name */
         if (!sr_parse_char_cspan(&local_input, "\n", &frame->function_name))
         {
-            location->message = sr_asprintf("Unable to find the newline character "
+            location->message = g_strdup_printf("Unable to find the newline character "
                     "identifying the end of function name.");
 
             goto fail;

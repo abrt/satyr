@@ -83,7 +83,7 @@ sr_callgraph_extend(struct sr_callgraph *callgraph,
 
     if (!fde)
     {
-        *error_message = sr_asprintf(
+        *error_message = g_strdup_printf(
             "Unable to find FDE for address 0x%"PRIx64,
             start_address);
 

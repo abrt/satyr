@@ -496,7 +496,7 @@ sr_koops_stacktrace_parse_modules(const char **input)
                     break; /* wtf? */
                 }
 
-                char *tmp = sr_asprintf("%s%s", result[result_offset-1], therest);
+                char *tmp = g_strdup_printf("%s%s", result[result_offset-1], therest);
                 free(result[result_offset-1]);
                 result[result_offset-1] = tmp;
             }

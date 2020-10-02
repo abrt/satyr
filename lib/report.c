@@ -209,7 +209,7 @@ sr_report_to_json(struct sr_report *report)
     assert(report->reporter_name);
     assert(report->reporter_version);
 
-    char *reporter = sr_asprintf("{   \"name\": \"%s\"\n,   \"version\": \"%s\"\n}",
+    char *reporter = g_strdup_printf("{   \"name\": \"%s\"\n,   \"version\": \"%s\"\n}",
                                  report->reporter_name,
                                  report->reporter_version);
     char *reporter_indented = sr_indent_except_first_line(reporter, strlen(",   \"reporter\": "));

@@ -98,7 +98,7 @@ sr_js_platform_from_string(const char *runtime_name,
     enum sr_js_runtime runtime = sr_js_runtime_from_string(runtime_name);
     if (!runtime)
     {
-        *error_message = sr_asprintf("No known JavaScript platform with runtime "
+        *error_message = g_strdup_printf("No known JavaScript platform with runtime "
                                     "'%s'", runtime_name);
 
         return SR_JS_PLATFORM_NULL;
@@ -119,7 +119,7 @@ sr_js_platform_from_string(const char *runtime_name,
 
     if (!engine)
     {
-        *error_message = sr_asprintf("No known JavaScript engine for runtime"
+        *error_message = g_strdup_printf("No known JavaScript engine for runtime"
                                     "by '%s%s%s'",
                                     runtime_name,
                                     runtime_version ? " " : "",
@@ -181,7 +181,7 @@ sr_js_platform_to_json(sr_js_platform_t platform)
     if (!engine_str)
         engine_str = "<unknown>";
 
-   return sr_asprintf("{    \"engine\": \"%s\"\n"
+   return g_strdup_printf("{    \"engine\": \"%s\"\n"
                       ",    \"runtime\": \"%s\"\n"
                       "}\n",
                       engine_str,
@@ -209,7 +209,7 @@ sr_js_platform_from_json(json_object *root, char **error_message)
     if (     strcmp(engine_str, "<unknown>") != 0
         && !(engine = sr_js_engine_from_string(engine_str)))
     {
-        *error_message = sr_asprintf("Unknown JavaScript engine '%s'", engine_str);
+        *error_message = g_strdup_printf("Unknown JavaScript engine '%s'", engine_str);
         goto fail;
     }
 
@@ -226,7 +226,7 @@ sr_js_platform_from_json(json_object *root, char **error_message)
     if (     strcmp(runtime_str, "<unknown>") != 0
         && !(runtime = sr_js_runtime_from_string(runtime_str)))
     {
-        *error_message = sr_asprintf("Unknown JavaScript runtime '%s'", runtime_str);
+        *error_message = g_strdup_printf("Unknown JavaScript runtime '%s'", runtime_str);
         goto fail;
     }
 
