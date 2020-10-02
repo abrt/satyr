@@ -58,12 +58,6 @@ sr_debug_parser;
  * Never returns NULL.
  */
 char *
-sr_vasprintf(const char *format, va_list p);
-
-/**
- * Never returns NULL.
- */
-char *
 sr_strdup(const char *s);
 
 /**

@@ -100,7 +100,7 @@ _set_error(char **error_msg, const char *fmt, ...)
         return;
 
     va_start(ap, fmt);
-    *error_msg = sr_vasprintf(fmt, ap);
+    *error_msg = g_strdup_vprintf(fmt, ap);
     va_end(ap);
 }
 
