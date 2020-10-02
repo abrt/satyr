@@ -160,7 +160,7 @@ sr_core_frame_cmp(struct sr_core_frame *frame1,
                   struct sr_core_frame *frame2)
 {
     /* Build ID. */
-    int build_id = sr_strcmp0(frame1->build_id,
+    int build_id = g_strcmp0(frame1->build_id,
                               frame2->build_id);
     if (build_id != 0)
         return build_id;
@@ -171,19 +171,19 @@ sr_core_frame_cmp(struct sr_core_frame *frame1,
         return build_id_offset;
 
     /* Function name. */
-    int function_name = sr_strcmp0(frame1->function_name,
+    int function_name = g_strcmp0(frame1->function_name,
                                     frame2->function_name);
     if (function_name != 0)
         return function_name;
 
     /* File name */
-    int file_name = sr_strcmp0(frame1->file_name,
+    int file_name = g_strcmp0(frame1->file_name,
                                 frame2->file_name);
     if (file_name != 0)
         return file_name;
 
     /* Fingerprint. */
-    int fingerprint = sr_strcmp0(frame1->fingerprint,
+    int fingerprint = g_strcmp0(frame1->fingerprint,
                                   frame2->fingerprint);
     if (fingerprint != 0)
         return fingerprint;
@@ -200,7 +200,7 @@ sr_core_frame_cmp_distance(struct sr_core_frame *frame1,
         return strcmp(frame1->function_name, frame2->function_name);
 
     /* Try matching build ID and offset. */
-    int build_id = sr_strcmp0(frame1->build_id,
+    int build_id = g_strcmp0(frame1->build_id,
                               frame2->build_id);
 
     int build_id_offset = frame1->build_id_offset - frame2->build_id_offset;

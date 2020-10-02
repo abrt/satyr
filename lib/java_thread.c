@@ -120,7 +120,7 @@ int
 sr_java_thread_cmp(struct sr_java_thread *thread1,
                    struct sr_java_thread *thread2)
 {
-    int res = sr_strcmp0(thread1->name, thread2->name);
+    int res = g_strcmp0(thread1->name, thread2->name);
     if (res)
         return res;
 

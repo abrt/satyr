@@ -186,18 +186,18 @@ sr_gdb_frame_cmp(struct sr_gdb_frame *frame1,
     }
 
     /* Function. */
-    int function_name = sr_strcmp0(frame1->function_name,
+    int function_name = g_strcmp0(frame1->function_name,
                                    frame2->function_name);
     if (function_name != 0)
         return function_name;
 
-    int function_type = sr_strcmp0(frame1->function_type,
+    int function_type = g_strcmp0(frame1->function_type,
                                    frame2->function_type);
     if (function_type != 0)
         return function_type;
 
     /* Sourcefile. */
-    int source_file = sr_strcmp0(frame1->source_file,
+    int source_file = g_strcmp0(frame1->source_file,
                                  frame2->source_file);
     if (source_file != 0)
         return source_file;
@@ -208,7 +208,7 @@ sr_gdb_frame_cmp(struct sr_gdb_frame *frame1,
         return source_line;
 
     /* Library name. */
-    int library_name = sr_strcmp0(frame1->library_name,
+    int library_name = g_strcmp0(frame1->library_name,
                                   frame2->library_name);
     if (library_name != 0)
         return library_name;
@@ -228,11 +228,11 @@ int
 sr_gdb_frame_cmp_distance(struct sr_gdb_frame *frame1,
                           struct sr_gdb_frame *frame2)
 {
-    if (sr_strcmp0(frame1->function_name, "??") == 0 &&
-        sr_strcmp0(frame2->function_name, "??") == 0)
+    if (g_strcmp0(frame1->function_name, "??") == 0 &&
+        g_strcmp0(frame2->function_name, "??") == 0)
         return -1;
 
-    int function_name = sr_strcmp0(frame1->function_name,
+    int function_name = g_strcmp0(frame1->function_name,
                                    frame2->function_name);
     if (function_name != 0)
         return function_name;

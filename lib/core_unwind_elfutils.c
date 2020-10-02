@@ -72,7 +72,7 @@ frame_callback(Dwfl_Frame *frame, void *data)
     struct sr_core_frame *result = resolve_frame(dwfl, pc, minus_one);
 
     /* Do not unwind below __libc_start_main. */
-    if (0 == sr_strcmp0(result->function_name, "__libc_start_main"))
+    if (0 == g_strcmp0(result->function_name, "__libc_start_main"))
     {
         sr_core_frame_free(result);
         return CB_STOP_UNWIND;

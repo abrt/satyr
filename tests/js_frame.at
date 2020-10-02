@@ -22,12 +22,12 @@ AT_TESTFUN([sr_js_frame_parse_v8], [[
             fprintf(stderr, "unexpected error -> '%s'\n", r_location.message); \
             assert(!i_input); \
         } \
-        if (    ( e_function && (sr_strcmp0(r_frame->function_name, e_function) != 0)) \
+        if (    ( e_function && (g_strcmp0(r_frame->function_name, e_function) != 0)) \
              || (!e_function && r_frame->function_name)) { \
             fprintf(stderr, "function_name -> '%s' != '%s'\n", r_frame->function_name, e_function); \
             assert(!i_input); \
         } \
-        if (    ( e_file && (sr_strcmp0(r_frame->file_name, e_file) != 0)) \
+        if (    ( e_file && (g_strcmp0(r_frame->file_name, e_file) != 0)) \
              || (!e_file && r_frame->file_name)) { \
             fprintf(stderr, "file_name -> '%s' != '%s'\n", r_frame->file_name, e_file); \
             assert(!i_input); \
@@ -486,7 +486,7 @@ main(void)
   sr_js_frame_append_to_str(frame1, strbuf);
   char *result = g_string_free(strbuf, FALSE);
 
-  if (sr_strcmp0(result, line) != 0) {
+  if (g_strcmp0(result, line) != 0) {
       fprintf(stderr, "'%s'\n  !=\n'%s'\n", result, line);
       assert(!"Failed to format JavaScript frame to string.");
   }

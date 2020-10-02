@@ -118,13 +118,13 @@ sr_python_frame_cmp(struct sr_python_frame *frame1,
                     struct sr_python_frame *frame2)
 {
     /* function_name */
-    int function_name = sr_strcmp0(frame1->function_name,
+    int function_name = g_strcmp0(frame1->function_name,
                                    frame2->function_name);
     if (function_name != 0)
         return function_name;
 
     /* file_name */
-    int file_name = sr_strcmp0(frame1->file_name,
+    int file_name = g_strcmp0(frame1->file_name,
                                frame2->file_name);
     if (file_name != 0)
         return file_name;
@@ -147,7 +147,7 @@ sr_python_frame_cmp(struct sr_python_frame *frame1,
         return special_file;
 
     /* line_contents */
-    int line_contents = sr_strcmp0(frame1->line_contents,
+    int line_contents = g_strcmp0(frame1->line_contents,
                                    frame2->line_contents);
     if (line_contents != 0)
         return line_contents;
@@ -160,13 +160,13 @@ sr_python_frame_cmp_distance(struct sr_python_frame *frame1,
                              struct sr_python_frame *frame2)
 {
     /* function_name */
-    int function_name = sr_strcmp0(frame1->function_name,
+    int function_name = g_strcmp0(frame1->function_name,
                                    frame2->function_name);
     if (function_name != 0)
         return function_name;
 
     /* file_name */
-    int file_name = sr_strcmp0(frame1->file_name,
+    int file_name = g_strcmp0(frame1->file_name,
                                frame2->file_name);
     if (file_name != 0)
         return file_name;

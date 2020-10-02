@@ -58,14 +58,7 @@ void
 sr_struniq(char **strings, size_t *size);
 
 /**
- * A strcmp() variant that works also with NULL parameters.  NULL is
- * considered to be less than a string.
- */
-int
-sr_strcmp0(const char *s1, const char *s2);
-
-/**
- * A wrapper around sr_strcmp0 that takes pointers to strings. Can be used as a
+ * A wrapper around g_strcmp0 that takes pointers to strings. Can be used as a
  * paramter to qsort or bsearch.
  */
 int

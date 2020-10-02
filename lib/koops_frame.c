@@ -137,7 +137,7 @@ sr_koops_frame_cmp(struct sr_koops_frame *frame1,
         return reliable;
 
     /* Function name. */
-    int function_name = sr_strcmp0(frame1->function_name,
+    int function_name = g_strcmp0(frame1->function_name,
                                    frame2->function_name);
 
     if (function_name != 0)
@@ -154,7 +154,7 @@ sr_koops_frame_cmp(struct sr_koops_frame *frame1,
         return function_length;
 
     /* Module name. */
-    int module_name = sr_strcmp0(frame1->module_name,
+    int module_name = g_strcmp0(frame1->module_name,
                                  frame2->module_name);
 
     if (module_name != 0)
@@ -166,7 +166,7 @@ sr_koops_frame_cmp(struct sr_koops_frame *frame1,
         return from_address;
 
     /* From function name. */
-    int from_function_name = sr_strcmp0(frame1->from_function_name,
+    int from_function_name = g_strcmp0(frame1->from_function_name,
                                         frame2->from_function_name);
 
     if (from_function_name != 0)
@@ -183,14 +183,14 @@ sr_koops_frame_cmp(struct sr_koops_frame *frame1,
         return from_function_length;
 
     /* From module name. */
-    int from_module_name = sr_strcmp0(frame1->from_module_name,
+    int from_module_name = g_strcmp0(frame1->from_module_name,
                                       frame2->from_module_name);
 
     if (from_module_name != 0)
         return from_module_name;
 
     /* Special stack. */
-    int special_stack = sr_strcmp0(frame1->special_stack,
+    int special_stack = g_strcmp0(frame1->special_stack,
                                    frame2->special_stack);
 
     if (special_stack != 0)
@@ -204,7 +204,7 @@ sr_koops_frame_cmp_distance(struct sr_koops_frame *frame1,
                             struct sr_koops_frame *frame2)
 {
     /* Function. */
-    int function_name = sr_strcmp0(frame1->function_name,
+    int function_name = g_strcmp0(frame1->function_name,
                                     frame2->function_name);
     if (function_name != 0)
         return function_name;

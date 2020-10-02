@@ -115,13 +115,13 @@ sr_ruby_frame_cmp(struct sr_ruby_frame *frame1,
                   struct sr_ruby_frame *frame2)
 {
     /* function_name */
-    int function_name = sr_strcmp0(frame1->function_name,
+    int function_name = g_strcmp0(frame1->function_name,
                                    frame2->function_name);
     if (function_name != 0)
         return function_name;
 
     /* file_name */
-    int file_name = sr_strcmp0(frame1->file_name,
+    int file_name = g_strcmp0(frame1->file_name,
                                frame2->file_name);
     if (file_name != 0)
         return file_name;
@@ -154,13 +154,13 @@ sr_ruby_frame_cmp_distance(struct sr_ruby_frame *frame1,
                            struct sr_ruby_frame *frame2)
 {
     /* function_name */
-    int function_name = sr_strcmp0(frame1->function_name,
+    int function_name = g_strcmp0(frame1->function_name,
                                    frame2->function_name);
     if (function_name != 0)
         return function_name;
 
     /* file_name */
-    int file_name = sr_strcmp0(frame1->file_name,
+    int file_name = g_strcmp0(frame1->file_name,
                                frame2->file_name);
     if (file_name != 0)
         return file_name;

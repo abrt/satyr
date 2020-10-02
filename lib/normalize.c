@@ -338,8 +338,8 @@ sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
     while (curr_frame)
     {
         if (prev_frame &&
-            0 != sr_strcmp0(prev_frame->function_name, "??") &&
-            0 == sr_strcmp0(prev_frame->function_name, curr_frame->function_name))
+            0 != g_strcmp0(prev_frame->function_name, "??") &&
+            0 == g_strcmp0(prev_frame->function_name, curr_frame->function_name))
         {
             prev_frame->next = curr_frame->next;
             sr_gdb_frame_free(curr_frame);
@@ -484,7 +484,7 @@ sr_normalize_core_thread(struct sr_core_thread *thread)
     {
         if (prev_frame &&
             prev_frame->function_name &&
-            0 == sr_strcmp0(prev_frame->function_name, curr_frame->function_name))
+            0 == g_strcmp0(prev_frame->function_name, curr_frame->function_name))
         {
             prev_frame->next = curr_frame->next;
             sr_core_frame_free(curr_frame);
@@ -516,9 +516,9 @@ next_functions_similar(struct sr_gdb_frame *frame1,
     if ((!frame1->next && frame2->next) ||
         (frame1->next && !frame2->next) ||
         (frame1->next && frame2->next &&
-         (0 != sr_strcmp0(frame1->next->function_name,
+         (0 != g_strcmp0(frame1->next->function_name,
                           frame2->next->function_name) ||
-          0 == sr_strcmp0(frame1->next->function_name, "??") ||
+          0 == g_strcmp0(frame1->next->function_name, "??") ||
          (frame1->next->library_name && frame2->next->library_name &&
           0 != strcmp(frame1->next->library_name, frame2->next->library_name)))))
         return false;
@@ -539,8 +539,8 @@ sr_normalize_gdb_paired_unknown_function_names(struct sr_gdb_thread *thread1,
     struct sr_gdb_frame *curr_frame1 = thread1->frames;
     struct sr_gdb_frame *curr_frame2 = thread2->frames;
 
-    if (0 == sr_strcmp0(curr_frame1->function_name, "??") &&
-        0 == sr_strcmp0(curr_frame2->function_name, "??") &&
+    if (0 == g_strcmp0(curr_frame1->function_name, "??") &&
+        0 == g_strcmp0(curr_frame2->function_name, "??") &&
         !(curr_frame1->library_name && curr_frame2->library_name &&
           strcmp(curr_frame1->library_name, curr_frame2->library_name)) &&
         next_functions_similar(curr_frame1, curr_frame2))
@@ -559,16 +559,16 @@ sr_normalize_gdb_paired_unknown_function_names(struct sr_gdb_thread *thread1,
 
     while (curr_frame1)
     {
-        if (0 == sr_strcmp0(curr_frame1->function_name, "??"))
+        if (0 == g_strcmp0(curr_frame1->function_name, "??"))
         {
             while (curr_frame2)
             {
-                if (0 == sr_strcmp0(curr_frame2->function_name, "??") &&
+                if (0 == g_strcmp0(curr_frame2->function_name, "??") &&
                     !(curr_frame1->library_name && curr_frame2->library_name &&
                       strcmp(curr_frame1->library_name, curr_frame2->library_name)) &&
-                    0 != sr_strcmp0(prev_frame2->function_name, "??") &&
+                    0 != g_strcmp0(prev_frame2->function_name, "??") &&
                     next_functions_similar(curr_frame1, curr_frame2) &&
-                    0 == sr_strcmp0(prev_frame1->function_name,
+                    0 == g_strcmp0(prev_frame1->function_name,
                                      prev_frame2->function_name) &&
                     !(prev_frame1->library_name && prev_frame2->library_name &&
                       strcmp(prev_frame1->library_name, prev_frame2->library_name)))

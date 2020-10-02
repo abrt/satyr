@@ -85,7 +85,7 @@ unwind_thread(struct UCD_info *ui,
         */
 
         /* Do not unwind below __libc_start_main. */
-        if (0 == sr_strcmp0(entry->function_name, "__libc_start_main"))
+        if (0 == g_strcmp0(entry->function_name, "__libc_start_main"))
             break;
 
         ret = unw_step(&c);
