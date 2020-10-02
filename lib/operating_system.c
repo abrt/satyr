@@ -164,10 +164,10 @@ sr_operating_system_parse_etc_system_release(const char *etc_system_release,
 
     /* Normal form of Red Hat Enterprise Linux's name is "rhel" */
     if (strncasecmp("Red Hat Enterprise Linux", etc_system_release, strlen("Red Hat Enterprise Linux")) == 0)
-        *name = sr_strndup("rhel", strlen("rhel"));
+        *name = g_strndup("rhel", strlen("rhel"));
     else
     {
-        *name = sr_strndup(etc_system_release, release - etc_system_release);
+        *name = g_strndup(etc_system_release, release - etc_system_release);
 
         if (0 == strlen(*name))
             return false;
@@ -191,7 +191,7 @@ sr_operating_system_parse_etc_system_release(const char *etc_system_release,
     if (0 == version_len)
         version_end = version_begin + strlen(version_begin);
 
-    *version = sr_strndup(version_begin, version_end - version_begin);
+    *version = g_strndup(version_begin, version_end - version_begin);
     return true;
 }
 

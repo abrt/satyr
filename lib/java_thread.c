@@ -325,7 +325,7 @@ sr_java_thread_parse(const char **input,
             return NULL;
         }
 
-        thread->name = sr_strndup(mark, cursor - mark);
+        thread->name = g_strndup(mark, cursor - mark);
 
         sr_location_eat_char(location, *(++cursor));
     }

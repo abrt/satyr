@@ -690,11 +690,11 @@ sr_rpm_package_parse_nvr(const char *text,
     *release = sr_strdup(last_dash + 1);
 
     // Version is before the last dash.
-    *version = sr_strndup(last_but_one_dash + 1,
+    *version = g_strndup(last_but_one_dash + 1,
                           last_dash - last_but_one_dash - 1);
 
     // Name is before version.
-    *name = sr_strndup(text, last_but_one_dash - text);
+    *name = g_strndup(text, last_but_one_dash - text);
 
     return true;
 }
@@ -743,16 +743,16 @@ sr_rpm_package_parse_nevra(const char *text,
     *architecture = sr_strdup(last_dot + 1);
 
     // Release is after the last dash.
-    *release = sr_strndup(last_dash + 1, last_dot - last_dash - 1);
+    *release = g_strndup(last_dash + 1, last_dot - last_dash - 1);
 
     // Epoch is optional.
     if (colon)
     {
         // Version is before the last dash.
-        *version = sr_strndup(colon + 1,
+        *version = g_strndup(colon + 1,
                               last_dash - colon - 1);
 
-        char *epoch_str = sr_strndup(last_but_one_dash + 1,
+        char *epoch_str = g_strndup(last_but_one_dash + 1,
                                      colon - last_but_one_dash - 1);
 
         char *endptr;
@@ -775,14 +775,14 @@ sr_rpm_package_parse_nevra(const char *text,
     else
     {
         // Version is before the last dash.
-        *version = sr_strndup(last_but_one_dash + 1,
+        *version = g_strndup(last_but_one_dash + 1,
                               last_dash - last_but_one_dash - 1);
 
         *epoch = 0;
     }
 
     // Name is before version.
-    *name = sr_strndup(text, last_but_one_dash - text);
+    *name = g_strndup(text, last_but_one_dash - text);
 
     return true;
 }

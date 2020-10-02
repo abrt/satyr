@@ -290,7 +290,7 @@ sr_java_frame_parse_exception(const char **input,
     }
 
     struct sr_java_frame *exception = sr_java_frame_new_exception();
-    exception->name = sr_strndup(mark, cursor - mark);
+    exception->name = g_strndup(mark, cursor - mark);
 
     /* : foo */
     if (*cursor == ':')
@@ -307,7 +307,7 @@ sr_java_frame_parse_exception(const char **input,
         sr_location_add(location, 0, sr_skip_char_cspan(&cursor, "\n"));
 
         if (mark != cursor)
-            exception->message = sr_strndup(mark, cursor - mark);
+            exception->message = g_strndup(mark, cursor - mark);
     }
     else
     {
@@ -468,7 +468,7 @@ const char *sr_java_frame_parse_frame_url(struct sr_java_frame *frame, const cha
 
         if (mark != cursor)
         {
-            frame->class_path = sr_strndup(mark, cursor - mark);
+            frame->class_path = g_strndup(mark, cursor - mark);
             frame->class_path = anonymize_path(frame->class_path);
         }
     }
@@ -508,7 +508,7 @@ sr_java_frame_parse(const char **input,
     struct sr_java_frame *frame = sr_java_frame_new();
 
     if (cursor != mark)
-        frame->name = sr_strndup(mark, cursor - mark);
+        frame->name = g_strndup(mark, cursor - mark);
 
     /* (SimpleTest.java:36) [file:/usr/lib/java/foo.class] */
     if (*cursor == '(')
@@ -526,7 +526,7 @@ sr_java_frame_parse(const char **input,
             else if (!sr_java_frame_parse_is_unknown_source(mark))
             {
                 /* DO NOT set file_name if input says that source isn't known */
-                frame->file_name = sr_strndup(mark, cursor - mark);
+                frame->file_name = g_strndup(mark, cursor - mark);
                 frame->file_name = anonymize_path(frame->file_name);
             }
         }

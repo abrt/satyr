@@ -60,12 +60,6 @@ sr_debug_parser;
 char *
 sr_strdup(const char *s);
 
-/**
- * Never returns NULL.
- */
-char *
-sr_strndup(const char *s, size_t n);
-
 void
 sr_struniq(char **strings, size_t *size);
 

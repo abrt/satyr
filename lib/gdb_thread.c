@@ -483,9 +483,9 @@ sr_gdb_thread_parse_funs(const char *input)
         }
 
         frame = sr_gdb_frame_new();
-        frame->function_name = sr_strndup(input, libname - input);
+        frame->function_name = g_strndup(input, libname - input);
         if (libname + 1 < next)
-            frame->library_name = sr_strndup(libname + 1, next - libname - 1);
+            frame->library_name = g_strndup(libname + 1, next - libname - 1);
 
         input = next + 1;
         frame->number = number++;
@@ -547,7 +547,7 @@ sr_gdb_thread_set_libnames(struct sr_gdb_thread *thread, struct sr_gdb_sharedlib
 
             if (frame->library_name)
                 free(frame->library_name);
-            frame->library_name = sr_strndup(s1, s2 - s1);
+            frame->library_name = g_strndup(s1, s2 - s1);
         }
         frame = frame->next;
     }
