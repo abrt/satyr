@@ -106,6 +106,10 @@ AM_CONDITIONAL(WITH_PYTHON3, [test $with_python3 = yes])
 AC_CHECK_LIB([bfd], [main])
 AC_CHECK_LIB([dl], [main])
 
+m4_define([glib_version], [2.43.4])
+
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= glib_version])
+
 PKG_CHECK_MODULES([JSON], [json-c])
 PKG_CHECK_MODULES([NETTLE], [nettle])
 
