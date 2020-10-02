@@ -250,17 +250,17 @@ main(void)
   frame2->function_name = NULL;
   assert(0 != sr_js_frame_cmp(frame1, frame2) || !"function_name - NULL");
 
-  frame2->function_name = sr_strdup("foo_blah");
+  frame2->function_name = g_strdup("foo_blah");
   assert(0 != sr_js_frame_cmp(frame1, frame2) || !"function_name");
 
   free(frame2->function_name);
-  frame2->function_name = sr_strdup(frame1->function_name);
+  frame2->function_name = g_strdup(frame1->function_name);
 
   free(frame2->file_name);
   frame2->file_name = NULL;
   assert(0 != sr_js_frame_cmp(frame1, frame2) || !"file_name - NULL");
 
-  frame2->file_name = sr_strdup("blah_foo");
+  frame2->file_name = g_strdup("blah_foo");
   assert(0 != sr_js_frame_cmp(frame1, frame2) || !"file_name");
 
   sr_js_frame_free(frame1);
@@ -309,17 +309,17 @@ main(void)
   frame2->function_name = NULL;
   assert(0 != sr_js_frame_cmp_distance(frame1, frame2) || !"function_name - NULL");
 
-  frame2->function_name = sr_strdup("foo_blah");
+  frame2->function_name = g_strdup("foo_blah");
   assert(0 != sr_js_frame_cmp_distance(frame1, frame2) || !"function_name");
 
   free(frame2->function_name);
-  frame2->function_name = sr_strdup(frame1->function_name);
+  frame2->function_name = g_strdup(frame1->function_name);
 
   free(frame2->file_name);
   frame2->file_name = NULL;
   assert(0 != sr_js_frame_cmp_distance(frame1, frame2) || !"file_name - NULL");
 
-  frame2->file_name = sr_strdup("blah_foo");
+  frame2->file_name = g_strdup("blah_foo");
   assert(0 != sr_js_frame_cmp_distance(frame1, frame2) || !"file_name");
 
   sr_js_frame_free(frame1);

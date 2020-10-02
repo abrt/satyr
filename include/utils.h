@@ -54,12 +54,6 @@ extern "C" {
 extern bool
 sr_debug_parser;
 
-/**
- * Never returns NULL.
- */
-char *
-sr_strdup(const char *s);
-
 void
 sr_struniq(char **strings, size_t *size);
 

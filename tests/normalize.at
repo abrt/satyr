@@ -26,8 +26,8 @@ create_thread(int count, ...)
   {
     const char *fname = va_arg(argp, const char*);
     struct sr_gdb_frame *frame = sr_gdb_frame_new();
-    frame->function_name = sr_strdup(fname);
-    frame->source_file = sr_strdup("");
+    frame->function_name = g_strdup(fname);
+    frame->source_file = g_strdup("");
 
     if (!thread->frames)
       thread->frames = frame;
@@ -58,20 +58,20 @@ int
 main(void)
 {
   struct sr_gdb_frame *frame2 = sr_gdb_frame_new();
-  frame2->function_name = sr_strdup("??");
+  frame2->function_name = g_strdup("??");
   frame2->number = 2;
   frame2->address = 0x0000;
 
   struct sr_gdb_frame *frame1 = sr_gdb_frame_new();
-  frame1->function_name = sr_strdup("write_to_temp_file");
+  frame1->function_name = g_strdup("write_to_temp_file");
   frame1->number = 1;
-  frame1->source_file = sr_strdup("gfileutils.c");
+  frame1->source_file = g_strdup("gfileutils.c");
   frame1->source_line = 980;
   frame1->address = 0x322160e7fdULL;
   frame1->next = frame2;
 
   struct sr_gdb_frame *frame0 = sr_gdb_frame_new();
-  frame0->function_name = sr_strdup("??");
+  frame0->function_name = g_strdup("??");
   frame0->number = 0;
   frame0->address = 0x0000;
   frame0->next = frame1;
@@ -102,11 +102,11 @@ main()
   threads[[0]] = create_thread(5, "aa", "abort", "raise", "__assert_fail_base", "ee");
   
   threads[[1]] = create_thread(5, "aa", "abort", "bb", "cc", "dd");
-  threads[[1]]->frames->next->source_file = sr_strdup("abort.c");
+  threads[[1]]->frames->next->source_file = g_strdup("abort.c");
   
   threads[[2]] = create_thread(5, "aa", "abort", "raise", "dd", "ee");
-  threads[[2]]->frames->next->source_file = sr_strdup("abort.c");
-  threads[[2]]->frames->next->next->source_file = sr_strdup("libc.so");
+  threads[[2]]->frames->next->source_file = g_strdup("abort.c");
+  threads[[2]]->frames->next->next->source_file = g_strdup("libc.so");
 
   sr_normalize_gdb_thread(threads[[0]]);
   assert(0 == strcmp(threads[[0]]->frames->function_name, "ee"));
@@ -209,33 +209,33 @@ int
 main(void)
 {
   struct sr_gdb_frame *frame3 = sr_gdb_frame_new();
-  frame3->function_name = sr_strdup("jthread_map_push");
+  frame3->function_name = g_strdup("jthread_map_push");
   frame3->number = 3;
-  frame3->source_file = sr_strdup("jthread_map.c");
+  frame3->source_file = g_strdup("jthread_map.c");
   frame3->source_line = 110;
   frame3->address = 0x7fda9a03f920ULL;
   frame3->next = NULL;
 
   struct sr_gdb_frame *frame2 = sr_gdb_frame_new();
-  frame2->function_name = sr_strdup("JVM_handle_linux_signal");
+  frame2->function_name = g_strdup("JVM_handle_linux_signal");
   frame2->number = 2;
-  frame2->source_file = sr_strdup("os_linux_x86.cpp");
+  frame2->source_file = g_strdup("os_linux_x86.cpp");
   frame2->source_line = 531;
   frame2->address = 0x7fda9af3106fULL;
   frame2->next = frame3;
 
   struct sr_gdb_frame *frame1 = sr_gdb_frame_new();
-  frame1->function_name = sr_strdup("VMError::report_and_die");
+  frame1->function_name = g_strdup("VMError::report_and_die");
   frame1->number = 1;
-  frame1->source_file = sr_strdup("vmError.cpp");
+  frame1->source_file = g_strdup("vmError.cpp");
   frame1->source_line = 1053;
   frame1->address = 0x7fda9b0a83efULL;
   frame1->next = frame2;
 
   struct sr_gdb_frame *frame0 = sr_gdb_frame_new();
-  frame0->function_name = sr_strdup("os::abort");
+  frame0->function_name = g_strdup("os::abort");
   frame0->number = 0;
-  frame0->source_file = sr_strdup("os_linux.cpp");
+  frame0->source_file = g_strdup("os_linux.cpp");
   frame0->source_line = 1594;
   frame0->address = 0x7fda9af29259ULL;
   frame0->next = frame1;

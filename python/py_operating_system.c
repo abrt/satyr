@@ -114,13 +114,13 @@ sr_py_operating_system_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
         return NULL;
 
     if (name)
-        os->operating_system->name = sr_strdup(name);
+        os->operating_system->name = g_strdup(name);
 
     if (version)
-        os->operating_system->version = sr_strdup(version);
+        os->operating_system->version = g_strdup(version);
 
     if (arch)
-        os->operating_system->architecture = sr_strdup(arch);
+        os->operating_system->architecture = g_strdup(arch);
 
     return (PyObject*)os;
 }

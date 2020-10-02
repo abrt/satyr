@@ -98,8 +98,8 @@ void
 sr_report_add_auth(struct sr_report *report, const char *key, const char *value)
 {
     struct sr_report_custom_entry *new_entry = g_malloc(sizeof(*new_entry));
-    new_entry->key = sr_strdup(key);
-    new_entry->value = sr_strdup(value);
+    new_entry->key = g_strdup(key);
+    new_entry->value = g_strdup(value);
 
     /* prepend the new value
      * it is much faster and easier
@@ -186,8 +186,8 @@ sr_report_to_json(struct sr_report *report)
     default:
     case SR_REPORT_INVALID:
     case SR_REPORT_GDB: /* gdb ureports are not supported */
-        report_type = sr_strdup("invalid");
-        reason = sr_strdup("invalid");
+        report_type = g_strdup("invalid");
+        reason = g_strdup("invalid");
         break;
     case SR_REPORT_CORE:
     case SR_REPORT_PYTHON:
@@ -306,9 +306,9 @@ char *
 sr_report_type_to_string(enum sr_report_type report_type)
 {
     if (report_type < SR_REPORT_INVALID || report_type >= SR_REPORT_NUM)
-        return sr_strdup("invalid");
+        return g_strdup("invalid");
 
-    return sr_strdup(report_types[report_type]);
+    return g_strdup(report_types[report_type]);
 }
 
 struct sr_report *
@@ -460,7 +460,7 @@ sr_report_from_json_text(const char *report, char **error_message)
 
             description = json_tokener_error_desc(error);
 
-            *error_message = sr_strdup(description);
+            *error_message = g_strdup(description);
         }
         return NULL;
     }

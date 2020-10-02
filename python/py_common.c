@@ -56,7 +56,7 @@ sr_py_setter_string(PyObject *self, PyObject *rhs, void *data)
 
     char *str = MEMB_T(char*, MEMB(self, gsoff->c_struct_offset), gsoff->member_offset);
     free(str);
-    MEMB_T(char*, MEMB(self, gsoff->c_struct_offset), gsoff->member_offset) = sr_strdup(newvalue);
+    MEMB_T(char*, MEMB(self, gsoff->c_struct_offset), gsoff->member_offset) = g_strdup(newvalue);
 
     return 0;
 }

@@ -120,13 +120,13 @@ sr_gdb_frame_dup(struct sr_gdb_frame *frame, bool siblings)
 
     /* Duplicate all strings. */
     if (result->function_name)
-        result->function_name = sr_strdup(result->function_name);
+        result->function_name = g_strdup(result->function_name);
     if (result->function_type)
-        result->function_type = sr_strdup(result->function_type);
+        result->function_type = g_strdup(result->function_type);
     if (result->source_file)
-        result->source_file = sr_strdup(result->source_file);
+        result->source_file = g_strdup(result->source_file);
     if (result->library_name)
-        result->library_name = sr_strdup(result->library_name);
+        result->library_name = g_strdup(result->library_name);
 
     return result;
 }

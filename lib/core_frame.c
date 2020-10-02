@@ -108,13 +108,13 @@ sr_core_frame_dup(struct sr_core_frame *frame, bool siblings)
 
     /* Duplicate all strings if the copy is not shallow. */
     if (result->build_id)
-        result->build_id = sr_strdup(result->build_id);
+        result->build_id = g_strdup(result->build_id);
     if (result->function_name)
-        result->function_name = sr_strdup(result->function_name);
+        result->function_name = g_strdup(result->function_name);
     if (result->file_name)
-        result->file_name = sr_strdup(result->file_name);
+        result->file_name = g_strdup(result->file_name);
     if (result->fingerprint)
-        result->fingerprint = sr_strdup(result->fingerprint);
+        result->fingerprint = g_strdup(result->fingerprint);
 
     return result;
 }

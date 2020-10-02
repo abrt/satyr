@@ -105,19 +105,19 @@ sr_koops_frame_dup(struct sr_koops_frame *frame, bool siblings)
 
     /* Duplicate all strings. */
     if (result->function_name)
-        result->function_name = sr_strdup(result->function_name);
+        result->function_name = g_strdup(result->function_name);
 
     if (result->module_name)
-        result->module_name = sr_strdup(result->module_name);
+        result->module_name = g_strdup(result->module_name);
 
     if (result->from_function_name)
-        result->from_function_name = sr_strdup(result->from_function_name);
+        result->from_function_name = g_strdup(result->from_function_name);
 
     if (result->from_module_name)
-        result->from_module_name = sr_strdup(result->from_module_name);
+        result->from_module_name = g_strdup(result->from_module_name);
 
     if (result->special_stack)
-        result->special_stack = sr_strdup(result->special_stack);
+        result->special_stack = g_strdup(result->special_stack);
 
     return result;
 }

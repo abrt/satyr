@@ -58,7 +58,7 @@ sr_gdb_sharedlib_dup(struct sr_gdb_sharedlib *sharedlib,
 {
     struct sr_gdb_sharedlib *result = sr_gdb_sharedlib_new();
     memcpy(result, sharedlib, sizeof(struct sr_gdb_sharedlib));
-    result->soname = sr_strdup(sharedlib->soname);
+    result->soname = g_strdup(sharedlib->soname);
 
     if (siblings)
     {

@@ -814,7 +814,7 @@ int main(void)
     test(thread, "Thread\n0xdeadbeaf\n", NULL);
 
     frame->address = 0xDEADBEAF;
-    frame->function_name = sr_strdup("omg_warn_slowpath_common");
+    frame->function_name = g_strdup("omg_warn_slowpath_common");
     stacktrace->frames = frame;
 
     fprintf(stderr, "Checkpoint 3\n");

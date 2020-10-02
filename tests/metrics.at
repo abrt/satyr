@@ -25,7 +25,7 @@ create_thread(int count, ...)
   {
     const char *fname = va_arg(argp, const char*);
     struct sr_gdb_frame *frame = sr_gdb_frame_new();
-    frame->function_name = sr_strdup(fname);
+    frame->function_name = g_strdup(fname);
 
     if (!thread->frames)
       thread->frames = frame;

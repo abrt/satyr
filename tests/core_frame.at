@@ -17,19 +17,19 @@ main(void)
 {
   struct sr_core_frame *frame1 = sr_core_frame_new();;
   frame1->address = 0xffffffff1;
-  frame1->build_id = sr_strdup("aabbccddeeff1");
+  frame1->build_id = g_strdup("aabbccddeeff1");
   frame1->build_id_offset = 2561;
-  frame1->function_name = sr_strdup("test1");
-  frame1->file_name = sr_strdup("executable1");
-  frame1->fingerprint = sr_strdup("ab");
+  frame1->function_name = g_strdup("test1");
+  frame1->file_name = g_strdup("executable1");
+  frame1->fingerprint = g_strdup("ab");
 
   struct sr_core_frame *frame0 = sr_core_frame_new();;
   frame0->address = 0xffffffff0;
-  frame0->build_id = sr_strdup("aabbccddeeff0");
+  frame0->build_id = g_strdup("aabbccddeeff0");
   frame0->build_id_offset = 2560;
-  frame0->function_name = sr_strdup("test0");
-  frame0->file_name = sr_strdup("executable0");
-  frame0->fingerprint = sr_strdup("ab");
+  frame0->function_name = g_strdup("test0");
+  frame0->file_name = g_strdup("executable0");
+  frame0->fingerprint = g_strdup("ab");
   frame0->next = frame1;
 
   /* Test the duplication without siblings. */
@@ -73,11 +73,11 @@ main(void)
 {
   struct sr_core_frame *frame = sr_core_frame_new();;
   frame->address = 0xffffffff1;
-  frame->build_id = sr_strdup("aabbccddeeff1");
+  frame->build_id = g_strdup("aabbccddeeff1");
   frame->build_id_offset = 2561;
-  frame->function_name = sr_strdup("test1");
-  frame->file_name = sr_strdup("executable1");
-  frame->fingerprint = sr_strdup("ab");
+  frame->function_name = g_strdup("test1");
+  frame->file_name = g_strdup("executable1");
+  frame->fingerprint = g_strdup("ab");
 
   char *json = sr_core_frame_to_json(frame);
   assert(0 == strcmp(json,
@@ -109,11 +109,11 @@ main(void)
 {
   struct sr_core_frame *frame = sr_core_frame_new();;
   frame->address = 0xffffffff1;
-  frame->build_id = sr_strdup("aabbccddeeff1");
+  frame->build_id = g_strdup("aabbccddeeff1");
   frame->build_id_offset = 2561;
-  frame->function_name = sr_strdup("test1");
-  frame->file_name = sr_strdup("executable1");
-  frame->fingerprint = sr_strdup("ab");
+  frame->function_name = g_strdup("test1");
+  frame->file_name = g_strdup("executable1");
+  frame->fingerprint = g_strdup("ab");
   frame->next = 0xdeadbeef;
 
   assert(sr_frame_next((struct sr_frame*)frame) == (void*)0xdeadbeef);

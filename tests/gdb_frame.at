@@ -15,18 +15,18 @@ int
 main(void)
 {
   struct sr_gdb_frame *frame1 = sr_gdb_frame_new();;
-  frame1->function_name = sr_strdup("test1");
-  frame1->function_type = sr_strdup("type1");
+  frame1->function_name = g_strdup("test1");
+  frame1->function_type = g_strdup("type1");
   frame1->number = 10;
-  frame1->source_file = sr_strdup("file1");
+  frame1->source_file = g_strdup("file1");
   frame1->source_line = 11;
   frame1->address = 12;
 
   struct sr_gdb_frame *frame0 = sr_gdb_frame_new();;
-  frame0->function_name = sr_strdup("test0");
-  frame0->function_type = sr_strdup("type0");
+  frame0->function_name = g_strdup("test0");
+  frame0->function_type = g_strdup("type0");
   frame0->number = 13;
-  frame0->source_file = sr_strdup("file0");
+  frame0->source_file = g_strdup("file0");
   frame0->source_line = 14;
   frame0->address = 15;
   frame0->next = frame1;
@@ -233,7 +233,7 @@ check(const char *input, size_t len)
     if (len == -1)
         len = strlen(input);
 
-    char *local_input = sr_strdup(input);
+    char *local_input = g_strdup(input);
     char *old_input = local_input;
 
     char *namechunk = (char *)0xDEADBEEF;

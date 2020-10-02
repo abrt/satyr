@@ -193,7 +193,7 @@ touch_module(Dwfl_Module *mod, void **userdata, const char *name,
     {
         **tailp = g_malloc0(sizeof(struct exe_mapping_data));
         (**tailp)->start = (uint64_t)base;
-        (**tailp)->filename = sr_strdup(filename);
+        (**tailp)->filename = g_strdup(filename);
         *tailp = &((**tailp)->next);
     }
 
@@ -324,14 +324,14 @@ resolve_frame(Dwfl *dwfl, Dwarf_Addr ip, bool minus_one)
         if (modname)
         {
             frame->build_id_offset = ip - start;
-            frame->file_name = filename ? sr_strdup(filename) : sr_strdup(modname);
+            frame->file_name = filename ? g_strdup(filename) : g_strdup(modname);
         }
 
         funcname = dwfl_module_addrname(mod, (GElf_Addr)ip_adjusted);
         if (funcname)
         {
             char *demangled = sr_demangle_symbol(funcname);
-            frame->function_name = (demangled ? demangled : sr_strdup(funcname));
+            frame->function_name = (demangled ? demangled : g_strdup(funcname));
         }
     }
 

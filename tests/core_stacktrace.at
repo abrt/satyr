@@ -21,18 +21,18 @@ main(void)
 {
   struct sr_core_frame *frame1 = sr_core_frame_new();
   frame1->address = 0xffffffff0;
-  frame1->build_id = sr_strdup("aabbccddeeff0");
+  frame1->build_id = g_strdup("aabbccddeeff0");
   frame1->build_id_offset = 2560;
-  frame1->function_name = sr_strdup("test0");
-  frame1->file_name = sr_strdup("executable0");
+  frame1->function_name = g_strdup("test0");
+  frame1->file_name = g_strdup("executable0");
 
   struct sr_core_frame *frame0 = sr_core_frame_new();;
   frame0->address = 0xffffffff1;
-  frame0->build_id = sr_strdup("aabbccddeeff1");
+  frame0->build_id = g_strdup("aabbccddeeff1");
   frame0->build_id_offset = 2561;
-  frame0->function_name = sr_strdup("test1");
-  frame0->file_name = sr_strdup("executable1");
-  frame0->fingerprint = sr_strdup("ab");
+  frame0->function_name = g_strdup("test1");
+  frame0->file_name = g_strdup("executable1");
+  frame0->fingerprint = g_strdup("ab");
   frame0->next = frame1;
 
   struct sr_core_thread *thread1 = sr_core_thread_new();
@@ -40,18 +40,18 @@ main(void)
 
   struct sr_core_frame *frame3 = sr_core_frame_new();
   frame3->address = 0xffffffff3;
-  frame3->build_id = sr_strdup("aabbccddeeff3");
+  frame3->build_id = g_strdup("aabbccddeeff3");
   frame3->build_id_offset = 2563;
-  frame3->function_name = sr_strdup("test3");
-  frame3->file_name = sr_strdup("executable3");
+  frame3->function_name = g_strdup("test3");
+  frame3->file_name = g_strdup("executable3");
 
   struct sr_core_frame *frame2 = sr_core_frame_new();;
   frame2->address = 0xffffffff2;
-  frame2->build_id = sr_strdup("aabbccddeeff2");
+  frame2->build_id = g_strdup("aabbccddeeff2");
   frame2->build_id_offset = 2562;
-  frame2->function_name = sr_strdup("test2");
-  frame2->file_name = sr_strdup("executable2");
-  frame2->fingerprint = sr_strdup("ab");
+  frame2->function_name = g_strdup("test2");
+  frame2->file_name = g_strdup("executable2");
+  frame2->fingerprint = g_strdup("ab");
   frame2->next = frame3;
 
   struct sr_core_thread *thread0 = sr_core_thread_new();

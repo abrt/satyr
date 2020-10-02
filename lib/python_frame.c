@@ -102,13 +102,13 @@ sr_python_frame_dup(struct sr_python_frame *frame, bool siblings)
 
     /* Duplicate all strings. */
     if (result->file_name)
-        result->file_name = sr_strdup(result->file_name);
+        result->file_name = g_strdup(result->file_name);
 
     if (result->function_name)
-        result->function_name = sr_strdup(result->function_name);
+        result->function_name = g_strdup(result->function_name);
 
     if (result->line_contents)
-        result->line_contents = sr_strdup(result->line_contents);
+        result->line_contents = g_strdup(result->line_contents);
 
     return result;
 }
@@ -231,7 +231,7 @@ sr_python_frame_parse(const char **input,
     {
         frame->special_file = true;
         frame->file_name[strlen(frame->file_name)-1] = '\0';
-        char *inside = sr_strdup(frame->file_name + 1);
+        char *inside = g_strdup(frame->file_name + 1);
         free(frame->file_name);
         frame->file_name = inside;
     }
@@ -270,7 +270,7 @@ sr_python_frame_parse(const char **input,
          * function name on its line. For the sake of simplicity, we will
          * believe that we are dealing with such a frame now.
          */
-        frame->function_name = sr_strdup("syntax");
+        frame->function_name = g_strdup("syntax");
         frame->special_function = true;
     }
     else
@@ -294,7 +294,7 @@ sr_python_frame_parse(const char **input,
         {
             frame->special_function = true;
             frame->function_name[strlen(frame->function_name)-1] = '\0';
-            char *inside = sr_strdup(frame->function_name + 1);
+            char *inside = g_strdup(frame->function_name + 1);
             free(frame->function_name);
             frame->function_name = inside;
         }
@@ -389,7 +389,7 @@ sr_python_frame_from_json(json_object *root, char **error_message)
         string = json_object_get_string(val);
 
         result->special_file = false;
-        result->file_name = sr_strdup(string);
+        result->file_name = g_strdup(string);
     }
     else if (json_object_object_get_ex(root, "special_file", &val))
     {
@@ -401,7 +401,7 @@ sr_python_frame_from_json(json_object *root, char **error_message)
         string = json_object_get_string(val);
 
         result->special_file = true;
-        result->file_name = sr_strdup(string);
+        result->file_name = g_strdup(string);
     }
 
     /* Function name / special function. */
@@ -415,7 +415,7 @@ sr_python_frame_from_json(json_object *root, char **error_message)
         string = json_object_get_string(val);
 
         result->special_function = false;
-        result->function_name = sr_strdup(string);
+        result->function_name = g_strdup(string);
     }
     else if (json_object_object_get_ex(root, "special_function", &val))
     {
@@ -427,7 +427,7 @@ sr_python_frame_from_json(json_object *root, char **error_message)
         string = json_object_get_string(val);
 
         result->special_function = true;
-        result->function_name = sr_strdup(string);
+        result->function_name = g_strdup(string);
     }
 
     bool success =

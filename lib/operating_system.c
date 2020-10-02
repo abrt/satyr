@@ -215,7 +215,7 @@ os_release_callback(char *key, char *value, void *data)
     {
         if (operating_system->version)
             free(operating_system->version);
-        operating_system->version = sr_strdup("rawhide");
+        operating_system->version = g_strdup("rawhide");
         free(value);
     }
     else if (0 == strcmp(key, "CPE_NAME"))

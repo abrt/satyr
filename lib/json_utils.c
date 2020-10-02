@@ -41,7 +41,7 @@
 DEFINE_JSON_READ(json_read_uint64, uint64_t, json_type_int, int64, NOOP)
 DEFINE_JSON_READ(json_read_uint32, uint32_t, json_type_int, int, NOOP)
 DEFINE_JSON_READ(json_read_uint16, uint16_t, json_type_int, int, NOOP)
-DEFINE_JSON_READ(json_read_string, char *, json_type_string, string, sr_strdup)
+DEFINE_JSON_READ(json_read_string, char *, json_type_string, string, g_strdup)
 DEFINE_JSON_READ(json_read_bool, bool, json_type_boolean, boolean, NOOP)
 
 bool

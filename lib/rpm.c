@@ -217,16 +217,16 @@ package_merge(struct sr_rpm_package *p1, struct sr_rpm_package *p2)
         return NULL;
 
     struct sr_rpm_package *merged = sr_rpm_package_new();
-    merged->name = sr_strdup(p1->name);
+    merged->name = g_strdup(p1->name);
     merged->epoch = p1->epoch;
-    merged->version = sr_strdup(p1->version);
-    merged->release = sr_strdup(p1->release);
+    merged->version = g_strdup(p1->version);
+    merged->release = g_strdup(p1->release);
 
     /* architecture is sometimes missing */
     if (p1->architecture)
-        merged->architecture = sr_strdup(p1->architecture);
+        merged->architecture = g_strdup(p1->architecture);
     else if (p2->architecture)
-        merged->architecture = sr_strdup(p2->architecture);
+        merged->architecture = g_strdup(p2->architecture);
 
     merged->install_time = (p1->install_time ?
                             p1->install_time : p2->install_time);
@@ -288,7 +288,7 @@ header_get_string(Header header,
         return false;
 
     const char *str = rpmtdGetString(tag_data);
-    *result = (str ? sr_strdup(str) : NULL);
+    *result = (str ? g_strdup(str) : NULL);
     rpmtdFree(tag_data);
     return str;
 }
@@ -687,7 +687,7 @@ sr_rpm_package_parse_nvr(const char *text,
     }
 
     // Release is after the last dash.
-    *release = sr_strdup(last_dash + 1);
+    *release = g_strdup(last_dash + 1);
 
     // Version is before the last dash.
     *version = g_strndup(last_but_one_dash + 1,
@@ -740,7 +740,7 @@ sr_rpm_package_parse_nevra(const char *text,
     }
 
     // Architecture is after the last dot.
-    *architecture = sr_strdup(last_dot + 1);
+    *architecture = g_strdup(last_dot + 1);
 
     // Release is after the last dash.
     *release = g_strndup(last_dash + 1, last_dot - last_dash - 1);

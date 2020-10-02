@@ -132,7 +132,7 @@ unwind_thread(Dwfl_Thread *thread, void *data)
     }
     else if (ret != 0 && ret != CB_STOP_UNWIND)
     {
-        *error_msg = sr_strdup("Unknown error in dwfl_thread_getframes");
+        *error_msg = g_strdup("Unknown error in dwfl_thread_getframes");
         goto abort;
     }
 
@@ -206,7 +206,7 @@ sr_parse_coredump(const char *core_file,
         goto fail;
     }
 
-    stacktrace->executable = sr_strdup(exe_file);
+    stacktrace->executable = g_strdup(exe_file);
     stacktrace->signal = get_signal_number(ch->eh, core_file);
     /* FIXME: is this the best we can do? */
     stacktrace->crash_thread = stacktrace->threads;
@@ -362,7 +362,7 @@ sr_core_stacktrace_from_core_hook_generate(pid_t tid,
     truncate_long_thread(stacktrace->threads, &frame_arg);
 
     if (executable)
-        stacktrace->executable = sr_strdup(executable);
+        stacktrace->executable = g_strdup(executable);
     if (signum > 0)
         stacktrace->signal = (uint16_t)signum;
     stacktrace->crash_thread = stacktrace->threads;

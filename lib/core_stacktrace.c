@@ -115,7 +115,7 @@ sr_core_stacktrace_dup(struct sr_core_stacktrace *stacktrace)
     if (stacktrace->threads)
         result->threads = sr_core_thread_dup(stacktrace->threads, true);
     if (stacktrace->executable)
-        result->executable = sr_strdup(stacktrace->executable);
+        result->executable = g_strdup(stacktrace->executable);
 
     return result;
 }
@@ -237,7 +237,7 @@ sr_core_stacktrace_from_json_text(const char *text,
 
             description = json_tokener_error_desc(error);
 
-            *error_message = sr_strdup(description);
+            *error_message = g_strdup(description);
         }
 
         return NULL;
@@ -351,16 +351,16 @@ sr_core_stacktrace_create(const char *gdb_stacktrace_text,
 
             if (unstrip_entry)
             {
-                core_frame->build_id = sr_strdup(unstrip_entry->build_id);
+                core_frame->build_id = g_strdup(unstrip_entry->build_id);
                 core_frame->build_id_offset = core_frame->address - unstrip_entry->start;
-                core_frame->file_name = sr_strdup(unstrip_entry->file_name);
+                core_frame->file_name = g_strdup(unstrip_entry->file_name);
             }
 
             if (gdb_frame->function_name &&
                 0 != strcmp(gdb_frame->function_name, "??"))
             {
                 core_frame->function_name =
-                    sr_strdup(gdb_frame->function_name);
+                    g_strdup(gdb_frame->function_name);
             }
 
             core_thread->frames = sr_core_frame_append(core_thread->frames, core_frame);

@@ -35,7 +35,7 @@ main(void)
 
   thread1 = create_real_main_thread_objects();
   free(thread1->name);
-  thread1->name = sr_strdup("worker");
+  thread1->name = g_strdup("worker");
 
   assert(0 != sr_java_thread_cmp(thread0, thread1));
   assert(0 != sr_thread_cmp(thread0, thread1));
