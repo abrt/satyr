@@ -1,6 +1,7 @@
 AC_INIT([satyr], m4_esyscmd([cat ./satyr-version]), [crash-catcher@fedorahosted.org])
 AC_CANONICAL_TARGET
 AC_CONFIG_HEADERS([lib/config.h])
+AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AM_MAINTAINER_MODE
 PKG_PROG_PKG_CONFIG
@@ -55,6 +56,13 @@ fi
 # Initialize the test suite.
 AC_CONFIG_TESTDIR(tests)
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
+
+AX_VALGRIND_DFLT([memcheck], [on])
+AX_VALGRIND_DFLT([helgrind], [off])
+AX_VALGRIND_DFLT([drd], [off])
+AX_VALGRIND_DFLT([sgcheck], [off])
+AX_VALGRIND_CHECK
+
 # Needed by tests/atlocal.in.
 AC_SUBST([O0CFLAGS], [`echo $CFLAGS | sed 's/-O[[0-9]] *//'`])
 

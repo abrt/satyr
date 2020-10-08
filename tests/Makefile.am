@@ -121,6 +121,9 @@ check_DATA = atconfig atlocal $(TESTSUITE)
 DISTCLEANFILES = atconfig
 EXTRA_DIST += atlocal.in
 EXTRA_DIST += java_testcases.c
+
+@VALGRIND_CHECK_RULES@
+VALGRIND_SUPRESSION_FILES = valgrind.supp
 EXTRA_DIST += valgrind.supp
 
 TESTSUITEFLAGS =
