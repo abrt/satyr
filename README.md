@@ -1,3 +1,7 @@
+![Build](https://github.com/abrt/satyr/workflows/Build/badge.svg)
+
+## About Satyr
+
 Failures of computer programs are omnipresent in the information technology
 industry: they occur during software development, software testing, and also in
 production.  Failures occur in programs from all levels of the system stack.
@@ -26,3 +30,29 @@ its functionality is currently limited to Linux-based operating systems using
 ELF binaries.  The library can be extended to support Microsoft Windows and OS
 X platforms without changing its design, but dedicated engineering effort would
 be required to accomplish that.
+
+## How to build Satyr from source
+
+### Install dependencies:
+
+    $ sudo dnf builddep --spec satyr.spec
+
+or
+
+    $ ./autogen.sh sysdeps --install
+
+### Configure:
+
+    $ ./autogen.sh
+    $ ./configure
+
+### Build and install:
+
+Directly:
+
+    $ make && sudo make install
+
+With rpms:
+
+    $ make rpm
+    $ sudo dnf install build/x86_64/*rpm
