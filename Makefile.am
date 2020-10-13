@@ -12,6 +12,8 @@ satyr_LDADD = lib/libsatyr.la
 man_MANS = satyr.1
 EXTRA_DIST = satyr.1.in
 
+dist_doc_DATA = README.md
+
 satyr.1: satyr.1.in
 	sed -e "s,\@PACKAGE_STRING\@,$(PACKAGE_STRING),g" $< > $@
 

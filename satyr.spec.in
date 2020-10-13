@@ -107,7 +107,7 @@ make check|| {
 %endif
 
 %files
-%doc README NEWS
+%doc README.md NEWS
 %license COPYING
 %{_bindir}/satyr
 %{_mandir}/man1/%{name}.1*
