@@ -1,6 +1,5 @@
 #include <core/frame.h>
 #include <frame.h>
-#include <strbuf.h>
 #include <utils.h>
 
 #include <glib.h>
@@ -92,11 +91,11 @@ static void
 test_core_frame_abstract_functions(void)
 {
     struct sr_core_frame *frame;
-    struct sr_strbuf *strbuf;
+    GString *strbuf;
     g_autofree char *res = NULL;
 
     frame = sr_core_frame_new();
-    strbuf = sr_strbuf_new();
+    strbuf = g_string_new(NULL);
 
     frame->address = 0xffffffff1;
     frame->build_id = sr_strdup("aabbccddeeff1");
@@ -110,7 +109,7 @@ test_core_frame_abstract_functions(void)
 
     sr_frame_append_to_str((struct sr_frame*)frame, strbuf);
 
-    res = sr_strbuf_free_nobuf(strbuf);
+    res = g_string_free(strbuf, FALSE);
 
     g_assert_cmpstr(res, ==, "[executable1] test1");
 }

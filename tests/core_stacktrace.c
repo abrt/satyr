@@ -12,7 +12,6 @@
 #include <internal_unwind.h>
 #include <stacktrace.h>
 #include <stdio.h>
-#include <strbuf.h>
 #include <sys/wait.h>
 #include <unistd.h>
 

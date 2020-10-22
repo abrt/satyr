@@ -2,7 +2,6 @@
 #include <glib.h>
 #include <location.h>
 #include <ruby/frame.h>
-#include <strbuf.h>
 
 typedef struct
 {
@@ -148,7 +147,7 @@ test_ruby_frame_append_to_str(void)
     struct sr_location location;
     const char *line = "/usr/share/ruby/vendor_ruby/will_crash.rb:13:in `rescue in block (2 levels) in func'";
     struct sr_ruby_frame *frame;
-    struct sr_strbuf *strbuf;
+    GString *strbuf;
     g_autofree char *result = NULL;
 
     sr_location_init(&location);
@@ -157,11 +156,11 @@ test_ruby_frame_append_to_str(void)
 
     g_assert_nonnull(frame);
 
-    strbuf = sr_strbuf_new();
+    strbuf = g_string_new(NULL);
 
     sr_ruby_frame_append_to_str(frame, strbuf);
 
-    result = sr_strbuf_free_nobuf(strbuf);
+    result = g_string_free(strbuf, FALSE);
 
     g_assert_cmpstr(result, ==, "rescue in block (2 levels) in func in /usr/share/ruby/vendor_ruby/will_crash.rb:13");
 
@@ -235,7 +234,7 @@ test_ruby_frame_generic_functions(void)
     struct sr_location location;
     const char *line = "/usr/share/ruby/vendor_ruby/will_crash.rb:13:in `rescue in block (2 levels) in func'";
     struct sr_ruby_frame *frame;
-    struct sr_strbuf *strbuf;
+    GString *strbuf;
     g_autofree char *result = NULL;
 
     sr_location_init(&location);
@@ -245,11 +244,11 @@ test_ruby_frame_generic_functions(void)
     g_assert_nonnull(frame);
     g_assert_null(sr_frame_next((struct sr_frame *)frame));
 
-    strbuf = sr_strbuf_new();
+    strbuf = g_string_new(NULL);
 
     sr_frame_append_to_str((struct sr_frame*)frame, strbuf);
 
-    result = sr_strbuf_free_nobuf(strbuf);
+    result = g_string_free(strbuf, FALSE);
 
     g_assert_cmpstr(result, ==, "rescue in block (2 levels) in func in /usr/share/ruby/vendor_ruby/will_crash.rb:13");
 
