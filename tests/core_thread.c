@@ -34,17 +34,17 @@ test_core_thread_to_json(void)
     thread = sr_core_thread_new();
 
     frames[0]->address = 0xffffffff0;
-    frames[0]->build_id = sr_strdup("aabbccddeeff0");
+    frames[0]->build_id = g_strdup("aabbccddeeff0");
     frames[0]->build_id_offset = 2560;
-    frames[0]->function_name = sr_strdup("test0");
-    frames[0]->file_name = sr_strdup("executable0");
+    frames[0]->function_name = g_strdup("test0");
+    frames[0]->file_name = g_strdup("executable0");
 
     frames[1]->address = 0xffffffff1;
-    frames[1]->build_id = sr_strdup("aabbccddeeff1");
+    frames[1]->build_id = g_strdup("aabbccddeeff1");
     frames[1]->build_id_offset = 2561;
-    frames[1]->function_name = sr_strdup("test1");
-    frames[1]->file_name = sr_strdup("executable1");
-    frames[1]->fingerprint = sr_strdup("ab");
+    frames[1]->function_name = g_strdup("test1");
+    frames[1]->file_name = g_strdup("executable1");
+    frames[1]->fingerprint = g_strdup("ab");
     frames[1]->next = frames[0];
 
     thread->frames = frames[1];
@@ -70,17 +70,17 @@ test_core_thread_abstract_functions(void)
     thread = sr_core_thread_new();
 
     frames[0]->address = 0xffffffff0;
-    frames[0]->build_id = sr_strdup("aabbccddeeff0");
+    frames[0]->build_id = g_strdup("aabbccddeeff0");
     frames[0]->build_id_offset = 2560;
-    frames[0]->function_name = sr_strdup("test0");
-    frames[0]->file_name = sr_strdup("executable0");
+    frames[0]->function_name = g_strdup("test0");
+    frames[0]->file_name = g_strdup("executable0");
 
     frames[1]->address = 0xffffffff1;
-    frames[1]->build_id = sr_strdup("aabbccddeeff1");
+    frames[1]->build_id = g_strdup("aabbccddeeff1");
     frames[1]->build_id_offset = 2561;
-    frames[1]->function_name = sr_strdup("test1");
-    frames[1]->file_name = sr_strdup("executable1");
-    frames[1]->fingerprint = sr_strdup("ab");
+    frames[1]->function_name = g_strdup("test1");
+    frames[1]->file_name = g_strdup("executable1");
+    frames[1]->fingerprint = g_strdup("ab");
     frames[1]->next = frames[0];
 
     thread->frames = frames[1];

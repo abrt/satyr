@@ -29,8 +29,8 @@ create_thread(int count,
         fname = va_arg(argp, const char*);
         frame = sr_gdb_frame_new();
 
-        frame->function_name = sr_strdup(fname);
-        frame->source_file = sr_strdup("");
+        frame->function_name = g_strdup(fname);
+        frame->source_file = g_strdup("");
 
         if (NULL == thread->frames)
         {
@@ -56,11 +56,11 @@ test_normalize_gdb_thread(void)
     threads[0] = create_thread(5, "aa", "abort", "raise", "__assert_fail_base", "ee");
 
     threads[1] = create_thread(5, "aa", "abort", "bb", "cc", "dd");
-    threads[1]->frames->next->source_file = sr_strdup("abort.c");
+    threads[1]->frames->next->source_file = g_strdup("abort.c");
 
     threads[2] = create_thread(5, "aa", "abort", "raise", "dd", "ee");
-    threads[2]->frames->next->source_file = sr_strdup("abort.c");
-    threads[2]->frames->next->next->source_file = sr_strdup("libc.so");
+    threads[2]->frames->next->source_file = g_strdup("abort.c");
+    threads[2]->frames->next->next->source_file = g_strdup("libc.so");
 
     sr_normalize_gdb_thread(threads[0]);
     sr_normalize_gdb_thread(threads[1]);
@@ -81,18 +81,18 @@ test_normalize_gdb_thread_remove_zeroes(void)
     frames[1] = sr_gdb_frame_new();
     frames[2] = sr_gdb_frame_new();
 
-    frames[0]->function_name = sr_strdup("??");
+    frames[0]->function_name = g_strdup("??");
     frames[0]->number = 2;
     frames[0]->address = 0x0000;
 
-    frames[1]->function_name = sr_strdup("write_to_temp_file");
+    frames[1]->function_name = g_strdup("write_to_temp_file");
     frames[1]->number = 1;
-    frames[1]->source_file = sr_strdup("gfileutils.c");
+    frames[1]->source_file = g_strdup("gfileutils.c");
     frames[1]->source_line = 980;
     frames[1]->address = 0x322160e7fdULL;
     frames[1]->next = frames[0];
 
-    frames[2]->function_name = sr_strdup("??");
+    frames[2]->function_name = g_strdup("??");
     frames[2]->number = 0;
     frames[2]->address = 0x0000;
     frames[2]->next = frames[1];
@@ -243,30 +243,30 @@ test_normalize_gdb_thread_java_frames(void)
     frames[2] = sr_gdb_frame_new();
     frames[3] = sr_gdb_frame_new();
 
-    frames[0]->function_name = sr_strdup("jthread_map_push");
+    frames[0]->function_name = g_strdup("jthread_map_push");
     frames[0]->number = 3;
-    frames[0]->source_file = sr_strdup("jthread_map.c");
+    frames[0]->source_file = g_strdup("jthread_map.c");
     frames[0]->source_line = 110;
     frames[0]->address = 0x7fda9a03f920ULL;
     frames[0]->next = NULL;
 
-    frames[1]->function_name = sr_strdup("JVM_handle_linux_signal");
+    frames[1]->function_name = g_strdup("JVM_handle_linux_signal");
     frames[1]->number = 2;
-    frames[1]->source_file = sr_strdup("os_linux_x86.cpp");
+    frames[1]->source_file = g_strdup("os_linux_x86.cpp");
     frames[1]->source_line = 531;
     frames[1]->address = 0x7fda9af3106fULL;
     frames[1]->next = frames[0];
 
-    frames[2]->function_name = sr_strdup("VMError::report_and_die");
+    frames[2]->function_name = g_strdup("VMError::report_and_die");
     frames[2]->number = 1;
-    frames[2]->source_file = sr_strdup("vmError.cpp");
+    frames[2]->source_file = g_strdup("vmError.cpp");
     frames[2]->source_line = 1053;
     frames[2]->address = 0x7fda9b0a83efULL;
     frames[2]->next = frames[1];
 
-    frames[3]->function_name = sr_strdup("os::abort");
+    frames[3]->function_name = g_strdup("os::abort");
     frames[3]->number = 0;
-    frames[3]->source_file = sr_strdup("os_linux.cpp");
+    frames[3]->source_file = g_strdup("os_linux.cpp");
     frames[3]->source_line = 1594;
     frames[3]->address = 0x7fda9af29259ULL;
     frames[3]->next = frames[2];

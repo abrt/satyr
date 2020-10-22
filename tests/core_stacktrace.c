@@ -76,31 +76,31 @@ test_core_stacktrace_to_json(void)
     threads[1]->next = threads[0];
 
     frames[0]->address = 0xffffffff0;
-    frames[0]->build_id = sr_strdup("aabbccddeeff0");
+    frames[0]->build_id = g_strdup("aabbccddeeff0");
     frames[0]->build_id_offset = 2560;
-    frames[0]->function_name = sr_strdup("test0");
-    frames[0]->file_name = sr_strdup("executable0");
+    frames[0]->function_name = g_strdup("test0");
+    frames[0]->file_name = g_strdup("executable0");
 
     frames[1]->address = 0xffffffff1;
-    frames[1]->build_id = sr_strdup("aabbccddeeff1");
+    frames[1]->build_id = g_strdup("aabbccddeeff1");
     frames[1]->build_id_offset = 2561;
-    frames[1]->function_name = sr_strdup("test1");
-    frames[1]->file_name = sr_strdup("executable1");
-    frames[1]->fingerprint = sr_strdup("ab");
+    frames[1]->function_name = g_strdup("test1");
+    frames[1]->file_name = g_strdup("executable1");
+    frames[1]->fingerprint = g_strdup("ab");
     frames[1]->next = frames[0];
 
     frames[2]->address = 0xffffffff3;
-    frames[2]->build_id = sr_strdup("aabbccddeeff3");
+    frames[2]->build_id = g_strdup("aabbccddeeff3");
     frames[2]->build_id_offset = 2563;
-    frames[2]->function_name = sr_strdup("test3");
-    frames[2]->file_name = sr_strdup("executable3");
+    frames[2]->function_name = g_strdup("test3");
+    frames[2]->file_name = g_strdup("executable3");
 
     frames[3]->address = 0xffffffff2;
-    frames[3]->build_id = sr_strdup("aabbccddeeff2");
+    frames[3]->build_id = g_strdup("aabbccddeeff2");
     frames[3]->build_id_offset = 2562;
-    frames[3]->function_name = sr_strdup("test2");
-    frames[3]->file_name = sr_strdup("executable2");
-    frames[3]->fingerprint = sr_strdup("ab");
+    frames[3]->function_name = g_strdup("test2");
+    frames[3]->file_name = g_strdup("executable2");
+    frames[3]->fingerprint = g_strdup("ab");
     frames[3]->next = frames[2];
 
     stacktrace = sr_core_stacktrace_new();

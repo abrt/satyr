@@ -15,15 +15,15 @@ test_java_frame_cmp(void)
         frames[i] = sr_java_frame_new();
     }
 
-    frames[0]->name = sr_strdup("name.space.test1.ctor");
-    frames[0]->file_name = sr_strdup("test1.java");
+    frames[0]->name = g_strdup("name.space.test1.ctor");
+    frames[0]->file_name = g_strdup("test1.java");
     frames[0]->file_line = 1;
-    frames[0]->class_path = sr_strdup("/usr/share/jar1");
+    frames[0]->class_path = g_strdup("/usr/share/jar1");
 
-    frames[1]->name = sr_strdup(frames[0]->name);
-    frames[1]->file_name = sr_strdup(frames[0]->file_name);
+    frames[1]->name = g_strdup(frames[0]->name);
+    frames[1]->file_name = g_strdup(frames[0]->file_name);
     frames[1]->file_line = frames[0]->file_line;
-    frames[1]->class_path = sr_strdup(frames[0]->class_path);
+    frames[1]->class_path = g_strdup(frames[0]->class_path);
 
     g_assert_cmpint(sr_java_frame_cmp(frames[1], frames[0]), ==, 0);
 
@@ -54,11 +54,11 @@ test_java_frame_cmp(void)
         exception_frames[i] = sr_java_frame_new_exception();
     }
 
-    exception_frames[0]->name = sr_strdup("com.sun.java.NullPointer");
-    exception_frames[0]->message = sr_strdup("Null pointer exception");
+    exception_frames[0]->name = g_strdup("com.sun.java.NullPointer");
+    exception_frames[0]->message = g_strdup("Null pointer exception");
 
-    exception_frames[1]->name = sr_strdup(exception_frames[0]->name);
-    exception_frames[1]->message = sr_strdup(exception_frames[0]->message);
+    exception_frames[1]->name = g_strdup(exception_frames[0]->name);
+    exception_frames[1]->message = g_strdup(exception_frames[0]->message);
 
     g_assert_cmpint(sr_java_frame_cmp(exception_frames[0], exception_frames[1]), ==, 0);
     g_assert_cmpint(sr_java_frame_cmp(frames[1], exception_frames[1]), !=, 0);
@@ -70,7 +70,7 @@ test_java_frame_cmp(void)
     g_assert_cmpint(sr_java_frame_cmp(exception_frames[0], exception_frames[1]), ==, 0);
 
     free(exception_frames[1]->name);
-    exception_frames[1]->name = sr_strdup("com.sun.java.InvalidOperation");
+    exception_frames[1]->name = g_strdup("com.sun.java.InvalidOperation");
 
     g_assert_cmpint(sr_java_frame_cmp(exception_frames[0], exception_frames[1]), !=, 0);
 
@@ -93,17 +93,17 @@ test_java_frame_dup(void)
 
     frames[0] = sr_java_frame_new();
 
-    frames[0]->name = sr_strdup("name.space.test1.ctor");
-    frames[0]->file_name = sr_strdup("test1.java");
+    frames[0]->name = g_strdup("name.space.test1.ctor");
+    frames[0]->file_name = g_strdup("test1.java");
     frames[0]->file_line = 1;
-    frames[0]->class_path = sr_strdup("/usr/share/jar1");
+    frames[0]->class_path = g_strdup("/usr/share/jar1");
 
     frames[1] = sr_java_frame_new();
 
-    frames[1]->name = sr_strdup("name.space.test0.ctor");
-    frames[1]->file_name = sr_strdup("test0.java");
+    frames[1]->name = g_strdup("name.space.test0.ctor");
+    frames[1]->file_name = g_strdup("test0.java");
     frames[1]->file_line = 2;
-    frames[1]->class_path = sr_strdup("/usr/share/jar0");
+    frames[1]->class_path = g_strdup("/usr/share/jar0");
     frames[1]->next = frames[0];
 
     /* Test the duplication without siblings. */
@@ -153,8 +153,8 @@ test_java_frame_dup(void)
 
     exception_frame = sr_java_frame_new_exception();
 
-    exception_frame->name = sr_strdup("com.sun.java.NullPointer");
-    exception_frame->message = sr_strdup("Null pointer exception");
+    exception_frame->name = g_strdup("com.sun.java.NullPointer");
+    exception_frame->message = g_strdup("Null pointer exception");
     exception_frame->next = frames[1];
 
     {
@@ -255,8 +255,8 @@ test_java_frame_append_to_str(void)
 
     exception_frame = sr_java_frame_new_exception();
 
-    exception_frame->name = sr_strdup("com.sun.java.NullPointer");
-    exception_frame->message = sr_strdup("Null pointer exception");
+    exception_frame->name = g_strdup("com.sun.java.NullPointer");
+    exception_frame->message = g_strdup("Null pointer exception");
 
     test_java_frame_append_to_str_check(exception_frame,
                                         "com.sun.java.NullPointer: Null pointer exception");
@@ -270,7 +270,7 @@ test_java_frame_append_to_str(void)
 
     test_java_frame_append_to_str_check(exception_frame, "");
 
-    exception_frame->message = sr_strdup("Null pointer exception");
+    exception_frame->message = g_strdup("Null pointer exception");
 
     test_java_frame_append_to_str_check(exception_frame,
                                         ": Null pointer exception");
@@ -310,8 +310,8 @@ test_java_frame_parse(void)
         sr_java_frame_init(&frame);
         sr_location_init(&location);
 
-        frame.name = sr_strdup("com.redhat.abrt.duke.nuke");
-        frame.file_name = sr_strdup("duke.java");
+        frame.name = g_strdup("com.redhat.abrt.duke.nuke");
+        frame.file_name = g_strdup("duke.java");
         frame.file_line = 666;
 
         location.line = 1;
@@ -456,8 +456,8 @@ test_java_frame_parse(void)
         sr_java_frame_init(&frame);
         sr_location_init(&location);
 
-        frame.name = sr_strdup("com.redhat.abrt.duke.nuke");
-        frame.file_name = sr_strdup("duke.java");
+        frame.name = g_strdup("com.redhat.abrt.duke.nuke");
+        frame.file_name = g_strdup("duke.java");
 
         location.line = 2;
         location.column = 0;
@@ -608,8 +608,8 @@ test_java_frame_parse_exception(void)
 
         sr_location_init(&location);
 
-        frame->name = sr_strdup("com.sun.java.NullPointer");
-        frame->message = sr_strdup("Null Pointer Exception");
+        frame->name = g_strdup("com.sun.java.NullPointer");
+        frame->message = g_strdup("Null Pointer Exception");
 
         location.line = 1;
         location.column = 48;
@@ -629,7 +629,7 @@ test_java_frame_parse_exception(void)
 
         sr_location_init(&location);
 
-        frame->name = sr_strdup("com.sun.java.NullPointer");
+        frame->name = g_strdup("com.sun.java.NullPointer");
 
         location.line = 1;
         location.column = 26;
@@ -650,7 +650,7 @@ test_java_frame_parse_exception(void)
 
         sr_location_init(&location);
 
-        frame->name = sr_strdup("com.sun.java.NullPointer");
+        frame->name = g_strdup("com.sun.java.NullPointer");
 
         location.line = 1;
         location.column = 26;
@@ -679,8 +679,8 @@ test_java_frame_parse_exception(void)
         frame.file_name = "duke.java";
         frame.file_line = 666;
 
-        exception_frame->name = sr_strdup("com.sun.java.NullPointer");
-        exception_frame->message = sr_strdup("Null Pointer Exception");
+        exception_frame->name = g_strdup("com.sun.java.NullPointer");
+        exception_frame->message = g_strdup("Null Pointer Exception");
         exception_frame->next = &frame;
 
         location.line = 2;
@@ -718,11 +718,11 @@ test_java_frame_parse_exception(void)
 
         sr_location_init(&location);
 
-        exception_frames[0]->name = sr_strdup("com.sun.java.NullPointer");
-        exception_frames[0]->message = sr_strdup("Null Pointer Exception");
+        exception_frames[0]->name = g_strdup("com.sun.java.NullPointer");
+        exception_frames[0]->message = g_strdup("Null Pointer Exception");
         exception_frames[0]->next = frame;
 
-        exception_frames[1]->name = sr_strdup("com.sun.java.InvalidOperation");
+        exception_frames[1]->name = g_strdup("com.sun.java.InvalidOperation");
 
         exception_frames[2] = sr_java_frame_dup(exception_frames[1], false);
 
