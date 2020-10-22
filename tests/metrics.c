@@ -35,7 +35,7 @@ create_threadv(size_t  frame_count,
         frame = sr_gdb_frame_new();
         function_name = va_arg(function_names, const char*);
 
-        frame->function_name = sr_strdup(function_name);
+        frame->function_name = g_strdup(function_name);
 
         if (NULL == thread->frames)
         {
