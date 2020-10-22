@@ -236,7 +236,7 @@ generate_coredump(int start)
   if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
       errx(1, "gcore failed");
 
-  return sr_asprintf("%s.%s", coredump_pattern, mypid);
+  return g_strdup_printf("%s.%s", coredump_pattern, mypid);
 }
 
 GString *
