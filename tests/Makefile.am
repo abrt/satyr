@@ -29,8 +29,7 @@ check_PROGRAMS = \
 	operating_system \
 	report \
 	rpm \
-	ruby_frame \
-	strbuf
+	ruby_frame
 
 abrt_SOURCES = abrt.c
 cluster_SOURCES = cluster.c
@@ -49,7 +48,6 @@ operating_system_SOURCES = operating_system.c
 report_SOURCES = report.c
 rpm_SOURCES = rpm.c
 ruby_frame_SOURCES = ruby_frame.c
-strbuf_SOURCES = strbuf.c
 
 TESTS = $(check_PROGRAMS)
 

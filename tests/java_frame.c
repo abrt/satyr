@@ -1,7 +1,6 @@
 #include <glib.h>
 #include <java/frame.h>
 #include <location.h>
-#include <strbuf.h>
 #include <utils.h>
 
 static void
@@ -206,15 +205,15 @@ static void
 test_java_frame_append_to_str_check(struct sr_java_frame *frame,
                                     const char           *string)
 {
-    struct sr_strbuf *strbuf;
+    GString *strbuf;
 
-    strbuf = sr_strbuf_new();
+    strbuf = g_string_new(NULL);
 
     sr_java_frame_append_to_str(frame, strbuf);
 
-    g_assert_cmpstr(strbuf->buf, ==, string);
+    g_assert_cmpstr(strbuf->str, ==, string);
 
-    sr_strbuf_free(strbuf);
+    g_string_free(strbuf, TRUE);
 }
 
 static void
@@ -568,7 +567,7 @@ test_java_frame_parse_exception_check(const char           *input,
     struct sr_location location;
     struct sr_java_frame *parsed_frame;
     struct sr_java_frame *frame;
-    struct sr_strbuf *buf;
+    GString *buf;
 
     sr_location_init(&location);
 
@@ -576,13 +575,13 @@ test_java_frame_parse_exception_check(const char           *input,
 
     g_assert_true(input == expected_input);
 
-    buf = sr_strbuf_new();
+    buf = g_string_new(NULL);
 
     sr_java_frame_append_to_str(parsed_frame, buf);
 
-    g_assert_cmpstr(expected_exception, ==, buf->buf);
+    g_assert_cmpstr(expected_exception, ==, buf->str);
 
-    sr_strbuf_free(buf);
+    g_string_free(buf, TRUE);
 
     for (frame = parsed_frame;
          NULL != frame && NULL != expected_frame;

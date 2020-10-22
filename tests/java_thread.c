@@ -1,7 +1,6 @@
 #include <glib.h>
 #include <java/thread.h>
 #include <location.h>
-#include <strbuf.h>
 #include <thread.h>
 
 #include "java_testcases.c"
@@ -178,13 +177,13 @@ test_java_thread_parse(void)
 
     if (NULL != parsed_thread)
     {
-        struct sr_strbuf *output;
+        GString *output;
 
-        output = sr_strbuf_new();
+        output = g_string_new(NULL);
 
         sr_java_thread_append_to_str(parsed_thread, output);
 
-        sr_strbuf_free(output);
+        g_string_free(output, TRUE);
 
         g_assert_cmpint(*input, ==, '\0');
         g_assert_cmpint(sr_java_thread_cmp(parsed_thread, expected_thread), ==, 0);
