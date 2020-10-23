@@ -146,41 +146,41 @@ test_core_stacktrace_from_json_check(struct sr_core_stacktrace *stacktrace)
     g_assert_cmpstr(stacktrace->executable, ==, "/usr/bin/will_abort");
     g_assert_nonnull(stacktrace->threads);
 
-    assert(stacktrace->threads->next);
-    assert(stacktrace->crash_thread == stacktrace->threads->next);
+    g_assert_nonnull(stacktrace->threads->next);
+    g_assert_true(stacktrace->crash_thread == stacktrace->threads->next);
 
     frame = stacktrace->threads->frames;
 
-    assert(frame->address == 87654);
-    assert(0 == strcmp(frame->build_id, "92ebaf825e4f492952c45189cb9ffc6541f8599b"));
-    assert(frame->build_id_offset == 42);
-    assert(0 == strcmp(frame->function_name, "fake_frame_for_the_sake_of_multiple_threads"));
-    assert(0 == strcmp(frame->file_name, "/usr/bin/will_abort"));
-    assert(frame->fingerprint == NULL);
+    g_assert_cmpint(frame->address, ==, 87654);
+    g_assert_cmpstr(frame->build_id, ==, "92ebaf825e4f492952c45189cb9ffc6541f8599b");
+    g_assert_cmpint(frame->build_id_offset, ==, 42);
+    g_assert_cmpstr(frame->function_name, ==, "fake_frame_for_the_sake_of_multiple_threads");
+    g_assert_cmpstr(frame->file_name, ==, "/usr/bin/will_abort");
+    g_assert_null(frame->fingerprint);
 
     frame = frame->next;
-    assert(frame->address == 98346);
-    assert(0 == strcmp(frame->build_id, "92ebaf825e4f492952c45189cb9ffc6541f8599b"));
-    assert(frame->build_id_offset == 10734);
-    assert(0 == strcmp(frame->function_name, "fake_function"));
-    assert(0 == strcmp(frame->file_name, "/usr/bin/will_abort"));
-    assert(frame->fingerprint == NULL);
+    g_assert_cmpint(frame->address, ==, 98346);
+    g_assert_cmpstr(frame->build_id, ==, "92ebaf825e4f492952c45189cb9ffc6541f8599b");
+    g_assert_cmpint(frame->build_id_offset, ==, 10734);
+    g_assert_cmpstr(frame->function_name, ==, "fake_function");
+    g_assert_cmpstr(frame->file_name, ==, "/usr/bin/will_abort");
+    g_assert_null(frame->fingerprint);
 
     frame = stacktrace->threads->next->frames;
-    assert(frame->address == 237190207797);
-    assert(0 == strcmp(frame->build_id, "cc10c72da62c93033e227ffbe2670f2c4fbbde1a"));
-    assert(frame->build_id_offset == 219445);
-    assert(0 == strcmp(frame->function_name, "raise"));
-    assert(0 == strcmp(frame->file_name, "/usr/lib64/libc-2.15.so"));
-    assert(0 == strcmp(frame->fingerprint, "f33186a4c862fb0751bca60701f553b829210477"));
+    g_assert_cmpint(frame->address, ==, 237190207797);
+    g_assert_cmpstr(frame->build_id, ==, "cc10c72da62c93033e227ffbe2670f2c4fbbde1a");
+    g_assert_cmpint(frame->build_id_offset, ==, 219445);
+    g_assert_cmpstr(frame->function_name, ==, "raise");
+    g_assert_cmpstr(frame->file_name, ==, "/usr/lib64/libc-2.15.so");
+    g_assert_cmpstr(frame->fingerprint, ==, "f33186a4c862fb0751bca60701f553b829210477");
 
     frame = frame->next->next->next;
-    assert(frame->address == 237190125365);
-    assert(0 == strcmp(frame->build_id, "cc10c72da62c93033e227ffbe2670f2c4fbbde1a"));
-    assert(frame->build_id_offset == 137013);
-    assert(0 == strcmp(frame->function_name, "__libc_start_main"));
-    assert(0 == strcmp(frame->file_name, "/usr/lib64/libc-2.15.so"));
-    assert(0 == strcmp(frame->fingerprint, "5ff4a3d3743fdde711c49033d1e01784477e57fb"));
+    g_assert_cmpint(frame->address, ==, 237190125365);
+    g_assert_cmpstr(frame->build_id, ==, "cc10c72da62c93033e227ffbe2670f2c4fbbde1a");
+    g_assert_cmpint(frame->build_id_offset, ==, 137013);
+    g_assert_cmpstr(frame->function_name, ==, "__libc_start_main");
+    g_assert_cmpstr(frame->file_name, ==, "/usr/lib64/libc-2.15.so");
+    g_assert_cmpstr(frame->fingerprint, ==, "5ff4a3d3743fdde711c49033d1e01784477e57fb");
 }
 
 static void

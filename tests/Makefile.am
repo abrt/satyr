@@ -19,17 +19,26 @@ check_PROGRAMS = \
 	core_frame \
 	core_stacktrace \
 	core_thread \
+	gdb_frame \
+	gdb_stacktrace \
+	gdb_thread \
 	gdb_sharedlib \
 	java_frame \
 	java_stacktrace \
 	java_thread \
+	js_frame \
+	js_platform \
+	js_stacktrace \
 	koops_frame \
+	koops_stacktrace \
 	metrics \
 	normalize \
 	operating_system \
 	report \
 	rpm \
-	ruby_frame
+	ruby_frame \
+	ruby_stacktrace \
+	utils
 
 abrt_SOURCES = abrt.c
 cluster_SOURCES = cluster.c
@@ -37,17 +46,26 @@ core_frame_SOURCES = core_frame.c
 EXTRA_core_stacktrace_DEPENDENCIES = dump_core
 core_stacktrace_SOURCES = core_stacktrace.c
 core_thread_SOURCES = core_thread.c
+gdb_frame_SOURCES = gdb_frame.c
+gdb_stacktrace_SOURCES = gdb_stacktrace.c
+gdb_thread_SOURCES = gdb_thread.c
 gdb_sharedlib_SOURCES = gdb_sharedlib.c
 java_frame_SOURCES = java_frame.c
 java_stacktrace_SOURCES = java_stacktrace.c
 java_thread_SOURCES = java_thread.c
+js_frame_SOURCES = js_frame.c
+js_platform_SOURCES = js_platform.c
+js_stacktrace_SOURCES = js_stacktrace.c
 koops_frame_SOURCES = koops_frame.c
+koops_stacktrace_SOURCES = koops_stacktrace.c
 metrics_SOURCES = metrics.c
 normalize_SOURCES = normalize.c
 operating_system_SOURCES = operating_system.c
 report_SOURCES = report.c
 rpm_SOURCES = rpm.c
 ruby_frame_SOURCES = ruby_frame.c
+ruby_stacktrace_SOURCES = ruby_stacktrace.c
+utils_SOURCES = utils.c
 
 TESTS = $(check_PROGRAMS)
 
@@ -72,6 +90,10 @@ EXTRA_DIST = gdb_stacktraces \
              python/test_helpers.py \
              python_stacktraces \
              problem_dir
+
+@VALGRIND_CHECK_RULES@
+VALGRIND_SUPRESSION_FILES = valgrind.supp
+EXTRA_DIST += valgrind.supp
 
 ## ------------ ##
 ## package.m4.  ##
@@ -102,15 +124,6 @@ EXTRA_DIST += package.m4
 TESTSUITE_AT =		\
   local.at 		\
   testsuite.at		\
-  utils.at 		\
-  gdb_frame.at 		\
-  gdb_thread.at 	\
-  gdb_stacktrace.at  	\
-  koops_stacktrace.at   \
-  ruby_stacktrace.at	\
-  js_platform.at \
-  js_frame.at \
-  js_stacktrace.at \
   python_bindings.at
 
 EXTRA_DIST += $(TESTSUITE_AT)
@@ -121,10 +134,6 @@ check_DATA = atconfig atlocal $(TESTSUITE)
 DISTCLEANFILES = atconfig
 EXTRA_DIST += atlocal.in
 EXTRA_DIST += java_testcases.c
-
-@VALGRIND_CHECK_RULES@
-VALGRIND_SUPRESSION_FILES = valgrind.supp
-EXTRA_DIST += valgrind.supp
 
 TESTSUITEFLAGS =
 
@@ -148,12 +157,3 @@ AUTOTEST = $(AUTOM4TE) --language=autotest
 $(TESTSUITE): $(TESTSUITE_AT) $(srcdir)/package.m4
 	$(AUTOTEST) -I '$(srcdir)' -o $@.tmp $@.at
 	mv $@.tmp $@
-
-.PHONY: maintainer-check-valgrind
-maintainer-check-valgrind: $(check_DATA)
-	$(MAKE) check-local \
-			PRE_AT_CHECK='$(abs_top_builddir)/libtool --mode=execute $(VALGRIND)' \
-			VALGRIND_OPTS='--tool=memcheck --leak-check=full --show-reachable=yes --errors-for-leak-kinds=definite,indirect --error-exitcode=1 --suppressions=$(abs_top_builddir)/tests/valgrind.supp -q'
-
-.PHONY: maintainer-check
-maintainer-check: maintainer-check-valgrind
