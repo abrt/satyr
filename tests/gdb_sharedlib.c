@@ -18,7 +18,12 @@ test_gdb_sharedlib_parse(void)
     g_assert_true(libraries->symbols == SYMS_OK);
     g_assert_cmpstr("/lib64/libpthread.so.0", ==, libraries->soname);
 
-    sr_gdb_sharedlib_free(libraries);
+    while (libraries)
+    {
+        struct sr_gdb_sharedlib *library = libraries;
+        libraries = library->next;
+        sr_gdb_sharedlib_free(library);
+    }
 }
 
 static void
@@ -35,7 +40,12 @@ test_gdb_sharedlib_count(void)
 
     g_assert_cmpint(count, ==, 185);
 
-    sr_gdb_sharedlib_free(libraries);
+    while (libraries)
+    {
+        struct sr_gdb_sharedlib *library = libraries;
+        libraries = library->next;
+        sr_gdb_sharedlib_free(library);
+    }
 }
 
 static void
@@ -70,7 +80,7 @@ static void
 test_gdb_sharedlib_find_address(void)
 {
     char *error;
-    char *stack_trace;
+    g_autofree char *stack_trace = NULL;
     struct sr_gdb_sharedlib *libraries;
 
     stack_trace = sr_file_to_string("gdb_stacktraces/rhbz-621492", &error);
@@ -81,7 +91,12 @@ test_gdb_sharedlib_find_address(void)
     g_assert_null(sr_gdb_sharedlib_find_address(libraries, 0));
     g_assert_null(sr_gdb_sharedlib_find_address(libraries, 0xffff00000000ffff));
 
-    sr_gdb_sharedlib_free(libraries);
+    while (libraries)
+    {
+        struct sr_gdb_sharedlib *library = libraries;
+        libraries = library->next;
+        sr_gdb_sharedlib_free(library);
+    }
 }
 
 int

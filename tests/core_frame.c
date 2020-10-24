@@ -108,6 +108,7 @@ test_core_frame_abstract_functions(void)
     g_assert_true(sr_frame_next((struct sr_frame*)frame) == (void*)0xdeadbeef);
 
     sr_frame_append_to_str((struct sr_frame*)frame, strbuf);
+    sr_core_frame_free(frame);
 
     res = g_string_free(strbuf, FALSE);
 

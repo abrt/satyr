@@ -202,6 +202,7 @@ test_distances_basic_properties(void)
             }
         }
     }
+    sr_distances_free(distances);
 }
 
 static void
@@ -245,6 +246,8 @@ test_distances_threads_compare(void)
 
     distance = sr_distances_get_distance(distances, 2, 3);
     g_assert_cmpfloat_with_epsilon(distance, 1.0, FLT_EPSILON);
+
+    sr_distances_free(distances);
 
     for (size_t i = 0; i < G_N_ELEMENTS(threads); i++)
     {
@@ -371,6 +374,8 @@ test_distances_part_conquer(void)
                 g_assert_cmpfloat_with_epsilon(lhs, rhs, FLT_EPSILON);
             }
         }
+        sr_distances_free(reference);
+        sr_distances_free(distances);
 
         for (size_t i = 0; i < G_N_ELEMENTS(threads); i++)
         {

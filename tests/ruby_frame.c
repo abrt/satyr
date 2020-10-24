@@ -54,6 +54,7 @@ test_ruby_frame_parse_fail(void)
 
     g_assert_null(frame);
     g_assert_nonnull(location.message);
+    g_free((void *)location.message);
 }
 
 static void
@@ -191,6 +192,8 @@ test_ruby_frame_to_json(void)
     json = sr_ruby_frame_to_json(frame);
 
     g_assert_cmpstr(json, ==, expected);
+
+    sr_ruby_frame_free(frame);
 }
 
 static void

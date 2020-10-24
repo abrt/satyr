@@ -77,7 +77,7 @@ test_report_add_auth(void)
     struct sr_report *report;
     struct sr_report_custom_entry *report_iterator;
     g_autofree char *json = NULL;
-    char *error = NULL;
+    g_autofree char *error = NULL;
 
     report = sr_report_new();
 
@@ -121,6 +121,10 @@ test_report_add_auth(void)
         g_assert_cmpstr(report_iterator->key, ==, expected[i][0]);
         g_assert_cmpstr(report_iterator->value, ==, expected[i][1]);
     }
+
+    g_free(report->reporter_version);
+    g_free(report->reporter_name);
+    sr_report_free(report);
 }
 
 static void

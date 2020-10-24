@@ -46,6 +46,7 @@ test_java_frame_cmp(void)
     frames[1]->file_name = tmp;
 
     tmp = frames[1]->class_path;
+    g_free(frames[1]->class_path);
     frames[1]->class_path = NULL;
     g_assert_cmpint(sr_java_frame_cmp(frames[1], frames[0]), !=, 0);
 
@@ -126,6 +127,7 @@ test_java_frame_dup(void)
         g_assert_cmpstr(frame->class_path, ==, frames[1]->class_path);
 
         g_assert_cmpint(sr_java_frame_cmp(frame, frames[1]), ==, 0);
+        sr_java_frame_free(frame);
     }
 
     /* Test the duplication with the siblings. */
@@ -318,6 +320,8 @@ test_java_frame_parse(void)
         location.column = 46;
 
         test_java_frame_parse_check(input, input + strlen(input), &frame, &location);
+        g_free(frame.name);
+        g_free(frame.file_name);
     }
 
     {
@@ -463,6 +467,8 @@ test_java_frame_parse(void)
         location.column = 0;
 
         test_java_frame_parse_check(input, input + strlen(input), &frame, &location);
+        g_free(frame.name);
+        g_free(frame.file_name);
     }
 
     {
@@ -689,6 +695,7 @@ test_java_frame_parse_exception(void)
         test_java_frame_parse_exception_check(input, input + strlen(input),
                                               "com.sun.java.NullPointer: Null Pointer Exception",
                                               exception_frame, &location);
+        sr_java_frame_free(exception_frame);
     }
 
     {
@@ -737,7 +744,14 @@ test_java_frame_parse_exception(void)
         test_java_frame_parse_exception_check(input, input + strlen(input),
                                               "com.sun.java.InvalidOperation: Invalid Operation",
                                               exception_frames[2], &location);
+        sr_java_frame_free(exception_frames[2]);
+        sr_java_frame_free(frame2);
+        sr_java_frame_free(exception_frames[1]);
+        sr_java_frame_free(frame1);
+        sr_java_frame_free(exception_frames[0]);
+        free(frame);
     }
+    
 }
 
 static void

@@ -318,6 +318,8 @@ test_js_frame_dup(void)
     g_assert_false(frame1 == frame2);
     g_assert_false(frame1->function_name == frame2->function_name);
     g_assert_false(frame1->file_name == frame2->file_name);
+    sr_js_frame_free(frame1);
+    sr_js_frame_free(frame2);
 }
 
 static void
@@ -354,6 +356,7 @@ test_js_frame_to_json(void)
         "}";
 
     char *json = sr_js_frame_to_json(frame1);
+    sr_js_frame_free(frame1);
     if (0 != strcmp(json, expected)) {
       fprintf(stderr, "%s\n!=\n%s\n", json, expected);
       g_assert_false("Invalid JSON for JavaScript frame");
@@ -405,14 +408,13 @@ test_js_frame_append_to_str(void)
 
     GString *strbuf = g_string_new(NULL);
     sr_js_frame_append_to_str(frame1, strbuf);
-    char *result = g_string_free(strbuf, FALSE);
+    g_autofree char *result = g_string_free(strbuf, FALSE);
 
     if (g_strcmp0(result, line) != 0) {
         fprintf(stderr, "'%s'\n  !=\n'%s'\n", result, line);
         g_assert_false("Failed to format JavaScript frame to string.");
     }
 
-    free(result);
     sr_js_frame_free(frame1);
 }
 
@@ -430,7 +432,7 @@ test_js_frame_generic_functions(void)
 
     GString *strbuf = g_string_new(NULL);
     sr_frame_append_to_str((struct sr_frame*)frame1, strbuf);
-    char *result = g_string_free(strbuf, FALSE);
+    g_autofree char *result = g_string_free(strbuf, FALSE);
 
     g_assert_cmpstr(result, ==, "at process._tickCallback (internal/process/next_tick.js:98:9)");
 

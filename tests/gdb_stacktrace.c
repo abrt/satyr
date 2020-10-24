@@ -109,7 +109,7 @@ test_gdb_stacktrace_limit_frame_depth(void)
     struct sr_location location;
     sr_location_init(&location);
     char *error_message;
-    char *full_input = sr_file_to_string("gdb_stacktraces/rhbz-621492", &error_message);
+    g_autofree char *full_input = sr_file_to_string("gdb_stacktraces/rhbz-621492", &error_message);
     g_assert_nonnull(full_input);
     char *input = full_input;
     struct sr_gdb_stacktrace *stacktrace = sr_gdb_stacktrace_parse((const char **)&input, &location);
@@ -155,7 +155,7 @@ test_gdb_stacktrace_quality_complex(void)
         struct sr_location location;
         sr_location_init(&location);
         char *error_message;
-        char *full_input = sr_file_to_string(t[i].path, &error_message);
+        g_autofree char *full_input = sr_file_to_string(t[i].path, &error_message);
         g_assert_nonnull(full_input);
         char *input = full_input;
         struct sr_gdb_stacktrace *stacktrace = sr_gdb_stacktrace_parse((const char **)&input, &location);
@@ -175,7 +175,7 @@ test_gdb_stacktrace_get_crash_frame(void)
     struct sr_location location;
     sr_location_init(&location);
     char *error_message;
-    char *full_input = sr_file_to_string("gdb_stacktraces/rhbz-803600", &error_message);
+    g_autofree char *full_input = sr_file_to_string("gdb_stacktraces/rhbz-803600", &error_message);
     g_assert_nonnull(full_input);
     char *input = full_input;
     struct sr_gdb_stacktrace *stacktrace = sr_gdb_stacktrace_parse((const char **)&input, &location);
@@ -194,7 +194,7 @@ test_gdb_stacktrace_parse_no_thread_header(void)
     struct sr_location location;
     sr_location_init(&location);
     char *error_message;
-    char *full_input = sr_file_to_string("gdb_stacktraces/no-thread-header", &error_message);
+    g_autofree char *full_input = sr_file_to_string("gdb_stacktraces/no-thread-header", &error_message);
     g_assert_nonnull(full_input);
     char *input = full_input;
     struct sr_gdb_stacktrace *stacktrace = sr_gdb_stacktrace_parse((const char **)&input, &location);
@@ -217,7 +217,7 @@ test_gdb_stacktrace_parse_ppc64(void)
     struct sr_location location;
     sr_location_init(&location);
     char *error_message;
-    char *full_input = sr_file_to_string("gdb_stacktraces/rhbz-1119072", &error_message);
+    g_autofree char *full_input = sr_file_to_string("gdb_stacktraces/rhbz-1119072", &error_message);
     g_assert_nonnull(full_input);
     char *input = full_input;
     struct sr_gdb_stacktrace *stacktrace = sr_gdb_stacktrace_parse((const char **)&input, &location);

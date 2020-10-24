@@ -267,9 +267,12 @@ test_parse_hexadecimal_0xuint64(void)
 static void
 test_indent(void)
 {
-    g_assert_cmpstr(sr_indent("text", 2), ==, "  text");
-    g_assert_cmpstr(sr_indent("text\n", 2), ==, "  text\n");
-    g_assert_cmpstr(sr_indent("text\n\n", 2), ==, "  text\n  \n");
+    g_autofree char *indented1 = sr_indent("text", 2);
+    g_autofree char *indented2 = sr_indent("text\n", 2);
+    g_autofree char *indented3 = sr_indent("text\n\n", 2);
+    g_assert_cmpstr(indented1, ==, "  text");
+    g_assert_cmpstr(indented2, ==, "  text\n");
+    g_assert_cmpstr(indented3, ==, "  text\n  \n");
 }
 
 void do_check(char **in, size_t inlen, char **out, size_t outlen)
@@ -311,6 +314,7 @@ test_demangle_symbol(void)
 
     char *result = sr_demangle_symbol("_ZN3Job8WaitDoneEv");
     g_assert_cmpstr(result, ==, "Job::WaitDone()");
+    free(result);
 
     result = sr_demangle_symbol("not_mangled");
     g_assert_null(result);

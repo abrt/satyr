@@ -189,12 +189,13 @@ test_java_thread_parse(void)
         g_assert_cmpint(sr_java_thread_cmp(parsed_thread, expected_thread), ==, 0);
 
         sr_java_thread_free(parsed_thread);
+        sr_java_thread_free(expected_thread);
     }
     else
     {
         /* Check that the pointer is not moved. */
-        assert(old_input == input);
-        assert(!expected_thread);
+        g_assert_true(old_input == input);
+        g_assert_null(expected_thread);
     }
 }
 

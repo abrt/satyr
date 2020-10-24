@@ -209,6 +209,7 @@ test_koops_stacktrace_parse(void)
 
         free(reason);
         free(reason2);
+
         sr_stacktrace_free(stacktrace2);
 
         sr_koops_stacktrace_free(stacktrace);
@@ -747,6 +748,7 @@ test_thread_get_duphash(void)
     fprintf(stderr, "Checkpoint 4\n");
     frame->reliable = 0;
     test(thread, "Thread\nomg_warn_slowpath_common\n", NULL);
+    sr_koops_stacktrace_free(stacktrace);
 }
 
 static void
@@ -767,7 +769,7 @@ test_koops_stacktrace_get_reason(void)
     free(full_input);
 
     char *expected_reason = "general protection fault in find_get_entry";
-    char *actual_reason = sr_koops_stacktrace_get_reason(stacktrace);
+    g_autofree char *actual_reason = sr_koops_stacktrace_get_reason(stacktrace);
     printf("%s\n%s\n", expected_reason, actual_reason);
     g_assert_cmpstr(expected_reason, ==, actual_reason);
 

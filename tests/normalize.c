@@ -56,10 +56,13 @@ test_normalize_gdb_thread(void)
     threads[0] = create_thread(5, "aa", "abort", "raise", "__assert_fail_base", "ee");
 
     threads[1] = create_thread(5, "aa", "abort", "bb", "cc", "dd");
+    g_free(threads[1]->frames->next->source_file);
     threads[1]->frames->next->source_file = g_strdup("abort.c");
 
     threads[2] = create_thread(5, "aa", "abort", "raise", "dd", "ee");
+    g_free(threads[2]->frames->next->source_file);
     threads[2]->frames->next->source_file = g_strdup("abort.c");
+    g_free(threads[2]->frames->next->next->source_file);
     threads[2]->frames->next->next->source_file = g_strdup("libc.so");
 
     sr_normalize_gdb_thread(threads[0]);
@@ -69,6 +72,10 @@ test_normalize_gdb_thread(void)
     g_assert_cmpstr(threads[0]->frames->function_name, ==, "ee");
     g_assert_cmpstr(threads[1]->frames->function_name, ==, "bb");
     g_assert_cmpstr(threads[2]->frames->function_name, ==, "dd");
+
+    sr_gdb_thread_free(threads[0]);
+    sr_gdb_thread_free(threads[1]);
+    sr_gdb_thread_free(threads[2]);
 }
 
 static void
