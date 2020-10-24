@@ -268,6 +268,7 @@ test_js_stacktrace_get_reason(void)
     {
         struct sr_js_stacktrace *stacktrace = sr_js_stacktrace_new();
         check1(stacktrace, "Error at <unknown>:0:0");
+        sr_js_stacktrace_free(stacktrace);
     }
 }
 

@@ -19,6 +19,7 @@ test_distances_cluster_objects_1(void)
     sr_distances_set_distance(distances, 2, 3, 0.7);
 
     dendrogram = sr_distances_cluster_objects(distances);
+    sr_distances_free(distances);
 
     g_assert_cmpint(dendrogram->size, ==, 4);
 
@@ -30,6 +31,7 @@ test_distances_cluster_objects_1(void)
     g_assert_cmpfloat_with_epsilon(dendrogram->merge_levels[0], 0.0, 1e-6);
     g_assert_cmpfloat_with_epsilon(dendrogram->merge_levels[1], 0.625, 1e-6);
     g_assert_cmpfloat_with_epsilon(dendrogram->merge_levels[2], 0.1, 1e-6);
+    sr_dendrogram_free(dendrogram);
 }
 
 static void
@@ -47,6 +49,7 @@ test_distances_cluster_objects_2(void)
     sr_distances_set_distance(distances, 0, 5, 0.9);
 
     dendrogram = sr_distances_cluster_objects(distances);
+    sr_distances_free(distances);
 
     g_assert_cmpint(dendrogram->size, ==, 6);
 
@@ -62,6 +65,7 @@ test_distances_cluster_objects_2(void)
     g_assert_cmpfloat_with_epsilon(dendrogram->merge_levels[2], 0.5, 1e-6);
     g_assert_cmpfloat_with_epsilon(dendrogram->merge_levels[3], 0.9, 1e-6);
     g_assert_cmpfloat_with_epsilon(dendrogram->merge_levels[4], 1.0, 1e-6);
+    sr_dendrogram_free(dendrogram);
 }
 
 static void
@@ -69,6 +73,7 @@ test_dendrogram_cut_1(void)
 {
     struct sr_dendrogram *dendrogram;
     struct sr_cluster *cluster;
+    struct sr_cluster *orig;
 
     dendrogram = sr_dendrogram_new(6);
 
@@ -92,14 +97,18 @@ test_dendrogram_cut_1(void)
     g_assert_cmpint(cluster->size, ==, 1);
     g_assert_cmpint(cluster->objects[0], ==, 5);
 
+    orig = cluster;
     cluster = cluster->next;
+    sr_cluster_free(orig);
 
     g_assert_nonnull(cluster);
 
     g_assert_cmpint(cluster->size, ==, 1);
     g_assert_cmpint(cluster->objects[0], ==, 4);
 
+    orig = cluster;
     cluster = cluster->next;
+    sr_cluster_free(orig);
 
     g_assert_nonnull(cluster);
 
@@ -107,7 +116,9 @@ test_dendrogram_cut_1(void)
     g_assert_cmpint(cluster->objects[0], ==, 1);
     g_assert_cmpint(cluster->objects[1], ==, 2);
 
+    orig = cluster;
     cluster = cluster->next;
+    sr_cluster_free(orig);
 
     g_assert_nonnull(cluster);
 

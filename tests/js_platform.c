@@ -327,6 +327,7 @@ test_js_platform_from_json(void)
             g_string_free(buf, TRUE); \
             g_assert_true(!"Failed with " #i_engine ", " #i_runtime ", " #i_frame_str); \
         } \
+        sr_js_frame_free(r_frame); \
     } while (0)
 
 static void

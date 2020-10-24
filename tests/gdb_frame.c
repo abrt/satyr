@@ -384,6 +384,7 @@ test_gdb_frame_parse_function_call(void)
                           0 == g_strcmp0(t[i].expected_function_type, function_type));
             g_assert_cmpuint(*t[i].input, ==, '\0');
             free(function_name);
+            free(function_type);
         }
         else
         {
@@ -646,8 +647,10 @@ test_gdb_frame_parse(void)
         if (frame)
         {
             g_assert_cmpint(sr_gdb_frame_cmp(frame, t[i].expected_frame, true), ==, 0);
-            puts(sr_location_to_string(&location));
-            puts(sr_location_to_string(t[i].expected_location));
+            g_autofree char *loc_str = sr_location_to_string(&location);
+            puts(loc_str);
+            g_autofree char *exp_loc_str = sr_location_to_string(t[i].expected_location);
+            puts(exp_loc_str);
             g_assert_cmpint(sr_location_cmp(&location, t[i].expected_location, true), ==, 0);
             sr_gdb_frame_free(frame);
         }

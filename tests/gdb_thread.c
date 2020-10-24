@@ -104,6 +104,7 @@ test_gdb_thread_remove_frames_above(void)
     /* Remove frames above a nonexistant frame -> should return false. */
     g_assert_false(sr_gdb_thread_remove_frames_above(&thread, frame0));
     g_assert_true(frame2 == thread.frames);
+    sr_gdb_frame_free(frame2);
 }
 
 static void

@@ -184,7 +184,7 @@ test_ruby_stacktrace_get_reason(void)
     sr_location_init(&location);
     struct sr_ruby_stacktrace *stacktrace1 = sr_ruby_stacktrace_parse(&input, &location);
 
-    char *reason = sr_ruby_stacktrace_get_reason(stacktrace1);
+    g_autofree char *reason = sr_ruby_stacktrace_get_reason(stacktrace1);
     char *expected = "RuntimeError in /usr/share/gems/gems/openshift-origin-node-1.18.0.1/lib/openshift-origin-node/utils/tc.rb:103";
     g_assert_cmpstr(reason, ==, expected);
 
@@ -218,7 +218,7 @@ test_ruby_stacktrace_to_json(void)
 
         struct sr_ruby_stacktrace *stacktrace1 = sr_ruby_stacktrace_parse(&input, &location);
 
-        char *expected = sr_file_to_string(t[i].json_filename, &error_message);
+        g_autofree char *expected = sr_file_to_string(t[i].json_filename, &error_message);
         char *json = sr_ruby_stacktrace_to_json(stacktrace1);
 
         g_assert_cmpstr(json, ==, expected);
