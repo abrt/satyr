@@ -404,6 +404,8 @@ sr_koops_stacktrace_parse(const char **input,
 next_line:
         sr_skip_char(&local_input, '\n');
     }
+    if (alt_stack)
+        free(alt_stack);
 
     *input = local_input;
     return stacktrace;
