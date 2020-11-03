@@ -131,6 +131,8 @@ sr_koops_stacktrace_free(struct sr_koops_stacktrace *stacktrace)
         sr_koops_frame_free(frame);
     }
 
+    g_strfreev(stacktrace->modules);
+
     free(stacktrace->version);
     free(stacktrace->raw_oops);
     free(stacktrace->reason);
@@ -154,6 +156,8 @@ sr_koops_stacktrace_dup(struct sr_koops_stacktrace *stacktrace)
 
     if (result->reason)
         result->reason = g_strdup(result->reason);
+
+    result->modules = g_strdupv(result->modules);
 
     return result;
 }
