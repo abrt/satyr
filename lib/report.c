@@ -363,7 +363,7 @@ sr_report_from_json(json_object *root, char **error_message)
 
     if (json_object_object_get_ex(root, "problem", &problem))
     {
-        char *report_type;
+        g_autofree char *report_type = NULL;
 
         success =
             json_check_type(problem, json_type_object, "problem", error_message) &&
