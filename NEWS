@@ -1,3 +1,7 @@
+unreleased
+==========
+Fix leaks in kernel oops stacktrace and report handling code
+
 satyr 0.31
 ==========
 Remove #define PyString_AsString PyUnicode_AsUTF8
