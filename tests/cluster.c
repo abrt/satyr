@@ -166,7 +166,7 @@ main(int    argc,
 
     g_test_add_func("/cluster/objects-distances-1", test_distances_cluster_objects_1);
     g_test_add_func("/cluster/objects-distances-2", test_distances_cluster_objects_2);
-    g_test_add_func("/dendrogram/cut-1", test_dendrogram_cut_2);
+    g_test_add_func("/dendrogram/cut-1", test_dendrogram_cut_1);
     g_test_add_func("/dendrogram/cut-2", test_dendrogram_cut_2);
 
     return g_test_run();
