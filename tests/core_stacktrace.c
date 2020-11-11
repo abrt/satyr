@@ -201,44 +201,6 @@ test_core_stacktrace_from_json(void)
     sr_core_stacktrace_free(core_stacktrace);
 }
 
-static char *
-generate_coredump(int start)
-{
-  if (start)
-  {
-      return generate_coredump(--start);
-  }
-
-  const char* coredump_pattern = "/tmp/satyr.core";
-
-  char *mypid = NULL;
-  asprintf(&mypid, "%d", getpid());
-  if (mypid == NULL)
-      err(1, "asprintf");
-
-  pid_t pid = fork();
-  if (pid < 0)
-      err(1, "fork");
-  if (pid == 0)
-  {
-      char *args[] = { "gcore", "-o", (char *)coredump_pattern, mypid, NULL };
-      execv("/usr/bin/gcore", args);
-  }
-
-  int status;
-  int r;
-  while ((r = waitpid(pid, &status, 0)) < 0)
-  {
-      if (errno != EAGAIN)
-          err(1, "waitpid");
-  }
-
-  if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
-      errx(1, "gcore failed");
-
-  return g_strdup_printf("%s.%s", coredump_pattern, mypid);
-}
-
 GString *
 run_and_get_stdout(char const **argv)
 {
