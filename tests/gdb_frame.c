@@ -76,7 +76,7 @@ test_gdb_frame_parse_frame_start(void)
 
     for (int i = 0; i < sizeof (t) / sizeof (*t); i++)
     {
-        int number;
+        uint32_t number;
         char *old_input = t[i].input;
         g_assert_cmpuint(t[i].parsed_char_count, ==, sr_gdb_frame_parse_frame_start((const char **)&t[i].input, &number));
         if (0 < t[i].parsed_char_count)

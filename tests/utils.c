@@ -258,7 +258,7 @@ test_parse_hexadecimal_0xuint64(void)
     g_assert_cmpint(11, ==, sr_parse_hexadecimal_0xuint64((const char **)&input, &num));
     g_assert_cmpint(*input, ==, ' ');
     g_assert_cmpuint(num, ==, 0xfafaffff);
-    *input++;
+    input++;
     g_assert_cmpint(18, ==, sr_parse_hexadecimal_0xuint64((const char **)&input, &num));
     g_assert_cmpint(*input, ==, '\0');
     g_assert_cmpuint(num, ==, 0x2badf00dbaadf00d);
@@ -277,7 +277,7 @@ test_indent(void)
 
 void do_check(char **in, size_t inlen, char **out, size_t outlen)
 {
-    printf("%d %d\n", inlen, outlen);
+    printf("%ld %ld\n", inlen, outlen);
     sr_struniq(in, &inlen);
     g_assert_true(inlen == outlen);
     

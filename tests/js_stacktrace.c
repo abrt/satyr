@@ -312,7 +312,7 @@ test_js_stacktrace_to_json(void)
         }
         
         const size_t elen = strlen(expected);
-        if (expected[elen - 1] = '\n') {
+        if ((expected[elen - 1] = '\n')) {
             expected[elen - 1] = '\0';
         }
         
@@ -375,7 +375,7 @@ test_js_stacktrace_from_json(void)
         }
         
         if (0 != g_strcmp0(stacktrace1->exception_name, stacktrace2->exception_name)) {
-            fprintf(stderr, "'%s': exception_name -> '%s' != '%s'\n", stacktrace1->exception_name, stacktrace2->exception_name);
+            fprintf(stderr, "test_js_stacktrace_from_json: exception_name -> '%s' != '%s'\n", stacktrace1->exception_name, stacktrace2->exception_name);
             g_assert_true(!"Error names do no match");
         }
         

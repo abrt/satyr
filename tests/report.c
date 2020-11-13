@@ -88,7 +88,7 @@ test_report_add_auth(void)
     report_iterator = report->auth_entries;
 
     for (size_t i = 0;
-         i < G_N_ELEMENTS(expected), NULL != report_iterator;
+         i < G_N_ELEMENTS(expected) && NULL != report_iterator;
          i++, report_iterator = report_iterator->next)
     {
         g_assert_cmpstr(report_iterator->key, ==, expected[i][0]);
@@ -115,7 +115,7 @@ test_report_add_auth(void)
     report_iterator = report->auth_entries;
 
     for (size_t i = 0;
-         i < G_N_ELEMENTS(expected), NULL != report_iterator;
+         i < G_N_ELEMENTS(expected) && NULL != report_iterator;
          i++, report_iterator = report_iterator->next)
     {
         g_assert_cmpstr(report_iterator->key, ==, expected[i][0]);
