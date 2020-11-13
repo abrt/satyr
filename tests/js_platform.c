@@ -10,7 +10,7 @@
     do { \
         const char *value = sr_js_engine_to_string(a_engine); \
         if (g_strcmp0(value, a_expected) != 0) { \
-            fprintf(stderr, "%s != %s\n", value, a_expected); \
+            fprintf(stderr, "%s != '%s'\n", value, a_expected ? (char *)a_expected : ""); \
             g_assert_true(!"sr_js_engine_to_string(" #a_engine ") != " #a_expected); \
         } \
     } while (0)
@@ -44,7 +44,7 @@ test_js_engine_from_string(void)
     do { \
         const char *t_value = sr_js_runtime_to_string(a_runtime); \
         if (g_strcmp0(t_value, a_expected) != 0) { \
-            fprintf(stderr, "%s != %s\n", t_value, a_expected); \
+            fprintf(stderr, "%s != '%s'\n", t_value, a_expected ? (char *)a_expected : ""); \
             g_assert_true(!"sr_js_runtime_to_string(" #a_runtime ") != " #a_expected); \
         } \
     } while (0)
@@ -78,7 +78,7 @@ static void
 test_js_platform_basics(void)
 {
     sr_js_platform_t platform;
-    g_assert_true(platform = sr_js_platform_new());
+    g_assert_true((platform = sr_js_platform_new()));
 
     sr_js_platform_init(platform, SR_JS_RUNTIME_NODEJS, SR_JS_ENGINE_V8);
 
@@ -86,7 +86,7 @@ test_js_platform_basics(void)
     g_assert_true(sr_js_platform_runtime(platform) == SR_JS_RUNTIME_NODEJS);
 
     sr_js_platform_t another_platform;
-    g_assert_true(another_platform = sr_js_platform_dup(platform));
+    g_assert_true((another_platform = sr_js_platform_dup(platform)));
 
     /* In the future we might need also the above test but now the test would
      * fail because sr_js_platform_t is a pure integer.
@@ -130,7 +130,7 @@ test_js_platform_basics(void)
         } \
         else { \
             if (g_strcmp0(r_error_message, e_error_message) != 0) { \
-                fprintf(stderr, "%s != %s\n", r_error_message, e_error_message); \
+                fprintf(stderr, "%s != %s\n", r_error_message, e_error_message ? (char *)e_error_message : ""); \
                 g_assert_true(!"Got invalid error message: sr_js_platform_from_string(" \
                         #i_runtime_str "," #i_version_str ")"); \
             } \

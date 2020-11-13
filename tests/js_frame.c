@@ -18,7 +18,7 @@
         } \
         if (    ( e_function && (g_strcmp0(r_frame->function_name, e_function) != 0)) \
              || (!e_function && r_frame->function_name)) { \
-            fprintf(stderr, "function_name -> '%s' != '%s'\n", r_frame->function_name, e_function); \
+            fprintf(stderr, "function_name -> '%s' != '%s'\n", r_frame->function_name, e_function ? (char *)e_function : ""); \
             g_assert_null(i_input); \
         } \
         if (    ( e_file && (g_strcmp0(r_frame->file_name, e_file) != 0)) \

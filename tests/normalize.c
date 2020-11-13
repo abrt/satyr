@@ -51,7 +51,6 @@ static void
 test_normalize_gdb_thread(void)
 {
     struct sr_gdb_thread *threads[3];
-    struct sr_gdb_frame *frame;
 
     threads[0] = create_thread(5, "aa", "abort", "raise", "__assert_fail_base", "ee");
 
