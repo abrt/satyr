@@ -2,6 +2,10 @@
 #define _GNU_SOURCE
 #endif
 
+#if defined _FORTIFY_SOURCE
+#undef _FORTIFY_SOURCE
+#endif
+
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
