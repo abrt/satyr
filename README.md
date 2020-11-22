@@ -56,3 +56,36 @@ With rpms:
 
     $ make rpm
     $ sudo dnf install build/x86_64/*rpm
+
+## Contributing a change
+
+### Basic git workflow:
+
+1. Fork the Satyr repository (hit fork button on https://github.com/abrt/satyr)
+
+2. Clone your fork
+
+3. Create and check out to a new branch in your clone (`git checkout -b <name_of_branch>`)
+
+4. ... make changes...
+
+5. Test your changes with `make check` and `make check-valgrind`
+
+6. Create tests for the given changes
+
+7. Add edited files (`git add <file_name>`)
+
+8. Create commit (`git commit`) [How to write a proper git commit
+   message](https://chris.beams.io/posts/git-commit/)  
+Note: You can set up a helpful commit message template for your text editor by running
+`$ git config commit.template .git-commit-template`. Remember though that
+committing with `git commit -m` defeats its purpose. You might want to rethink
+your habits.
+
+9. Push your branch (`git push -u origin <name_of_branch>`)
+
+10. Go to https://github.com/abrt/satyr and click `Compare & pull request`
+
+11. Create the PR
+
+12. Wait for review
