@@ -127,6 +127,39 @@ make check|| {
 %endif
 
 %changelog
+* Tue Nov 24 2020 Michal Fabik <mfabik@redhat.com> 0.32-1
+- README: Add instructions for contributing
+- Add a commit message template
+- tests: Don't _FORTIFY_SOURCE for dump_core.c
+- tests: Fix compiler warnings
+- NEWS: Update unreleased changes
+- report: Fix leak
+- koops_stacktrace: Copy and free modules too
+- koops_stacktrace: Fix leak
+- tests: Fix leaks
+- test: Remove unused generate_coredump
+- tests: Reintroduce dendrogram_cut test
+- tests: Finish moving away from Autotest
+- tests: Replace sr_strdup with g_strdup
+- tests: Replace sr_asprintf with g_strdup_printf
+- tests: Replace sr_strbuf with GString
+- tests: Move away from Autotest
+- spec, Makefile, RELEASE: README -> README.md
+- README: Add building instructions
+- Replace sr_strcmp0 with g_strcmp0
+- Replace sr_strdup with g_strdup
+- Replace sr_strndup with g_strndup
+- Replace sr_vasprintf with g_strdup_vprintf
+- Replace sr_asprintf with g_strdup_printf
+- Replace sr_realloc with g_realloc
+- Replace sr_malloc with g_malloc
+- Replace sr_mallocz with g_malloc0
+- Replace sr_realloc_array with g_realloc_n
+- Replace sr_malloc_array with g_malloc_n
+- Replace sr_strbuf with GString
+- Add dependency on GLib
+- lib: abrt: Drop references to fingerprinting
+
 * Tue Aug 18 2020 Michal Fabik <mfabik@redhat.com> 0.31-1
 - Bump version-info before new release
 - spec: Make some dependencies architecture-dependent

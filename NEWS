@@ -1,5 +1,8 @@
 unreleased
 ==========
+
+0.32
+==========
 Fix leaks in kernel oops stacktrace and report handling code
 
 satyr 0.31
