@@ -95,6 +95,7 @@ find %{buildroot} -name "*.la" -delete
 make check|| {
     # find and print the logs of failed test
     # do not cat tests/testsuite.log because it contains a lot of bloat
+    cat tests/test-suite.log
     find tests/testsuite.dir -name "testsuite.log" -print -exec cat '{}' \;
     exit 1
 }
