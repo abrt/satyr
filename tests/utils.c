@@ -277,7 +277,7 @@ test_indent(void)
 
 void do_check(char **in, size_t inlen, char **out, size_t outlen)
 {
-    printf("%ld %ld\n", inlen, outlen);
+    printf("%zd %zd\n", inlen, outlen);
     sr_struniq(in, &inlen);
     g_assert_true(inlen == outlen);
     
