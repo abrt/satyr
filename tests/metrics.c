@@ -21,7 +21,7 @@ typedef struct
 
 static struct sr_gdb_thread *
 create_threadv(size_t  frame_count,
-               va_list function_names)
+               char **function_names)
 {
     struct sr_gdb_thread *thread;
 
@@ -33,9 +33,8 @@ create_threadv(size_t  frame_count,
         const char *function_name;
 
         frame = sr_gdb_frame_new();
-        function_name = va_arg(function_names, const char*);
 
-        frame->function_name = g_strdup(function_name);
+        frame->function_name = g_strdup(function_names[i]);
 
         if (NULL == thread->frames)
         {
@@ -54,11 +53,21 @@ static struct sr_gdb_thread *
 create_thread(size_t frame_count,
               ...)
 {
+    struct sr_gdb_thread *thread;
+    char **function_names = g_malloc_n(frame_count + 1, sizeof (*function_names));
     va_list argp;
 
     va_start(argp, frame_count);
+    for (size_t i = 0; i < frame_count; i++)
+    {
+        function_names[i] = g_strdup(va_arg(argp, char *));
+    }
+    va_end(argp);
+    function_names[frame_count] = NULL;
+    thread = create_threadv(frame_count, function_names);
+    g_strfreev(function_names);
 
-    return create_threadv(frame_count, argp);
+    return thread;
 }
 
 static DistanceTestData *
@@ -85,7 +94,14 @@ distance_test_data_new(bool        normalize,
 
     for (size_t i = 0; i < G_N_ELEMENTS(test_data->threads); i++)
     {
-        test_data->threads[i] = create_threadv(frame_counts[i], argp);
+        char **function_names = g_malloc_n(frame_counts[i] + 1, sizeof (*function_names));
+        for (size_t j = 0; j < frame_counts[i]; j++)
+        {
+            function_names[j] = g_strdup(va_arg(argp, char *));
+        }
+        function_names[frame_counts[i]] = NULL;
+        test_data->threads[i] = create_threadv(frame_counts[i], function_names);
+        g_strfreev(function_names);
     }
 
     va_end(argp);
