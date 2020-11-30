@@ -30,7 +30,6 @@ create_threadv(size_t  frame_count,
     for (size_t i = 0; i < frame_count; i++)
     {
         struct sr_gdb_frame *frame;
-        const char *function_name;
 
         frame = sr_gdb_frame_new();
 
