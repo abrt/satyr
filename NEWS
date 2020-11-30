@@ -1,6 +1,11 @@
 unreleased
 ==========
 
+0.33
+==========
+Fix leaks in kernel oops stacktrace and report handling code
+Fix unit test portability issue
+
 0.32
 ==========
 Fix leaks in kernel oops stacktrace and report handling code

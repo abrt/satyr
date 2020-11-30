@@ -128,6 +128,12 @@ make check|| {
 %endif
 
 %changelog
+* Mon Nov 30 2020 Michal Fabik <mfabik@redhat.com> 0.33-1
+- tests: Don't pass va_list as function argument
+- spec: Output logs from failed tests
+- tests: Use correct format specifier for size_t
+- spec: Don't use GitHub-generated tarball as Source
+
 * Tue Nov 24 2020 Michal Fabik <mfabik@redhat.com> 0.32-1
 - README: Add instructions for contributing
 - Add a commit message template
