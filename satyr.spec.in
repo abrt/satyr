@@ -128,6 +128,9 @@ make check|| {
 %endif
 
 %changelog
+* Mon Nov 30 2020 Michal Fabik <mfabik@redhat.com> 0.34-1
+- tests: Drop unused var
+
 * Mon Nov 30 2020 Michal Fabik <mfabik@redhat.com> 0.33-1
 - tests: Don't pass va_list as function argument
 - spec: Output logs from failed tests
