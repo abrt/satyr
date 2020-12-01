@@ -129,6 +129,9 @@ make check|| {
 %endif
 
 %changelog
+* Tue Dec 01 2020 Michal Fabik <mfabik@redhat.com> 0.35-1
+- BR make
+
 * Mon Nov 30 2020 Michal Fabik <mfabik@redhat.com> 0.34-1
 - tests: Drop unused var
 

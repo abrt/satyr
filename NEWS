@@ -1,6 +1,12 @@
 unreleased
 ==========
 
+0.35
+==========
+Fix leaks in kernel oops stacktrace and report handling code
+Fix unit test portability issue
+Add build dependency on make
+
 0.34
 ==========
 Fix leaks in kernel oops stacktrace and report handling code
