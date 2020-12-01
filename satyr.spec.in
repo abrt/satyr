@@ -32,6 +32,7 @@ BuildRequires: rpm-devel
 BuildRequires: libtool
 BuildRequires: doxygen
 BuildRequires: pkgconfig
+BuildRequires: make
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: gdb
