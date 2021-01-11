@@ -10,7 +10,9 @@ satyr_SOURCES = satyr.c
 satyr_LDADD = lib/libsatyr.la
 
 man_MANS = satyr.1
-EXTRA_DIST = satyr.1.in
+EXTRA_DIST = \
+    satyr.1.in \
+    satyr-version
 
 dist_doc_DATA = README.md
 

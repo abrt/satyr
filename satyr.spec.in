@@ -77,6 +77,8 @@ Python 3 bindings for %{name}.
 %setup -q
 
 %build
+autoreconf
+
 %configure \
 %if %{without python3}
         --without-python3 \
