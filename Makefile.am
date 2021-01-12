@@ -40,8 +40,10 @@ RPM_DIRS = --define "_sourcedir `pwd`" \
 
 EXTRA_DIST += satyr.spec.in
 rpm: dist satyr.spec
+	./gen-version
 	rpmbuild $(RPM_DIRS) $(RPM_FLAGS) -ba satyr.spec
 srpm: dist satyr.spec
+	./gen-version
 	rpmbuild $(RPM_DIRS) -bs satyr.spec
 
 .PHONY: release-minor
