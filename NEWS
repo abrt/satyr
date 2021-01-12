@@ -1,6 +1,10 @@
 unreleased
 ==========
 
+0.36
+==========
+spec: Use autoreconf in %build
+
 0.35
 ==========
 Fix leaks in kernel oops stacktrace and report handling code

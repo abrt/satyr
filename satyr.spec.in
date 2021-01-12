@@ -131,6 +131,9 @@ make check|| {
 %endif
 
 %changelog
+* Tue Jan 12 2021 Michal Fabik <mfabik@redhat.com> 0.36-1
+- spec: Use autoreconf in %build
+
 * Tue Dec 01 2020 Michal Fabik <mfabik@redhat.com> 0.35-1
 - BR make
 
