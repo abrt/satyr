@@ -107,10 +107,13 @@ cluster_reverse(struct cluster *cluster)
 struct sr_dendrogram *
 sr_distances_cluster_objects(struct sr_distances *distances)
 {
+    assert(distances->n);
     int i, j, merges, m = distances->m, n = distances->n;
 
     struct sr_distances *cluster_distances;
     struct cluster clusters[n];
+    /* to stop gcc 11 from complaining about uninitialized variables */
+    clusters[0].objects = NULL;
 
     float merge_levels[n];
 
