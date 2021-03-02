@@ -131,6 +131,10 @@ make check|| {
 %endif
 
 %changelog
+* Tue Mar 02 2021 Michal Fabik <mfabik@redhat.com> 0.37-1
+- sr_distances_cluster_objects: Check arg safety
+- spec: Drop trailing comment
+
 * Tue Jan 12 2021 Michal Fabik <mfabik@redhat.com> 0.36-1
 - spec: Use autoreconf in %build
 

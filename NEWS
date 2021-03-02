@@ -1,6 +1,11 @@
 unreleased
 ==========
 
+0.37
+==========
+Add sr_distances_cluster_objects argument validation
+Fix var initialization warning in GCC 11
+
 0.36
 ==========
 spec: Use autoreconf in %build
