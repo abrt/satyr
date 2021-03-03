@@ -71,6 +71,11 @@ With rpms:
 
 5. Test your changes with `make check` and `make check-valgrind`
 
+(Note: When running the test suite in a docker or podman container,
+you might need to pass `--cap-add=SYS_PTRACE --security-opt seccomp=unconfined`.
+This is needed to ensure correct coredump generation and subsequent gdb operation
+in the core_stacktrace test.)
+
 6. Create tests for the given changes
 
 7. Add edited files (`git add <file_name>`)
