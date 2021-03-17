@@ -1,5 +1,6 @@
 AC_INIT([satyr], m4_esyscmd([cat ./satyr-version]), [crash-catcher@fedorahosted.org])
 AC_CANONICAL_TARGET
+AC_CANONICAL_HOST
 AC_CONFIG_HEADERS([lib/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
@@ -148,6 +149,15 @@ AC_ARG_WITH([rpm],
 AC_CHECK_LIB([stdc++], [__cxa_demangle], [], [echo "error: stdc++ library not found"; exit 1])
 
 AC_CHECK_PROGS([VALGRIND], [valgrind])
+
+case "$host_os" in
+    freebsd*)
+        AC_CHECK_HEADER([elfutils/version.h], [],
+            [AC_MSG_ERROR([elfutils/version.h is needed to build satyr])])
+        ;;
+    *)
+        ;;
+esac
 
 AC_CONFIG_FILES([
 	satyr.pc
