@@ -47,7 +47,7 @@ sr_callgraph_compute(struct sr_disasm_state *disassembler,
         if (!instructions)
         {
             sr_callgraph_free(result);
-            free(entry);
+            g_free(entry);
             return NULL;
         }
 
@@ -104,7 +104,7 @@ sr_callgraph_extend(struct sr_callgraph *callgraph,
 
     if (!instructions)
     {
-        free(entry);
+        g_free(entry);
         return NULL;
     }
 
@@ -132,7 +132,7 @@ sr_callgraph_extend(struct sr_callgraph *callgraph,
             callgraph = result;
         else if (*error_message)
         {
-            free(*error_message);
+            g_free(*error_message);
             *error_message = NULL;
         }
 
@@ -150,8 +150,8 @@ sr_callgraph_free(struct sr_callgraph *callgraph)
     {
         struct sr_callgraph *entry = callgraph;
         callgraph = entry->next;
-        free(entry->callees);
-        free(entry);
+        g_free(entry->callees);
+        g_free(entry);
     }
 }
 

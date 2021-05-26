@@ -49,7 +49,7 @@
  *   Save the section header here. Cannot be NULL.
  * @param error_message
  *   Will be filled by an error message if the function fails (returns
- *   zero).  Caller is responsible for calling free() on the string
+ *   zero).  Caller is responsible for calling g_free() on the string
  *   pointer.  If function succeeds, the pointer is not touched by the
  *   function.
  * @returns
@@ -158,7 +158,7 @@ sr_elf_get_procedure_linkage_table(const char *filename,
                                      filename,
                                      find_section_error_message);
 
-        free(find_section_error_message);
+        g_free(find_section_error_message);
         elf_end(elf);
         close(fd);
         return NULL;
@@ -334,8 +334,8 @@ sr_elf_procedure_linkage_table_free(struct sr_elf_plt_entry *entries)
     {
         struct sr_elf_plt_entry *entry = entries;
         entries = entry->next;
-        free(entry->symbol_name);
-        free(entry);
+        g_free(entry->symbol_name);
+        g_free(entry);
     }
 }
 
@@ -395,7 +395,7 @@ cie_free(struct cie *entries)
     {
         struct cie *entry = entries;
         entries = entry->next;
-        free(entry);
+        g_free(entry);
     }
 }
 
@@ -433,7 +433,7 @@ read_cie(Dwarf_CFI_Entry *cfi,
             {
                 *error_message = g_strdup_printf("Unknown FDE encoding (CIE %jx)",
                                              (uintmax_t)cfi_offset);
-                free(cie);
+                g_free(cie);
                 return NULL;
             }
 
@@ -452,7 +452,7 @@ read_cie(Dwarf_CFI_Entry *cfi,
                 *error_message = g_strdup_printf("Unknown size for personality encoding (CIE %jx)",
                                              (uintmax_t)cfi_offset);
 
-                free(cie);
+                g_free(cie);
                 return NULL;
             }
 
@@ -462,7 +462,7 @@ read_cie(Dwarf_CFI_Entry *cfi,
         default:
             *error_message = g_strdup_printf("Unknown augmentation char (CIE %jx)",
                                          (uintmax_t)cfi_offset);
-            free(cie);
+            g_free(cie);
             return NULL;
         }
 
@@ -547,7 +547,7 @@ sr_elf_get_eh_frame(const char *filename,
                                      filename,
                                      find_section_error_message);
 
-        free(find_section_error_message);
+        g_free(find_section_error_message);
         elf_end(elf);
         close(fd);
         return NULL;
@@ -673,7 +673,7 @@ sr_elf_get_eh_frame(const char *filename,
                                              filename,
                                              cie_error_message);
 
-                free(cie_error_message);
+                g_free(cie_error_message);
                 cie_free(cie_list);
                 sr_elf_eh_frame_free(result);
                 elf_end(elf);
@@ -786,7 +786,7 @@ sr_elf_eh_frame_free(struct sr_elf_fde *entries)
     {
         struct sr_elf_fde *entry = entries;
         entries = entry->next;
-        free(entry);
+        g_free(entry);
     }
 }
 
@@ -863,8 +863,8 @@ sr_elf_fde_to_json(struct sr_elf_fde *fde,
             char *fde_json = sr_elf_fde_to_json(loop, false);
             char *indented_fde_json = sr_indent_except_first_line(fde_json, 2);
             g_string_append(strbuf, indented_fde_json);
-            free(indented_fde_json);
-            free(fde_json);
+            g_free(indented_fde_json);
+            g_free(fde_json);
             loop = loop->next;
             if (loop)
                 g_string_append(strbuf, "\n");

@@ -151,7 +151,7 @@ sr_py_core_stacktrace_new(PyTypeObject *object,
         if (!stacktrace)
         {
             PyErr_SetString(PyExc_ValueError, error_msg);
-            free(error_msg);
+            g_free(error_msg);
             return NULL;
         }
     }
@@ -183,7 +183,7 @@ sr_py_core_stacktrace_str(PyObject *self)
                            (ssize_t)(PyList_Size(this->threads)));
     char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
-    free(str);
+    g_free(str);
     return result;
 }
 

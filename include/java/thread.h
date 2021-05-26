@@ -217,7 +217,7 @@ sr_java_thread_parse(const char **input,
  * comparison.
  * @returns
  * Newly allocated string, which should be released by
- * calling free().
+ * calling g_free().
  */
 char *
 sr_java_thread_format_funs(struct sr_java_thread *thread);

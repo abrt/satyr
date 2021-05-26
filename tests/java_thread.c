@@ -31,7 +31,7 @@ test_java_thread_cmp(void)
 
     threads[1] = create_real_main_thread_objects();
 
-    free(threads[1]->name);
+    g_free(threads[1]->name);
     threads[1]->name = g_strdup("worker");
 
     g_assert_cmpint(sr_java_thread_cmp(threads[0], threads[1]), !=, 0);

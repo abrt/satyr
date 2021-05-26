@@ -128,7 +128,7 @@ test_ruby_stacktrace_parse(void)
         }
 
         sr_ruby_stacktrace_free(stacktrace);
-        free((void *)file_contents);
+        g_free((void *)file_contents);
     }
 }
 
@@ -170,7 +170,7 @@ test_ruby_stacktrace_dup(void)
 
         sr_ruby_stacktrace_free(stacktrace1);
         sr_ruby_stacktrace_free(stacktrace2);
-        free((void *)file_contents);
+        g_free((void *)file_contents);
     }
 }
 
@@ -189,7 +189,7 @@ test_ruby_stacktrace_get_reason(void)
     g_assert_cmpstr(reason, ==, expected);
 
     sr_ruby_stacktrace_free(stacktrace1);
-    free((void *)file_contents);
+    g_free((void *)file_contents);
 }
 
 static void
@@ -224,8 +224,8 @@ test_ruby_stacktrace_to_json(void)
         g_assert_cmpstr(json, ==, expected);
 
         sr_ruby_stacktrace_free(stacktrace1);
-        free(json);
-        free((void *)file_contents);
+        g_free(json);
+        g_free((void *)file_contents);
     }
 }
 
@@ -268,8 +268,8 @@ test_ruby_stacktrace_from_json(void)
 
         sr_ruby_stacktrace_free(stacktrace1);
         sr_ruby_stacktrace_free(stacktrace2);
-        free(json);
-        free((void *)file_contents);
+        g_free(json);
+        g_free((void *)file_contents);
     }
 }
 

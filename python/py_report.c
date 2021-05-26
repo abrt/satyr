@@ -392,7 +392,7 @@ sr_py_report_new(PyTypeObject *object, PyObject *args, PyObject *kwds)
         if (!report)
         {
             PyErr_SetString(PyExc_ValueError, error_msg);
-            free(error_msg);
+            g_free(error_msg);
             return NULL;
         }
     }
@@ -436,14 +436,14 @@ sr_py_report_str(PyObject *object)
 
     char *type = sr_report_type_to_string(this->report->report_type);
     g_string_append_printf(buf, "Report, type: %s", type);
-    free(type);
+    g_free(type);
 
     if (this->report->component_name)
         g_string_append_printf(buf, ", component: %s", this->report->component_name);
 
     char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
-    free(str);
+    g_free(str);
     return result;
 }
 
@@ -461,7 +461,7 @@ sr_py_report_get_type(PyObject *self, void *data)
     char *type = sr_report_type_to_string(report->report->report_type);
     PyObject *res = PyString_FromString(type);
 
-    free(type);
+    g_free(type);
     return res;
 }
 
@@ -502,7 +502,7 @@ sr_py_report_to_json(PyObject *self, PyObject *args)
         return NULL;
 
     PyObject *result = PyString_FromString(json);
-    free(json);
+    g_free(json);
     return result;
 }
 

@@ -112,10 +112,10 @@ core_handle_free(struct core_handle *ch)
         struct exe_mapping_data *seg = ch->segments, *next;
         while (seg)
         {
-            free(seg->filename);
+            g_free(seg->filename);
 
             next = seg->next;
-            free(seg);
+            g_free(seg);
             seg = next;
         }
 
@@ -125,7 +125,7 @@ core_handle_free(struct core_handle *ch)
             elf_end(ch->eh);
         if (ch->fd > 0)
             close(ch->fd);
-        free(ch);
+        g_free(ch);
     }
 }
 
@@ -283,7 +283,7 @@ fail_elf:
 fail_close:
     close(ch->fd);
 fail_free:
-    free(ch);
+    g_free(ch);
 
     return NULL;
 }

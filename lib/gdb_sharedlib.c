@@ -48,8 +48,8 @@ sr_gdb_sharedlib_free(struct sr_gdb_sharedlib *sharedlib)
     if (!sharedlib)
         return;
 
-    free(sharedlib->soname);
-    free(sharedlib);
+    g_free(sharedlib->soname);
+    g_free(sharedlib);
 }
 
 struct sr_gdb_sharedlib *

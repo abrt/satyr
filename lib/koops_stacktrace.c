@@ -133,10 +133,10 @@ sr_koops_stacktrace_free(struct sr_koops_stacktrace *stacktrace)
 
     g_strfreev(stacktrace->modules);
 
-    free(stacktrace->version);
-    free(stacktrace->raw_oops);
-    free(stacktrace->reason);
-    free(stacktrace);
+    g_free(stacktrace->version);
+    g_free(stacktrace->raw_oops);
+    g_free(stacktrace->reason);
+    g_free(stacktrace);
 }
 
 struct sr_koops_stacktrace *
@@ -320,7 +320,7 @@ parse_alt_stack_start(const char **input)
         !sr_parse_char_cspan(&local_input, "> \t\n", &stack_label) ||
         !sr_skip_char(&local_input, '>'))
     {
-        free(stack_label);
+        g_free(stack_label);
         return NULL;
     }
 
@@ -383,7 +383,7 @@ sr_koops_stacktrace_parse(const char **input,
         /* <IRQ>, <NMI>, ... */
         if (parse_alt_stack_end(&local_input))
         {
-            free(alt_stack);
+            g_free(alt_stack);
             alt_stack = NULL;
         }
 
@@ -409,7 +409,7 @@ next_line:
         sr_skip_char(&local_input, '\n');
     }
     if (alt_stack)
-        free(alt_stack);
+        g_free(alt_stack);
 
     *input = local_input;
     return stacktrace;
@@ -503,7 +503,7 @@ sr_koops_stacktrace_parse_modules(const char **input)
                 }
 
                 char *tmp = g_strdup_printf("%s%s", result[result_offset-1], therest);
-                free(result[result_offset-1]);
+                g_free(result[result_offset-1]);
                 result[result_offset-1] = tmp;
             }
 
@@ -570,9 +570,9 @@ sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace)
     /* Kernel taint flags. */
     char *taint_flags = taint_flags_to_json(stacktrace);
     char *indented_taint_flags = sr_indent_except_first_line(taint_flags, strlen(",   \"taint_flags\": "));
-    free(taint_flags);
+    g_free(taint_flags);
     g_string_append_printf(strbuf, ",   \"taint_flags\": %s\n", indented_taint_flags);
-    free(indented_taint_flags);
+    g_free(indented_taint_flags);
 
     /* Modules. */
     if (stacktrace->modules)
@@ -610,8 +610,8 @@ sr_koops_stacktrace_to_json(struct sr_koops_stacktrace *stacktrace)
             char *frame_json = sr_koops_frame_to_json(frame);
             char *indented_frame_json = sr_indent_except_first_line(frame_json, 8);
             g_string_append(strbuf, indented_frame_json);
-            free(indented_frame_json);
-            free(frame_json);
+            g_free(indented_frame_json);
+            g_free(frame_json);
             frame = frame->next;
             if (frame)
                 g_string_append(strbuf, "\n");

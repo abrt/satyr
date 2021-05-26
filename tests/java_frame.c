@@ -65,12 +65,12 @@ test_java_frame_cmp(void)
     g_assert_cmpint(sr_java_frame_cmp(frames[1], exception_frames[1]), !=, 0);
     g_assert_cmpint(sr_java_frame_cmp(exception_frames[0], frames[0]), !=, 0);
 
-    free(exception_frames[1]->message);
+    g_free(exception_frames[1]->message);
     exception_frames[1]->message = NULL;
 
     g_assert_cmpint(sr_java_frame_cmp(exception_frames[0], exception_frames[1]), ==, 0);
 
-    free(exception_frames[1]->name);
+    g_free(exception_frames[1]->name);
     exception_frames[1]->name = g_strdup("com.sun.java.InvalidOperation");
 
     g_assert_cmpint(sr_java_frame_cmp(exception_frames[0], exception_frames[1]), !=, 0);
@@ -263,12 +263,12 @@ test_java_frame_append_to_str(void)
     test_java_frame_append_to_str_check(exception_frame,
                                         "com.sun.java.NullPointer: Null pointer exception");
 
-    g_clear_pointer(&exception_frame->message, free);
+    g_clear_pointer(&exception_frame->message, g_free);
 
     test_java_frame_append_to_str_check(exception_frame,
                                         "com.sun.java.NullPointer");
 
-    g_clear_pointer(&exception_frame->name, free);
+    g_clear_pointer(&exception_frame->name, g_free);
 
     test_java_frame_append_to_str_check(exception_frame, "");
 
@@ -749,7 +749,7 @@ test_java_frame_parse_exception(void)
         sr_java_frame_free(exception_frames[1]);
         sr_java_frame_free(frame1);
         sr_java_frame_free(exception_frames[0]);
-        free(frame);
+        g_free(frame);
     }
     
 }

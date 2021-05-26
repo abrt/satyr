@@ -93,11 +93,11 @@ sr_gdb_frame_free(struct sr_gdb_frame *frame)
     if (!frame)
         return;
 
-    free(frame->function_name);
-    free(frame->function_type);
-    free(frame->source_file);
-    free(frame->library_name);
-    free(frame);
+    g_free(frame->function_name);
+    g_free(frame->function_type);
+    g_free(frame->source_file);
+    g_free(frame->library_name);
+    g_free(frame);
 }
 
 struct sr_gdb_frame *
@@ -530,7 +530,7 @@ sr_gdb_frame_parse_function_name_braces(const char **input, char **target)
             0 < sr_gdb_frame_parse_function_name_template(&local_input, &namechunk))
         {
             g_string_append(buf, namechunk);
-            free(namechunk);
+            g_free(namechunk);
         }
         else
             break;
@@ -576,7 +576,7 @@ sr_gdb_frame_parse_function_name_template(const char **input, char **target)
             0 < sr_gdb_frame_parse_function_name_template(&local_input, &namechunk))
         {
             g_string_append(buf, namechunk);
-            free(namechunk);
+            g_free(namechunk);
         }
         else
             break;
@@ -641,7 +641,7 @@ sr_gdb_frame_parse_function_name(const char **input,
         if (0 < chars)
         {
             g_string_append(buf0, namechunk);
-            free(namechunk);
+            g_free(namechunk);
             location->column += chars;
         }
         else
@@ -676,7 +676,7 @@ sr_gdb_frame_parse_function_name(const char **input,
             break;
 
         g_string_append(buf0, namechunk);
-        free(namechunk);
+        g_free(namechunk);
         location->column += chars;
     }
 
@@ -722,7 +722,7 @@ sr_gdb_frame_parse_function_name(const char **input,
 
         buf1 = g_string_new(NULL);
         g_string_append(buf1, namechunk);
-        free(namechunk);
+        g_free(namechunk);
         location->column += chars;
 
         /* The rest consists of a function name parts, braces, templates...*/
@@ -746,7 +746,7 @@ sr_gdb_frame_parse_function_name(const char **input,
                 break;
 
             g_string_append(buf1, namechunk);
-            free(namechunk);
+            g_free(namechunk);
             location->column += chars;
         }
 
@@ -896,8 +896,8 @@ sr_gdb_frame_parse_function_call(const char **input,
                                         &line,
                                         &column))
     {
-        free(name);
-        free(type);
+        g_free(name);
+        g_free(type);
         location->message = "Expected a space or newline after the function name.";
         return false;
     }
@@ -906,8 +906,8 @@ sr_gdb_frame_parse_function_call(const char **input,
 
     if (!sr_gdb_frame_skip_function_args(&local_input, location))
     {
-        free(name);
-        free(type);
+        g_free(name);
+        g_free(type);
         /* The location message is set by the function returning
          * false, no need to update it here. */
         return false;
@@ -1059,7 +1059,7 @@ sr_gdb_frame_parse_file_location(const char **input,
     if((tmp = strstr(file_name, "/lib")) != NULL
        && (strstr(tmp, ".so.") != NULL
            || strcmp(tmp + strlen(tmp) - 3, ".so") == 0)) {
-        free(file_name);
+        g_free(file_name);
         file_name = NULL;
     }
 
@@ -1070,7 +1070,7 @@ sr_gdb_frame_parse_file_location(const char **input,
         location->column += digits;
         if (0 == digits)
         {
-            free(file_name);
+            g_free(file_name);
             location->message = "Expected a line number.";
             return false;
         }

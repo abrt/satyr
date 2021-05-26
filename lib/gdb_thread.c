@@ -93,7 +93,7 @@ sr_gdb_thread_free(struct sr_gdb_thread *thread)
         sr_gdb_frame_free(frame);
     }
 
-    free(thread);
+    g_free(thread);
 }
 
 struct sr_gdb_thread *
@@ -546,7 +546,7 @@ sr_gdb_thread_set_libnames(struct sr_gdb_thread *thread, struct sr_gdb_sharedlib
                 s2 += strlen(".so");
 
             if (frame->library_name)
-                free(frame->library_name);
+                g_free(frame->library_name);
             frame->library_name = g_strndup(s1, s2 - s1);
         }
         frame = frame->next;

@@ -47,7 +47,7 @@ file_contents(const char *directory, const char *file, char **error_message)
     char *path = sr_build_path(directory, file, NULL);
     char *contents = sr_file_to_string(path, error_message);
 
-    free(path);
+    g_free(path);
     return contents;
 }
 
@@ -64,7 +64,7 @@ sr_abrt_print_report_from_dir(const char *directory,
     char *json = sr_report_to_json(report);
     sr_report_free(report);
     puts(json);
-    free(json);
+    g_free(json);
     return true;
 }
 
@@ -108,8 +108,8 @@ create_core_stacktrace(const char *directory, const char *gdb_output,
         core_stacktrace = sr_parse_coredump(coredump_filename,
                 executable_contents, error_message);
 
-    free(executable_contents);
-    free(coredump_filename);
+    g_free(executable_contents);
+    g_free(coredump_filename);
     if (!core_stacktrace)
         return false;
 
@@ -127,8 +127,8 @@ create_core_stacktrace(const char *directory, const char *gdb_output,
                                     json,
                                     error_message);
 
-    free(core_backtrace_filename);
-    free(json);
+    g_free(core_backtrace_filename);
+    g_free(json);
     sr_core_stacktrace_free(core_stacktrace);
     return success;
 }
@@ -235,7 +235,7 @@ sr_abrt_parse_dso_list(const char *text)
                                                   &dso_package->release,
                                                   &dso_package->architecture);
 
-        free(nevra);
+        g_free(nevra);
 
         // If parsing failed, move to the next line.
         if (!success)
@@ -259,7 +259,7 @@ sr_abrt_parse_dso_list(const char *text)
         {
             pos = eol;
             sr_rpm_package_free(dso_package, true);
-            free(line);
+            g_free(line);
             continue;
         }
 
@@ -268,7 +268,7 @@ sr_abrt_parse_dso_list(const char *text)
         // Parse the package install time.
         int len = sr_parse_uint64((const char**)&pos,
                                   &dso_package->install_time);
-        free(line);
+        g_free(line);
 
         if (len <= 0)
         {
@@ -309,7 +309,7 @@ rpm_pkg_from_dir(struct sr_rpm_package *packages,
         *error_message = g_strdup_printf("Epoch '%s' is not a number", epoch_str);
         return NULL;
     }
-    free(epoch_str);
+    g_free(epoch_str);
 
 
     packages->epoch = (uint32_t)epoch;
@@ -355,7 +355,7 @@ rpm_dso_list_from_dir(struct sr_rpm_package *packages,
             packages = sr_rpm_package_uniq(packages);
         }
 
-        free(dso_list_contents);
+        g_free(dso_list_contents);
     }
 
     return packages;
@@ -378,7 +378,7 @@ rpm_interpreter_from_dir(struct sr_rpm_package *packages,
                                                   &interpreter_package->release,
                                                   &interpreter_package->architecture);
 
-        free(interpreter_str);
+        g_free(interpreter_str);
         if (success)
             packages = sr_rpm_package_append(packages, interpreter_package);
         else
@@ -397,7 +397,7 @@ file_exist(const char *directory, const char *filename)
     if (access(path, F_OK) == 0)
         retval = true;
 
-    free(path);
+    g_free(path);
     return retval;
 }
 
@@ -446,7 +446,7 @@ desktop_from_dir(const char *directory,
     char *desktop = strstr(environ_contents, "DESKTOP_SESSION=");
     if (!desktop)
     {
-        free(environ_contents);
+        g_free(environ_contents);
         return NULL;
     }
 
@@ -454,7 +454,7 @@ desktop_from_dir(const char *directory,
        the very first variable or preceeded by a newline */
     if (desktop != environ_contents && *(desktop - 1) != '\n')
     {
-        free(environ_contents);
+        g_free(environ_contents);
         return NULL;
     }
 
@@ -463,7 +463,7 @@ desktop_from_dir(const char *directory,
     *newline = '\0';
 
     char *result = g_strdup(desktop);
-    free(environ_contents);
+    g_free(environ_contents);
 
     return result;
 }
@@ -511,7 +511,7 @@ occurrences_from_dir(const char *directory,
     result = true;
 
 finito:
-    free(count_contents);
+    g_free(count_contents);
     return result;
 }
 
@@ -536,7 +536,7 @@ get_component(const char *directory,
 
             char *artificial_component = g_strdup_printf("%s-unpackaged", basename);
 
-            free(executable);
+            g_free(executable);
             return artificial_component;
         }
     }
@@ -555,7 +555,7 @@ sr_abrt_operating_system_from_dir(const char *directory,
     if (osinfo_contents)
     {
         success = sr_operating_system_parse_etc_os_release(osinfo_contents, os);
-        free(osinfo_contents);
+        g_free(osinfo_contents);
     }
 
     /* fall back to os_release if parsing os_info fails */
@@ -568,7 +568,7 @@ sr_abrt_operating_system_from_dir(const char *directory,
             success = sr_operating_system_parse_etc_system_release(release_contents,
                                                                    &os->name,
                                                                    &os->version);
-            free(release_contents);
+            g_free(release_contents);
         }
     }
 
@@ -607,7 +607,7 @@ sr_abrt_report_from_dir(const char *directory,
     }
 
     report->report_type = sr_abrt_type_from_type(type_contents);
-    free(type_contents);
+    g_free(type_contents);
 
     /* Operating system. */
     report->operating_system = sr_abrt_operating_system_from_dir(
@@ -650,7 +650,7 @@ sr_abrt_report_from_dir(const char *directory,
         report->stacktrace = (struct sr_stacktrace *)sr_core_stacktrace_from_json_text(
                 core_backtrace_contents, error_message);
 
-        free(core_backtrace_contents);
+        g_free(core_backtrace_contents);
         if (!report->stacktrace)
         {
             sr_report_free(report);
@@ -677,7 +677,7 @@ sr_abrt_report_from_dir(const char *directory,
             &contents_pointer,
             &location);
 
-        free(backtrace_contents);
+        g_free(backtrace_contents);
         if (!report->stacktrace)
         {
             *error_message = sr_location_to_string(&location);
@@ -717,7 +717,7 @@ sr_abrt_report_from_dir(const char *directory,
         stacktrace->version = kernel_contents;
         report->stacktrace = (struct sr_stacktrace *)stacktrace;
 
-        free(backtrace_contents);
+        g_free(backtrace_contents);
         if (!report->stacktrace)
         {
             *error_message = sr_location_to_string(&location);
@@ -744,7 +744,7 @@ sr_abrt_report_from_dir(const char *directory,
             &contents_pointer,
             &location);
 
-        free(backtrace_contents);
+        g_free(backtrace_contents);
         if (!report->stacktrace)
         {
             *error_message = sr_location_to_string(&location);
@@ -772,7 +772,7 @@ sr_abrt_report_from_dir(const char *directory,
             &contents_pointer,
             &location);
 
-        free(backtrace_contents);
+        g_free(backtrace_contents);
         if (!report->stacktrace)
         {
             *error_message = sr_location_to_string(&location);
@@ -805,7 +805,7 @@ sr_abrt_report_from_dir(const char *directory,
         sr_js_platform_t platform = sr_js_platform_from_string(analyzer_contents,
                                                                NULL,
                                                                error_message);
-        free(analyzer_contents);
+        g_free(analyzer_contents);
 
         struct sr_location location;
         sr_location_init(&location);
@@ -824,7 +824,7 @@ sr_abrt_report_from_dir(const char *directory,
             /* This message should help maintainers when a new platform
              * appears. */
             warn("Have to try to guess JavaScript platform: %s", *error_message);
-            free(*error_message);
+            g_free(*error_message);
             *error_message = NULL;
 
             report->stacktrace = (struct sr_stacktrace *)sr_js_stacktrace_parse(
@@ -832,7 +832,7 @@ sr_abrt_report_from_dir(const char *directory,
                 &location);
         }
 
-        free(backtrace_contents);
+        g_free(backtrace_contents);
         if (!report->stacktrace)
         {
             *error_message = sr_location_to_string(&location);

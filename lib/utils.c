@@ -192,7 +192,7 @@ sr_file_to_string(const char *filename,
     {
         *error_message = g_strdup_printf("Unable to read from '%s'.", filename);
         close(fd);
-        free(contents);
+        g_free(contents);
         return NULL;
     }
 
@@ -413,7 +413,7 @@ sr_parse_uint32(const char **input, uint32_t *result)
     bool failure = (errno || numstr == endptr || *endptr != '\0'
                     || r > UINT32_MAX);
 
-    free(numstr);
+    g_free(numstr);
     if (failure) /* number too big or some other error */
         return 0;
 
@@ -438,7 +438,7 @@ sr_parse_uint64(const char **input, uint64_t *result)
     unsigned long long result_tmp = strtoull(numstr, &endptr, 10);
     bool failure = (errno || numstr == endptr || *endptr != '\0'
                     || result_tmp == UINT64_MAX);
-    free(numstr);
+    g_free(numstr);
     if (failure) /* number too big or some other error */
         return 0;
     *result = result_tmp;
@@ -487,7 +487,7 @@ sr_parse_hexadecimal_uint64(const char **input, uint64_t *result)
     errno = 0;
     unsigned long long r = strtoull(numstr, &endptr, 16);
     bool failure = (errno || numstr == endptr || *endptr != '\0');
-    free(numstr);
+    g_free(numstr);
     if (failure) /* number too big or some other error */
         return 0;
 
@@ -577,7 +577,7 @@ sr_indent(const char *input, int spaces)
 
     char *indented = sr_indent_except_first_line(input, spaces);
     g_string_append(strbuf, indented);
-    free(indented);
+    g_free(indented);
 
     return g_string_free(strbuf, FALSE);
 }
@@ -740,7 +740,7 @@ anonymize_path(char *orig_path)
         {
             // Join /home/anonymized/ and ^
             new_path = g_strdup_printf("%s%s", ANONYMIZED_PATH, new_path);
-            free(orig_path);
+            g_free(orig_path);
             return new_path;
         }
     }

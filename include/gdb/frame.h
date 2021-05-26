@@ -339,7 +339,7 @@ sr_gdb_frame_parse_function_name_template_args(const char **input,
  * A pointer pointing to an uninitialized pointer. This function
  * allocates a string and sets the pointer to it if it parses the
  * function name from the input successfully.  The memory returned
- * this way must be released by the caller using the function free().
+ * this way must be released by the caller using the function g_free().
  * If this function returns true, this pointer is guaranteed to be
  * non-NULL.
  * @param location

@@ -77,7 +77,7 @@ struct sr_elf_fde
  * Reads the Procedure Linkage Table from an ELF file.
  * @param error_message
  *   Will be filled by an error message if the function fails (returns
- *   NULL).  Caller is responsible for calling free() on the string
+ *   NULL).  Caller is responsible for calling g_free() on the string
  *   pointer.  If function succeeds, the pointer is not touched by the
  *   function.
  * @returns
@@ -98,7 +98,7 @@ sr_elf_plt_find_for_address(struct sr_elf_plt_entry *plt,
  * Reads the .eh_frame section from an ELF file.
  * @param error_message
  *   Will be filled by an error message if the function fails (returns
- *   NULL).  Caller is responsible for calling free() on the string
+ *   NULL).  Caller is responsible for calling g_free() on the string
  *   pointer.  If function succeeds, the pointer is not touched by the
  *   function.
  * @returns

@@ -79,10 +79,10 @@ sr_python_frame_free(struct sr_python_frame *frame)
     if (!frame)
         return;
 
-    free(frame->file_name);
-    free(frame->function_name);
-    free(frame->line_contents);
-    free(frame);
+    g_free(frame->file_name);
+    g_free(frame->function_name);
+    g_free(frame->line_contents);
+    g_free(frame);
 }
 
 struct sr_python_frame *
@@ -232,7 +232,7 @@ sr_python_frame_parse(const char **input,
         frame->special_file = true;
         frame->file_name[strlen(frame->file_name)-1] = '\0';
         char *inside = g_strdup(frame->file_name + 1);
-        free(frame->file_name);
+        g_free(frame->file_name);
         frame->file_name = inside;
     }
 
@@ -295,7 +295,7 @@ sr_python_frame_parse(const char **input,
             frame->special_function = true;
             frame->function_name[strlen(frame->function_name)-1] = '\0';
             char *inside = g_strdup(frame->function_name + 1);
-            free(frame->function_name);
+            g_free(frame->function_name);
             frame->function_name = inside;
         }
     }

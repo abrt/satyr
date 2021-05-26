@@ -91,7 +91,7 @@ sr_java_stacktrace_free(struct sr_java_stacktrace *stacktrace)
         sr_java_thread_free(thread);
     }
 
-    free(stacktrace);
+    g_free(stacktrace);
 }
 
 struct sr_java_stacktrace *
@@ -180,8 +180,8 @@ sr_java_stacktrace_to_json(struct sr_java_stacktrace *stacktrace)
         char *thread_json = sr_java_thread_to_json(thread);
         char *indented_thread_json = sr_indent_except_first_line(thread_json, 8);
         g_string_append(strbuf, indented_thread_json);
-        free(indented_thread_json);
-        free(thread_json);
+        g_free(indented_thread_json);
+        g_free(thread_json);
         thread = thread->next;
         if (thread)
             g_string_append(strbuf, "\n");

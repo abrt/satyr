@@ -196,7 +196,7 @@ sr_parse_coredump(const char *core_file,
         else if (ret == DWARF_CB_ABORT)
         {
             set_error("%s", thread_arg.error_msg);
-            free(thread_arg.error_msg);
+            g_free(thread_arg.error_msg);
         }
         else
             set_error("Unknown error in dwfl_getthreads");
@@ -232,7 +232,7 @@ sr_core_stacktrace_unwind_state_free(struct sr_core_stracetrace_unwind_state *st
         state->dwfl = NULL;
     }
 
-    free(state);
+    g_free(state);
 }
 
 struct sr_core_stracetrace_unwind_state *
@@ -349,7 +349,7 @@ sr_core_stacktrace_from_core_hook_generate(pid_t tid,
         else if (ret == DWARF_CB_ABORT)
         {
             set_error("%s", frame_arg.error_msg);
-            free(frame_arg.error_msg);
+            g_free(frame_arg.error_msg);
         }
         else
             set_error("Unknown error in dwfl_getthreads");

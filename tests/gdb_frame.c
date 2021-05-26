@@ -177,7 +177,7 @@ test_gdb_frame_parse_function_name(void)
           printf("Function name '%s'\n", function_name);
           g_assert_cmpstr(function_name, ==, t[i].input);
           g_assert_null(function_type);
-          free(function_name);
+          g_free(function_name);
           g_assert_cmpuint(*input_with_space, ==, ' ');
         }
         else
@@ -186,7 +186,7 @@ test_gdb_frame_parse_function_name(void)
           g_assert_true(old_input_with_space == input_with_space);
         }
 
-        free(old_input_with_space);
+        g_free(old_input_with_space);
     }
 }
 
@@ -241,10 +241,10 @@ test_gdb_frame_parse_function_name_template_args(void)
 
         if (namechunk != (char *)0xDEADBEEF)
         {
-            free(namechunk);
+            g_free(namechunk);
         }
 
-        free(old_input);
+        g_free(old_input);
     }
 }
 
@@ -383,8 +383,8 @@ test_gdb_frame_parse_function_call(void)
             g_assert_true((!t[i].expected_function_type && !function_type) ||
                           0 == g_strcmp0(t[i].expected_function_type, function_type));
             g_assert_cmpuint(*t[i].input, ==, '\0');
-            free(function_name);
-            free(function_type);
+            g_free(function_name);
+            g_free(function_type);
         }
         else
         {
@@ -436,8 +436,8 @@ test_gdb_frame_parse_address_in_function(void)
             g_assert_cmpstr(function, ==, t[i].expected_function);
             g_assert_cmpuint(address, ==, t[i].expected_address);
             g_assert_cmpuint(*t[i].input, ==, '\0');
-            free(function);
-            free(type);
+            g_free(function);
+            g_free(type);
         }
         else
         {
@@ -494,7 +494,7 @@ test_gdb_frame_parse_file_location(void)
             g_assert_cmpstr(file, ==, t[i].expected_file);
             g_assert_cmpuint(line, ==, t[i].expected_line);
             g_assert_cmpuint(*t[i].input, ==, '\0');
-            free(file);
+            g_free(file);
         }
         else
         {

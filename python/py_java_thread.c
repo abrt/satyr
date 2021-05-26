@@ -169,7 +169,7 @@ sr_py_java_thread_str(PyObject *self)
     g_string_append_printf(buf, " with %zd frames", (ssize_t)(PyList_Size(this->frames)));
     char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
-    free(str);
+    g_free(str);
     return result;
 }
 

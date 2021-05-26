@@ -40,11 +40,11 @@ test_koops_stacktrace_parse_modules(void)
             offset = 0;
             while (modules[offset])
             {
-                free(modules[offset]);
+                g_free(modules[offset]);
                 ++offset;
             }
 
-            free(modules);
+            g_free(modules);
         }
         else
         {
@@ -161,8 +161,8 @@ test_koops_stacktrace_parse(void)
         char *reason2 = sr_stacktrace_get_reason((struct sr_stacktrace *)stacktrace);
         g_assert_nonnull(reason2);
         g_assert_cmpstr(reason, ==, reason2);
-        free(reason);
-        free(reason2);
+        g_free(reason);
+        g_free(reason2);
 
         int actual_taint_count =
           stacktrace->taint_module_proprietary +
@@ -207,13 +207,13 @@ test_koops_stacktrace_parse(void)
         g_assert_true(reason && reason2);
         g_assert_cmpstr(reason, ==, reason2);
 
-        free(reason);
-        free(reason2);
+        g_free(reason);
+        g_free(reason2);
 
         sr_stacktrace_free(stacktrace2);
 
         sr_koops_stacktrace_free(stacktrace);
-        free(full_input);
+        g_free(full_input);
     }
 }
 
@@ -234,7 +234,7 @@ test_koops_stacktrace_to_json(void)
 
     g_assert_nonnull(stacktrace);
     g_assert_cmpint(*input, ==, '\0');
-    free(full_input);
+    g_free(full_input);
 
     char *json = sr_koops_stacktrace_to_json(stacktrace);
     puts(json);
@@ -678,10 +678,10 @@ test_koops_stacktrace_to_json(void)
 
     char *json2 = sr_stacktrace_to_json((struct sr_stacktrace *)stacktrace);
     g_assert_cmpstr(json, ==, json2);
-    free(json2);
+    g_free(json2);
 
     sr_koops_stacktrace_free(stacktrace);
-    free(json);
+    g_free(json);
 }
 
 void generate_and_test(struct sr_thread *thread, int flags, const char *expected)
@@ -766,7 +766,7 @@ test_koops_stacktrace_get_reason(void)
 
     g_assert_nonnull(stacktrace);
     g_assert_cmpint(*input, ==, '\0');
-    free(full_input);
+    g_free(full_input);
 
     char *expected_reason = "general protection fault in find_get_entry";
     g_autofree char *actual_reason = sr_koops_stacktrace_get_reason(stacktrace);

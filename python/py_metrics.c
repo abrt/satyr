@@ -283,7 +283,7 @@ sr_py_distances_str(PyObject *self)
                            this->distances->m, this->distances->n);
     char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
-    free(str);
+    g_free(str);
     return result;
 }
 

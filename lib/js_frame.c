@@ -85,9 +85,9 @@ sr_js_frame_free(struct sr_js_frame *frame)
     if (!frame)
         return;
 
-    free(frame->file_name);
-    free(frame->function_name);
-    free(frame);
+    g_free(frame->file_name);
+    g_free(frame->function_name);
+    g_free(frame);
 }
 
 struct sr_js_frame *
