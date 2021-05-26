@@ -160,7 +160,7 @@ sr_disasm_get_callee_addresses(char **instructions)
     }
 
     /* Create the output array and fill it */
-    uint64_t *result = malloc(result_size * sizeof(uint64_t) + 1);
+    uint64_t *result = g_malloc(result_size * sizeof(*result) + 1);
     size_t result_offset = 0;
     instruction_offset = 0;
     while (instructions[instruction_offset])

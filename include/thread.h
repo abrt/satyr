@@ -156,7 +156,7 @@ sr_thread_normalize(struct sr_thread *thread);
 
 /**
  * Returns the duplication hash. Two threads resulting from the same crash
- * should have the same duphash. The returned string is allocated by malloc().
+ * should have the same duphash. The returned string is allocated by g_malloc().
  *
  * @param thread The thread to hash.
  * @param frames Number of frames to include in the hash. If the value is 0,

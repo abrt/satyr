@@ -33,7 +33,7 @@ sr_callgraph_compute(struct sr_disasm_state *disassembler,
     struct sr_callgraph *result = NULL, *last = NULL;
     while (fde_entry)
     {
-        struct sr_callgraph *entry = malloc(sizeof(struct sr_callgraph));
+        struct sr_callgraph *entry = g_malloc(sizeof(*entry));
         entry->address = fde_entry->start_address;
         entry->callees = NULL;
         entry->next = NULL;
@@ -91,7 +91,7 @@ sr_callgraph_extend(struct sr_callgraph *callgraph,
     }
 
     struct sr_callgraph *last = sr_callgraph_last(callgraph);
-    struct sr_callgraph *entry = malloc(sizeof(struct sr_callgraph));
+    struct sr_callgraph *entry = g_malloc(sizeof(*entry));
     entry->address = fde->exec_base + fde->start_address;
     entry->callees = NULL;
     entry->next = NULL;

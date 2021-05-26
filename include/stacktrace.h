@@ -124,7 +124,7 @@ sr_stacktrace_get_reason(struct sr_stacktrace *stacktrace);
  * Returns hash of a backtrace. This is a hash in the usual sense that the same
  * stacktraces always have the same hash while two distinct stacktraces have
  * negligible probability of having the same hash. The string is allocated by
- * malloc().
+ * g_malloc().
  */
 char *
 sr_stacktrace_get_bthash(struct sr_stacktrace *stacktrace, enum sr_bthash_flags flags);
