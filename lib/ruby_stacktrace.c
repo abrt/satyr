@@ -21,7 +21,6 @@
 #include "ruby/frame.h"
 #include "location.h"
 #include "utils.h"
-#include "sha1.h"
 #include "report_type.h"
 #include "generic_stacktrace.h"
 #include "generic_thread.h"

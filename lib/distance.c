@@ -22,12 +22,13 @@
 #include "frame.h"
 #include "normalize.h"
 #include "utils.h"
-#include "sha1.h"
 #include "gdb/thread.h"
 #include "internal_utils.h"
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
+
+#define SHA1_DIGEST_LEN 20
 
 float
 distance_jaro_winkler(struct sr_thread *thread1,
@@ -580,23 +581,24 @@ sr_distances_part_create(int m, int n, enum sr_distance_type dist_type,
 static uint32_t
 thread_list_checksum(struct sr_thread **threads, size_t n)
 {
-    struct sha1_ctx ctx;
+    g_autoptr(GChecksum) checksum = g_checksum_new(G_CHECKSUM_SHA1);
+
     int frame_count;
     union
     {
-        unsigned char hashbuf[SHA1_DIGEST_SIZE];
+        unsigned char hashbuf[SHA1_DIGEST_LEN];
         uint32_t truncated;
     } u;
-
-    sha1_init(&ctx);
 
     for (size_t i = 0; i < n; i++)
     {
         frame_count = sr_thread_frame_count(threads[i]);
-        sha1_update(&ctx, sizeof(frame_count), (void *)&frame_count);
+        g_checksum_update(checksum, (void *)&frame_count, sizeof(frame_count));
     }
 
-    sha1_digest(&ctx, SHA1_DIGEST_SIZE, u.hashbuf);
+    gsize digest_len = SHA1_DIGEST_LEN;
+    g_checksum_get_digest(checksum, u.hashbuf, &digest_len);
+    assert(digest_len == SHA1_DIGEST_LEN);
 
     return u.truncated;
 }

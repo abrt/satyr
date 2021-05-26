@@ -257,7 +257,7 @@ debug_duphash(int argc, char **argv)
         exit(1);
     }
 
-    free(duphash);
+    g_free(duphash);
     duphash = sr_thread_get_duphash(thread, 3, component,
                                     SR_DUPHASH_NORMAL);
     if (duphash)
@@ -267,6 +267,7 @@ debug_duphash(int argc, char **argv)
         fprintf(stderr, "Computing duphash failed\n");
         exit(1);
     }
+    g_free(duphash);
 }
 
 static void

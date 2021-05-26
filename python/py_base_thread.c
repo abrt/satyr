@@ -282,6 +282,6 @@ sr_py_base_thread_get_duphash(PyObject *self, PyObject *args, PyObject *kwds)
     }
 
     PyObject *result = PyString_FromString(hash);
-    free(hash);
+    g_free(hash);
     return result;
 }
