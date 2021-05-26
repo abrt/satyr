@@ -44,7 +44,7 @@ enum sr_report_type
     SR_REPORT_NUM
 };
 
-/* returns malloc()ed string representation of report_type */
+/* returns g_malloc()ed string representation of report_type */
 char *
 sr_report_type_to_string(enum sr_report_type report_type);
 
