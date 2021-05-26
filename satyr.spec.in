@@ -37,14 +37,12 @@ BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: gdb
 BuildRequires: gperf
-BuildRequires: nettle-devel%{?_isa}
 BuildRequires: json-c-devel%{?_isa}
 BuildRequires: glib2-devel%{?_isa}
 %if %{with python3}
 BuildRequires: python3-sphinx
 %endif
 Requires: json-c%{?_isa}
-Requires: nettle%{?_isa}
 Requires: glib2%{?_isa} >= %{glib_ver}
 
 %description

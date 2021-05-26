@@ -22,7 +22,6 @@
 
 #include "internal_utils.h"
 #include "location.h"
-#include "sha1.h"
 #include "json.h"
 
 #include "frame.h"
@@ -212,7 +211,8 @@ sr_stacktrace_get_bthash(struct sr_stacktrace *stacktrace, enum sr_bthash_flags 
         ret = g_string_free(strbuf, FALSE);
     else
     {
-        ret = sr_sha1_hash_string(strbuf->str);
+        ret = g_compute_checksum_for_string(G_CHECKSUM_SHA1, strbuf->str,
+                                            strlen(strbuf->str));
         g_string_free(strbuf, TRUE);
     }
 

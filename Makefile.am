@@ -5,7 +5,7 @@ libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status libtool
 
 bin_PROGRAMS = satyr
-satyr_CFLAGS = -Wall -Iinclude -Ilib $(GLIB_CFLAGS) $(JSON_CFLAGS) $(NETTLE_CFLAGS)
+satyr_CFLAGS = -Wall -Iinclude -Ilib $(GLIB_CFLAGS) $(JSON_CFLAGS)
 satyr_SOURCES = satyr.c
 satyr_LDADD = lib/libsatyr.la
 

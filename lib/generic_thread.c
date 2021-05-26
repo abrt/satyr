@@ -23,7 +23,6 @@
 #include "generic_frame.h"
 #include "generic_thread.h"
 #include "stacktrace.h"
-#include "sha1.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -272,7 +271,8 @@ sr_thread_get_duphash(struct sr_thread *thread, int nframes, char *prefix,
         ret = g_string_free(strbuf, FALSE);
     else
     {
-        ret = sr_sha1_hash_string(strbuf->str);
+        ret = g_compute_checksum_for_string(G_CHECKSUM_SHA1, strbuf->str,
+                                            strlen(strbuf->str));
         g_string_free(strbuf, TRUE);
     }
 

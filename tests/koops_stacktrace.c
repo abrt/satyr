@@ -708,7 +708,7 @@ void generate_and_test(struct sr_thread *thread, int flags, const char *expected
         fprintf(stderr, "'%s' != '%s'\n", expected, hash);
     }
 
-    free(hash);
+    g_free(hash);
 }
 
 void test(struct sr_thread *thread, const char *expected, const char *expected_compat)

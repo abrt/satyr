@@ -116,7 +116,6 @@ AC_CHECK_LIB([dl], [main])
 
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 PKG_CHECK_MODULES([JSON], [json-c])
-PKG_CHECK_MODULES([NETTLE], [nettle])
 
 PKG_CHECK_MODULES([LIBDW], [libdw], [AC_DEFINE([HAVE_LIBDW], [], [libdw found])])
 PKG_CHECK_MODULES([LIBELF], [libelf], [AC_DEFINE([HAVE_LIBELF], [], [libelf found])])

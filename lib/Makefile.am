@@ -16,7 +16,6 @@ libsatyr_conv_la_SOURCES = \
 	cluster.h \
 	disasm.h \
 	elves.h \
-	sha1.h \
 	unstrip.h \
 	abrt.c \
 	callgraph.c \
@@ -63,7 +62,6 @@ libsatyr_conv_la_SOURCES = \
 	js_platform.c \
 	js_frame.c \
 	js_stacktrace.c \
-	sha1.c \
 	unstrip.c \
 	utils.c
 
@@ -77,7 +75,6 @@ libsatyr_conv_la_CFLAGS = \
 	-Wall -Wformat=2 -std=gnu99 -D_GNU_SOURCE -I$(top_srcdir)/include \
 	$(GLIB_CFLAGS) \
 	$(JSON_CFLAGS) \
-	$(NETTLE_CFLAGS) \
 	$(LIBDW_CFLAGS) \
 	$(LIBELF_CFLAGS) \
 	$(LIBUNWIND_CFLAGS) \
@@ -85,7 +82,6 @@ libsatyr_conv_la_CFLAGS = \
 libsatyr_conv_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(JSON_LIBS) \
-	$(NETTLE_LIBS) \
 	$(LIBDW_LIBS) \
 	$(LIBELF_LIBS) \
 	$(LIBUNWIND_LIBS) \
