@@ -113,7 +113,7 @@ sr_json_append_escaped(GString *strbuf, const char *str)
     g_string_append_c(strbuf, '\"');
     g_string_append(strbuf, escaped_str);
     g_string_append_c(strbuf, '\"');
-    free(escaped_str);
+    g_free(escaped_str);
 
     return strbuf;
 }

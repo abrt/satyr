@@ -80,9 +80,9 @@ sr_ruby_frame_free(struct sr_ruby_frame *frame)
     if (!frame)
         return;
 
-    free(frame->file_name);
-    free(frame->function_name);
-    free(frame);
+    g_free(frame->file_name);
+    g_free(frame->function_name);
+    g_free(frame);
 }
 
 struct sr_ruby_frame *
@@ -336,7 +336,7 @@ sr_ruby_frame_parse(const char **input,
 
 fail:
     sr_ruby_frame_free(frame);
-    free(filename_lineno_in);
+    g_free(filename_lineno_in);
     return NULL;
 }
 

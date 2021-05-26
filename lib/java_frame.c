@@ -95,11 +95,11 @@ sr_java_frame_free(struct sr_java_frame *frame)
     if (!frame)
         return;
 
-    free(frame->file_name);
-    free(frame->name);
-    free(frame->class_path);
-    free(frame->message);
-    free(frame);
+    g_free(frame->file_name);
+    g_free(frame->name);
+    g_free(frame->class_path);
+    g_free(frame->message);
+    g_free(frame);
 }
 
 void

@@ -231,17 +231,17 @@ test_js_frame_cmp(void)
 
     frame2->line_column = frame1->line_column;
 
-    free(frame2->function_name);
+    g_free(frame2->function_name);
     frame2->function_name = NULL;
     g_assert_true(0 != sr_js_frame_cmp(frame1, frame2) || !"function_name - NULL");
 
     frame2->function_name = g_strdup("foo_blah");
     g_assert_true(0 != sr_js_frame_cmp(frame1, frame2) || !"function_name");
 
-    free(frame2->function_name);
+    g_free(frame2->function_name);
     frame2->function_name = g_strdup(frame1->function_name);
 
-    free(frame2->file_name);
+    g_free(frame2->file_name);
     frame2->file_name = NULL;
     g_assert_true(0 != sr_js_frame_cmp(frame1, frame2) || !"file_name - NULL");
 
@@ -281,17 +281,17 @@ test_js_frame_cmp_distance(void)
     g_assert_true(0 == sr_js_frame_cmp_distance(frame1, frame2) || !"line_column");
     frame2->line_column = frame1->line_column;
 
-    free(frame2->function_name);
+    g_free(frame2->function_name);
     frame2->function_name = NULL;
     g_assert_true(0 != sr_js_frame_cmp_distance(frame1, frame2) || !"function_name - NULL");
 
     frame2->function_name = g_strdup("foo_blah");
     g_assert_true(0 != sr_js_frame_cmp_distance(frame1, frame2) || !"function_name");
 
-    free(frame2->function_name);
+    g_free(frame2->function_name);
     frame2->function_name = g_strdup(frame1->function_name);
 
-    free(frame2->file_name);
+    g_free(frame2->file_name);
     frame2->file_name = NULL;
     g_assert_true(0 != sr_js_frame_cmp_distance(frame1, frame2) || !"file_name - NULL");
 
@@ -362,7 +362,7 @@ test_js_frame_to_json(void)
       g_assert_false("Invalid JSON for JavaScript frame");
     }
 
-    free(json);
+    g_free(json);
 }
 
 static void
@@ -391,7 +391,7 @@ test_js_frame_from_json(void)
 
     sr_js_frame_free(frame2);
     json_object_put(root);
-    free(json);
+    g_free(json);
     sr_js_frame_free(frame1);
 }
 

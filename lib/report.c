@@ -74,7 +74,7 @@ sr_report_init(struct sr_report *report)
 void
 sr_report_free(struct sr_report *report)
 {
-    free(report->component_name);
+    g_free(report->component_name);
     sr_operating_system_free(report->operating_system);
     sr_rpm_package_free(report->rpm_packages, true);
     sr_stacktrace_free(report->stacktrace);
@@ -84,14 +84,14 @@ sr_report_free(struct sr_report *report)
     {
         struct sr_report_custom_entry *tmp = iter->next;
 
-        free(iter->value);
-        free(iter->key);
-        free(iter);
+        g_free(iter->value);
+        g_free(iter->key);
+        g_free(iter);
 
         iter = tmp;
     }
 
-    free(report);
+    g_free(report);
 }
 
 void
@@ -160,7 +160,7 @@ problem_object_string(struct sr_report *report, const char *report_type)
         char *stacktrace = sr_stacktrace_to_json(report->stacktrace);
         dismantle_object(stacktrace);
         g_string_append(strbuf, stacktrace);
-        free(stacktrace);
+        g_free(stacktrace);
     }
 
     g_string_append(strbuf, "}");
@@ -203,7 +203,7 @@ sr_report_to_json(struct sr_report *report)
     g_string_append(strbuf, ",   \"reason\": ");
     sr_json_append_escaped(strbuf, reason);
     g_string_append(strbuf, "\n");
-    free(reason);
+    g_free(reason);
 
     /* Reporter name and version. */
     assert(report->reporter_name);
@@ -213,46 +213,46 @@ sr_report_to_json(struct sr_report *report)
                                  report->reporter_name,
                                  report->reporter_version);
     char *reporter_indented = sr_indent_except_first_line(reporter, strlen(",   \"reporter\": "));
-    free(reporter);
+    g_free(reporter);
     g_string_append_printf(strbuf,
                           ",   \"reporter\": %s\n",
                           reporter_indented);
-    free(reporter_indented);
+    g_free(reporter_indented);
 
     /* Operating system. */
     if (report->operating_system)
     {
         char *opsys_str = sr_operating_system_to_json(report->operating_system);
         char *opsys_str_indented = sr_indent_except_first_line(opsys_str, strlen(",   \"os\": "));
-        free(opsys_str);
+        g_free(opsys_str);
         g_string_append_printf(strbuf,
                               ",   \"os\": %s\n",
                               opsys_str_indented);
 
-        free(opsys_str_indented);
+        g_free(opsys_str_indented);
     }
 
     /* Problem section - stacktrace + other info. */
     char *problem = problem_object_string(report, report_type);
     char *problem_indented = sr_indent_except_first_line(problem, strlen(",   \"problem\": "));
-    free(problem);
-    free(report_type);
+    g_free(problem);
+    g_free(report_type);
     g_string_append_printf(strbuf,
                           ",   \"problem\": %s\n",
                           problem_indented);
-    free(problem_indented);
+    g_free(problem_indented);
 
     /* Packages. (Only RPM supported so far.) */
     if (report->rpm_packages)
     {
         char *rpms_str = sr_rpm_package_to_json(report->rpm_packages, true);
         char *rpms_str_indented = sr_indent_except_first_line(rpms_str, strlen(",   \"packages\": "));
-        free(rpms_str);
+        g_free(rpms_str);
         g_string_append_printf(strbuf,
                               ",   \"packages\": %s\n",
                               rpms_str_indented);
 
-        free(rpms_str_indented);
+        g_free(rpms_str_indented);
     }
     /* If there is no package, attach empty list (packages is a mandatory field) */
     else

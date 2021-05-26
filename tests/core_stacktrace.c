@@ -193,7 +193,7 @@ test_core_stacktrace_from_json(void)
     full_input = sr_file_to_string("json_files/core-01", NULL);
     core_stacktrace = sr_core_stacktrace_from_json_text(full_input, NULL);
     stacktrace = sr_stacktrace_parse(SR_REPORT_CORE, full_input, NULL);
-    free(full_input);
+    g_free(full_input);
 
     test_core_stacktrace_from_json_check(core_stacktrace);
     test_core_stacktrace_from_json_check((struct sr_core_stacktrace *)stacktrace);

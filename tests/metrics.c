@@ -116,7 +116,7 @@ distance_test_data_free(DistanceTestData *data)
         sr_gdb_thread_free(data->threads[i]);
     }
 
-    free(data);
+    g_free(data);
 }
 
 static void

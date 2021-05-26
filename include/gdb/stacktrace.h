@@ -196,7 +196,7 @@ sr_gdb_stacktrace_quality_complex(struct sr_gdb_stacktrace *stacktrace);
  * function.
  * @returns
  * This function never returns NULL. The caller is responsible for
- * releasing the returned memory using function free().
+ * releasing the returned memory using function g_free().
  */
 char *
 sr_gdb_stacktrace_to_text(struct sr_gdb_stacktrace *stacktrace,
@@ -317,7 +317,7 @@ sr_gdb_stacktrace_set_libnames(struct sr_gdb_stacktrace *stacktrace);
  * @returns
  * Brief text representation of the crash thread suitable for being part of a
  * bugzilla comment. The string is allocated by the function and must be freed
- * using the free() function.
+ * using the g_free() function.
  */
 char *
 sr_gdb_stacktrace_to_short_text(struct sr_gdb_stacktrace *stacktrace,

@@ -57,15 +57,15 @@ sr_rpm_package_free(struct sr_rpm_package *package,
     if (!package)
         return;
 
-    free(package->name);
-    free(package->version);
-    free(package->release);
-    free(package->architecture);
+    g_free(package->name);
+    g_free(package->version);
+    g_free(package->release);
+    g_free(package->architecture);
     sr_rpm_consistency_free(package->consistency, true);
     if (package->next && recursive)
         sr_rpm_package_free(package->next, true);
 
-    free(package);
+    g_free(package);
 }
 
 int
@@ -199,7 +199,7 @@ sr_rpm_package_sort(struct sr_rpm_package *packages)
     }
 
     struct sr_rpm_package *result = array[0];
-    free(array);
+    g_free(array);
     return result;
 }
 
@@ -481,8 +481,8 @@ sr_rpm_package_to_json(struct sr_rpm_package *package,
             char *package_json = sr_rpm_package_to_json(p, false);
             char *indented_package_json = sr_indent_except_first_line(package_json, 2);
             g_string_append(strbuf, indented_package_json);
-            free(indented_package_json);
-            free(package_json);
+            g_free(indented_package_json);
+            g_free(package_json);
             p = p->next;
             if (p)
                 g_string_append(strbuf, "\n");
@@ -763,14 +763,14 @@ sr_rpm_package_parse_nevra(const char *text,
 
         if (failure)
         {
-            free(epoch_str);
-            free(*release);
-            free(*architecture);
+            g_free(epoch_str);
+            g_free(*release);
+            g_free(*architecture);
             return false;
         }
 
         *epoch = r;
-        free(epoch_str);
+        g_free(epoch_str);
     }
     else
     {
@@ -810,11 +810,11 @@ sr_rpm_consistency_free(struct sr_rpm_consistency *consistency,
     if (!consistency)
         return;
 
-    free(consistency->path);
+    g_free(consistency->path);
     if (consistency->next && recursive)
         sr_rpm_consistency_free(consistency->next, true);
 
-    free(consistency);
+    g_free(consistency);
 }
 
 int

@@ -232,7 +232,7 @@ sr_py_gdb_frame_str(PyObject *self)
         g_string_append_printf(buf, " (%s)", this->frame->library_name);
     char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
-    free(str);
+    g_free(str);
     return result;
 }
 

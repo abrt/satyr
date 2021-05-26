@@ -72,7 +72,7 @@ unwind_thread(struct UCD_info *ui,
             if (unw_get_proc_name(&c, funcname, funcname_len, NULL) == 0)
                 entry->function_name = funcname;
             else
-                free(funcname);
+                g_free(funcname);
         }
 
         trace = sr_core_frame_append(trace, entry);

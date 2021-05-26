@@ -107,8 +107,8 @@ sr_python_stacktrace_free(struct sr_python_stacktrace *stacktrace)
         sr_python_frame_free(frame);
     }
 
-    free(stacktrace->exception_name);
-    free(stacktrace);
+    g_free(stacktrace->exception_name);
+    g_free(stacktrace);
 }
 
 struct sr_python_stacktrace *
@@ -279,8 +279,8 @@ sr_python_stacktrace_to_json(struct sr_python_stacktrace *stacktrace)
             char *frame_json = sr_python_frame_to_json(frame);
             char *indented_frame_json = sr_indent_except_first_line(frame_json, 8);
             g_string_append(strbuf, indented_frame_json);
-            free(indented_frame_json);
-            free(frame_json);
+            g_free(indented_frame_json);
+            g_free(frame_json);
             frame = frame->next;
             if (frame)
                 g_string_append(strbuf, "\n");

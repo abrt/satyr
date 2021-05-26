@@ -275,7 +275,7 @@ sr_py_single_stacktrace_to_short_text(PyObject *self, PyObject *args)
 
     PyObject *result = PyString_FromString(text);
 
-    free(text);
+    g_free(text);
     return result;
 }
 
@@ -298,7 +298,7 @@ sr_py_multi_stacktrace_to_short_text(PyObject *self, PyObject *args)
 
     PyObject *result = PyString_FromString(text);
 
-    free(text);
+    g_free(text);
     return result;
 }
 
@@ -324,7 +324,7 @@ sr_py_single_stacktrace_get_bthash(PyObject *self, PyObject *args)
     }
 
     PyObject *result = PyString_FromString(hash);
-    free(hash);
+    g_free(hash);
     return result;
 }
 
@@ -348,7 +348,7 @@ sr_py_multi_stacktrace_get_bthash(PyObject *self, PyObject *args)
     }
 
     PyObject *result = PyString_FromString(hash);
-    free(hash);
+    g_free(hash);
     return result;
 }
 

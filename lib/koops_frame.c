@@ -80,12 +80,12 @@ sr_koops_frame_free(struct sr_koops_frame *frame)
     if (!frame)
         return;
 
-    free(frame->function_name);
-    free(frame->module_name);
-    free(frame->from_function_name);
-    free(frame->from_module_name);
-    free(frame->special_stack);
-    free(frame);
+    g_free(frame->function_name);
+    g_free(frame->module_name);
+    g_free(frame->from_function_name);
+    g_free(frame->from_module_name);
+    g_free(frame->special_stack);
+    g_free(frame);
 }
 
 struct sr_koops_frame *
@@ -508,7 +508,7 @@ sr_koops_parse_module_name(const char **input,
 
     if (!sr_skip_char(&local_input, ']'))
     {
-        free(*module_name);
+        g_free(*module_name);
         *module_name = NULL;
         return false;
     }
@@ -553,7 +553,7 @@ sr_koops_parse_function(const char **input,
 
         if (!sr_skip_char(&local_input, '/'))
         {
-            free(*function_name);
+            g_free(*function_name);
             *function_name = NULL;
             return false;
         }
@@ -574,11 +574,11 @@ sr_koops_parse_function(const char **input,
 
     if (parenthesis && !sr_skip_char(&local_input, ')'))
     {
-        free(*function_name);
+        g_free(*function_name);
         *function_name = NULL;
         if (has_module)
         {
-            free(*module_name);
+            g_free(*module_name);
             *module_name = NULL;
         }
 

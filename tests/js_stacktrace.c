@@ -75,7 +75,7 @@ check_valid(char *filename, char *exc_name, unsigned frame_count,
     }
 
     sr_js_stacktrace_free(stacktrace);
-    free(file_contents);
+    g_free(file_contents);
 }
 
 void
@@ -224,7 +224,7 @@ test_js_stacktrace_dup(void)
         
         sr_js_stacktrace_free(stacktrace1);
         sr_js_stacktrace_free(stacktrace2);
-        free(file_contents);
+        g_free(file_contents);
     }
 }
 
@@ -236,7 +236,7 @@ check1(struct sr_js_stacktrace *stacktrace, const char *expected)
         fprintf(stderr, "reason -> '%s' != '%s'\n", reason, expected);
         g_assert_true(!"Invalid reason");
     }
-    free(reason);
+    g_free(reason);
 }
 
 static void
@@ -263,7 +263,7 @@ test_js_stacktrace_get_reason(void)
         check1(stacktrace1, "ReferenceError at /tmp/index.js:2:1");
 
         sr_js_stacktrace_free(stacktrace1);
-        free(file_contents);
+        g_free(file_contents);
     }
     {
         struct sr_js_stacktrace *stacktrace = sr_js_stacktrace_new();
@@ -322,10 +322,10 @@ test_js_stacktrace_to_json(void)
             abort();
         }
         
-        free(json);
-        free(expected);
+        g_free(json);
+        g_free(expected);
         sr_js_stacktrace_free(stacktrace);
-        free(file_contents);
+        g_free(file_contents);
     }
 }
 
@@ -406,9 +406,9 @@ test_js_stacktrace_from_json(void)
         }
         
         sr_js_stacktrace_free(stacktrace2);
-        free(json_file_contents);
+        g_free(json_file_contents);
         sr_js_stacktrace_free(stacktrace1);
-        free(file_contents);
+        g_free(file_contents);
     }
 }
 

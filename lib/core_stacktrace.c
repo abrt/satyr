@@ -101,9 +101,9 @@ sr_core_stacktrace_free(struct sr_core_stacktrace *stacktrace)
     }
 
     if (stacktrace->executable)
-        free(stacktrace->executable);
+        g_free(stacktrace->executable);
 
-    free(stacktrace);
+    g_free(stacktrace);
 }
 
 struct sr_core_stacktrace *
@@ -287,8 +287,8 @@ sr_core_stacktrace_to_json(struct sr_core_stacktrace *stacktrace)
         char *indented_thread_json = sr_indent_except_first_line(thread_json, 8);
 
         g_string_append(strbuf, indented_thread_json);
-        free(indented_thread_json);
-        free(thread_json);
+        g_free(indented_thread_json);
+        g_free(thread_json);
         thread = thread->next;
         if (thread)
             g_string_append(strbuf, "\n");

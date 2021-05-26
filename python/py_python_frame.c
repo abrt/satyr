@@ -187,7 +187,7 @@ sr_py_python_frame_str(PyObject *self)
 
     char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
-    free(str);
+    g_free(str);
     return result;
 }
 

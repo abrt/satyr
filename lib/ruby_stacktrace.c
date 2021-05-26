@@ -106,8 +106,8 @@ sr_ruby_stacktrace_free(struct sr_ruby_stacktrace *stacktrace)
         sr_ruby_frame_free(frame);
     }
 
-    free(stacktrace->exception_name);
-    free(stacktrace);
+    g_free(stacktrace->exception_name);
+    g_free(stacktrace);
 }
 
 struct sr_ruby_stacktrace *
@@ -219,7 +219,7 @@ sr_ruby_stacktrace_parse(const char **input,
     }
 
     /* Throw away the message, it may contain sensitive data. */
-    free(message_and_class);
+    g_free(message_and_class);
     message_and_class = p = NULL;
 
     /* /some/thing.rb:13:in `method': exception message (Exception::Class)\n\tfrom ...
@@ -265,7 +265,7 @@ sr_ruby_stacktrace_parse(const char **input,
 
 fail:
     sr_ruby_stacktrace_free(stacktrace);
-    free(message_and_class);
+    g_free(message_and_class);
     return NULL;
 }
 
@@ -297,8 +297,8 @@ sr_ruby_stacktrace_to_json(struct sr_ruby_stacktrace *stacktrace)
             char *frame_json = sr_ruby_frame_to_json(frame);
             char *indented_frame_json = sr_indent_except_first_line(frame_json, 8);
             g_string_append(strbuf, indented_frame_json);
-            free(indented_frame_json);
-            free(frame_json);
+            g_free(indented_frame_json);
+            g_free(frame_json);
             frame = frame->next;
             if (frame)
                 g_string_append(strbuf, "\n");

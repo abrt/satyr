@@ -45,9 +45,9 @@ sr_dendrogram_free(struct sr_dendrogram *dendrogram)
 {
     if (!dendrogram)
         return;
-    free(dendrogram->order);
-    free(dendrogram->merge_levels);
-    free(dendrogram);
+    g_free(dendrogram->order);
+    g_free(dendrogram->merge_levels);
+    g_free(dendrogram);
 }
 
 struct cluster
@@ -67,7 +67,7 @@ cluster_init(struct cluster *cluster)
 static void
 cluster_clean(struct cluster *cluster)
 {
-    free(cluster->objects);
+    g_free(cluster->objects);
     cluster_init(cluster);
 }
 
@@ -281,8 +281,8 @@ sr_cluster_free(struct sr_cluster *cluster)
 {
     if (!cluster)
         return;
-    free(cluster->objects);
-    free(cluster);
+    g_free(cluster->objects);
+    g_free(cluster);
 }
 
 struct sr_cluster *

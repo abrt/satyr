@@ -101,7 +101,7 @@ sr_py_base_frame_short_string(PyObject *self, PyObject *args)
     char *str = g_string_free(strbuf, FALSE);
 
     PyObject *result = PyString_FromString(str);
-    free(str);
+    g_free(str);
     return result;
 }
 

@@ -234,8 +234,8 @@ sr_js_platform_from_json(json_object *root, char **error_message)
     sr_js_platform_init(platform, engine, runtime);
 
 fail:
-    free(engine_str);
-    free(runtime_str);
+    g_free(engine_str);
+    g_free(runtime_str);
     return platform;
 }
 

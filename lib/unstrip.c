@@ -120,10 +120,10 @@ sr_unstrip_free(struct sr_unstrip_entry *entries)
     {
         struct sr_unstrip_entry *entry = entries;
         entries = entry->next;
-        free(entry->build_id);
-        free(entry->file_name);
-        free(entry->mod_name);
-        free(entry);
+        g_free(entry->build_id);
+        g_free(entry->file_name);
+        g_free(entry->mod_name);
+        g_free(entry);
     }
 }
 

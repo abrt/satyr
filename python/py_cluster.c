@@ -122,7 +122,7 @@ sr_py_dendrogram_str(PyObject *self)
                           this->dendrogram->size);
     char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
-    free(str);
+    g_free(str);
     return result;
 }
 

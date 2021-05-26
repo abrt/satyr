@@ -84,11 +84,11 @@ sr_core_frame_free(struct sr_core_frame *frame)
     if (!frame)
         return;
 
-    free(frame->build_id);
-    free(frame->function_name);
-    free(frame->file_name);
-    free(frame->fingerprint);
-    free(frame);
+    g_free(frame->build_id);
+    g_free(frame->function_name);
+    g_free(frame->file_name);
+    g_free(frame->fingerprint);
+    g_free(frame);
 }
 
 struct sr_core_frame *

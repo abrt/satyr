@@ -251,7 +251,7 @@ sr_gdb_thread_parse_funs(const char *input);
  * comparison.
  * @returns
  * Newly allocated string, which should be released by
- * calling free(). The string can be parsed by sr_gdb_thread_parse_funs().
+ * calling g_free(). The string can be parsed by sr_gdb_thread_parse_funs().
  */
 char *
 sr_gdb_thread_format_funs(struct sr_gdb_thread *thread);

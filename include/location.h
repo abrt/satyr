@@ -88,7 +88,7 @@ sr_location_cmp(struct sr_location *location1,
 
 /**
  * Creates a string representation of location.
- * User must delete the returned string using free().
+ * User must delete the returned string using g_free().
  */
 char *
 sr_location_to_string(struct sr_location *location);

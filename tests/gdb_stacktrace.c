@@ -98,7 +98,7 @@ test_gdb_stacktrace_find_crash_thread(void)
         g_assert_true(crash_thread == crash_thread2);
 
         sr_gdb_stacktrace_free(stacktrace);
-        free(full_input);
+        g_free(full_input);
     }
 }
 

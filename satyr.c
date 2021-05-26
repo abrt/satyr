@@ -96,7 +96,7 @@ abrt_print_report_from_dir(int argc, char **argv)
     if (!success)
     {
         fprintf(stderr, "%s\n", error_message);
-        free(error_message);
+        g_free(error_message);
         exit(1);
     }
 }
@@ -125,7 +125,7 @@ abrt_create_core_stacktrace(int argc, char **argv)
     if (!success)
     {
         fprintf(stderr, "%s\n", error_message);
-        free(error_message);
+        g_free(error_message);
         exit(1);
     }
 }
@@ -200,7 +200,7 @@ debug_normalize(int argc, char **argv)
     sr_gdb_thread_append_to_str(thread, strbuf, false);
     puts(strbuf->str);
 
-    free(text);
+    g_free(text);
     g_string_free(strbuf, TRUE);
 }
 
@@ -342,7 +342,7 @@ debug_unwind_from_hook(int argc, char **argv)
         exit(1);
     }
 
-    free(json);
+    g_free(json);
     sr_core_stacktrace_free(core_stacktrace);
 }
 

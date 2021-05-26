@@ -265,8 +265,8 @@ distance_levenshtein(struct sr_thread *thread1,
     }
 
     int result = dist[n];
-    free(dist);
-    free(dist1);
+    g_free(dist);
+    g_free(dist1);
 
     return (float)result / max_frame_count;
 }
@@ -353,8 +353,8 @@ sr_distances_free(struct sr_distances *distances)
     if (!distances)
         return;
 
-    free(distances->distances);
-    free(distances);
+    g_free(distances->distances);
+    g_free(distances);
 }
 
 float
@@ -691,9 +691,9 @@ sr_distances_part_free(struct sr_distances_part *part, bool follow_links)
     struct sr_distances_part *next = part->next;
 
     if (part->distances)
-        free(part->distances);
+        g_free(part->distances);
 
-    free(part);
+    g_free(part);
 
     if (follow_links)
         sr_distances_part_free(next, true);

@@ -134,7 +134,7 @@ test_js_platform_basics(void)
                 g_assert_true(!"Got invalid error message: sr_js_platform_from_string(" \
                         #i_runtime_str "," #i_version_str ")"); \
             } \
-            free(r_error_message); \
+            g_free(r_error_message); \
         } \
     } while (0)
 
@@ -181,7 +181,7 @@ test_js_platform_from_string(void)
             fprintf(stderr, "%s\n!=\n%s\n", r_json, e_json); \
             g_assert_true(!"sr_js_platform_to_json(("#i_runtime","#i_engine"))");\
         } \
-        free(r_json); \
+        g_free(r_json); \
     } while (0)
 
 static void
@@ -257,7 +257,7 @@ test_js_platform_to_json(void)
                 g_assert_true(!"Got invalid error message: sr_js_platform_from_json(" \
                         #i_json_str ")"); \
             } \
-            free(r_error_message); \
+            g_free(r_error_message); \
         } \
     } while (0)
 

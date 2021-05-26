@@ -53,13 +53,13 @@ sr_operating_system_free(struct sr_operating_system *operating_system)
     if (!operating_system)
         return;
 
-    free(operating_system->name);
-    free(operating_system->version);
-    free(operating_system->architecture);
-    free(operating_system->cpe);
-    free(operating_system->desktop);
-    free(operating_system->variant);
-    free(operating_system);
+    g_free(operating_system->name);
+    g_free(operating_system->version);
+    g_free(operating_system->architecture);
+    g_free(operating_system->cpe);
+    g_free(operating_system->desktop);
+    g_free(operating_system->variant);
+    g_free(operating_system);
 }
 
 char *
@@ -214,9 +214,9 @@ os_release_callback(char *key, char *value, void *data)
     else if (0 == strcmp(key, "VERSION") && strstr(value, "(Rawhide)"))
     {
         if (operating_system->version)
-            free(operating_system->version);
+            g_free(operating_system->version);
         operating_system->version = g_strdup("rawhide");
-        free(value);
+        g_free(value);
     }
     else if (0 == strcmp(key, "CPE_NAME"))
     {
@@ -228,9 +228,9 @@ os_release_callback(char *key, char *value, void *data)
     }
     else
     {
-        free(value);
+        g_free(value);
     }
-    free(key);
+    g_free(key);
 }
 
 bool

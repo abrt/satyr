@@ -84,7 +84,7 @@ sr_core_thread_free(struct sr_core_thread *thread)
         sr_core_frame_free(frame);
     }
 
-    free(thread);
+    g_free(thread);
 }
 
 struct sr_core_thread *
@@ -247,8 +247,8 @@ sr_core_thread_to_json(struct sr_core_thread *thread, bool is_crash_thread)
             char *frame_json = sr_core_frame_to_json(frame);
             char *indented_frame_json = sr_indent_except_first_line(frame_json, 8);
             g_string_append(strbuf, indented_frame_json);
-            free(indented_frame_json);
-            free(frame_json);
+            g_free(indented_frame_json);
+            g_free(frame_json);
             frame = frame->next;
             if (frame)
                 g_string_append(strbuf, "\n");

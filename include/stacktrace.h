@@ -73,7 +73,7 @@ sr_stacktrace_parse(enum sr_report_type type, const char *input, char **error_me
 
 /**
  * Returns short textual representation of given stacktrace. At most max_frames
- * are printed. Caller needs to free the result using free() afterwards.
+ * are printed. Caller needs to free the result using g_free() afterwards.
  */
 char *
 sr_stacktrace_to_short_text(struct sr_stacktrace *stacktrace, int max_frames);

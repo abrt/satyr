@@ -181,10 +181,10 @@ test_parse_char_span(void)
     g_assert_true(*input == 'c' && strcmp(result, "ab") == 0);
     g_assert_cmpint(0, ==, sr_parse_char_span((const char **)&input, "ba", &result));
     g_assert_true(*input == 'c' && strcmp(result, "ab") == 0);
-    free(result);
+    g_free(result);
     g_assert_cmpint(2, ==, sr_parse_char_span((const char **)&input, "ecfd", &result));
     g_assert_true(*input == '\0' && strcmp(result, "cd") == 0);
-    free(result);
+    g_free(result);
 }
 
 static void
@@ -196,10 +196,10 @@ test_parse_char_cspan(void)
     g_assert_true(*input == 'c' && strcmp(result, "ab") == 0);
     g_assert_false(sr_parse_char_cspan((const char **)&input, "c", &result));
     g_assert_true(*input == 'c' && strcmp(result, "ab") == 0);
-    free(result);
+    g_free(result);
     g_assert_true(sr_parse_char_cspan((const char **)&input, "e", &result));
     g_assert_true(*input == '\0' && strcmp(result, "cd") == 0);
-    free(result);
+    g_free(result);
 }
 
 static void
@@ -221,7 +221,7 @@ test_parse_string(void)
     g_assert_true(sr_parse_string((const char **)&input, "ab", &result));
     g_assert_cmpstr(result, ==, "ab");
     g_assert_cmpint(*input, ==, 'c');
-    free(result);
+    g_free(result);
 }
 
 static void

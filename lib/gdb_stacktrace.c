@@ -116,7 +116,7 @@ sr_gdb_stacktrace_free(struct sr_gdb_stacktrace *stacktrace)
     if (stacktrace->crash)
         sr_gdb_frame_free(stacktrace->crash);
 
-    free(stacktrace);
+    g_free(stacktrace);
 }
 
 struct sr_gdb_stacktrace *

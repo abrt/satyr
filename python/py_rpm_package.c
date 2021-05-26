@@ -188,7 +188,7 @@ sr_py_rpm_package_str(PyObject *object)
 
     char *str = g_string_free(buf, FALSE);
     PyObject *result = Py_BuildValue("s", str);
-    free(str);
+    g_free(str);
     return result;
 }
 
