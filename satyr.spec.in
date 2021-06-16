@@ -129,6 +129,8 @@ make check|| {
 %endif
 
 %changelog
+* Wed Jun 16 2021 Michal Fabik <mfabik@redhat.com> -1
+
 * Tue Mar 02 2021 Michal Fabik <mfabik@redhat.com> 0.37-1
 - sr_distances_cluster_objects: Check arg safety
 - spec: Drop trailing comment

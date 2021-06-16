@@ -1,6 +1,10 @@
 unreleased
 ==========
 
+0.38
+==========
+lib: Use GLib for computing SHA-1 digests
+
 0.37
 ==========
 Add sr_distances_cluster_objects argument validation
