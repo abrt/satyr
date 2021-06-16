@@ -129,6 +129,12 @@ make check|| {
 %endif
 
 %changelog
+* Wed Jun 16 2021 Michal Fabik <mfabik@redhat.com> 0.38-1
+- Release
+- lib: Use GLib for computing SHA-1 digests
+- configure: Add check for elfutils on FreeBSD
+- README: Document running testsuite in container
+
 * Wed Jun 16 2021 Michal Fabik <mfabik@redhat.com> -1
 
 * Tue Mar 02 2021 Michal Fabik <mfabik@redhat.com> 0.37-1
