@@ -1,4 +1,6 @@
-#! /bin/sh
+#!/bin/sh
+
+set -x
 
 print_help()
 {
