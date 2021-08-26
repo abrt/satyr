@@ -1,0 +1,7 @@
+comment:
+  # Only comment on a pull request if code coverage changes.
+  require_changes: true
+
+fixes:
+  # Fix file structure imposed by GitHub Actions runners.
+  - "/__w/satyr/satyr/::"
