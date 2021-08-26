@@ -1,4 +1,5 @@
-![Build](https://github.com/abrt/satyr/workflows/Build/badge.svg)
+[![Build](https://github.com/abrt/satyr/workflows/Build/badge.svg)](https://github.com/abrt/satyr/actions/workflows/check.yml)
+[![codecov](https://codecov.io/gh/abrt/satyr/branch/master/graph/badge.svg?token=AHUkZe3dV6)](https://codecov.io/gh/abrt/satyr)
 
 ## About Satyr
 
