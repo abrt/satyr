@@ -7,6 +7,44 @@
 #include <stdint.h>
 
 static void
+test_rpm_package_cmp(void)
+{
+    struct sr_rpm_package *p1;
+    struct sr_rpm_package *p2;
+
+    p1 = sr_rpm_package_new();
+    p2 = sr_rpm_package_new();
+
+    p1->name = g_strdup("coreutils");
+    p1->version = g_strdup("8.32");
+    p1->release = g_strdup("19.fc33");
+    p1->architecture = g_strdup("x86_64");
+    p1->install_time = 1627139000;
+    p1->next = p2;
+
+    p2->name = g_strdup("coreutils");
+    p2->version = g_strdup("8.32");
+    p2->release = g_strdup("21.fc33");
+    p2->architecture = g_strdup("x86_64");
+    p2->install_time = 1627139000;
+    p2->next = NULL;
+
+    g_assert_cmpint(sr_rpm_package_cmp(p1, p2), <, 0);
+
+    g_free(p1->release);
+    p1->release = g_strdup(p2->release);
+    p1->install_time += 3600;
+
+    g_assert_cmpint(sr_rpm_package_cmp(p1, p2), >, 0);
+
+    p1->install_time = p2->install_time;
+
+    g_assert_cmpint(sr_rpm_package_cmp(p1, p2), ==, 0);
+
+    sr_rpm_package_free(p1, true);
+}
+
+static void
 test_rpm_package_parse_nvr(void)
 {
     g_autofree char *name = NULL;
@@ -200,6 +238,7 @@ main(int    argc,
 {
     g_test_init(&argc, &argv, NULL);
 
+    g_test_add_func("/rpm/package-cmp", test_rpm_package_cmp);
     g_test_add_func("/rpm/package-parse-nvr", test_rpm_package_parse_nvr);
     g_test_add_func("/rpm/package-parse-nevra", test_rpm_package_parse_nevra);
 
