@@ -179,9 +179,9 @@ class TestCoreFrame(BindingsTestCase):
 
     def test_str(self):
         out = str(self.frame)
-        self.assertEquals(out, '[0x0000003739a35935] raise cc10c72da62c93033e227ffbe2670f2c4fbbde1a+0x35935 '
-                               '[/usr/lib64/libc-2.15.so] '
-                               'fingerprint: f33186a4c862fb0751bca60701f553b829210477 (hashed)')
+        self.assertEqual(out, '[0x0000003739a35935] raise cc10c72da62c93033e227ffbe2670f2c4fbbde1a+0x35935 '
+                              '[/usr/lib64/libc-2.15.so] '
+                              'fingerprint: f33186a4c862fb0751bca60701f553b829210477 (hashed)')
 
     def test_dup(self):
         dup = self.frame.dup()
