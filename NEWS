@@ -1,6 +1,12 @@
 unreleased
 ==========
 
+0.39
+==========
+Use g_malloc() and g_free() instead of malloc()/free() in many instances
+Fix call to a deprecated in Python tests
+Add test case for sr_rpm_package_cmp()
+
 0.38
 ==========
 lib: Use GLib for computing SHA-1 digests

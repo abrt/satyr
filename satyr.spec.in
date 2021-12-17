@@ -129,6 +129,16 @@ make check|| {
 %endif
 
 %changelog
+* Fri Dec 17 2021 Matěj Grabovský <mgrabovs@redhat.com> 0.39-1
+- tests: Fix call to deprecated method
+- gitignore: Update local rules
+- tests: Add test case for sr_rpm_package_cmp
+- readme: Add Codecov badge
+- github: Calculate and upload code coverage to Codecov
+- autogen: Show executed commands
+- Use g_malloc instead of malloc
+- Use matching g_free for g_malloc'd memory
+
 * Wed Jun 16 2021 Michal Fabik <mfabik@redhat.com> 0.38-1
 - Release
 - lib: Use GLib for computing SHA-1 digests
