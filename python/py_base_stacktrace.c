@@ -19,7 +19,6 @@
 */
 #include <glib.h>
 #include "py_common.h"
-#include "py_base_thread.h"
 #include "py_base_stacktrace.h"
 
 #include "stacktrace.h"
