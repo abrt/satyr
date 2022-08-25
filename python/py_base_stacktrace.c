@@ -17,7 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
+#include <glib.h>
 #include "py_common.h"
 #include "py_base_thread.h"
 #include "py_base_stacktrace.h"
