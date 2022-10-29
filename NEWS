@@ -1,5 +1,6 @@
 unreleased
 ==========
+Add support for fine-grained error location lines in Python tracebacks
 
 0.39
 ==========

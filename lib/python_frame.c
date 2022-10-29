@@ -207,6 +207,39 @@ sr_python_frame_parse(const char **input,
 {
     const char *local_input = *input;
 
+    /*
+     * Skip fine-grained error location lines (See: PEP 657),
+     * and syntax error lines. Such lines only contain '^' and '~'
+     * characters.
+     *
+     * Example:
+     *
+     * Traceback (most recent call last):
+     *   File "test.py", line 2, in <module>
+     *     x['a']['b']['c']['d'] = 1
+     *     ~~~~~~~~~~~^^^^^
+     * TypeError: 'NoneType' object is not subscriptable
+     */
+    bool is_error_location_line = true;
+    const char *tmp_input = local_input;
+    while (*tmp_input != '\n' && *tmp_input != '\0')
+    {
+        if (*tmp_input != ' ' && *tmp_input != '^' && *tmp_input != '~')
+        {
+            is_error_location_line = false;
+            break;
+        }
+        ++tmp_input;
+    }
+
+    if (is_error_location_line)
+    {
+        /* Skip the error location line */
+        sr_skip_char_cspan(&local_input, "\n");
+        ++local_input;
+        *input = local_input;
+    }
+
     if (0 == sr_skip_string(&local_input, "  File \""))
     {
         location->message = g_strdup_printf("Frame header not found.");

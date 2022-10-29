@@ -215,27 +215,6 @@ sr_python_stacktrace_parse(const char **input,
         return NULL;
     }
 
-    bool invalid_syntax_pointer = true;
-    const char *tmp_input = local_input;
-    while (*tmp_input != '\n' && *tmp_input != '\0')
-    {
-        if (*tmp_input != ' ' && *tmp_input != '^')
-        {
-            invalid_syntax_pointer = false;
-            break;
-        }
-        ++tmp_input;
-    }
-
-    if (invalid_syntax_pointer)
-    {
-        /* Skip line "   ^" pointing to the invalid code */
-        sr_skip_char_cspan(&local_input, "\n");
-        ++local_input;
-        ++location->line;
-        location->column = 1;
-    }
-
     /* Parse exception name. */
     if (!sr_parse_char_cspan(&local_input, ":\n", &stacktrace->exception_name))
     {
