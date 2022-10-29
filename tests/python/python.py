@@ -181,6 +181,22 @@ class TestPythonStacktrace(BindingsTestCase):
         self.assertTrue(f.special_function)
         self.assertFalse(f.special_file)
 
+    def test_fine_grained_error_location(self):
+        trace = load_input_contents('../python_stacktraces/python-06')
+        trace = satyr.PythonStacktrace(trace)
+
+        self.assertEqual(len(trace.frames), 1)
+        self.assertEqual(trace.exception_name, 'ZeroDivisionError')
+
+        f = trace.frames[0]
+        self.assertEqual(f.file_name, '/usr/bin/will_python3_raise')
+        self.assertEqual(f.function_name, "module")
+        self.assertEqual(f.file_line, 3)
+        self.assertEqual(f.line_contents, '0/0')
+        self.assertTrue(f.special_function)
+        self.assertFalse(f.special_file)
+
+
 class TestPythonFrame(BindingsTestCase):
     def setUp(self):
         self.frame = satyr.PythonStacktrace(contents).frames[-1]

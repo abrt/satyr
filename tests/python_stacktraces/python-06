@@ -1,0 +1,18 @@
+will_python3_raise:3:<module>:ZeroDivisionError: division by zero
+
+Traceback (most recent call last):
+  File "/usr/bin/will_python3_raise", line 3, in <module>
+    0/0
+    ~^~
+ZeroDivisionError: division by zero
+
+Local variables in innermost frame:
+__name__: '__main__'
+__doc__: None
+__package__: None
+__loader__: <_frozen_importlib_external.SourceFileLoader object at 0x7fd295c62c50>
+__spec__: None
+__annotations__: {}
+__builtins__: <module 'builtins' (built-in)>
+__file__: '/usr/bin/will_python3_raise'
+__cached__: None
