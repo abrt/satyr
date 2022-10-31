@@ -129,6 +129,11 @@ make check|| {
 %endif
 
 %changelog
+* Mon Oct 31 2022 Michal Srb <michal@redhat.com> 0.40-1
+- Add support for fine-grained error location lines in Python tracebacks
+- py_base_stacktrace.c: Avoid duplicate include of py_base_thread.h
+- py_base_stacktrace.c: include glib.h
+
 * Fri Dec 17 2021 Matěj Grabovský <mgrabovs@redhat.com> 0.39-1
 - tests: Fix call to deprecated method
 - gitignore: Update local rules
