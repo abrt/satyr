@@ -215,6 +215,20 @@ sr_gdb_frame_is_removable(const char *function_name,
     return false;
 }
 
+void sr_normalize_gdb_frame(struct sr_gdb_frame *frame)
+{
+    if (frame && frame->source_file)
+    {
+        /* Remove IA__ prefix used in GLib, GTK and GDK. */
+        remove_func_prefix(frame->function_name, "IA__gdk", strlen("IA__"));
+        remove_func_prefix(frame->function_name, "IA__g_", strlen("IA__"));
+        remove_func_prefix(frame->function_name, "IA__gtk", strlen("IA__"));
+
+        /* Remove __GI_ (glibc internal) prefix. */
+        remove_func_prefix(frame->function_name, "__GI_", strlen("__GI_"));
+    }
+}
+
 void
 sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
 {
@@ -234,17 +248,7 @@ sr_normalize_gdb_thread(struct sr_gdb_thread *thread)
     struct sr_gdb_frame *frame = thread->frames;
     while (frame)
     {
-        if (frame->source_file)
-        {
-            /* Remove IA__ prefix used in GLib, GTK and GDK. */
-            remove_func_prefix(frame->function_name, "IA__gdk", strlen("IA__"));
-            remove_func_prefix(frame->function_name, "IA__g_", strlen("IA__"));
-            remove_func_prefix(frame->function_name, "IA__gtk", strlen("IA__"));
-
-            /* Remove __GI_ (glibc internal) prefix. */
-            remove_func_prefix(frame->function_name, "__GI_", strlen("__GI_"));
-        }
-
+        sr_normalize_gdb_frame(frame);
         frame = frame->next;
     }
 
@@ -506,6 +510,10 @@ sr_normalize_gdb_stacktrace(struct sr_gdb_stacktrace *stacktrace)
     {
         sr_normalize_gdb_thread(thread);
         thread = thread->next;
+    }
+
+    if (stacktrace->crash) {
+        sr_normalize_gdb_frame(stacktrace->crash);
     }
 }
 

@@ -532,7 +532,9 @@ sr_py_gdb_stacktrace_normalize(PyObject *self, PyObject *args)
     Py_DECREF(this->threads);
 
     this->stacktrace->threads = tmp->threads;
+    this->stacktrace->crash = tmp->crash;
     tmp->threads = NULL;
+    tmp->crash = NULL;
     sr_gdb_stacktrace_free(tmp);
 
     this->threads = thread_linked_list_to_python_list(this->stacktrace);
