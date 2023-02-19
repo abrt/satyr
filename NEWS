@@ -1,6 +1,10 @@
 unreleased
 ==========
 
+0.41
+==========
+Normalize both gdb stacktrace and the crash frame (rhbz#2168223)
+
 0.40
 ==========
 Add support for fine-grained error location lines in Python tracebacks
