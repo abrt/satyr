@@ -129,6 +129,10 @@ make check|| {
 %endif
 
 %changelog
+* Sun Feb 19 2023 Michal Srb <michal@redhat.com> 0.41-1
+- Normalize both gdb stacktrace and the crash frame
+- Use SPDX format for license field
+
 * Mon Oct 31 2022 Michal Srb <michal@redhat.com> 0.40-1
 - Add support for fine-grained error location lines in Python tracebacks
 - py_base_stacktrace.c: Avoid duplicate include of py_base_thread.h
