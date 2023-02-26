@@ -505,6 +505,20 @@ sr_normalize_core_thread(struct sr_core_thread *thread)
 void
 sr_normalize_gdb_stacktrace(struct sr_gdb_stacktrace *stacktrace)
 {
+
+    if (stacktrace->crash_tid == UINT32_MAX)
+    {
+        // We don't have the crash thread id yet and it will be more
+        // difficult to find the crach thread once we normalize the stacktrace.
+        // So let's just look for it now and remember it.
+        struct sr_gdb_thread *crash_thread;
+        crash_thread = sr_gdb_stacktrace_find_crash_thread(stacktrace);
+        if (crash_thread)
+        {
+            stacktrace->crash_tid = crash_thread->tid;
+        }
+    }
+
     struct sr_gdb_thread *thread = stacktrace->threads;
     while (thread)
     {
