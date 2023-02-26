@@ -129,6 +129,9 @@ make check|| {
 %endif
 
 %changelog
+* Sun Feb 26 2023 Michal Srb <michal@redhat.com> 0.42-1
+- Find crash thread before stacktrace is normalized
+
 * Sun Feb 19 2023 Michal Srb <michal@redhat.com> 0.41-1
 - Normalize both gdb stacktrace and the crash frame
 - Use SPDX format for license field
