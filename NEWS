@@ -1,6 +1,10 @@
 unreleased
 ==========
 
+0.42
+==========
+Find crash thread before stacktrace is normalized
+
 0.41
 ==========
 Normalize both gdb stacktrace and the crash frame (rhbz#2168223)
