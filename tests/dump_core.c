@@ -15,7 +15,11 @@
 
 static char const *prefix = "/tmp/satyr.core";
 
+#if __clang__
+__attribute__((optnone))  
+#else
 __attribute__((optimize((0))))
+#endif
 int
 dump_core(int    depth,
           char **name)
