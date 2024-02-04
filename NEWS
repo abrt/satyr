@@ -1,5 +1,6 @@
-unreleased
+0.43
 ==========
+Fix test failure when using clang (Thanks to Alex)
 
 0.42
 ==========

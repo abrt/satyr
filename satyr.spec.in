@@ -129,6 +129,9 @@ make check|| {
 %endif
 
 %changelog
+* Sun Feb 04 2024 Michal Srb <michal@redhat.com> 0.43-1
+- (HEAD -> master, origin/master, origin/HEAD) Fix test suit core_stacktrace fail using clang
+
 * Sun Feb 26 2023 Michal Srb <michal@redhat.com> 0.42-1
 - Find crash thread before stacktrace is normalized
 
