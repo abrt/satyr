@@ -15,7 +15,7 @@
 
 static char const *prefix = "/tmp/satyr.core";
 
-#if __clang__
+#if defined(__clang__)
 __attribute__((optnone))  
 #else
 __attribute__((optimize((0))))
