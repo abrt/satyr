@@ -37,7 +37,7 @@ jobs:
         run: make check
 
       - name: Upload test log
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: testsuite.log
           path: tests/testsuite.log
