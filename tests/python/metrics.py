@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, get_start_method, get_context
 
 from test_helpers import *
 
@@ -142,6 +142,17 @@ class TestDistances(unittest.TestCase):
         self.assert_correct_matrix(dist_from_parts, self.threads)
 
     def test_distances_part_parallel(self):
+
+        # On macOS and newly non-macOS POSIX systems (since Python 3.14),
+        # the default method has been changed to forkserver.
+        # The code in this module does not work with it,
+        # hence the explicit change to 'fork'
+        # See https://github.com/python/cpython/issues/125714
+        if get_start_method() == "forkserver":
+            _mp_context = get_context(method="fork")
+        else:
+            _mp_context = get_context()
+
         def do_test(threads, nparts):
             parts = satyr.DistancesPart.create(len(threads), nparts)
 
@@ -156,7 +167,7 @@ class TestDistances(unittest.TestCase):
             result_queue = Queue()
             processes = []
             for p in parts:
-                processes.append(Process(target=compute_part, args=(p, result_queue)))
+                processes.append(_mp_context.Process(target=compute_part, args=(p, result_queue)))
                 processes[-1].start()
 
             parts = []
